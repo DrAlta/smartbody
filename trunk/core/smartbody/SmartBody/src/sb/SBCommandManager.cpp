@@ -23,6 +23,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAttribute.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 #include <sstream>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/MiscCommands.h>
@@ -94,7 +95,7 @@ bool SequenceManager::removeSequence(const std::string& seqName, bool deleteSequ
 		}
 	}
 
-	LOG("Could not find sequence in active sequence queue. Please check code - this should not happen.");
+	SmartBody::util::log("Could not find sequence in active sequence queue. Please check code - this should not happen.");
 	return false;
 }
 
@@ -350,7 +351,7 @@ int SBCommandManager::execute( const char *key, char* strArgs )
 
 int SBCommandManager::execute( char *cmd )
 { 
-	//LOG("execute cmd = %s\n",cmd);
+	//SmartBody::util::log("execute cmd = %s\n",cmd);
 	// check to see if this is a sequence command
 	// if so, save the command id
 	std::string checkCmd = cmd;
@@ -380,7 +381,7 @@ int SBCommandManager::execute_seq( srCmdSeq *seq, const char* seq_name )
 //	seq_p->print();
 
 	if ( !activeSequences.addSequence( seq_name, seq ) ) {
-		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_name );
+		SmartBody::util::log("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_name );
 		return CMD_FAILURE;
 	}	
 
@@ -402,7 +403,7 @@ int SBCommandManager::execute_seq_chain( const std::vector<std::string>& seq_nam
 	FILE* first_file_p = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( first_seq_name.c_str(), fullPath );
 	if( first_file_p == NULL ) {
 		if( error_prefix )
-			LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
+			SmartBody::util::log("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -411,7 +412,7 @@ int SBCommandManager::execute_seq_chain( const std::vector<std::string>& seq_nam
 	fclose( first_file_p );
 	if( parse_result != CMD_SUCCESS ) {
 		if( error_prefix )
-			LOG("%s Unable to parse sequence\"%s\".", error_prefix, first_seq_name.c_str());
+			SmartBody::util::log("%s Unable to parse sequence\"%s\".", error_prefix, first_seq_name.c_str());
 
 		delete seq_p;
 		seq_p = NULL;
@@ -428,7 +429,7 @@ int SBCommandManager::execute_seq_chain( const std::vector<std::string>& seq_nam
 		FILE* file = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( next_seq.c_str(), fullPath );
 		if( file == NULL ) {
 			if( error_prefix )
-				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq.c_str() );
+				SmartBody::util::log("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq.c_str() );
 			return CMD_FAILURE;
 		} else {
 			fclose( file );
@@ -452,7 +453,7 @@ int SBCommandManager::execute_seq_chain( const std::vector<std::string>& seq_nam
 		int result = seq_p->insert( time, oss.str().c_str() );
 		if( result != CMD_SUCCESS ) {
 			if( error_prefix )
-				LOG("%s Failed to insert seq-chain command at time %f", error_prefix, time);
+				SmartBody::util::log("%s Failed to insert seq-chain command at time %f", error_prefix, time);
 
 			delete seq_p;
 			seq_p = NULL;
@@ -512,13 +513,13 @@ srCmdSeq* SBCommandManager::lookup_seq( const char* name )
 			fclose( file );
 
 			if( err != CMD_SUCCESS ) {
-				LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", name ); 
+				SmartBody::util::log("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", name ); 
 
 				delete seq;
 				seq = NULL;
 			}
 		} else {
-			LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", name ); 
+			SmartBody::util::log("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", name ); 
 		}
 	}
 	
@@ -568,7 +569,7 @@ int SBCommandManager::mcu_set_func( srArgBuffer& args, SmartBody::SBCommandManag
     int result = SmartBody::SBScene::getScene()->getCommandManager()->set_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		LOG("SmartBody error: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
+		SmartBody::util::log("SmartBody error: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -585,7 +586,7 @@ int SBCommandManager::mcu_print_func( srArgBuffer& args, SmartBody::SBCommandMan
     int result = SmartBody::SBScene::getScene()->getCommandManager()->print_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		LOG("SmartBody error: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
+		SmartBody::util::log("SmartBody error: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -601,7 +602,7 @@ int SBCommandManager::mcu_test_func( srArgBuffer& args, SmartBody::SBCommandMana
     char* arg = args.read_token();
     int result = SmartBody::SBScene::getScene()->getCommandManager()->test_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
-		LOG("SmartBody error: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
+		SmartBody::util::log("SmartBody error: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;

@@ -21,6 +21,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "SBReach.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include <controllers/MeCtBodyReachState.h>
 #include <controllers/MeCtReachEngine.h>
 
@@ -63,7 +64,7 @@ void SBReach::addMotion(std::string type, SBMotion* motion)
 {
 	if (!_character)
 	{
-		LOG("No character present, motion %s was not added to reach.", motion->getName().c_str());
+		SmartBody::util::log("No character present, motion %s was not added to reach.", motion->getName().c_str());
 		return;
 	}
 
@@ -79,7 +80,7 @@ void SBReach::addMotion(std::string type, SBMotion* motion)
 	}
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}
 }
@@ -88,7 +89,7 @@ void SBReach::removeMotion(std::string type, SBMotion* motion)
 {
 	if (!_character)
 	{
-		LOG("No character present, motion %s was not removed from reach.", motion->getName().c_str());
+		SmartBody::util::log("No character present, motion %s was not removed from reach.", motion->getName().c_str());
 		return;
 	}
 
@@ -103,7 +104,7 @@ void SBReach::removeMotion(std::string type, SBMotion* motion)
 	}	
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}
 }
@@ -189,7 +190,7 @@ void SBReach::setPointHandMotion( std::string type, SBMotion* pointMotion )
 	}
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}	
 
@@ -216,7 +217,7 @@ void SBReach::setGrabHandMotion(std::string type, SBMotion* grabMotion)
 	}
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}	
 }
@@ -242,7 +243,7 @@ void SBReach::setReleaseHandMotion(std::string type, SBMotion* releasebMotion)
 	}
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}	
 }
@@ -268,7 +269,7 @@ void SBReach::setReachHandMotion(std::string type, SBMotion* reachMotion)
 	}
 	else
 	{
-		LOG("Please use 'LEFT' or 'RIGHT'");
+		SmartBody::util::log("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}	
 }

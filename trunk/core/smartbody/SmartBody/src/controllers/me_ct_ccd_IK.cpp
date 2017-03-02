@@ -54,7 +54,7 @@ void MeCtCCDIK::CCDUpdate( MeCtIKTreeNode* startNode, EffectorConstraint* con )
 	while (pNode != startNode)
 	{		
 		if (!pNode->lock && pNode->active)
-		//LOG("node name = %s\n",pNode->nodeName.c_str());
+		//SmartBody::util::log("node name = %s\n",pNode->nodeName.c_str());
 		{
 			CCDIteration(pNode,con);
 			pNode->lock = true;
@@ -66,7 +66,7 @@ void MeCtCCDIK::CCDUpdate( MeCtIKTreeNode* startNode, EffectorConstraint* con )
 void MeCtCCDIK::CCDIteration(MeCtIKTreeNode* startNode, EffectorConstraint* con )
 {	
 	SrVec targetPos = con->getPosConstraint();
-	//LOG("target pos = %s")
+	//SmartBody::util::log("target pos = %s")
 	//sr_out << "targetPos = " << targetPos << srnl;
 	MeCtIKTreeNode* endEffector = ikScenario->findIKTreeNode(con->efffectorName.c_str());
 	if (!endEffector)

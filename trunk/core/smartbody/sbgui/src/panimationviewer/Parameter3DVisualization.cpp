@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "Parameter3DVisualization.h"
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
@@ -32,7 +32,7 @@ VisualizationBase::~VisualizationBase()
 
 void VisualizationBase::draw()
 {
-	//LOG("Para3D Draw()\n");
+	//SmartBody::util::log("Para3D Draw()\n");
 
 	if (!visible()) 
 		return;
@@ -397,7 +397,7 @@ Parameter3DVisualization::~Parameter3DVisualization()
 
 void Parameter3DVisualization::draw()
 {
-	//LOG("Para3D Draw()\n");
+	//SmartBody::util::log("Para3D Draw()\n");
 
 	if (!visible()) 
 		return;
@@ -480,8 +480,8 @@ void Parameter3DVisualization::draw()
 
 SrVec Parameter3DVisualization::determineScale(float& largestScale)
 {
-	SrVec min(99999, 99999, 99999);
-	SrVec max(-99999, -99999, -99999);
+	SrVec minVal(99999, 99999, 99999);
+	SrVec maxVal(-99999, -99999, -99999);
 
 	// determine the tetrahedron scale
 	for (unsigned int i = 0; i < blendData->state->getParameters().size(); i++)
@@ -489,15 +489,15 @@ SrVec Parameter3DVisualization::determineScale(float& largestScale)
 		SrVec& param = blendData->state->getParameters()[i];
 		for (int x = 0; x < 3; x++)
 		{
-			if (param[x] < min[x])
-				min[x] = param[x];
-			if (param[x] > max[x])
-				max[x] = param[x];
+			if (param[x] < minVal[x])
+				minVal[x] = param[x];
+			if (param[x] > maxVal[x])
+				maxVal[x] = param[x];
 		}
 	}
 
 	SrVec scale(1.0f, 1.0f, 1.0f);
-	SrVec sizes(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
+	SrVec sizes(maxVal[0] - minVal[0], maxVal[1] - minVal[1], maxVal[2] - minVal[2]);
 	float largest = 0;
 	if (sizes[0] > sizes[1])
 	{

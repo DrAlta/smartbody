@@ -20,7 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
-#include "vhcl.h"
+
 
 #include "controllers/me_ct_locomotion_navigator.hpp"
 
@@ -471,7 +471,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		routine_stack.set(i, routine);
 	}
 	pre_orientation_angle = orientation_angle;
-	//LOG("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
+	//SmartBody::util::log("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
 	if(limb_blending_factor == 0.0f)
 	{
 		local_vel.set(0.0f, 0.0f, 0.0f);

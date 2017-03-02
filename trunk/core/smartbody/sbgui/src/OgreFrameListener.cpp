@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
@@ -391,7 +391,7 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 				//}
 			}			
 		}
-		//LOG("Num of visible characters = %d",numVisibleCharacters);
+		//SmartBody::util::log("Num of visible characters = %d",numVisibleCharacters);
 	}
 	
 

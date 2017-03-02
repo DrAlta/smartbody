@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ParamAnimTransitionCreatorWidget.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>

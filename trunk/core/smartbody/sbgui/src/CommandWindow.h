@@ -66,9 +66,10 @@ that is distributed: */
 #include <string>
 #include <vector>
 #include <sbm/GenericViewer.h>
+#include <sb/SBUtilities.h>
 
 
-class CommandWindow : public GenericViewer, public Fl_Double_Window, public vhcl::Log::Listener
+class CommandWindow : public GenericViewer, public Fl_Double_Window, public SmartBody::util::Listener
 {
 public:
 	CommandWindow(int, int, int, int, const char*);

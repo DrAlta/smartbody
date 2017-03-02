@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimTransitionEditor2.h"
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Hold_Browser.H>

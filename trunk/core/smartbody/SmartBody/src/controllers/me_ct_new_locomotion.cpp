@@ -352,7 +352,7 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 			continue;
 		float tempdist = d(qInit,qEval);
 		//if(tempdist>0.7f)
-			//LOG("%s  :  %f", node->getNodeName().c_str(), tempdist);
+			//SmartBody::util::log("%s  :  %f", node->getNodeName().c_str(), tempdist);
 		tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
 	}
 	//*/
@@ -374,7 +374,7 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 		float tempdist = d(qInit,qEval);
 		//if(tempdist>0.7f)
 		//{
-			//LOG("%s  :  %f", node->getNodeName().c_str(), tempdist);
+			//SmartBody::util::log("%s  :  %f", node->getNodeName().c_str(), tempdist);
 		//}
 		tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
 	}

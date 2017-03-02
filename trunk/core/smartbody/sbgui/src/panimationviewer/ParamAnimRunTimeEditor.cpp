@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimRunTimeEditor.h"
 #include <FL/gl.h>
 #include <FL/fl_draw.H>

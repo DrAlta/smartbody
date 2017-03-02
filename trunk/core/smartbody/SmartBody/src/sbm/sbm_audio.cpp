@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "vhcl_audio.h"
 #include <sstream>
 #include <cstdlib>
+#include <sb/SBUtilities.h>
 
 
 vhcl::Audio * g_audio = NULL;
@@ -34,17 +35,17 @@ vhcl::Audio * g_audio = NULL;
 
 bool AUDIO_Init()
 {
-	LOG("Initializing AUDIO...");
+	SmartBody::util::log("Initializing AUDIO...");
 	if (g_audio)
 	{
-		LOG("Could not initialize AUDIO...");
+		SmartBody::util::log("Could not initialize AUDIO...");
 		return false;
 	}
 
 	g_audio = new vhcl::Audio();
 	bool ret = g_audio->Open();
 	if (!ret)
-		LOG("Could not perform AUDIO_Init()");
+		SmartBody::util::log("Could not perform AUDIO_Init()");
 	return ret;
 }
 
@@ -59,7 +60,7 @@ void AUDIO_Play( const char * audio_file )
 	}
 	else
 	{
-		LOG("no sound available from %s", audio_file);
+		SmartBody::util::log("no sound available from %s", audio_file);
 	}
 
 }

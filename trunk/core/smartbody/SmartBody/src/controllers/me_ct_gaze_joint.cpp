@@ -1,31 +1,29 @@
-/*
- *  me_ct_gaze_joint.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "controllers/me_ct_gaze_joint.h"
 #include "controllers/me_ct_gaze_alg.h"
 using namespace gwiz;
-#include <vhcl_log.h>
 
 #include <sr/sr_alg.h>
+#include <sb/SBUtilities.h>
 
 #define ENABLE_FORWARD_RAY  		1
 #define USE_OLD_GAZE 0
@@ -155,7 +153,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 		}
 		else	{
 			const char *name = joint_p->name().c_str();
-			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			SmartBody::util::log( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
 #else // consider the pre-rotation
@@ -213,7 +211,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 		}
 		else	{
 			const char *name = joint_p->jointName().c_str();
-			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			SmartBody::util::log( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 #endif
 }
@@ -496,7 +494,7 @@ quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
 	float sw_x = (float)st.x();
 	float sw_y = (float)st.y();
 
-//if( id == 6 ) LOG( "%f %f %f %f\n", limit_p_up, limit_p_dn, limit_h, limit_r );
+//if( id == 6 ) SmartBody::util::log( "%f %f %f %f\n", limit_p_up, limit_p_dn, limit_h, limit_r );
 //euler_t e = task_rot; if( id == 6 ) e.print();
 
 	// Marcelo's exact ellipse solution:
@@ -540,7 +538,7 @@ if( id == 5 )	{ // MeCtGaze::GAZE_JOINT_SKULL
  t_elapse += dt;
  Q_dif = ( world_rot * ( -prev_world_rot ) ).shortest();
  dps = (float)( Q_dif.degrees() ) / dt;
- if( dps > 0.1 ) LOG( "MeCtGazeJoint world-speed: %f  at %f\n", dps, t_elapse );
+ if( dps > 0.1 ) SmartBody::util::log( "MeCtGazeJoint world-speed: %f  at %f\n", dps, t_elapse );
 }
 #endif
 

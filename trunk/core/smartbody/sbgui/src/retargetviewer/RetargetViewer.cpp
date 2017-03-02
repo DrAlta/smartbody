@@ -1,8 +1,9 @@
-#include "vhcl.h"
+
 #include "RetargetViewer.h"
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <FL/Fl_Check_Button.H>
 #include <sstream>
 #include <cstring>
@@ -106,7 +107,7 @@ void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());				
 				if (behavSet && viewer->getCharacterName() != "")
 				{
-					LOG("Retargetting %s on %s ...", check->label(), viewer->getCharacterName().c_str());
+					SmartBody::util::log("Retargetting %s on %s ...", check->label(), viewer->getCharacterName().c_str());
 					const std::string& script = behavSet->getScript();
 					SmartBody::SBScene::getScene()->runScript(script.c_str());
 					std::stringstream strstr;

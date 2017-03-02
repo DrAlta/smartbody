@@ -24,7 +24,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 using namespace gwiz;
 
 #include "controllers/me_ct_tether.h"
-#include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 

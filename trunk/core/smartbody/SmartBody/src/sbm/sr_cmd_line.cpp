@@ -9,7 +9,6 @@
 #include <sys/time.h>
 #endif
 
-#include <vhcl_log.h>
 #include "sr_cmd_line.h"
 #include <sbm/sbm_constants.h>
 

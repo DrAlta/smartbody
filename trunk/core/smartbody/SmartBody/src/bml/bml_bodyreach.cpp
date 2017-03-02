@@ -1,26 +1,24 @@
-/*
- *  bml_gaze.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Wei-Wen Feng, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -37,7 +35,7 @@
 #include "controllers/me_ct_example_body_reach.hpp"
 #include "controllers/me_controller_tree_root.hpp"
 #include <sb/SBCharacter.h>
-
+#include <sb/SBUtilities.h>
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
 #include "sbm/xercesc_utils.hpp"
@@ -81,7 +79,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	//std::map<int,MeCtReachEngine*>* reMapPtr = curCharacter->getCurrentReachEngineMap();
 	if (!reach || reach->getReachEngineMap().size() == 0)
 	{
-		LOG("Character : %s, no reach engine initialized.", request->actor->getName().c_str());
+		SmartBody::util::log("Character : %s, no reach engine initialized.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -100,7 +98,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 		if (!bodyReachCt)
 		{
-			LOG("Handle : %s, controller not found.",handle.c_str());
+			SmartBody::util::log("Handle : %s, controller not found.",handle.c_str());
 		}
 	}
 

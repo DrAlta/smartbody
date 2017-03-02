@@ -20,7 +20,7 @@
  *      Andrew n marshall, USC
  */
 
-#include "vhcl.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -33,6 +33,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 
 using namespace std;
 using namespace BML;
@@ -42,7 +43,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 {
 	if (!request->actor->motion_sched_p)
 	{
-		LOG("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -104,7 +105,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		} else {
 			// TODO: exception?
 			//cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;
-			LOG("WARNING: BML::parse_bml_animation(): behavior \"%s\": name=\"%s\" not loaded; ignoring behavior.", unique_id.c_str(), asciiName.c_str());
+			SmartBody::util::log("WARNING: BML::parse_bml_animation(): behavior \"%s\": name=\"%s\" not loaded; ignoring behavior.", unique_id.c_str(), asciiName.c_str());
 			
 			return BehaviorRequestPtr();  // a.k.a., NULL
 		}
@@ -112,7 +113,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		// TODO: exception?
 		std::wstringstream wstrstr;
 		cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": missing name= attribute; ignoring <animation>.";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+		SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 	return BehaviorRequestPtr();  // a.k.a., NULL

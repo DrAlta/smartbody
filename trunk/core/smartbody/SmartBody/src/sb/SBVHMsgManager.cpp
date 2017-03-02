@@ -23,7 +23,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBCommandManager.h>
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 #include <iostream>
 #include <sstream>
 #include <sbm/sr_arg_buff.h>
@@ -162,17 +163,17 @@ bool SBVHMsgManager::connect()
 		err = vhmsg::ttu_register( "vrPerception" );
 		err = vhmsg::ttu_register( "vrBCFeedback" );
 		err = vhmsg::ttu_register( "vrSpeech" );
-		LOG("VHMSG connected successfully");
+		SmartBody::util::log("VHMSG connected successfully");
 		return true;
 	} 
 	else
 	{
-		LOG("Could not connect to %s:%s", _server.c_str(), _port.c_str());
+		SmartBody::util::log("Could not connect to %s:%s", _server.c_str(), _port.c_str());
 		setEnable(false);
 		return false;
 	}
 #else
-	LOG("VHMSG has been disabled.");
+	SmartBody::util::log("VHMSG has been disabled.");
 	return false;
 #endif
 }
@@ -205,7 +206,7 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 				strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message." << std::endl;
 			else
 				strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << "  " << message << "\"." << std::endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 	else
@@ -251,7 +252,7 @@ int SBVHMsgManager::send( const char* message )
 		if( err != vhmsg::TTU_SUCCESS )	{
 			std::stringstream strstr;
 			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify1 failed on message \"" << message << "\"." << std::endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 	else
@@ -331,7 +332,7 @@ const std::string& SBVHMsgManager::getScope()
 void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * user_data )
 {
 	if (SmartBody::SBScene::getScene()->getVHMsgManager()->getBoolAttribute("showMessages"))
-		LOG("[%s] %s", op, args);
+		SmartBody::util::log("[%s] %s", op, args);
 	if (SmartBody::SBScene::getScene()->isRemoteMode())
 	{
 		SmartBody::SBScene::getScene()->getDebuggerClient()->ProcessVHMsgs(op, args);
@@ -342,14 +343,14 @@ void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * use
 		SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 	}
 
-	//LOG("Get VHMSG , op = %s, args = %s", op, args);
+	//SmartBody::util::log("Get VHMSG , op = %s, args = %s", op, args);
 	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) )
 	{
         case CMD_NOT_FOUND:
-            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
+            SmartBody::util::log("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
+            SmartBody::util::log("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }

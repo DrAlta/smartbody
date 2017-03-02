@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ErrorVisualization.h"
 #include <sb/SBAnimationState.h>
 #include <sr/sr_gl.h>

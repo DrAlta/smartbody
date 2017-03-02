@@ -19,6 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "DefaultAttributeTable.h"
+#include <sb/SBUtilities.h>
 
 DefaultAttributeTable::DefaultAttributeTable(void)
 {
@@ -50,7 +51,7 @@ int DefaultAttributeTable::setDefaultAttributeGroupPriority(const std::string& g
 	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(groupName);
 	if (iter == _defaultGroups.end())
 	{
-		LOG("No default attribute group named '%s' found.", groupName.c_str());
+		SmartBody::util::log("No default attribute group named '%s' found.", groupName.c_str());
 		return 0;
 	}
 	else

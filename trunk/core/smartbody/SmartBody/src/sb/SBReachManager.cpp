@@ -22,6 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sb/SBScene.h>
 #include <sb/SBReach.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -41,7 +42,7 @@ SBAPI SBReach* SBReachManager::createReachWithTag( std::string characterName, st
 	SBCharacter* character = scene->getCharacter(characterName);
 	if (!character)
 	{
-		LOG("Character named %s does not exist.", characterName.c_str());
+		SmartBody::util::log("Character named %s does not exist.", characterName.c_str());
 		return NULL;
 	}
 	std::string charReachTag = characterName + "_" + reachTag;

@@ -1,5 +1,25 @@
 
-#include "vhcl.h"
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include "TreeItemInfoWidget.h"
 
 #include <FL/Fl_Float_Input.H>
@@ -9,6 +29,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBEvent.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBUtilities.h>
 
 #include "ResourceWindow.h"
 #include "channelbufferviewer/GlChartViewArchive.hpp"
@@ -135,7 +156,7 @@ void SkeletonItemInfoWidget::updateWidget()
 		if (!skeleton)
 			return; // skeleton is lost, no update
 
-		//LOG("skelName = %s\n",skelName.c_str());
+		//SmartBody::util::log("skelName = %s\n",skelName.c_str());
 		itemSkeleton = skeleton;
 	}
 	jointInfoObject->setSkeleton(itemSkeleton);
@@ -460,7 +481,7 @@ void SeqItemInfoWidget::updateWidget()
 	std::string fullSeqPath;
 	/* 
 	FILE* fp = mcu.open_sequence_file(seqFilename.c_str(),fullSeqPath);
-	//LOG("seq file name = %s, full path = %s\n",seqFilename.c_str(),fullSeqPath.c_str());
+	//SmartBody::util::log("seq file name = %s, full path = %s\n",seqFilename.c_str(),fullSeqPath.c_str());
 	if (fp)
 	{
 		textBuffer->loadfile(fullSeqPath.c_str());
@@ -480,7 +501,7 @@ void SeqItemInfoWidget::runSeqCallback( Fl_Widget* widget, void* data )
 		std::string seqName = seqInfoWidget->getSeqFile();
 		std::string seqCmd = "seq ";
 		seqCmd += seqName;
-		LOG("seq cmd = %s\n", seqCmd.c_str());
+		SmartBody::util::log("seq cmd = %s\n", seqCmd.c_str());
 		SmartBody::SBScene::getScene()->command(seqCmd);
 	}
 }
@@ -610,7 +631,7 @@ void EventItemInfoWidget::removeEvent()
 	{
 		std::string eventCmd = "unregisterevent " + eventType;
 		SmartBody::SBScene::getScene()->command(eventCmd);
-		//LOG("Remove Event %s",eventType.c_str());
+		//SmartBody::util::log("Remove Event %s",eventType.c_str());
 	}
 }
 /************************************************************************/

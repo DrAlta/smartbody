@@ -3,6 +3,7 @@
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBUtilities.h>
 #include <FL/Fl_File_Chooser.H>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -509,7 +510,7 @@ void MotionEditorWindow::PlayAnimation(const std::string& characterName, const s
 {
    if (characterName.length() == 0 || animName.length() == 0)
    {
-      LOG("failed to play animation %s on character %s", animName.c_str(), characterName.c_str());
+      SmartBody::util::log("failed to play animation %s on character %s", animName.c_str(), characterName.c_str());
       return;
    }
 
@@ -527,7 +528,7 @@ void MotionEditorWindow::PlayAnimation(const std::string& characterName, const s
       std::stringstream ss;
       ss << "send sb " << "bml.execBML(\'" << characterName << "\', \'" << bml << "\')";
       std::string sendStr = ss.str();
-      LOG("%s", sendStr.c_str());
+      SmartBody::util::log("%s", sendStr.c_str());
 		SmartBody::SBScene::getScene()->command(sendStr);
 	}
 }
@@ -548,7 +549,7 @@ void MotionEditorWindow::GazeAt(const std::string& characterName, const std::str
       std::stringstream ss;
       ss << "send sb " << "bml.execBML(\'" << characterName << "\', \'" << bml << "\')";
       std::string sendStr = ss.str();
-      LOG("%s", sendStr.c_str());
+      SmartBody::util::log("%s", sendStr.c_str());
 		SmartBody::SBScene::getScene()->command(sendStr);
    }
 }
@@ -566,7 +567,7 @@ void MotionEditorWindow::StopGaze(const std::string& characterName)
       std::stringstream ss;
       ss << "send sb scene.command(\'" << cmd <<"\')";
       std::string sendStr = ss.str();
-      LOG("%s", sendStr.c_str());
+      SmartBody::util::log("%s", sendStr.c_str());
 		SmartBody::SBScene::getScene()->command(sendStr);
 	}
 }
@@ -706,7 +707,7 @@ void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 	if (!boost::filesystem2::is_directory(motionFolder))
 #endif
 	{
-		LOG("MotionEditorWindow::OnButtonPlayMotionFolder ERR: Please input a valid directory %s", motionFolderPath.c_str());
+		SmartBody::util::log("MotionEditorWindow::OnButtonPlayMotionFolder ERR: Please input a valid directory %s", motionFolderPath.c_str());
 		return;
 	}
 
@@ -723,11 +724,11 @@ void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 		std::string fileName = boost::filesystem::basename(cur);
 		skmMotionNames.push_back(fileName);
 	}
-	LOG("Playing animations in folder %s", motionFolderPath.c_str());
+	SmartBody::util::log("Playing animations in folder %s", motionFolderPath.c_str());
 	std::stringstream command;
 	for (size_t i = 0; i < skmMotionNames.size(); ++i)
 	{
-		LOG("%s", skmMotionNames[i].c_str());
+		SmartBody::util::log("%s", skmMotionNames[i].c_str());
 		command << "<animation name=\"" << skmMotionNames[i] << "\" id=\"anim" << i << "\"";
 		if (i > 0)
 			command << " start=\"anim" << (i - 1) << ":end\"/>";

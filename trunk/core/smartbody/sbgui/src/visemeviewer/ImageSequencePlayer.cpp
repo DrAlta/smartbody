@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ImageSequencePlayer.h"
 #include "external/glew/glew.h"
 #include <sr/sr_gl.h>
@@ -66,7 +66,7 @@ void ImageSequenceViewer::OnSimulationUpdate()
 		int numImages = _imageSequencePlayer->_imageSequences.size();
 		float localPlayTime = curTime - _startTime;
 		int id = int(localPlayTime * numImages / _playbackLength);
-		//LOG("ImageSequenceViewer::OnSimulationUpdate local playback time %f(%d), total lenght %f", localPlayTime, id, _playbackLength);
+		//SmartBody::util::log("ImageSequenceViewer::OnSimulationUpdate local playback time %f(%d), total lenght %f", localPlayTime, id, _playbackLength);
 		if (id >= (int)_imageSequencePlayer->_imageSequences.size())
 		{
 			_startTime = -1.0f;

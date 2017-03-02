@@ -1,6 +1,6 @@
 #include "RotationControl.h"
 
-#include "vhcl.h"
+
 #include <FL/gl.h>
 #include <sr/sr_plane.h>
 #include <sr/sr_sphere.h>

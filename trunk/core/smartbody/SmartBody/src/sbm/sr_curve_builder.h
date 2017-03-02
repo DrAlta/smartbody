@@ -25,7 +25,6 @@
 
 
 #include <stdio.h>
-//#include <vhcl_log.h>
 
 #include "sr_linear_curve.h"
 #include "sr_spline_curve.h"

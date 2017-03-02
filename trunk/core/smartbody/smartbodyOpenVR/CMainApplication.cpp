@@ -504,21 +504,21 @@ void CMainApplication::ProcessVREvent(const vr::VREvent_t & event)
 void CMainApplication::RenderFrame()
 {
 	// for now as fast as possible
-	//LOG("RenderFrame");
+	//SmartBody::util::log("RenderFrame");
 	if (m_pHMD)
 	{
-		//LOG("DrawControllers");
+		//SmartBody::util::log("DrawControllers");
 		DrawControllers();
-		//LOG("RenderStereoTargets");
+		//SmartBody::util::log("RenderStereoTargets");
 		RenderStereoTargets();
-		//LOG("RenderDistortion");
+		//SmartBody::util::log("RenderDistortion");
 		RenderDistortion();
-		//LOG("After RenderDistortion");
+		//SmartBody::util::log("After RenderDistortion");
 		vr::Texture_t leftEyeTexture = { (void*)leftEyeDesc.m_nResolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
 		vr::Texture_t rightEyeTexture = { (void*)rightEyeDesc.m_nResolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
-		//LOG("After VRCompositor");
+		//SmartBody::util::log("After VRCompositor");
 	}
 
 	if (m_bVblank && m_bGlFinishHack)
@@ -527,13 +527,13 @@ void CMainApplication::RenderFrame()
 		// happen right before and after the vsync causing all kinds of jittering issues. This glFinish()
 		// appears to clear that up. Temporary fix while I try to get nvidia to investigate this problem.
 		// 1/29/2014 mikesart
-		//LOG("Before glFinish");
+		//SmartBody::util::log("Before glFinish");
 		glFinish();
 	}
 
 	// SwapWindow
 	{
-		//LOG("Before SDL_GL_SwapWindow");
+		//SmartBody::util::log("Before SDL_GL_SwapWindow");
 		SDL_GL_SwapWindow(m_pWindow);
 	}
 
@@ -543,7 +543,7 @@ void CMainApplication::RenderFrame()
 		// of the command. So, we do a clear here right here so the glFinish will wait fully for the swap.
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//LOG("After glClearBuffer");
+		//SmartBody::util::log("After glClearBuffer");
 	}
 
 	// Flush and wait for swap.
@@ -562,9 +562,9 @@ void CMainApplication::RenderFrame()
 		dprintf("PoseCount:%d(%s) Controllers:%d\n", m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount);
 	}
 
-	//LOG("Before update HMDMatrixPose");
+	//SmartBody::util::log("Before update HMDMatrixPose");
 	UpdateHMDMatrixPose();
-	//LOG("After update HMDMatrixPose");
+	//SmartBody::util::log("After update HMDMatrixPose");
 }
 
 
@@ -1444,10 +1444,10 @@ void CMainApplication::updateLights()
 			_lights.push_back(light);
 		}
 	}
-	//LOG("light size = %d\n",_lights.size());
+	//SmartBody::util::log("light size = %d\n",_lights.size());
 
 	SmartBody::SBScene::getScene()->setIntAttribute("numLightsInScene", numLightsInScene);
-	//LOG("numLightsInScene = %d\n", numLightsInScene);
+	//SmartBody::util::log("numLightsInScene = %d\n", numLightsInScene);
 	if (_lights.size() == 0 &&
 		numLightsInScene == 0 &&
 		SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights"))
@@ -1572,14 +1572,14 @@ void CMainApplication::RenderScene(vr::Hmd_Eye nEye)
 				//pawn->dMesh_p->update();
 				if (!meshInstance->isStaticMesh()) // is skinned mesh
 				{
-					//LOG("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
+					//SmartBody::util::log("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
 					//meshInstance->update();
 					DeformableMesh* mesh = meshInstance->getDeformableMesh();
 					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
 				}
 				else
 				{
-					//LOG("drawStaticMesh(): Rendering %s", pawn->getName().c_str());
+					//SmartBody::util::log("drawStaticMesh(): Rendering %s", pawn->getName().c_str());
 					DeformableMesh* mesh = meshInstance->getDeformableMesh();
 					//if (mesh)
 					//	printf("drawStatic Mesh, mesh name = %s\n", mesh->getName().c_str());

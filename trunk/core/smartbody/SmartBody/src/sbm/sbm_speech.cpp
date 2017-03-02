@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
-#include "vhcl.h"
+
 
 #include "sbm/sbm_speech.hpp"
 #include <sb/SBUtilities.h>
@@ -42,7 +42,7 @@ VisemeData::VisemeData( const std::string& id, int numKeys, const std::string& c
 		int index = 4 * (numKeys - 1);
 		if (tokens.size() <= (unsigned int) index)
 		{
-			LOG("Curve %s is not properly created - insufficient number of keys (%d) - expected %d.", id.c_str(), tokens.size() / 4, numKeys * 4);
+			SmartBody::util::log("Curve %s is not properly created - insufficient number of keys (%d) - expected %d.", id.c_str(), tokens.size() / 4, numKeys * 4);
 		}
 		else
 		{

@@ -312,7 +312,7 @@ XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT = NULL;
 XMLCh* BMLDefs::ATTR_SID = NULL;
 XMLCh* BMLDefs::ATTR_STRIDE = NULL;
 XMLCh* BMLDefs::ATTR_COUNT = NULL;
-XMLCh* BMLDefs::ATTR_INPUT = NULL;
+XMLCh* BMLDefs::ATTR_INPUTSTR = NULL;
 XMLCh* BMLDefs::ATTR_SEMANTIC = NULL;
 XMLCh* BMLDefs::ATTR_VCOUNT = NULL;
 XMLCh* BMLDefs::ATTR_SOURCE = NULL;
@@ -695,7 +695,7 @@ BMLDefs::BMLDefs()
 	ATTR_SID = XMLString::transcode("sid");
 	ATTR_STRIDE = XMLString::transcode("stride");
 	ATTR_COUNT = XMLString::transcode("count");
-	ATTR_INPUT = XMLString::transcode("input");
+	ATTR_INPUTSTR = XMLString::transcode("input");
 	ATTR_SEMANTIC = XMLString::transcode("semantic");
 	ATTR_VCOUNT = XMLString::transcode("vcount");
 	ATTR_SOURCE = XMLString::transcode("source");

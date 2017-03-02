@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBPython.h"
 #include <sbm/sbm_deformable_mesh.h>
 

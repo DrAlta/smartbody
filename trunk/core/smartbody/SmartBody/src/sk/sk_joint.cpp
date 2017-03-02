@@ -1,25 +1,22 @@
-                                                                                                                                                                                                                                                                                                   /*
- *  sk_joint.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include <math.h>
 #include <sr/sr_model.h>
@@ -29,7 +26,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
-
+#include <sb/SBUtilities.h>
 //============================= SkJoint ============================
 
 SkJoint::SkJoint()
@@ -302,7 +299,7 @@ void SkJoint::remove_child(SkJoint* child)
 			return;
 		}
 	}
-	LOG("SkJoint::remove_child WARNING: cannot find child joint %s", child->getName().c_str());
+	SmartBody::util::log("SkJoint::remove_child WARNING: cannot find child joint %s", child->getName().c_str());
 }
 
 void SkJoint::updateGmatZero(const SrMat& gmatZero)

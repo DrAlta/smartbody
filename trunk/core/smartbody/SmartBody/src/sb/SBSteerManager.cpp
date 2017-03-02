@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAttribute.h>
 #include <PPRAgent.h>
 #include <sb/SBSteerAgent.h>
+#include <sb/SBUtilities.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <SteerLib.h>
@@ -158,7 +159,7 @@ void SBSteerManager::start()
 	
 	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		LOG("STEERSIM ALREADY STARTED");
+		SmartBody::util::log("STEERSIM ALREADY STARTED");
 		return;
 	}
 
@@ -182,7 +183,7 @@ void SBSteerManager::start()
 	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
 	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
 	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
-	//LOG("max Items per grid cell = %d",maxItemsPerGridCell);
+	//SmartBody::util::log("max Items per grid cell = %d",maxItemsPerGridCell);
 	steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
@@ -212,26 +213,26 @@ void SBSteerManager::start()
 	//	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemPerCell;
 
 
-	//LOG("INIT STEERSIM");
+	//SmartBody::util::log("INIT STEERSIM");
 	try {
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->init(steerOptions);
 	} catch (Util::GenericException& ge) {
-		LOG("Problem starting steering engine: %s", ge.what()); 
+		SmartBody::util::log("Problem starting steering engine: %s", ge.what()); 
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 		delete steerOptions;
 		return;
 	} catch (std::exception& e) {
 		if (e.what())
-			LOG("Problem starting steering engine: %s", e.what()); 
+			SmartBody::util::log("Problem starting steering engine: %s", e.what()); 
 		else
-			LOG("Unknown problem starting steering engine: %s", e.what()); 
+			SmartBody::util::log("Unknown problem starting steering engine: %s", e.what()); 
 
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 		delete steerOptions;
 		return;
 	}
 
-	//LOG("LOADING STEERSIM");
+	//SmartBody::util::log("LOADING STEERSIM");
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->loadSimulation();
 
 	int numSetup = 0;
@@ -247,7 +248,7 @@ void SBSteerManager::start()
 		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
 		if (!steerAgent)
 		{
-			LOG("No steering agent for character %s", character->getName().c_str());
+			SmartBody::util::log("No steering agent for character %s", character->getName().c_str());
 			continue;
 		}
 
@@ -270,12 +271,12 @@ void SBSteerManager::start()
 		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 		ppraiAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
-		LOG("Setting up steering agent for character %s", character->getName().c_str());
+		SmartBody::util::log("Setting up steering agent for character %s", character->getName().c_str());
 		numSetup++;
 	}
 	if (numSetup == 0)
 	{
-		//LOG("No characters set up with steering. Steering will need to be restarted when new characters are available.");
+		//SmartBody::util::log("No characters set up with steering. Steering will need to be restarted when new characters are available.");
 	}
 
 	bool useEnvironment = getBoolAttribute("useEnvironmentCollisions");
@@ -308,7 +309,7 @@ void SBSteerManager::start()
 		getEngineDriver()->_engine->getSpatialDatabase()->addObject((*iter), (*iter)->getBounds());
 	}
 
-	//LOG("STARTING STEERSIM");
+	//SmartBody::util::log("STARTING STEERSIM");
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->startSimulation();
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
 
@@ -373,13 +374,13 @@ SBSteerAgent* SBSteerManager::createSteerAgent(std::string name)
 	std::map<std::string, SBSteerAgent*>::iterator iter = _steerAgents.find(name);
 	if (iter != _steerAgents.end())
 	{
-		LOG("Steer agent with name %s already exists.", name.c_str());
+		SmartBody::util::log("Steer agent with name %s already exists.", name.c_str());
 		return iter->second;
 	}
 	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 	{
-		LOG("Character named '%s' does not exist, steering agent cannot be constructed.", name.c_str());
+		SmartBody::util::log("Character named '%s' does not exist, steering agent cannot be constructed.", name.c_str());
 		return NULL;
 	}
 	SBSteerAgent* agent = new PPRAISteeringAgent(character);
@@ -395,7 +396,7 @@ void SBSteerManager::removeSteerAgent(std::string name)
 		_steerAgents.erase(iter);
 		return;
 	}
-	LOG("Steer agent with name %s does not exist.", name.c_str());
+	SmartBody::util::log("Steer agent with name %s does not exist.", name.c_str());
 }
 
 int SBSteerManager::getNumSteerAgents()

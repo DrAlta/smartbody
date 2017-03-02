@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef TIME_INTERVAL_PROFILER_H
 #define TIME_INTERVAL_PROFILER_H
 
-#include <vhcl.h>
 #include <stdio.h>
 #include <iostream>
 #include "sbm/sr_hash_map.h"

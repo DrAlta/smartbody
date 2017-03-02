@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBJOINTMAP_H_
 #define _SBJOINTMAP_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <map>
 #include <vector>

@@ -512,7 +512,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 		SrVec constraintOffset = constraintPos - rootNode->getGlobalPos();
 		SrVec constraintDir = constraintOffset; constraintDir.normalize();
 		float chainLength = s->getIKChainLength(cons->rootName.c_str(), cons->efffectorName.c_str());
-		//LOG("rootNodePos = %s, constarintDir = %s, chainLength = %f",rootNode->getGlobalPos().toString().c_str(), constraintDir.toString().c_str(), chainLength);
+		//SmartBody::util::log("rootNodePos = %s, constarintDir = %s, chainLength = %f",rootNode->getGlobalPos().toString().c_str(), constraintDir.toString().c_str(), chainLength);
 //   		if (constraintOffset.len() > chainLength)
 //   		{
 //   			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			

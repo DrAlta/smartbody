@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include <fstream>
 
 
@@ -102,14 +103,14 @@ void SBFaceDefinition::setFaceNeutral(const std::string& motionName)
 		motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
-			LOG("ERROR: Unknown facial neutral motion \"%s\".", motionName.c_str());
+			SmartBody::util::log("ERROR: Unknown facial neutral motion \"%s\".", motionName.c_str());
 			return;
 		}
 	}
 
 	_faceNeutral = motion;
 
-	//LOG("Face neutral motion is now '%s'.", motionName.c_str());
+	//SmartBody::util::log("Face neutral motion is now '%s'.", motionName.c_str());
 }
 
 SkMotion* SBFaceDefinition::getFaceNeutral()
@@ -121,7 +122,7 @@ void SBFaceDefinition::setDefaultFacePose(const std::vector<std::string>& poses,
 {
 	if (poses.size() != values.size())
 	{
-		LOG("Cannot set default face pose; need the same number of face poses (%d) as values (%d)", poses.size(), values.size());
+		SmartBody::util::log("Cannot set default face pose; need the same number of face poses (%d) as values (%d)", poses.size(), values.size());
 		return;
 	}
 
@@ -219,7 +220,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		side != ""
 		)
 	{
-		LOG("Unrecognized side '%s'. Action Unit %d not added.", side.c_str(), auNum);
+		SmartBody::util::log("Unrecognized side '%s'. Action Unit %d not added.", side.c_str(), auNum);
 		return;
 	}
 
@@ -229,7 +230,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
-			LOG("ERROR: Unknown facial pose \"%s\".", motionName.c_str());
+			SmartBody::util::log("ERROR: Unknown facial pose \"%s\".", motionName.c_str());
 			return;
 		}
 	}
@@ -257,7 +258,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		}
 
 		addAU(auNum, au);
-		//LOG("AU '%d' added to face definition %s.", auNum, getName().c_str());
+		//SmartBody::util::log("AU '%d' added to face definition %s.", auNum, getName().c_str());
 		
 	} 
 	else
@@ -265,7 +266,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		if (side == "")
 		{
 			if( au->is_left() || au->is_right() )
-			LOG("WARNING: Overwritting au #%d", auNum);
+			SmartBody::util::log("WARNING: Overwritting au #%d", auNum);
 			au->set( motion );
 			au->reset_type();
 			au->set_bilateral();
@@ -273,7 +274,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		else if (side == "left" || side == "LEFT")
 		{				
 			if( au->is_left() || au->is_bilateral())
-			LOG("WARNING: Overwritting au #%d left", auNum);
+			SmartBody::util::log("WARNING: Overwritting au #%d left", auNum);
 			au->set( motion, au->right );
 			if (au->is_right())
 			{
@@ -290,7 +291,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		else if (side == "right" || side == "RIGHT")
 		{
 			if( au->is_right() )
-				LOG("WARNING: Overwritting au #%d right", auNum);
+				SmartBody::util::log("WARNING: Overwritting au #%d right", auNum);
 			au->set( au->left, motion );
 			if (au->is_left())
 			{
@@ -312,7 +313,7 @@ void SBFaceDefinition::addAU(int auNum, ActionUnit* au)
 {
 	if (!au)
 	{
-		LOG("No AU given. Cannot add AU '%d'.", auNum);
+		SmartBody::util::log("No AU given. Cannot add AU '%d'.", auNum);
 		return;
 	}
 
@@ -326,7 +327,7 @@ void SBFaceDefinition::addAU(int auNum, ActionUnit* au)
 	{
 		_auMap.erase(iter);
 		_auMap.insert(std::pair<int, ActionUnit*>(auNum, au));
-		LOG("Action unit '%d' replaced with new rules.", auNum);
+		SmartBody::util::log("Action unit '%d' replaced with new rules.", auNum);
 	}
 }
 
@@ -359,12 +360,12 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
-			LOG("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());
+			SmartBody::util::log("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());
 			return;
 		}
 
 		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
-		//LOG("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
+		//SmartBody::util::log("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
 		return;
 	}
 	else // viseme already exists - replace it with the new definition
@@ -377,7 +378,7 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 			{
 				_visemeMap.erase(iter);
 				_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>((SkMotion*)NULL, 1.0f)));
-				LOG("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->getName().c_str()); 
+				SmartBody::util::log("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->getName().c_str()); 
 				return;
 			}
 			else
@@ -385,14 +386,14 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 				SmartBody::SBMotion* newMotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 				if (!newMotion)
 				{
-					LOG("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());
+					SmartBody::util::log("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());
 					return;
 				}
 				else
 				{
 					_visemeMap.erase(iter);
 					_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(newMotion, 1.0f)));
-					LOG("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->getName().c_str(), motionName.c_str());
+					SmartBody::util::log("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->getName().c_str(), motionName.c_str());
 					return;
 				}
 			}
@@ -405,13 +406,13 @@ void SBFaceDefinition::setVisemeWeight(const std::string& visemeName, float weig
 	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(visemeName);
 	if (iter == _visemeMap.end())
 	{
-		LOG("Viseme '%s' does not exist, cannot set its' weight.", visemeName.c_str());
+		SmartBody::util::log("Viseme '%s' does not exist, cannot set its' weight.", visemeName.c_str());
 		return;
 	}
 	else // viseme already exists - replace it with the new definition
 	{
 		(*iter).second.second = weight;
-		LOG("Viseme '%s' now has weight %f", visemeName.c_str(), weight);
+		SmartBody::util::log("Viseme '%s' now has weight %f", visemeName.c_str(), weight);
 	}
 }
 
@@ -537,7 +538,7 @@ std::string SBFaceDefinition::getAUSide(int num)
 	std::map<int, ActionUnit*>::iterator iter = _auMap.find(num);
 	if (iter == _auMap.end())
 	{
-		LOG("AU %d not found.", num);
+		SmartBody::util::log("AU %d not found.", num);
 		return "";
 	}
 
@@ -557,7 +558,7 @@ SBMotion* SBFaceDefinition::getAUMotion(int num, std::string side)
 	std::map<int, ActionUnit*>::iterator iter = _auMap.find(num);
 	if (iter == _auMap.end())
 	{
-		LOG("AU %d not found.", num);
+		SmartBody::util::log("AU %d not found.", num);
 		return NULL;
 	}
 
@@ -571,7 +572,7 @@ SBMotion* SBFaceDefinition::getAUMotion(int num, std::string side)
 		}
 		else
 		{
-			LOG("Action Unit %d does not have a LEFT motion.", num);
+			SmartBody::util::log("Action Unit %d does not have a LEFT motion.", num);
 			return NULL;
 		}
 	}
@@ -583,7 +584,7 @@ SBMotion* SBFaceDefinition::getAUMotion(int num, std::string side)
 		}
 		else
 		{
-			LOG("Action Unit %d does not have a RIGHT motion.", num);
+			SmartBody::util::log("Action Unit %d does not have a RIGHT motion.", num);
 			return NULL;
 		}
 	}
@@ -595,13 +596,13 @@ SBMotion* SBFaceDefinition::getAUMotion(int num, std::string side)
 		}
 		else
 		{
-			LOG("Action Unit %d does not have a BOTH motion.", num);
+			SmartBody::util::log("Action Unit %d does not have a BOTH motion.", num);
 			return NULL;
 		}
 	}
 	else
 	{
-		LOG("Use: LEFT, RIGHT, BOTH for Action Unit side.");
+		SmartBody::util::log("Use: LEFT, RIGHT, BOTH for Action Unit side.");
 		return NULL;
 	}
 
@@ -646,7 +647,7 @@ void SBFaceDefinition::save(const std::string& fileName)
 	std::ofstream file(fileName.c_str());
 	if (file.is_open() != true)
 	{
-		LOG("Problem writing to file %s, face definition was not saved.", fileName.c_str());
+		SmartBody::util::log("Problem writing to file %s, face definition was not saved.", fileName.c_str());
 		return;
 	}
 	const std::string& fileContent = saveToString();

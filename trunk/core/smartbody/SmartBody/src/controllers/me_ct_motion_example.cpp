@@ -693,8 +693,8 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight; // interpolate the position using linear blend
 
 	ProfileCurveMap& interpProfileMap = profile->interpolationProfile;
-	//LOG("profile curve map size = %d\n",interpProfileMap.size());
-	//LOG("num affected joints = %d\n",affectedJoints.size());
+	//SmartBody::util::log("profile curve map size = %d\n",interpProfileMap.size());
+	//SmartBody::util::log("num affected joints = %d\n",affectedJoints.size());
 	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
@@ -704,7 +704,7 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 		{
 			ProfileCurve* curve = interpProfileMap[chanName];
 			interpW = curve->evaluate(weight);
-			//LOG("interp W = %f\n",interpW);
+			//SmartBody::util::log("interp W = %f\n",interpW);
 		}
 		if (interpW < 0)
 			interpW = 0;
@@ -737,8 +737,8 @@ float MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, Bo
 	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight; // interpolate the position using linear blend
 
 	ProfileCurveMap& eulerProfileMap = profile->eulerProfile[0];
-	//LOG("profile curve map size = %d\n",interpProfileMap.size());
-	//LOG("num affected joints = %d\n",affectedJoints.size());
+	//SmartBody::util::log("profile curve map size = %d\n",interpProfileMap.size());
+	//SmartBody::util::log("num affected joints = %d\n",affectedJoints.size());
 	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];

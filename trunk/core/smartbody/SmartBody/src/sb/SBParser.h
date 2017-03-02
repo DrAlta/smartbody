@@ -22,7 +22,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #define _SBPARSER_H_
 
 #include <sb/SBTypes.h>
-#include <vhcl.h>
 #include <external/parser/Params.h>
 
 class InputTree;

@@ -18,11 +18,12 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include "SBJointMapManager.h"
 #include <sb/SBJointMap.h>
 #include <sb/SBScene.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -97,7 +98,7 @@ void SBJointMapManager::removeJointMap(const std::string& name)
 	}
 	
 
-	LOG("Cannot find joint map %s, will not be erased.", name.c_str());
+	SmartBody::util::log("Cannot find joint map %s, will not be erased.", name.c_str());
 }
 
 void SBJointMapManager::removeAllJointMaps()

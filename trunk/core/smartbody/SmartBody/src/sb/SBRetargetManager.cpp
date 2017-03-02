@@ -20,6 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SBRetargetManager.h"
 #include <sb/SBRetarget.h>
+#include <sb/SBUtilities.h>
 
 
 namespace SmartBody {
@@ -38,7 +39,7 @@ SBAPI SBRetarget* SBRetargetManager::createRetarget( std::string sourceSk, std::
 {	
 	if (getRetarget(sourceSk, targetSk))
 	{
-		LOG("Retarget for skeleton pair (%s,%s) already exist.", sourceSk.c_str(), targetSk.c_str());
+		SmartBody::util::log("Retarget for skeleton pair (%s,%s) already exist.", sourceSk.c_str(), targetSk.c_str());
 		return NULL;			
 	}
 

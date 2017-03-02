@@ -339,7 +339,7 @@ extern "C"
 
 			if(infoLen > 0){ 
 				char* infoLog = (char*)malloc(sizeof(char) * infoLen);
-				glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+				glGetShaderInfoSmartBody::util::log(shader, infoLen, NULL, infoLog);
 				esLogMessage("Error compiling shader:\n%s\n", infoLog);
 				free(infoLog);
 			}
@@ -394,7 +394,7 @@ extern "C"
 			{
 				char *infoLog = (char*)malloc(sizeof(char) * infoLen);
 
-				glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
+				glGetProgramInfoSmartBody::util::log(programObject, infoLen, NULL, infoLog);
 				esLogMessage("Error linking program:\n%s\n", infoLog);
 				free(infoLog);
 
@@ -416,7 +416,7 @@ extern "C"
 
 		//query number of vertex uniform vector support
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &maxVUniforms);
-		LOG("Web browser supports %d number of Vertex uniform vectors", maxVUniforms);
+		SmartBody::util::log("Web browser supports %d number of Vertex uniform vectors", maxVUniforms);
 
 		//load Vertex and Fragment Shader and link them into program object
 		esContext->meshData = malloc(sizeof(MeshData)); 
@@ -669,7 +669,7 @@ extern "C"
 			 
 			SrVec meshScale = shape->getMeshScale();
 			SrMat scaleMat;
-			//LOG("mesh scale: %f, %f, %f\n", meshScale[0], meshScale[1], meshScale[2]);
+			//SmartBody::util::log("mesh scale: %f, %f, %f\n", meshScale[0], meshScale[1], meshScale[2]);
 			scaleMat.scale(meshScale[0], meshScale[1], meshScale[2]); 
 			//MV = scale * rotate * translation * root(joint->world) * MV
 			mvMat = scaleMat * mvMat;	
@@ -687,7 +687,7 @@ extern "C"
 		}
 		//use this flag to disable all lights in the scene for now, need a better way to do it.
 		//TODO: for example disable or enable a specific light
-		//LOG("mesh scale: %f, %f, %f\n", shape->getMeshScale()[0], shape->getMeshScale()[1], shape->getMeshScale()[2]);
+		//SmartBody::util::log("mesh scale: %f, %f, %f\n", shape->getMeshScale()[0], shape->getMeshScale()[1], shape->getMeshScale()[2]);
 		glUniform3f(meshData->meshScale_hasBone_lightEnabledLoc, shape->getMeshScale()[0], 
 			shape->transformBuffer.size() > 0 ? 1.0 : 0.0, scene->getBoolAttribute("lightEnabled") ? 1.0 : 0.0); 
 		

@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBPython.h"
 #include "SBPythonClass.h"
 #include <sr/sr_camera.h>

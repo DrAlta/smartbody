@@ -147,7 +147,7 @@ void TransparentListener::OnReset()
 
 void TransparentListener::OnLogMessage(const std::string& message)
 {
-	LOG(message.c_str());
+	SmartBody::util::log(message.c_str());
 }
 
 
@@ -201,7 +201,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 #endif
 		if ( name == "deformableMeshScale" || name == "meshScale")
 		{
-			//LOG("name = deformableMeshScale");
+			//SmartBody::util::log("name = deformableMeshScale");
 			bool useDeformableMesh = (name == "deformableMeshScale");
 			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
 			if (vec3Attribute)
@@ -213,7 +213,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 				
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 				meshInstance->setMeshScale(SrVec((float) vec3Attribute->getValue().x, (float) vec3Attribute->getValue().y, (float) vec3Attribute->getValue().z));
-				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+				//SmartBody::util::log("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
 		else if (name == "deformableMesh" || name == "mesh")

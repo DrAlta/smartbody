@@ -1,28 +1,28 @@
-/*  sr_model_import_obj.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmarBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently UC Merced)
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include <vhcl.h>
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include <sr/sr_string_array.h>
 #include <sr/sr_model.h>
 #include <sb/SBTypes.h>
+#include <sb/SBUtilities.h>
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -77,20 +77,20 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	std::string imageFile = file;
 	in.init( fopen(file,"r"));
 	int i = 0;
-	LOG("[load_texture] Loading texture: '%s' \n", file);
+	SmartBody::util::log("[load_texture] Loading texture: '%s' \n", file);
 	while ( !in.valid() && i < paths.size())
 	{
 		s = paths[i++];
-		LOG("Path = '%s'\n", (const char*)s);
+		SmartBody::util::log("Path = '%s'\n", (const char*)s);
 		s << file;
-		//LOG("Evaluating path " << i << " / " <<  paths.size() << ":\t" << s << "\n";
-		LOG("Evaluating path %d / %d:\t '%s' \n", i, paths.size(), (const char*)s);
+		//SmartBody::util::log("Evaluating path " << i << " / " <<  paths.size() << ":\t" << s << "\n";
+		SmartBody::util::log("Evaluating path %d / %d:\t '%s' \n", i, paths.size(), (const char*)s);
 		imageFile = s;
 		
 		in.init (fopen(s,"r") );
 	}
 	if (!in.valid()) {
-		LOG("[load_texture] ERROR: Invalid inpath for texture: '%s' \n", file);
+		SmartBody::util::log("[load_texture] ERROR: Invalid inpath for texture: '%s' \n", file);
 		return;		
 	}
 

@@ -24,7 +24,6 @@
 #define SR_LINEAR_CURVE_H
 
 #include <stdio.h>
-//#include <vhcl_log.h>
 #include "sbm/gwiz_math.h"
 #include "sr_spline_curve.h"
 

@@ -22,7 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_line.h>
 #include <float.h>
 #include <math.h>
-#include <vhcl.h>
+
 
 SteerPath::SteerPath(void)
 {
@@ -77,7 +77,7 @@ void SteerPath::advanceToNextGoal( float length )
 	if (pathTotalLength < length)
 	{
 		currentGoal++;
-		//LOG("next goal = %d",currentGoal);
+		//SmartBody::util::log("next goal = %d",currentGoal);
 	}
 	
 }

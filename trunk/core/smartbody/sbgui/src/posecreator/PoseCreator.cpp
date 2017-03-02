@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "PoseCreator.h"
 #include <FL/Fl_Value_Slider.H>
 #include <sb/SBScene.h>

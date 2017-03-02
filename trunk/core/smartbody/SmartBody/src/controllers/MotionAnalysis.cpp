@@ -468,7 +468,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 				if (legState.prevCycle != legCycle->cycleIdx)
 				{
 					//if (k==1)
-					//    LOG("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
+					//    SmartBody::util::log("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
 					legState.newCycle = true;	
 					legState.curStep = legState.nextStep;
 				}
@@ -513,9 +513,9 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 // 		{
 // 			SrVec sf = legState.stanceSupportPos[0];
 // 			SrVec cf = legState.curSupportPos[0];			
-// 			LOG("stance Foot = %f %f %f, curFoot = %f %f %f",sf.x,sf.y,sf.z, cf.x, cf.y, cf.z);
+// 			SmartBody::util::log("stance Foot = %f %f %f, curFoot = %f %f %f",sf.x,sf.y,sf.z, cf.x, cf.y, cf.z);
 // 		}
-		//if (k==0) LOG("time to next cycle = %f", legState.timeToNextCycle);
+		//if (k==0) SmartBody::util::log("time to next cycle = %f", legState.timeToNextCycle);
 		//SrVec nextStepFootPos = (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase;
 		legState.nextStep = nextStepFootPos;
 		// // set to ground height by default
@@ -546,7 +546,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 			{
 				SrVec spos;
 				spos = legState.curSupportPos[m];
-				//LOG("leg support pos = %f %f %f",spos.x, spos.y, spos.z);
+				//SmartBody::util::log("leg support pos = %f %f %f",spos.x, spos.y, spos.z);
 			}
 		}
 // 		if (legState.stanceSupportPos.size() != legState.curSupportPos.size()) // if stance pos is not initialized yet
@@ -669,7 +669,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 // 	SrQuat deltaQ = curQuat*prevQuat.inverse();
 // 	if (fabs(deltaQ.angle()) > 0.05)
 // 	{
-// 		LOG("sudden change in joint angle !");
+// 		SmartBody::util::log("sudden change in joint angle !");
 // 	}
 // 	prevQuat = curQuat;
 	outFrame = inputFrame;

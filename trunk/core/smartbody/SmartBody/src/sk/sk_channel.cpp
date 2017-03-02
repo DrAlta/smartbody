@@ -328,7 +328,7 @@ int SkChannel::load ( Type type, SrInput& in, float* v, double scale ) // static
 #if 0
 	float len = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 	if( fabs( len - 1.0 ) > 0.000001 )	{
-		LOG( "SkChannel::load Quat: len == %.12f\n", len );
+		SmartBody::util::log( "SkChannel::load Quat: len == %.12f\n", len );
 	}
 #endif
 

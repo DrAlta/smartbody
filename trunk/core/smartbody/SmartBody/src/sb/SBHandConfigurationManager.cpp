@@ -21,6 +21,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "SBHandConfigurationManager.h"
 #include <sb/SBHandConfiguration.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody{
 
@@ -75,7 +76,7 @@ SBAPI void SBHandConfigurationManager::printHandConfiguration(std::string config
 	if (iter != _configMap.end())
 	{
 		std::string name = iter->first;
-		LOG("Name of the hand configuration is %s",name.c_str());
+		SmartBody::util::log("Name of the hand configuration is %s",name.c_str());
 		SBHandConfiguration* config = iter->second;
 		config->printMotionNames();
 	}
@@ -88,7 +89,7 @@ SBAPI SBHandConfiguration* SBHandConfigurationManager::getHandConfiguration(std:
 	{
 		return iter->second;
 	}else{
-		LOG("Unable to find hand configuration named %s",configName.c_str());
+		SmartBody::util::log("Unable to find hand configuration named %s",configName.c_str());
 		return NULL;
 	}
 }

@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "FaceViewer.h"
 #include <FL/Fl_Value_Slider.H>
 #include <sb/SBScene.h>
@@ -395,7 +395,7 @@ void FaceViewer::DefaultFaceCB(Fl_Widget* widget, void* data)
 			}
 			else
 			{
-				LOG("Default face poses cannot be set in remote mode.");
+				SmartBody::util::log("Default face poses cannot be set in remote mode.");
 			}
 		}
 
@@ -423,7 +423,7 @@ void FaceViewer::ResetDefaultFaceCB(Fl_Widget* widget, void* data)
 			}
 			else
 			{
-				LOG("Reset default face poses cannot be set in remote mode.");
+				SmartBody::util::log("Reset default face poses cannot be set in remote mode.");
 			}
 			
 		}

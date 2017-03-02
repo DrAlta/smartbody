@@ -21,7 +21,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_vec.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBAttributeManager.h>
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 
 namespace SmartBody {
 
@@ -398,7 +399,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	SBAttributeGroup* group = this->getAttributeManager()->getGroup(name, false);
 	if (!group)
 	{
-		LOG("No group named '%s' found, cannot set priority.", name.c_str());
+		SmartBody::util::log("No group named '%s' found, cannot set priority.", name.c_str());
 		return 0;
 	}
 	else
@@ -434,7 +435,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Bool Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Bool Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -448,7 +449,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Int Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Int Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -462,7 +463,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Double Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Double Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -476,7 +477,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Vec3 Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Vec3 Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -490,7 +491,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, String Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, String Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -504,7 +505,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Matrix Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Matrix Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -518,7 +519,7 @@ int SBObject::getAttributeGroupPriority(const std::string& name)
 	  }
 	  else
 	  {
-		  LOG("Warning, Action Attribute %s does not exist.",name.c_str());
+		  SmartBody::util::log("Warning, Action Attribute %s does not exist.",name.c_str());
 	  }
   }
 

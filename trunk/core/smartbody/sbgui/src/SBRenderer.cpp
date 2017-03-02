@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
@@ -32,6 +32,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSkeleton.h>
 #include <sb/SBPawn.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_camera.h>
 #include <sr/sr_mat.h>
 #include <sr/sr_random.h>
@@ -117,7 +118,7 @@ SbmTexture* SBRenderer::getCurEnvMap(bool diffuseMap)
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	debugTex = texManager.findTexture(SbmTextureManager::TEXTURE_HDR_MAP, texName.c_str());
 	if (!debugTex)
-		LOG("Error ! Can't find tex name = %s", texName.c_str());		
+		SmartBody::util::log("Error ! Can't find tex name = %s", texName.c_str());		
 	return debugTex;
 }
 
@@ -198,7 +199,7 @@ void SBRenderer::initSSAO(int w, int h)
 		float rr = ratio*ratio;
 		float kernelWeight = 0.1*(1.f - rr) + 1.f*rr;
 		ssaoKernel[i] *= kernelWeight;
-		LOG("Kernel %d, vec = %s", i, ssaoKernel[i].toString().c_str());
+		SmartBody::util::log("Kernel %d, vec = %s", i, ssaoKernel[i].toString().c_str());
 	}
 	
 	
@@ -588,7 +589,7 @@ void SBRenderer::drawTestSSAO()
 
 	SrMat projMatrix;
 	cam->get_perspective_mat(projMatrix);
-	//LOG("Proj Mat = %s", projMatrix.toString().c_str());
+	//SmartBody::util::log("Proj Mat = %s", projMatrix.toString().c_str());
 	glUniformMatrix4fv(glGetUniformLocation(ssaoShader->getShaderProgram(), "uProjectionMatrix"), 1, GL_FALSE, (GLfloat*)&projMatrix);
 	glUniform1f(glGetUniformLocation(ssaoShader->getShaderProgram(), "uTanHalfFov"), tanHalfFov);
 	glUniform1f(glGetUniformLocation(ssaoShader->getShaderProgram(), "uAspectRatio"), aspectRatio);
@@ -683,7 +684,7 @@ void SBRenderer::renderMesh(DeformableMeshInstance* meshInstance)
 	DeformableMesh* mesh = meshInstance->getDeformableMesh();
 	if (!mesh)
 	{
-		LOG("SBRenderer::renderMesh ERR: no deformable mesh found!");
+		SmartBody::util::log("SBRenderer::renderMesh ERR: no deformable mesh found!");
 		return; // no deformable mesh
 	}
 
@@ -987,7 +988,7 @@ void SBRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 
 	//GLuint PrimitivesWritten = 0;
 	//glGetQueryObjectuiv(queryName, GL_QUERY_RESULT, &PrimitivesWritten);
-	//LOG("Output transform feedback = %d", PrimitivesWritten);
+	//SmartBody::util::log("Output transform feedback = %d", PrimitivesWritten);
 
 	glUseProgram(0);
 	glDisableVertexAttribArray(0);
@@ -1036,7 +1037,7 @@ SBGBuffer::SBGBuffer()
 
 void SBGBuffer::initBuffer(int w, int h)
 {
-	LOG("Init SBGBuffer");
+	SmartBody::util::log("Init SBGBuffer");
 	initFBO("gbuffer_fbo");
 
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
@@ -1059,7 +1060,7 @@ void SBGBuffer::initBuffer(int w, int h)
 
 void SBGBuffer::resize(int w, int h)
 {
-	LOG("Resize SBGBuffer");
+	SmartBody::util::log("Resize SBGBuffer");
 	createBufferTex(w, h, false);
 }
 

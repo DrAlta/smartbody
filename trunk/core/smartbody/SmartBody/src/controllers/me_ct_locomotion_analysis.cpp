@@ -20,7 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
-#include "vhcl.h"
+
 
 #include "controllers/me_ct_locomotion_analysis.hpp"
 
@@ -85,7 +85,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 {
 	if(_ct_locomotion_pawn == NULL) 
 	{
-		LOG("Error: no locomotion controller attached.");
+		SmartBody::util::log("Error: no locomotion controller attached.");
 		return;
 	}
 	//if (this->motion_standing)
@@ -536,7 +536,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 
 			walking_direction += *((SrVec*)base_pos)-prev_base_pos;
 			//displacement += *((SrVec*)base_pos)-prev_base_pos;
-			//LOG("\nheight[frame%2d]:%f", i, height[i]);
+			//SmartBody::util::log("\nheight[frame%2d]:%f", i, height[i]);
 		}
 		int next = -1;
 
@@ -680,7 +680,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	free(pos_z);
 	free(count);
 	free(temp_axis);
-	//LOG("\nend analysis......");
+	//SmartBody::util::log("\nend analysis......");
 }
 
 void MeCtLocomotionAnalysis::estimate_direction(MeCtLocomotionLimbAnim* anim, int* count)
@@ -792,7 +792,7 @@ void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* co
 	anim->get_timing_space()->set_ref_time(counter++, (float)start);
 
 	anim->get_timing_space()->set_frame_num((float)motion_locomotion->frames());
-	//LOG("\nstance_time:%f; lift_time:%f; land_time:%f", anim->get_timing_space()->get_ref_time(0), anim->get_timing_space()->get_ref_time(1), anim->get_timing_space()->get_ref_time(2));
+	//SmartBody::util::log("\nstance_time:%f; lift_time:%f; land_time:%f", anim->get_timing_space()->get_ref_time(0), anim->get_timing_space()->get_ref_time(1), anim->get_timing_space()->get_ref_time(2));
 
 }
 

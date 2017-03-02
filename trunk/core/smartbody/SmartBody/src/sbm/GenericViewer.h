@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _GENERICVIEWER_
 #define _GENERICVIEWER_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <string>
 

@@ -1,4 +1,4 @@
-#include <vhcl.h>
+
 #include <FL/Fl_Native_File_Chooser.H>
 #include <sbm/GPU/SbmShader.h>
 #include "RootWindow.h"

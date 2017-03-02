@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
+#include <sb/SBUtilities.h>
 
 std::string MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
 std::string MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";
@@ -59,37 +60,37 @@ void MeCtMotionPlayer::init(SmartBody::SBPawn* pawn, std::string name, double n)
 		frameNum = n;
 		return;
 	}
-	//LOG("controller != NULL");
+	//SmartBody::util::log("controller != NULL");
 	if (controller != NULL)
 	{
 		_sub_context->remove_controller(controller);
 		//controller->unref();
 		delete controller;
 	}
-	//LOG("after if (controller != NULL)");
+	//SmartBody::util::log("after if (controller != NULL)");
 		 
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
 	if (!motion)
 	{
-		LOG("No motion named '%s' found. Motionplayer cannot play it.", name.c_str());
+		SmartBody::util::log("No motion named '%s' found. Motionplayer cannot play it.", name.c_str());
 		return;
 	}
 	motionName = name;
 	motion->connect(character->getSkeleton());
 	controller = new MeCtMotion();
 	MeCtMotion* mController = dynamic_cast<MeCtMotion*> (controller);
-	//LOG("mController->init");
+	//SmartBody::util::log("mController->init");
 	mController->init(pawn,motion);
-	//LOG("after mController->init");
+	//SmartBody::util::log("after mController->init");
 	std::string controllerName;
 	controllerName = "motion player for " + motionName;
 	controller->setName(controllerName.c_str());
 	
-	//LOG("_sub_context->add_controller");
+	//SmartBody::util::log("_sub_context->add_controller");
 	_sub_context->add_controller(controller);
 	controller->ref();
 	controller_map_updated();
-	//LOG("after controller_map_updated");
+	//SmartBody::util::log("after controller_map_updated");
 	this->remap();
 	frameNum = n;
 }

@@ -21,7 +21,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include "sbm/time_profiler.h"
 #include "sbm/lin_win.h"
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1090,7 +1091,7 @@ void TimeIntervalProfiler::reset( void )
 void TimeIntervalProfiler::print( void )
 {
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: print request ignored\n" );
+		SmartBody::util::log( "TIP BYPASS: print request ignored\n" );
 		return;
 	}
 	req_print = true;
@@ -1100,7 +1101,7 @@ void TimeIntervalProfiler::print( void )
 void TimeIntervalProfiler::report( void )
 {
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: report request ignored\n" );
+		SmartBody::util::log( "TIP BYPASS: report request ignored\n" );
 		return;
 	}
 	req_report = true;
@@ -1110,7 +1111,7 @@ void TimeIntervalProfiler::report( void )
 void TimeIntervalProfiler::erase( void )
 {
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: erase request ignored\n" );
+		SmartBody::util::log( "TIP BYPASS: erase request ignored\n" );
 		return;
 	}
 	req_erase = true;
@@ -1120,7 +1121,7 @@ void TimeIntervalProfiler::erase( void )
 void TimeIntervalProfiler::enable( bool en )
 {
 	if( sys_bypass )
-		LOG( "TIP BYPASS: %s request noted\n", en ? "enable" : "disable" );
+		SmartBody::util::log( "TIP BYPASS: %s request noted\n", en ? "enable" : "disable" );
 	if( en )
 		req_enable = true;
 	else
@@ -1130,7 +1131,7 @@ void TimeIntervalProfiler::enable( bool en )
 
 void TimeIntervalProfiler::preload( void )	{
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: preload request ignored\n" );
+		SmartBody::util::log( "TIP BYPASS: preload request ignored\n" );
 		return;
 	}
 	req_preload = true;
@@ -1140,7 +1141,7 @@ void TimeIntervalProfiler::preload( void )	{
 bool TimeIntervalProfiler::enable( const char* group_name, bool en )
 {
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: group %s request ignored\n", en ? "enable" : "disable" );
+		SmartBody::util::log( "TIP BYPASS: group %s request ignored\n", en ? "enable" : "disable" );
 		return( false );
 	}
 	group_entry_t* group_p = get_group( group_name );
@@ -1157,7 +1158,7 @@ bool TimeIntervalProfiler::enable( const char* group_name, bool en )
 bool TimeIntervalProfiler::preload( const char* group_name )
 {
 	if( sys_bypass )	{
-		LOG( "TIP BYPASS: group preload request ignored\n" );
+		SmartBody::util::log( "TIP BYPASS: group preload request ignored\n" );
 		return( false );
 	}
 	group_entry_t* group_p = get_group( group_name );

@@ -1,28 +1,26 @@
-/*
- *  sr_timer.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently UC Merced)
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 # include <stdio.h>
 # include <sr/sr_timer.h>
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 
 # ifdef SR_TARGET_WINDOWS // defined in sr.h
 # include <windows.h>
@@ -44,7 +42,7 @@ SrUtcTimer::SrUtcTimer ()
    LARGE_INTEGER lpPerformanceCount;
    struct _timeb tbuf;
    if ( QueryPerformanceFrequency(&lpFrequency)==false )
-    LOG("SrTimer: WIN32 High Resolution Performance Counter not supported.\n");
+    SmartBody::util::log("SrTimer: WIN32 High Resolution Performance Counter not supported.\n");
    else
     { _perf_freq = (double)lpFrequency.QuadPart;
       QueryPerformanceCounter ( &lpPerformanceCount );

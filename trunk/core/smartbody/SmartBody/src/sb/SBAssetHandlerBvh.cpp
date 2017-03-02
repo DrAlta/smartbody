@@ -19,7 +19,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerBvh.h"
-#include <vhcl.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -28,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
 #include <sbm/ParserBVH.h>
 
 
@@ -71,7 +71,7 @@ std::vector<SBAsset*> SBAssetHandlerBvh::getAssets(const std::string& path)
 	{
 		delete motion;
 		delete skeleton;
-		LOG("Could not .bvh file %s", convertedPath.c_str());
+		SmartBody::util::log("Could not .bvh file %s", convertedPath.c_str());
 	}
 	else
 	{

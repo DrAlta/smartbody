@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ParameterGroup.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
@@ -180,7 +180,7 @@ void ParameterGroup::updateWeight(std::vector<double>& weights)
 	int wNumber = blendData->state->getNumMotions();
 	for (unsigned int j = 0; j < weights.size(); j++)
 		command << " " << weights[j];
-	//LOG("pgroup, weight size = %d",weights.size());
+	//SmartBody::util::log("pgroup, weight size = %d",weights.size());
 	paWindow->execCmd(paWindow, command.str());
 	
 }

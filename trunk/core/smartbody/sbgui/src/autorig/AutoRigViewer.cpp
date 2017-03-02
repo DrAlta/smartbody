@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "AutoRigViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
 #include <sb/SBScene.h>
@@ -10,6 +10,7 @@
 #include <sb/SBJointMap.h>
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBBehaviorSet.h>
+#include <sb/SBUtilities.h>
 #include <autorig/SBAutoRigManager.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sk/sk_joint.h>
@@ -152,7 +153,7 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
 	{
 
-		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
+		SmartBody::util::log("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
 		return;
 	}
 	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
@@ -162,9 +163,9 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
 	std::string deformMeshName = filebasename+"AutoRig.dae"; 
-	LOG("Start Build Auto Rigging");
+	SmartBody::util::log("Start Build Auto Rigging");
 	bool autoRigSuccess = autoRigManager.buildAutoRiggingFromPawnMesh(_characterName, riggingType, skelName, deformMeshName);
-	LOG("Auto Rigging Done");
+	SmartBody::util::log("Auto Rigging Done");
 #if 0
 
 	SrModel& model = mesh->dMeshStatic_p[0]->shape();		
@@ -191,14 +192,14 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 	}
 	else
 	{
-		LOG("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
+		SmartBody::util::log("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
 	}
 #endif
 
 	if (!autoRigSuccess && riggingType == 2)		
 	{
 		std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
-		LOG(errorMsg.c_str());
+		SmartBody::util::log(errorMsg.c_str());
 		fl_alert(errorMsg.c_str());
 		return;
 	}		
@@ -237,11 +238,11 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 
 		if (manager->getNumBehaviorSets() == 0)
 		{
-			LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+			SmartBody::util::log("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
 		}
 		else
 		{
-			LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+			SmartBody::util::log("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
 		}
 	}
 #define TEST_ROCKETBOX 1
@@ -402,9 +403,9 @@ void SkinViewer::setSkeleton(SmartBody::SBSkeleton* sk)
 void SkinViewer::setDeformableMesh(DeformableMesh* defMesh)
 {
 	if (defMesh)
-		LOG("SkinViewer::setDeformableMesh = %s", defMesh->getName().c_str());
+		SmartBody::util::log("SkinViewer::setDeformableMesh = %s", defMesh->getName().c_str());
 	else
-		LOG("SkinViewer::setDeformableMesh to NULL.");
+		SmartBody::util::log("SkinViewer::setDeformableMesh to NULL.");
 	mesh = defMesh;
 	redraw();
 }
@@ -416,7 +417,7 @@ void SkinViewer::drawSkinWeight()
 
 	if (!mesh)
 	{
-		//LOG("Render SkinWeight ERR: no deformable mesh found!");
+		//SmartBody::util::log("Render SkinWeight ERR: no deformable mesh found!");
 		return; // no deformable mesh
 	}
 	//SrGlRenderFuncs::render_model(mesh->dMeshStatic_p[0]);

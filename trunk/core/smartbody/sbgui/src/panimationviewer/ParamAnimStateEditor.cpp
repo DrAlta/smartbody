@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimStateEditor.h"
 #include <FL/Fl_File_Chooser.H>
 #include <sb/SBScene.h>

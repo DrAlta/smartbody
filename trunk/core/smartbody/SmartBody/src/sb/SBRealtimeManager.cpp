@@ -26,7 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBUtilities.h>
-#include <vhcl.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -215,7 +215,7 @@ void SBRealtimeManager::setData(const std::string& channel, const std::string& d
 	else
 	{
 		if (this->getBoolAttribute("debug"))
-			LOG("Cannot find channel named: %s", channel.c_str());
+			SmartBody::util::log("Cannot find channel named: %s", channel.c_str());
 	}
 }
 
@@ -229,7 +229,7 @@ std::string SBRealtimeManager::getData(const std::string& channel)
 	else
 	{
 		if (this->getBoolAttribute("debug"))
-			LOG("Cannot find channel named: %s", channel.c_str());
+			SmartBody::util::log("Cannot find channel named: %s", channel.c_str());
 	}
 	
 	return data;
@@ -334,7 +334,7 @@ void SBRealtimeManager::notify(SBSubject* subject)
 				 iter != channelTable.end();
 				 iter++)
 			{
-				LOG("[%s] = %s", (*iter).first.c_str(), (*iter).second.c_str());
+				SmartBody::util::log("[%s] = %s", (*iter).first.c_str(), (*iter).second.c_str());
 			}
 		}
 #if USE_PERCEPTIONNEURON > 0
@@ -361,14 +361,14 @@ void SBRealtimeManager::notify(SBSubject* subject)
 				}
 				else
 				{
-					LOG("PerceptionNeuron already stopped.");
+					SmartBody::util::log("PerceptionNeuron already stopped.");
 				}
 			}
 		}
 #else
 		else if (name == "usePerceptionNeuron")
 		{
-			LOG("Perception neuron module not enabled. Please set USE_PERCEPTIONNEURON and rebuild.");
+			SmartBody::util::log("Perception neuron module not enabled. Please set USE_PERCEPTIONNEURON and rebuild.");
 		}
 #endif
 	}
@@ -385,21 +385,21 @@ void SBRealtimeManager::startPerceptionNeuron()
 
 	if (BRGetSocketStatus(m_sockTCPRef) == CS_Running)
 	{
-		LOG("Perception neuron already connected...");
+		SmartBody::util::log("Perception neuron already connected...");
 		return;
 	}
-	LOG("Attempting to connect to %s:%d", this->getStringAttribute("perceptionNeuronIP").c_str(), this->getIntAttribute("perceptionNeuronPort"));
+	SmartBody::util::log("Attempting to connect to %s:%d", this->getStringAttribute("perceptionNeuronIP").c_str(), this->getIntAttribute("perceptionNeuronPort"));
 	m_sockTCPRef = BRConnectTo((char*) this->getStringAttribute("perceptionNeuronIP").c_str(), this->getIntAttribute("perceptionNeuronPort"));
 	if (m_sockTCPRef == 0)
 	{
 		char* errorMessage = BRGetLastErrorMessage();
-		LOG("Error message from Perception Neuron: %s", errorMessage);
+		SmartBody::util::log("Error message from Perception Neuron: %s", errorMessage);
 		this->setStringAttribute("perceptionNeuronStatus", "Disconnected");
 		return;
 	}
 	m_sockUDPRef = BRStartUDPServiceAt(7001);
 	//BRRegisterAutoSyncParmeter(m_sockTCPRef, Cmd_AvatarCount);
-	LOG("Connected to Perception Neuron!");
+	SmartBody::util::log("Connected to Perception Neuron!");
 
 
 	this->setStringAttribute("perceptionNeuronStatus", "Connected");
@@ -457,7 +457,7 @@ void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender
 	{
 		for (int d = 0; d < header->DataCount; d += 3)
 		{
-			LOG("%f %f %f", realtimeManager->_valuesBuffer[d], realtimeManager->_valuesBuffer[d + 1], realtimeManager->_valuesBuffer[d + 2]);
+			SmartBody::util::log("%f %f %f", realtimeManager->_valuesBuffer[d], realtimeManager->_valuesBuffer[d + 1], realtimeManager->_valuesBuffer[d + 2]);
 		}
 	}
 	
@@ -562,39 +562,39 @@ void SBRealtimeManager::myCalculationDataReceived(void* customedObj, SOCKET_REF 
 	/*
 	if (pack->CommandId == Cmd_BoneSize)
 	{
-		LOG("Cmd_BoneSize");
+		SmartBody::util::log("Cmd_BoneSize");
 	}
 	else if (pack->CommandId == Cmd_AvatarName)
 	{
-		LOG("Cmd_AvatarName");
+		SmartBody::util::log("Cmd_AvatarName");
 	}
 	else if (pack->CommandId == Cmd_FaceDirection)
 	{
-		LOG("Cmd_BoneSize");
+		SmartBody::util::log("Cmd_BoneSize");
 	}
 	else if (pack->CommandId == Cmd_DataFrequency)
 	{
-		LOG("Cmd_DataFrequency");
+		SmartBody::util::log("Cmd_DataFrequency");
 	}
 	else if (pack->CommandId == Cmd_BvhInheritanceTxt)
 	{
-		LOG("Cmd_BvhInheritanceTxt");
+		SmartBody::util::log("Cmd_BvhInheritanceTxt");
 	}
 	else if (pack->CommandId == Cmd_AvatarCount)
 	{
-		LOG("Cmd_AvatarCount");
+		SmartBody::util::log("Cmd_AvatarCount");
 	}
 	else if (pack->CommandId == Cmd_CombinationMode)
 	{
-		LOG("Cmd_CombinationMode");
+		SmartBody::util::log("Cmd_CombinationMode");
 	}
 	else if (pack->CommandId == Cmd_RegisterEvent)
 	{
-		LOG("Cmd_RegisterEvent");
+		SmartBody::util::log("Cmd_RegisterEvent");
 	}
 	else if (pack->CommandId == Cmd_UnRegisterEvent)
 	{
-		LOG("Cmd_UnRegisterEvent");
+		SmartBody::util::log("Cmd_UnRegisterEvent");
 	}
 	*/
 }
@@ -615,10 +615,10 @@ void SBRealtimeManager::mySocketStatusChanged(void* customedObj, SOCKET_REF send
 		currentStatus = "OffWork";
 	}
       
-	LOG("Socket status: %s", currentStatus.c_str());
+	SmartBody::util::log("Socket status: %s", currentStatus.c_str());
 	if (message)
 	{
-		LOG("Socket message: %s", message);
+		SmartBody::util::log("Socket message: %s", message);
 	}
 }
 

@@ -48,7 +48,7 @@ double MeCtTimeShiftWarp::controller_duration() {
 bool MeCtTimeShiftWarp::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
 		child()->evaluate( _curve.evaluate( t ), frame );
-//		LOG("MeCtTimeShiftWarp %s,  %f	%f	%f", this->getName().c_str(), t, _curve.evaluate( t ), controller_duration());
+//		SmartBody::util::log("MeCtTimeShiftWarp %s,  %f	%f	%f", this->getName().c_str(), t, _curve.evaluate( t ), controller_duration());
 		return true;
 	} else {
 		return false;

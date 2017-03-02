@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include <stdlib.h>
 #include <exception>
 #include <iostream>
@@ -71,6 +71,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBUtilities.h>
 
 using namespace BML;
 using namespace SmartBody;
@@ -112,7 +113,7 @@ namespace BML {
 		if( error_msg==NULL || error_msg[0]=='\0' )
 			error_msg = "INVALID_ERROR_MESSAGE";
 
-		////LOG("WARNING: bml_error(..): %s (agent \"%s\", message id \"%s\")", error_msg, agent_id, message_id);
+		////SmartBody::util::log("WARNING: bml_error(..): %s (agent \"%s\", message id \"%s\")", error_msg, agent_id, message_id);
 
 		// Old vrSpeakFailed form (sans recipient)
 		std::ostringstream buff;
@@ -199,11 +200,11 @@ BML::Processor::Processor()
 		//xmlParser->setErrorHandler(errHandler);
 		//xmlParser->setErrorHandler( new HandlerBase() );
 	} catch( const XMLException& e ) {
-		LOG("ERROR: BML Processor:  XMLException during constructor: %s", e.getMessage());
+		SmartBody::util::log("ERROR: BML Processor:  XMLException during constructor: %s", e.getMessage());
 	} catch( const std::exception& e ) {
-		LOG("ERROR: BML Processor:  std::exception during constructor: %s", e.what());
+		SmartBody::util::log("ERROR: BML Processor:  std::exception during constructor: %s", e.what());
 	} catch(...) {
-		LOG("ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================");
+		SmartBody::util::log("ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================");
 	}
 
 	exportXMLCounter = 0;
@@ -268,7 +269,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 
 	MapOfBmlRequest::iterator result = bml_requests.find( bpMsg.requestId );
     if( result != bml_requests.end() ) {
-		LOG("Duplicate BML Request Message ID: %s", bpMsg.requestId.c_str());
+		SmartBody::util::log("Duplicate BML Request Message ID: %s", bpMsg.requestId.c_str());
 		//  TODO: call vrSpeakFailed?  How do we show we're not failing on the original agent/message-id request?
 		return;
     }
@@ -277,7 +278,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 	DOMElement* root = xml->getDocumentElement();  
 	if( XMLString::compareString( root->getTagName(), BMLDefs::TAG_ACT )!=0 )
 	{
-		LOG("WARNING: BodyPlanner: Expected <act> tag as XML root.");
+		SmartBody::util::log("WARNING: BodyPlanner: Expected <act> tag as XML root.");
 	}
 	else
 	{
@@ -328,15 +329,15 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 			request->xmlBody = xmlBodyString;
 			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
 			{
-				LOG("%s, %s", request->msgId.c_str(), request->localId.c_str());
-				LOG("xmlbody %s", xmlBodyString.c_str());
+				SmartBody::util::log("%s, %s", request->msgId.c_str(), request->localId.c_str());
+				SmartBody::util::log("xmlbody %s", xmlBodyString.c_str());
 			}
 
 			// make sure that the request id isn't in the pending interrupt list
 			std::map<std::string, double>::iterator isPendingInterruptIter = pendingInterrupts.find(bpMsg.requestId);
 			if (isPendingInterruptIter != pendingInterrupts.end())
 			{
-				LOG("BML with id %s will not be processed because a recent interrupt request was made.", bpMsg.requestId.c_str());
+				SmartBody::util::log("BML with id %s will not be processed because a recent interrupt request was made.", bpMsg.requestId.c_str());
 				bml_requests.erase( bpMsg.requestId ); 
 				// now remove that pending interrupt request
 				pendingInterrupts.erase(isPendingInterruptIter);
@@ -358,13 +359,13 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 			std::ostringstream oss;
 			oss << e.type() << ": " << e.what();
 
-			LOG("ERROR: BML::Processor::bml_request(): %s", oss.str().c_str());
+			SmartBody::util::log("ERROR: BML::Processor::bml_request(): %s", oss.str().c_str());
 			bml_requests.erase( bpMsg.requestId );  // No further references if we're going to fail.
 			bml_error( bpMsg.actorId, bpMsg.msgId, oss.str().c_str(), scene );
 		}
 	} else {
 		const char* message = "No BML element found.";
-		LOG("ERROR: BML::Processor::bml_request(): %s", message);
+		SmartBody::util::log("ERROR: BML::Processor::bml_request(): %s", message);
 		bml_error( bpMsg.actorId, bpMsg.msgId, message, scene );
 	}
 }
@@ -408,7 +409,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)	
 			behav_syncs.parseStandardSyncPoints( child, request, unique_id );
 
-			//LOG("parse behaviorSyncPoints : stroke time = %f",behav_syncs.sync_stroke()->time());
+			//SmartBody::util::log("parse behaviorSyncPoints : stroke time = %f",behav_syncs.sync_stroke()->time());
 
 			BehaviorRequestPtr behavior;
 
@@ -430,7 +431,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						std::string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
 						bool insert_success = speeches.insert( std::make_pair( speechKey, speech_request ) ).second;  // store for later reply
 						if( !insert_success ) {
-							LOG("ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speeches already contains an entry for speechKey \"%s\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur..)", speechKey.c_str());
+							SmartBody::util::log("ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speeches already contains an entry for speechKey \"%s\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur..)", speechKey.c_str());
 							// TODO: Send vrSpeakFailed
 						}
 
@@ -439,13 +440,13 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						//  Speech is always treated as required
 						std::wstringstream wstrstr;
 						wstrstr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 					}
 				} else {
 					std::wstringstream wstrstr;
 					wstrstr<<"ERROR: BML <"<<tag<<"> must be first behavior.";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
-					LOG("\t(unique_id \"%s\".", unique_id.c_str()); // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log("\t(unique_id \"%s\".", unique_id.c_str()); // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
 					
 				}
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_ANIMATION )==0 ) {
@@ -481,7 +482,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_EVENT )==0 ) {
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SPEECH )==0 ) {
-				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
+				SmartBody::util::log("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_LOCOTMOTION )==0 ) {
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_STATES )==0 || XMLString::compareString( tag, BMLDefs::TAG_BLEND )==0) {
@@ -493,7 +494,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			} else {
 				std::wstringstream wstrstr;
 				wstrstr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported.";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 
 			
@@ -598,7 +599,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 
 				if (!request->actor->posture_sched_p)
 				{
-					LOG( "Character %s does not have posture scheduler.", request->actor->getName().c_str());
+					SmartBody::util::log( "Character %s does not have posture scheduler.", request->actor->getName().c_str());
 					return BehaviorRequestPtr();
 				}
 				PostureRequest * posture_new = new PostureRequest( unique_id, localId, motionCt, 1, request->actor, behav_syncs );
@@ -607,15 +608,15 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				return BehaviorRequestPtr( posture_new );
 			} else {
 				std::string s = xml_utils::xml_translate_string( postureName );
-				LOG( "WARNING: BML::Processor::parse_bml_body(): <body>: posture=\"%s\" not loaded; ignoring <body>.", s.c_str() );
+				SmartBody::util::log( "WARNING: BML::Processor::parse_bml_body(): <body>: posture=\"%s\" not loaded; ignoring <body>.", s.c_str() );
 //				std::wstringstream wstrstr;
 //				wstrstr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>.";
-//				LOG(convertWStringToString(wstrstr.str()).c_str());
+//				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 			}
 		}
 	} else {
-		LOG("WARNING: BML::Processor::parse_bml_body(): <body> missing posture = attribute; ignoring <body>.");
+		SmartBody::util::log("WARNING: BML::Processor::parse_bml_body(): <body> missing posture = attribute; ignoring <body>.");
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 	return BehaviorRequestPtr();  // a.k.a., NULL
@@ -625,7 +626,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 	
 	if (!request->actor->head_sched_p)
 	{
-		LOG("Character %s does not have a head scheduler, so cannot access head movements.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a head scheduler, so cannot access head movements.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -724,12 +725,12 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 				if (character == NULL)
 				{
-					LOG("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
+					SmartBody::util::log("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
 					return BehaviorRequestPtr();
 				}
 				if (character->head_param_anim_ct == NULL)
 				{
-					LOG("parse_bml_states ERR: cannot find head_param_anim_ct inside character %s.", characterName.c_str());
+					SmartBody::util::log("parse_bml_states ERR: cannot find head_param_anim_ct inside character %s.", characterName.c_str());
 					return BehaviorRequestPtr();					
 				}
 
@@ -750,61 +751,61 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 					// TODO
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior.";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else if( direction && *direction != 0 ) {
 					if( XMLString::compareIString( direction, BMLDefs::DIR_RIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_RIGHT<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, BMLDefs::DIR_LEFT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_LEFT<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, BMLDefs::DIR_UP )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_UP<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, BMLDefs::DIR_DOWN )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_DOWN<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, BMLDefs::DIR_ROLLRIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, BMLDefs::DIR_ROLLRIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else {
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unrecognized direction \""<<direction<<"\" in <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
+						SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					}
 
 					// TODO
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else {
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior.";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				}
 			}
@@ -813,7 +814,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				{
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 				}
 				*/
@@ -866,14 +867,14 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				{
 				std::wstringstream wstrstr;
                 wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 				}
         }
     } else {
 		std::wstringstream wstrstr;
         wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<"> BML tag missing "<< BMLDefs::ATTR_TYPE<<"= attribute.";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+		SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 	return BehaviorRequestPtr();  // a.k.a., NULL
@@ -916,7 +917,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 				} catch( std::exception& e ) {
 					std::stringstream strstr;
 					strstr << "ERROR: BML::Processor::speechReply() exception:" << e.what();
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 					bml_error( actor->getName().c_str(), request->msgId.c_str(), e.what(), scene );
 				}
 			} else {
@@ -924,7 +925,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 				{
 					std::stringstream strstr;
 					strstr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 				// NO ERROR MESSAGE!  Missing BmlRequest means vrSpeakFailed fields are lost.
 			}   // else ignore... not a part of this BodyPlanner or expired
@@ -933,7 +934,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest not found for \"" << requestId << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 			// NO ERROR MESSAGE!  Missing SpeechRequest means BmlRequest's vrSpeakFailed fields are also lost.
 		}   // else ignore... not a part of this BodyPlanner or expired
@@ -943,7 +944,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 	} else if( LOG_SPEECH ) {
 		std::stringstream strstr;
 		strstr << "ERROR: BodyPlannerImpl::speechReply(..): No speech found for \"" << requestId << "\"";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 	}   // else ignore... not a part of this BodyPlanner or expired
 }
 
@@ -1016,7 +1017,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		}
 
 		// Probably already cleaned up
-		LOG("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->getName().c_str(), performance_id.c_str());
+		SmartBody::util::log("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->getName().c_str(), performance_id.c_str());
 		// ignore without error
 	}
 
@@ -1045,7 +1046,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene )
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end complete_code \""<<complete_code<<"\". Treating as normal complete.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	} else if( end_code == "interrupted" ) {
 		// Ended by interruption from another behavior
@@ -1054,7 +1055,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene )
 	} else {
 		std::stringstream strstr;
 		strstr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end_code \""<<end_code<<"\". Treating as complete." << std::endl;
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 	}
 
 	request->cleanup( this, scene );
@@ -1080,7 +1081,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 
 	// show the message
 #if 0
-	LOG(args.peek_string());
+	SmartBody::util::log(args.peek_string());
 #endif
 
 	Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
@@ -1093,7 +1094,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		{
 			std::stringstream strstr;
 			strstr << "WARNING: BmlProcessor: Unknown agent \"" << character_id << "\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 		// Ignore
 		return CMD_SUCCESS;
@@ -1189,7 +1190,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		} catch( BmlException& e ) {
 			std::stringstream strstr;
 			strstr << "vrAgentBML .. end: " << e.type() << ": " << e.what() << std::endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		//} catch( AssertException& e ) {
 		//	strstr << "vrSpeak: AssertionException: "<<e.getMessage()<< endl;
@@ -1197,7 +1198,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		} catch( const std::exception& e ) {
 			std::stringstream strstr;
 			strstr << "vrAgentBML .. end: std::exception: "<<e.what()<< std::endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		//} catch( ... ) {
 		//	strstr << "vrSpeak: Unknown exception."<< endl;
@@ -1212,7 +1213,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		std::stringstream strstr;
 		strstr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
 		     << "vrAgentBML " << character_id << " " << message_id << " " << command << " " << args.read_remainder_raw();
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 #endif
 		return CMD_FAILURE;
 	}
@@ -1229,7 +1230,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 	const char *message_id   = args.read_token();
 	char       *xml          = args.read_remainder_raw();
 	//cout << "DEBUG: vrSpeak " << agentId << " " << recipientId << " " << messageId << endl;
-	//////LOG("agent_id = %s, recipient_id = %s, message id = %s, xml = %s",agent_id,recipient_id, message_id, xml);
+	//////SmartBody::util::log("agent_id = %s, recipient_id = %s, message id = %s, xml = %s",agent_id,recipient_id, message_id, xml);
 
 	try {
 		if( xml[0]=='\0' ) {
@@ -1262,7 +1263,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 			{
 				std::stringstream strstr;
 				strstr << "WARNING: BmlProcessor: Unknown agent \"" << agent_id << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 
 				
@@ -1362,7 +1363,7 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, SmartBody::SBCommandManager
 	} catch( const std::exception& e ) {
 		std::stringstream strstr;
 		strstr << "vrSpoke: std::exception: " << e.what();
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return CMD_FAILURE;
 	//} catch( ... ) {
 	//	strstr << "vrSpeak: Unknown exception."<< endl;
@@ -1381,14 +1382,14 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager*
         bp->reset();
         return CMD_SUCCESS;
 	} else if( command == "speech_ready" ) {
-		//LOG("bp speech ready");
+		//SmartBody::util::log("bp speech ready");
 		// bp speech_ready <CharacterId> <RequestId> SUCCESS/ERROR reason
 		char* actorId = args.read_token();
 		SmartBody::SBCharacter* actor = scene->getCharacter( actorId );
 		if( actor==NULL ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::Processor::bp_cmd_func(): Unknown actor \"" << actorId << "\".  This is probably an error since the command \"bp speech_reply\" is not supposed to be sent over the network, thus it should not be coming from another SBM process." << std::endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_SUCCESS;
 		}
 
@@ -1465,7 +1466,7 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "auto_print_sequence" ||
@@ -1480,7 +1481,7 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "log_sync_points" ||
@@ -1495,7 +1496,7 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "controller_speed" ||
@@ -1504,7 +1505,7 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		if( sub_attribute.empty() ) {
 			std::stringstream strstr;
 			strstr << "ERROR: Missing sub-attributes 'min <value>' or 'max <value>'.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 
@@ -1519,7 +1520,7 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 				} else if( value.empty() || !(std::istringstream( value ) >> ct_speed_min) ) {
 					std::stringstream strstr;
 					strstr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\".";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 					return CMD_FAILURE;
 				}
 			} else if( sub_attribute == "max" ) {
@@ -1529,13 +1530,13 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 				} else if( value.empty() || !(std::istringstream( value ) >> ct_speed_max) ) {
 					std::stringstream strstr;
 					strstr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\".";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 					return CMD_FAILURE;
 				}
 			} else {
 				std::stringstream strstr;
 				strstr << "ERROR: Unexpected sub_attribute \"" << sub_attribute << "\" for bp controller_speed.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 			sub_attribute = args.read_token();
@@ -1545,18 +1546,18 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		if( ct_speed_min >= 1 ) {
 			std::stringstream strstr;
 			strstr << "ERROR: controller_speed min must be less than 1.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			valid = false;
 		} else if( ct_speed_min <= 0 ) {
 			std::stringstream strstr;
 			strstr << "ERROR: controller_speed min must be greater than 0.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			valid = false;
 		}
 		if(  ct_speed_max <= 1 ) {
 			std::stringstream strstr;
 			strstr << "ERROR: controller_speed max must be greater than 1.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			valid = false;
 		}
 		if( valid ) {
@@ -1586,13 +1587,13 @@ int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else {
 		std::stringstream strstr;
 		strstr << "ERROR: BML::Processor::set_func(): Unknown attribute \"" << attribute <<"\".";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
         return CMD_NOT_FOUND;
 	}
 }
@@ -1635,13 +1636,13 @@ int BML::Processor::print_func( srArgBuffer& args, SmartBody::SBCommandManager* 
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else {
 		std::stringstream strstr;
 		strstr << "ERROR: BML::Processor::print_func(): Unknown attribute \"" << attribute <<"\".";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
         return CMD_NOT_FOUND;
 	}
 }

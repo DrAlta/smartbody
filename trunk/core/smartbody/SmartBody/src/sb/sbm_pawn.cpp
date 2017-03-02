@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
-#include "vhcl.h"
+
 #include <sb/SBTypes.h>
 
 #include "sbm_pawn.hpp"
@@ -34,6 +34,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
@@ -168,7 +169,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 {
 	if (!sk)
 	{
-		LOG("Cannot set a null skeleton on object %s", getName().c_str());
+		SmartBody::util::log("Cannot set a null skeleton on object %s", getName().c_str());
 		return;
 	}
 	 
@@ -239,7 +240,7 @@ int SbmPawn::setup() {
 	if( _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\".";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return( CMD_FAILURE ); 
 	}
 
@@ -287,7 +288,7 @@ int SbmPawn::init_skeleton() {
 	if( _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\".";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return( CMD_FAILURE ); 
 	}
 
@@ -431,7 +432,7 @@ SbmPawn::~SbmPawn()
 
 	if( _skeleton )
 	{
-		//LOG("skeleton ref count = %d",_skeleton->getref());
+		//SmartBody::util::log("skeleton ref count = %d",_skeleton->getref());
 		//_skeleton->unref();
 		delete _skeleton;
 	}
@@ -551,11 +552,11 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 								break;
 		case SkJoint::TypeSwingTwist:
 			strstr << "ERROR: SbmPawn::set_world_offset(..): Unsupported joint rotation type SwingTwist.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			break;
 		default:
 			strstr << "ERROR: SbmPawn::set_world_offset(..): Unknown joint rotation type: " << woj->rot_type();
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			break;
 	}	
 }
@@ -566,7 +567,7 @@ void SbmPawn::wo_cache_update() {
 	{
 		//std::stringstream strstr;
 		//strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << getName() << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
-		//LOG(strstr.str().c_str());
+		//SmartBody::util::log(strstr.str().c_str());
 		return;
 	}
 	const SkJointPos* pos = joint->const_pos();
@@ -581,7 +582,7 @@ void SbmPawn::wo_cache_update() {
 	if( rot_type != SkJoint::TypeQuat ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SbmPawn::wo_cache_update(..): Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return;
 	}
 
@@ -671,7 +672,7 @@ void SbmPawn::initSteeringSpaceObject()
 	
 	
 
-	//LOG("steeringSpaceObjSize = %f %f %f, scale = %f", steeringSpaceObjSize.x, steeringSpaceObjSize.y, steeringSpaceObjSize.z, steerScale);
+	//SmartBody::util::log("steeringSpaceObjSize = %f %f %f, scale = %f", steeringSpaceObjSize.x, steeringSpaceObjSize.y, steeringSpaceObjSize.z, steerScale);
 
 	if (steeringSpaceObj_p)
 	{

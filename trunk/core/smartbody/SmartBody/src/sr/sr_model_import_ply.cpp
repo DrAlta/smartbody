@@ -19,7 +19,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-#include <vhcl.h>
+
 #include <sr/sr_string_array.h>
 #include <sr/sr_model.h>
 #include <sb/SBTypes.h>
@@ -153,7 +153,7 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	}
 	if (!in.valid()) return;			
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
-	LOG("loading texture file = %s", imageFile.c_str());
+	SmartBody::util::log("loading texture file = %s", imageFile.c_str());
 	texManager.loadTexture(type,file,s);		
 #endif
 }
@@ -195,7 +195,7 @@ bool SrModel::import_ply( const char* file )
 			M.push_back(material);        
 			//SR_TRACE1 ( "new material: "<<in.last_token() );	
 			mtlnames.push_back ( mtlName.c_str() );
-			LOG("texture found : %s", texFile.c_str());
+			SmartBody::util::log("texture found : %s", texFile.c_str());
 			mtlTextureNameMap[mtlName] = texFile;	
 		}
 		comment = ply_get_next_comment(ply,comment);
@@ -223,7 +223,7 @@ bool SrModel::import_ply( const char* file )
 	ply_set_read_cb(ply, "face", "texnumber", texNumber_cb, this, 0);
 
 #endif
-	LOG("%ld\n%ld\n", nvertices, ntriangles);
+	SmartBody::util::log("%ld\n%ld\n", nvertices, ntriangles);
 	if (!ply_read(ply))
 		return false;
 	ply_close(ply);
@@ -237,7 +237,7 @@ bool SrModel::import_ply( const char* file )
 // 	for (int i=0;i<T.size();i++)
 // 	{
 // 		if (i%100 == 0)
-// 			LOG("Tex Coord %d = %.4f %.4f", i, T[i].x, T[i].y);
+// 			SmartBody::util::log("Tex Coord %d = %.4f %.4f", i, T[i].x, T[i].y);
 // 	}
 
 #if TEST_TEXTURE

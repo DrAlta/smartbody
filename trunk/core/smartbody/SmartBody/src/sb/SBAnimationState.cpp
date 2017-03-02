@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBEvent.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBUtilities.h>
 #include <set>
 #include <boost/algorithm/string.hpp>
 #include <controllers/me_ct_param_animation.h>
@@ -260,7 +261,7 @@ void SBAnimationBlend::createErrorSurfaces( const std::string& type, SrVec cente
 		for (unsigned int i=0;i<parameters.size();i++)
 		{		
 			SrVec offset = parameters[i] - center;
-			//LOG("parameter = %f %f %f",parameters[i][0],parameters[i][1],parameters[i][2]);
+			//SmartBody::util::log("parameter = %f %f %f",parameters[i][0],parameters[i][1],parameters[i][2]);
 			//offset.y = 0.f; // ignore y distance		
 			float curDist = offset.norm();
 			if (curDist < minDist)
@@ -278,14 +279,14 @@ void SBAnimationBlend::createErrorSurfaces( const std::string& type, SrVec cente
 			if (theta > (float)SR_PI*3.f/4.f) theta = theta - (float)SR_PI*2;
 			//float theta = atan2f(offsetDir.z,offsetDir.x);
 
-			//LOG("tan = %f, theta = %f, cos = %f, phi = %f",tanValue, theta*toDegree, cosValue, phi*toDegree);
+			//SmartBody::util::log("tan = %f, theta = %f, cos = %f, phi = %f",tanValue, theta*toDegree, cosValue, phi*toDegree);
 			if (theta < minTheta) minTheta = theta;
 			if (theta > maxTheta) maxTheta = theta;
 			if (phi < minPhi) minPhi = phi;
 			if (phi > maxPhi) maxPhi = phi;
 		}	 
 		minDist = (minDist+maxDist)*0.5f; // make sure "near surf" is not too close
-		//LOG("maxPhi = %f, minPhi = %f, maxTheta = %f, minTheta = %f",maxPhi*toDegree, minPhi*toDegree, maxTheta*toDegree, minTheta*toDegree);
+		//SmartBody::util::log("maxPhi = %f, minPhi = %f, maxTheta = %f, minTheta = %f",maxPhi*toDegree, minPhi*toDegree, maxTheta*toDegree, minTheta*toDegree);
 		SrVec2 thetaRange = SrVec2(minTheta, maxTheta-minTheta);
 		SrVec2 phiRange = SrVec2(minPhi, maxPhi-minPhi);
 		if(segments==0 || maxDist-minDist<srtiny) // creat only one surface in the middle
@@ -395,7 +396,7 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 	}
 
 	totalSmooth /= smoothList.size();
-	LOG("total avg smooth = %f",totalSmooth);
+	SmartBody::util::log("total avg smooth = %f",totalSmooth);
 	SrColor temp_c;
 	SrMaterial mtl;
 	//surfModel->M.remove(0,smoothList.size());
@@ -438,7 +439,7 @@ void SBAnimationBlend::updateErrorSurace( SrSnColorSurf* errorSurf, SrVec center
 	}
 
 	totalError /= errorList.size();
-	LOG("total avg error = %f",totalError);
+	SmartBody::util::log("total avg error = %f",totalError);
 	SrColor temp_c;
 	SrMaterial mtl;
 	//maxError = 0.4f;
@@ -464,12 +465,12 @@ void SBAnimationBlend::buildVisSurfaces( const std::string& errorType, const std
 {
 	if (errorType != "error" && errorType != "smooth")
 	{
-		LOG("Warning : errorType must be 'error' or 'smooth'");
+		SmartBody::util::log("Warning : errorType must be 'error' or 'smooth'");
 		return;
 	}
 	if (_dimension != "3D")
 	{
-		LOG("Warning : build Vis Surface only works for 3D parameterization state");
+		SmartBody::util::log("Warning : build Vis Surface only works for 3D parameterization state");
 	}
 
 	std::vector<SrSnColorSurf*>& surfaces = (errorType == "error") ? errorSurfaces : smoothSurfaces;
@@ -496,7 +497,7 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 	if(mo==0) return;
 	if(mo->frames()<3)
 	{
-		LOG("createMotionVectorFlow(): motion does not have enough frames, aborting...");
+		SmartBody::util::log("createMotionVectorFlow(): motion does not have enough frames, aborting...");
 		return;
 	}
 	SkSkeleton* sk = mo->connected_skeleton();
@@ -511,12 +512,12 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 		}
 		if(sk)
 		{
-			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			SmartBody::util::log("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
 			mo->connect(sk);
 		}
 		else
 		{
-			LOG("createMotionVectorFlow(): motion not connected to any skeleton, aborting...");
+			SmartBody::util::log("createMotionVectorFlow(): motion not connected to any skeleton, aborting...");
 			return;
 		}
 	}
@@ -543,7 +544,7 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 		getJointsGPosFromSkel(sk, *pnts_arr.top(), jnts);
 	}
 
-	// LOG("createMotionVectorFlow(): max vector norm = %f \n", getVectorMaxNorm(pnts_arr));
+	// SmartBody::util::log("createMotionVectorFlow(): max vector norm = %f \n", getVectorMaxNorm(pnts_arr));
 
 	// compute all vector norms
 	SrArray<SrArray<float>*> norm_arr; // jsize X (frames-1)
@@ -642,7 +643,7 @@ void SBAnimationBlend::plotMotion(const std::string& motionName, const std::stri
 	if(mo==0) return;
 	if(mo->frames()<3)
 	{
-		LOG("plotMotion(): motion does not have enough frames, aborting...");
+		SmartBody::util::log("plotMotion(): motion does not have enough frames, aborting...");
 		return;
 	}
 	SkSkeleton* sk = mo->connected_skeleton();
@@ -657,12 +658,12 @@ void SBAnimationBlend::plotMotion(const std::string& motionName, const std::stri
 		}
 		if(sk)
 		{
-			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			SmartBody::util::log("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
 			mo->connect(sk);
 		}
 		else
 		{
-			LOG("plotMotion(): motion not connected to any skeleton, aborting...");
+			SmartBody::util::log("plotMotion(): motion not connected to any skeleton, aborting...");
 			return;
 		}
 	}
@@ -720,7 +721,7 @@ void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const 
 	if(mo==0) return;
 	if(mo->frames()<3)
 	{
-		LOG("plotMotionFrame(): motion does not have enough frames, aborting...");
+		SmartBody::util::log("plotMotionFrame(): motion does not have enough frames, aborting...");
 		return;
 	}
 	SkSkeleton* sk = mo->connected_skeleton();
@@ -735,12 +736,12 @@ void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const 
 		}
 		if(sk)
 		{
-			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			SmartBody::util::log("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
 			mo->connect(sk);
 		}
 		else
 		{
-			LOG("plotMotionFrame(): motion not connected to any skeleton, aborting...");
+			SmartBody::util::log("plotMotionFrame(): motion not connected to any skeleton, aborting...");
 			return;
 		}
 	}
@@ -785,7 +786,7 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	if(mo==0) return;
 	if(mo->frames()<3)
 	{
-		LOG("plotMotionJointTrajectory(): motion does not have enough frames, aborting...");
+		SmartBody::util::log("plotMotionJointTrajectory(): motion does not have enough frames, aborting...");
 		return;
 	}
 	SkSkeleton* sk = mo->connected_skeleton();
@@ -801,19 +802,19 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 		}
 		if(sk)
 		{
-			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			SmartBody::util::log("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
 			mo->connect(sk);
 		}
 		else
 		{
-			LOG("plotMotionJointTrajectory(): motion not connected to any skeleton, aborting...");
+			SmartBody::util::log("plotMotionJointTrajectory(): motion not connected to any skeleton, aborting...");
 			return;
 		}
 	}
 	SkJoint* jnt = sk->search_joint(jointName.c_str());
 	if(!jnt)
 	{
-		LOG("plotMotionJointTrajectory(): specified joint is not found in skeleton, aborting...");
+		SmartBody::util::log("plotMotionJointTrajectory(): specified joint is not found in skeleton, aborting...");
 		return;
 	}
 	
@@ -968,25 +969,25 @@ void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& m
 {
 	if (motions.size() == 0)
 	{
-		LOG("Add motions before add correspondence points for state");
+		SmartBody::util::log("Add motions before add correspondence points for state");
 		return;
 	}
 	if (motionNames.size() != motions.size())
 	{
-		LOG("Add correspondence points error, input motion number is not the same with that when adding motions. %d motion names, %d motions.", motionNames.size(), motions.size());
+		SmartBody::util::log("Add correspondence points error, input motion number is not the same with that when adding motions. %d motion names, %d motions.", motionNames.size(), motions.size());
 		return;		
 	}
 	for (size_t i = 0; i < motionNames.size(); i++)
 	{
 		if (motionNames[i] != motions[i]->getName())
 		{
-			LOG("Add correspondence points error, input motion names are not in the same order with that when adding motions");
+			SmartBody::util::log("Add correspondence points error, input motion names are not in the same order with that when adding motions");
 			return;
 		}
 	}
 	if (motionNames.size() != points.size())
 	{
-		LOG("Add correspondence points error, input motion number is not the same with points number. %d motion names, %d points.", motionNames.size(), points.size());
+		SmartBody::util::log("Add correspondence points error, input motion number is not the same with points number. %d motion names, %d points.", motionNames.size(), points.size());
 		return;
 	}	
 	int num = motionNames.size();
@@ -1096,7 +1097,7 @@ void SBAnimationBlend::removeMotion(const std::string& motionName)
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(motionName);
 	if (!motion)
 	{
-		LOG("No motion named %s found, cannot remove from state %s.", motionName.c_str(), this->stateName.c_str());
+		SmartBody::util::log("No motion named %s found, cannot remove from state %s.", motionName.c_str(), this->stateName.c_str());
 	}
 }
 
@@ -1106,7 +1107,7 @@ bool SBAnimationBlend::addSkMotion(const std::string& motion)
 
 	if (!sbmotion)
 	{
-		LOG("SBAnimationBlend add sk motion failure, %s doesn't exist", motion.c_str());
+		SmartBody::util::log("SBAnimationBlend add sk motion failure, %s doesn't exist", motion.c_str());
 		return false;
 	}
 	else
@@ -1128,7 +1129,7 @@ bool SBAnimationBlend::removeSkMotion(const std::string& motionName)
 	}
 	if (index < 0)
 	{
-		LOG("SBAnimationBlend delete motion failure, %s doesn't exist", motionName.c_str());
+		SmartBody::util::log("SBAnimationBlend delete motion failure, %s doesn't exist", motionName.c_str());
 		return false;
 	}
 
@@ -1412,7 +1413,7 @@ SkMotion* SBAnimationBlend::getSkMotion( const std::string& motionName )
 			return m;
 	}
 	// not found!
-	LOG("Error: SBAnimationBlend::getSkMotion(): %s doesn't exist", motionName.c_str());
+	SmartBody::util::log("Error: SBAnimationBlend::getSkMotion(): %s doesn't exist", motionName.c_str());
 	return 0;
 }
 

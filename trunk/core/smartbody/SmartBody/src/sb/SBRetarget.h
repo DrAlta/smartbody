@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBRETARGET_H_
 #define _SBRETARGET_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sr/sr_quat.h>
 #include <string>

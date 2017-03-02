@@ -22,6 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBScene.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -78,7 +79,7 @@ void SBGestureMapManager::removeGestureMap(std::string gestureName)
 		_gestureMaps.erase(iter);
 	}
 	else
-		LOG("Gesture map %s doesn't exist!", gestureName.c_str());
+		SmartBody::util::log("Gesture map %s doesn't exist!", gestureName.c_str());
 }
 
 int SBGestureMapManager::getNumGestureMaps()

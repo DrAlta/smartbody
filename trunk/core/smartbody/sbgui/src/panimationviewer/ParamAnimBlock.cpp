@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimBlock.h"
 
 CorrespondenceMark::CorrespondenceMark()

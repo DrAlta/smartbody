@@ -18,13 +18,12 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include <list>
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_container.hpp>
 
@@ -34,6 +33,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/sbm_pawn.hpp>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 
 using namespace std;
@@ -230,7 +230,7 @@ public:
     SkChannelArray& channels() {
 #if 0
 		if( _state!=State::VALID ) 
-			LOG("ERROR: MeControllerTreeRoot::channels() called while invalid");
+			SmartBody::util::log("ERROR: MeControllerTreeRoot::channels() called while invalid");
 #endif
 		if( _state==INVALID )
 			remapFrameData();
@@ -277,11 +277,11 @@ public:
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 
 		if( skeleton==NULL ) {
-			LOG("MeEvaluationContextSimple::addSkeleton(..): skeleton is NULL");
+			SmartBody::util::log("MeEvaluationContextSimple::addSkeleton(..): skeleton is NULL");
 			return;
 		}
 		if( _skeleton!=NULL && _skeleton!=skeleton ) {
-			LOG("MeEvaluationContextSimple::addSkeleton(..): Unimplemented: Multiple Skeletons.");
+			SmartBody::util::log("MeEvaluationContextSimple::addSkeleton(..): Unimplemented: Multiple Skeletons.");
 			return;
 		}		
 		_skeletonName = entityName;		
@@ -330,7 +330,7 @@ public:
 	 *  Inserts controller at position, or end if position > countChildren()
 	 */
     void add_controller( MeController* ct,
-                        unsigned int position = std::numeric_limits<unsigned int>::max() )
+                        unsigned int position = 99999 )
 	{
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 		// Check bounds
@@ -505,10 +505,10 @@ public:
 						//fp_max = std::max( fp_max, fp );
 						channel.set( fp );
 					} else {
-						LOG("ERROR: applyBufferToAllSkeletons(): channels[%d].joint.skeleton() != _skeleton", i);
+						SmartBody::util::log("ERROR: applyBufferToAllSkeletons(): channels[%d].joint.skeleton() != _skeleton", i);
 					}
 				} else {
-					LOG("ERROR: applyBufferToAllSkeletons(): channels[%d].joint == NULL", i);
+					SmartBody::util::log("ERROR: applyBufferToAllSkeletons(): channels[%d].joint == NULL", i);
 				}
 			}
 		}
@@ -544,10 +544,10 @@ public:
 						//fp_max = std::max( fp_max, fp );
 						channel.get( fp );
 					} else {
-						LOG("ERROR: applySkeletonToBuffer(): channels[%d].joint.skeleton() != _skeleton", i);
+						SmartBody::util::log("ERROR: applySkeletonToBuffer(): channels[%d].joint.skeleton() != _skeleton", i);
 					}
 				} else {
-					LOG("ERROR: applySkeletonToBuffer(): channels[%d].joint == NULL", i);
+					SmartBody::util::log("ERROR: applySkeletonToBuffer(): channels[%d].joint == NULL", i);
 				}
 			}
 		}

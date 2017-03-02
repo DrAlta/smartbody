@@ -21,6 +21,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_ct_motion_recorder.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 std::string MeCtMotionRecorder::CONTROLLER_TYPE = "MeCtMotionRecorder";
 
@@ -87,7 +88,7 @@ void MeCtMotionRecorder::stopRecording(const std::string& motionName, const std:
 	}
 	else
 	{
-		LOG("Exported file format %s not supported, export to skm instead", type.c_str());
+		SmartBody::util::log("Exported file format %s not supported, export to skm instead", type.c_str());
 	}
 	saveMotionRecord(motionName.c_str());
 	stop_record();
@@ -109,7 +110,7 @@ void MeCtMotionRecorder::writeRecording(const std::string& motionName, const std
 	}
 	else
 	{
-		LOG("Exported file format %s not supported, export to skm instead", type.c_str());
+		SmartBody::util::log("Exported file format %s not supported, export to skm instead", type.c_str());
 	}
 	saveMotionRecord(motionName.c_str());
 }
@@ -126,7 +127,7 @@ void MeCtMotionRecorder::setJointChannelPos( const std::string& jointName, MeFra
 	if (positionChannelID < 0) hasTranslation = false;
 	int posBufferID = frame.toBufferIndex(positionChannelID);
 	if (posBufferID < 0) hasTranslation = false;
-	//LOG("MotionRecorder : jointname = %s, posChannelID = %d, posBufferID = %d",jointName.c_str(), positionChannelID, posBufferID);
+	//SmartBody::util::log("MotionRecorder : jointname = %s, posChannelID = %d, posBufferID = %d",jointName.c_str(), positionChannelID, posBufferID);
 	if (hasTranslation)
 	{		
 		frame.buffer()[posBufferID + 0] = outPos[0];

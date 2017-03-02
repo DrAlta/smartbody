@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include <string>
 #include <iostream>
@@ -35,6 +35,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_ct_interpolator.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_prune_policy.hpp>
 
 
@@ -240,7 +241,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 
 MeCtScheduler2::~MeCtScheduler2 () {
 
-   //LOG("delete scheduler %s\n",this->getName().c_str());
+   //SmartBody::util::log("delete scheduler %s\n",this->getName().c_str());
    stop (SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
    _sub_sched_context->unref();
    //clear();
@@ -609,9 +610,9 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		timingCt->setName( timing_name.c_str() );
 	}
 
-	LOG("[%s] Blend curve:", this->getName().c_str());
+	SmartBody::util::log("[%s] Blend curve:", this->getName().c_str());
 	blendingCt->get_curve().print();
-	LOG("[%s] Timewarp curve:", this->getName().c_str());
+	SmartBody::util::log("[%s] Timewarp curve:", this->getName().c_str());
 	timingCt->get_curve().print();
 	return create_track( blendingCt, timingCt, ct );
 }

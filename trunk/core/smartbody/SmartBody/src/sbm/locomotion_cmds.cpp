@@ -20,7 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
-#include "vhcl.h"
+
 #include <iostream>
 #include <string>
 
@@ -93,7 +93,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
 	if(arg=="initialize")
 	{
-		LOG("Command: 'locomotion initialize' has been deprecated.");
+		SmartBody::util::log("Command: 'locomotion initialize' has been deprecated.");
 		return CMD_FAILURE;
 	}
 
@@ -113,26 +113,26 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		string name = args.read_token();
 		actor = mcu_p->getCharacter( name );
 		if( actor == NULL ) {
-			LOG("ERROR: Could not find character \"%s\".", name.c_str());
+			SmartBody::util::log("ERROR: Could not find character \"%s\".", name.c_str());
 			return CMD_FAILURE;
 		}
 
 		arg = args.read_token();
 	} else {
 		if( mcu_p->test_character_default.empty() ) {
-			LOG("ERROR: No character specified, and no default set.");
+			SmartBody::util::log("ERROR: No character specified, and no default set.");
 			return CMD_FAILURE;
 		}
 		actor = mcu_p->getCharacter( mcu_p->test_character_default );
 		if( actor == NULL ) {
-			LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
+			SmartBody::util::log("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
 			return CMD_FAILURE;
 		}
 	}
 
 	if (!actor->get_locomotion_ct())
 	{
-		LOG("Character %s does not have a semi-procedural locomotion controller. Command ignored.", actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a semi-procedural locomotion controller. Command ignored.", actor->getName().c_str());
 		return CMD_FAILURE;
 	}
 
@@ -153,7 +153,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		anim_p = (*animIter).second;
 		if (!anim_p)
 		{
-			LOG("No animation: %s", arg.c_str());
+			SmartBody::util::log("No animation: %s", arg.c_str());
 			motionsNotLoaded = true;
 			if (actor->get_locomotion_ct())
 				actor->get_locomotion_ct()->motions_loaded = false;
@@ -221,7 +221,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
-		LOG("ERROR: Locomotion controller not initialized.");
+		SmartBody::util::log("ERROR: Locomotion controller not initialized.");
 		return CMD_FAILURE;
 	}
 
@@ -232,39 +232,39 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			actor->get_locomotion_ct()->get_analyzer()->init(NULL, mcu_p->me_paths);
 			if(!actor->get_locomotion_ct()->is_valid()) 
 			{
-				LOG("Locomotion not valid, can not be enabled.");
+				SmartBody::util::log("Locomotion not valid, can not be enabled.");
 				return CMD_FAILURE;
 			}
 			actor->get_locomotion_ct()->get_analyzer()->init_blended_anim();
 		}
 		actor->get_locomotion_ct()->set_enabled(true);
-		LOG("Locomotion engine has been enabled.");
+		SmartBody::util::log("Locomotion engine has been enabled.");
 
 		return CMD_SUCCESS;
 	}
 	else if(arg=="disable")
 	{
 		actor->get_locomotion_ct()->set_enabled(false);
-		LOG("Locomotion engine has been disabled.");
+		SmartBody::util::log("Locomotion engine has been disabled.");
 
 		return CMD_SUCCESS;
 	}
 
 	if(!actor->is_locomotion_controller_enabled()) 
 	{
-		LOG("ERROR: Locomotion controller not enabled.");
+		SmartBody::util::log("ERROR: Locomotion controller not enabled.");
 		return CMD_FAILURE;
 	}
 
 	if(!actor->get_locomotion_ct()->motions_loaded)
 	{
-		LOG("locomotion animations not loaded correctly.");
+		SmartBody::util::log("locomotion animations not loaded correctly.");
 		return CMD_FAILURE;
 	}
 
 	if(actor->get_locomotion_ct()->get_limb_list()->get(0)->walking_list.size() < 3)
 	{
-		LOG("locomotion animations not loaded correctly.");
+		SmartBody::util::log("locomotion animations not loaded correctly.");
 		return CMD_FAILURE;
 	}
 
@@ -431,7 +431,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			else 
 			{
-				LOG("Unknown token");
+				SmartBody::util::log("Unknown token");
 				//cerr << "Please specify the speed. (example:'spd 50')" <<endl;
 				return CMD_FAILURE;
 			}
@@ -551,7 +551,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				arg = args.read_token();
 			} 
 			else {
-				LOG("ERROR: Unexpected token \"%s\"", arg.c_str() );
+				SmartBody::util::log("ERROR: Unexpected token \"%s\"", arg.c_str() );
 				return CMD_FAILURE;
 			}
 			
@@ -672,7 +672,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				id = args.read_int();
 				//data[ id_index ] = (float)id;
 			} else {
-				LOG("ERROR: Unexpected token \"%d\".", arg.c_str());
+				SmartBody::util::log("ERROR: Unexpected token \"%d\".", arg.c_str());
 				return CMD_FAILURE;
 			}
 			if(id_index == -1)

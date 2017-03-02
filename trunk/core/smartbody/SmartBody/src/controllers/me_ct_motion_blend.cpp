@@ -92,7 +92,7 @@ bool MeCtMotionBlend::controller_evaluate( double t, MeFrameData& frame )
 	
 	if (currentBlendEngine)
 	{		
-		//LOG("update reach");
+		//SmartBody::util::log("update reach");
 		currentBlendEngine->updateBlend((float)t,dt,inputMotionFrame);		
 	}
 	

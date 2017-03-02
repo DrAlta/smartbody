@@ -1,7 +1,7 @@
 #include "PawnPosControl.h"
 
 #include <sb/sbm_pawn.hpp>
-#include "vhcl.h"
+
 #include <FL/gl.h>
 #include <sr/sr_euler.h>
 #include <sr/sr_plane.h>
@@ -12,6 +12,7 @@
 #include <sr/sr_gl_render_funcs.h>
 #include <sb/SBScene.h>
 #include <sb/SBVHMsgManager.h>
+#include <sb/SBUtilities.h>
 #include <sbm/gwiz_math.h>
 
 PawnControl::PawnControl()
@@ -37,7 +38,7 @@ void PawnControl::init_font()
 	if (!label.Create(fontPath.c_str(), 0))
 	{
 		if(!label.Create(".font.glf", 0))
-			LOG("PawnPosControl::InitFont(): Error: Cannot load font file\n");
+			SmartBody::util::log("PawnPosControl::InitFont(): Error: Cannot load font file\n");
 	}	
 #endif
 }
@@ -215,7 +216,7 @@ SrVec PawnPosControl::getWorldPt()
 {
 	if (!pawn)
 	{
-		LOG("No pawn attached. Check code.");
+		SmartBody::util::log("No pawn attached. Check code.");
 		return SrVec();
 	}
 
@@ -311,7 +312,7 @@ void PawnSelectControl::hitTest( SrCamera& cam )
 		PositionControl::drawBox(bbox, false, color);	
 	}
 	
-	//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
+	//SmartBody::util::log("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 	
 
 }

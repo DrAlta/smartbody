@@ -81,7 +81,7 @@ double MultiLinearTimeWarp::timeWarp( double u )
 	if (u <= 0.0)
 		u = 0.0;
 	int section = getSection(refKeyTimes,u);
-	//LOG("section = %d, u = %f, time slope = %f, refKeyTime = %f, targetKeyTime = %f", section, u, timeSlope(u), refKeyTimes[section], targetKeyTimes[section]);
+	//SmartBody::util::log("section = %d, u = %f, time slope = %f, refKeyTime = %f, targetKeyTime = %f", section, u, timeSlope(u), refKeyTimes[section], targetKeyTimes[section]);
 	return targetKeyTimes[section] + (u-refKeyTimes[section])*timeSlope(u);
 }
 

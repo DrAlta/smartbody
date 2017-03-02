@@ -97,7 +97,7 @@ void SBParser::initialize(const std::string& param1, const std::string& param2)
 	argv[1] = (char*) arg1.c_str();
 	argv[2] = (char*) arg2.c_str();
 
-	LOG("starting Charniak parser..");
+	SmartBody::util::log("starting Charniak parser..");
 
 	ECArgs args( argc, argv );
 
@@ -114,7 +114,7 @@ SmartBody::SBParseNode* SBParser::parse(const std::string& input)
 {
 	if (!_initialized)
 	{
-		LOG("Cannot parse until parser has been initialized.");
+		SmartBody::util::log("Cannot parse until parser has been initialized.");
 		return NULL;
 	}
 
@@ -126,7 +126,7 @@ SmartBody::SBParseNode* SBParser::parse(const std::string& input)
 
 
 
-	LOG("parser ready");
+	SmartBody::util::log("parser ready");
 
 	std::string string_to_parse = input;
 	int      sentenceCount = 0;  //counts all sentences so we can use e.g,1/50;
@@ -161,7 +161,7 @@ SmartBody::SBParseNode* SBParser::parse(const std::string& input)
 	} 
 	catch(...)
 	{ 
-		LOG("Error: parsing error from natural language parser");
+		SmartBody::util::log("Error: parsing error from natural language parser");
 		return NULL;
 	}	
 
@@ -237,7 +237,7 @@ SmartBody::SBParseNode* SBParser::parse(const std::string& input)
 		InputTree*  mapparse = saveTrees[i];
 		
 
-		double logP =log(saveProbs[i]);
+		double logP = log(saveProbs[i]);
 		logP -= (srp->length()*log600);
 		if(Bchart::Nth > 1)
 			std::cout <<  logP << "\n";
@@ -310,7 +310,7 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 {
 	if (!listener)
 	{
-		LOG("Parse listener not available. Use SBParser::parse() to parse directly, or add a listener.");
+		SmartBody::util::log("Parse listener not available. Use SBParser::parse() to parse directly, or add a listener.");
 		return "";
 	}
 

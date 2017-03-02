@@ -190,7 +190,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		DOMNode* skNode = getNode("library_visual_scenes", doc, 0, 2);
 		if (!skNode)
 		{
-			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
+			SmartBody::util::log("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
 			delete parser;
 			delete errHandler;
 			return false;
@@ -220,7 +220,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		DOMNode* skmNode = getNode("library_animations", doc, 0, 2);
 		if (!skmNode)
 		{
-		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
+		//	SmartBody::util::log("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
 			delete parser;
 			delete errHandler;
 			return true;
@@ -244,7 +244,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		return false;
 	}
 	catch (...) {
-		LOG("Unexpected Exception in ParseOpenCollada::parse()");
+		SmartBody::util::log("Unexpected Exception in ParseOpenCollada::parse()");
 		return false;
 	}
 
@@ -379,19 +379,19 @@ XercesDOMParser* ParserOpenCOLLADA::getParserFromFile( std::string fileName )
 	{
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		delete parser;
 		return NULL;
 	}
 	catch (const DOMException& toCatch) {
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.msg);
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		delete parser;
 		return NULL;
 	}
 	catch (...) {
-		LOG("Unexpected Exception in ParserOpenCOLLADA::getNode()");
+		SmartBody::util::log("Unexpected Exception in ParserOpenCOLLADA::getNode()");
 		delete parser;
 		return NULL;
 	}
@@ -433,17 +433,17 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 	{
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		return NULL;
 	}
 	catch (const DOMException& toCatch) {
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.msg);
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		return NULL;
 	}
 		catch (...) {
-		LOG("Unexpected Exception in ParserOpenCOLLADA::getNode()");
+		SmartBody::util::log("Unexpected Exception in ParserOpenCOLLADA::getNode()");
 		return NULL;
 	}
 
@@ -486,17 +486,17 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 	{
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		return NULL;
 	}
 	catch (const DOMException& toCatch) {
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.msg);
-		LOG("Exception message is: %s", message.c_str());
+		SmartBody::util::log("Exception message is: %s", message.c_str());
 		return NULL;
 	}
 		catch (...) {
-		LOG("Unexpected Exception in ParserOpenCOLLADA::getNode()");
+		SmartBody::util::log("Unexpected Exception in ParserOpenCOLLADA::getNode()");
 		return NULL;
 	}
 
@@ -862,7 +862,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				// if this a duplicate joint name, use the sid attribute as a unique name instead of the name attribute
 				if (skeleton.search_joint(nameAttr.c_str()) != NULL)
 				{
-					LOG("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), sidAttr.c_str());
+					SmartBody::util::log("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), sidAttr.c_str());
 					joint->name(sidAttr);
 					joint->extName(sidAttr);
 				}
@@ -1012,7 +1012,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					}
 					else
 					{
-						LOG("COLLADA Parser: skeleton joint has invalid rotations.");
+						SmartBody::util::log("COLLADA Parser: skeleton joint has invalid rotations.");
 					}
 				}
 
@@ -1042,14 +1042,14 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					std::string sidAttr;
 					xml_utils::xml_translate(&sidAttr, urlAttr->getNodeValue());
 					sidAttr = sidAttr.substr(1);
-					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
-					//LOG("instance_geometry: %s", sidAttr.c_str());
+					//SmartBody::util::log("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//SmartBody::util::log("instance_geometry: %s", sidAttr.c_str());
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
 					if (!parent)
 					{
-						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						SmartBody::util::log("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
 						delete newModel;
 					}
 					else
@@ -1121,14 +1121,14 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					std::string sidAttr;
 					xml_utils::xml_translate(&sidAttr, urlAttr->getNodeValue());
 					sidAttr = sidAttr.substr(1);
-					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
-					//LOG("instance_geometry: %s", sidAttr.c_str());
+					//SmartBody::util::log("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//SmartBody::util::log("instance_geometry: %s", sidAttr.c_str());
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
 					if (!parent)
 					{
-						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						SmartBody::util::log("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
 						delete newModel;
 					}
 					else
@@ -1351,7 +1351,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 		vi++)
 	{
 		std::string jointName = (*vi).first;
-		//LOG("joint name = %s",jointName.c_str());
+		//SmartBody::util::log("joint name = %s",jointName.c_str());
 		int channelID = motionChannels.search(jointName,SkChannel::Quat);
 		if (channelID != -1)
 		{
@@ -1370,7 +1370,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
 			float roty = motion.posture(frameCt)[quatId + 1] / scale;
 			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
-			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			//SmartBody::util::log("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
 			rotx *= float(M_PI) / 180.0f;
 			roty *= float(M_PI) / 180.0f;
 			rotz *= float(M_PI) / 180.0f;
@@ -1381,7 +1381,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 			motion.posture(frameCt)[quatId + 1] = quat.x;
 			motion.posture(frameCt)[quatId + 2] = quat.y;
 			motion.posture(frameCt)[quatId + 3] = quat.z;
-			//LOG("w = %f, x = %f, y = %f, z = %f",quat.w, quat.x, quat.y, quat.z);
+			//SmartBody::util::log("w = %f, x = %f, y = %f, z = %f",quat.w, quat.x, quat.y, quat.z);
 		}
 
 		if (zaxis) // rotate the root joints depending on up axis
@@ -1462,7 +1462,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 				xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
 			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
-			//LOG("joint name = %s, channel type = %s",jointName.c_str(),channelType.c_str());
+			//SmartBody::util::log("joint name = %s, channel type = %s",jointName.c_str(),channelType.c_str());
 			int numTimeInput = -1;
 			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
 			{
@@ -1703,7 +1703,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 		 vi++)
 	{
 		std::string jointName = (*vi).first;
-		//LOG("joint name = %s",jointName.c_str());
+		//SmartBody::util::log("joint name = %s",jointName.c_str());
 		int channelID = motionChannels.search(jointName,SkChannel::Quat);
 		if (channelID != -1)
 		{
@@ -1720,7 +1720,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
 			float roty = motion.posture(frameCt)[quatId + 1] / scale;
 			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
-			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			//SmartBody::util::log("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
  			rotx *= float(M_PI) / 180.0f;
  			roty *= float(M_PI) / 180.0f;
  			rotz *= float(M_PI) / 180.0f;
@@ -1813,7 +1813,7 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 			{
 				SrQuat globalQuat = SrQuat(motion.posture(i)[dataId], motion.posture(i)[dataId + 1], motion.posture(i)[dataId + 2], motion.posture(i)[dataId + 3]);
 				SrQuat preQuat = joint->quat()->prerot();
-				//LOG("prerot = %f",preQuat.angle());
+				//SmartBody::util::log("prerot = %f",preQuat.angle());
 				SrQuat localQuat = preQuat.inverse() * globalQuat;
 				motion.posture(i)[dataId] = localQuat.w;
 				motion.posture(i)[dataId + 1] = localQuat.x;
@@ -2025,7 +2025,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	if (found != std::string::npos)
 		return "texcoords";
 
-//	LOG("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
+//	SmartBody::util::log("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
 	return "";
 }
 
@@ -2037,14 +2037,14 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 	while (curNode)
 	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		//LOG("parseLibraryGeometries, iter %d", c);
+		//SmartBody::util::log("parseLibraryGeometries, iter %d", c);
 		//DOMNode* node = list->item(c);
 		DOMNode* node = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName ,node->getNodeName());	
 		if (nodeName == "geometry")
 		{
-			//LOG("nodeName = geometry");
+			//SmartBody::util::log("nodeName = geometry");
 			std::map<std::string, std::string> verticesArrayMap;
 			std::map<std::string, std::vector<SrVec> > floatArrayMap;	
 
@@ -2073,7 +2073,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 				
 				if (nodeName1 == "source")
 				{
-					//LOG("nodeName1 = source");
+					//SmartBody::util::log("nodeName1 = source");
 					DOMNamedNodeMap* sourceAttr = node1->getAttributes();
 					DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
 					std::string idString;
@@ -2171,7 +2171,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 				}			
 				if (nodeName1 == "vertices")
 				{
-					//LOG("nodeName1 = vertices");
+					//SmartBody::util::log("nodeName1 = vertices");
 					vertexSemantics.clear();
 					DOMNode* verticeCurNode = node1->getFirstChild();
 					while (verticeCurNode)
@@ -2179,7 +2179,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					{
 						//DOMNode* inputNode = node1->getChildNodes()->item(c2);
 						DOMNode* inputNode = verticeCurNode;
-						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUT) == 0)
+						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUTSTR) == 0)
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
@@ -2197,7 +2197,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 
 				if (nodeName1 == "triangles" || nodeName1 == "polylist" || nodeName1 == "polygons")
 				{
-					//LOG("nodeName1 = %s", nodeName1.c_str());
+					//SmartBody::util::log("nodeName1 = %s", nodeName1.c_str());
 					int curmtl = -1;
 					DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
 					DOMNode* countNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_COUNT);
@@ -2227,7 +2227,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					{
 						//DOMNode* inputNode = node1->getChildNodes()->item(c2);
 						DOMNode* inputNode = triangleCurNode;
-						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUT) == 0)
+						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUTSTR) == 0)
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
@@ -2243,7 +2243,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 							if (inputMap.find(offset) != inputMap.end())	// same offset is wrong
 							{
 								if (inputSemantic == "VERTEX" || inputSemantic == "NORMAL" || inputSemantic == "TEXCOORD")
-									LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: file not correct.");
+									SmartBody::util::log("ParserOpenCOLLADA::parseLibraryGeometries ERR: file not correct.");
 							}
 							else
 							{
@@ -2361,7 +2361,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					}
 					/*
 					if (tokens.size() != index)
-						LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
+						SmartBody::util::log("ParserOpenCOLLADA::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
 						*/
 				}
 				meshCurNode = meshCurNode->getNextSibling();
@@ -2400,7 +2400,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
-				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
+				   //SmartBody::util::log("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
 			   }
 			}
@@ -2425,7 +2425,7 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 		bool printOut = false;
 // 		if (sourceName.find("LEyeLashShape-positions") != std::string::npos || sourceName.find("REyelashShape-positions") != std::string::npos)
 // 		{
-// 			LOG("sourname = %s",sourceName.c_str());
+// 			SmartBody::util::log("sourname = %s",sourceName.c_str());
 // 			printOut = true;
 // 		}
 		for (unsigned int i=0;i<sourceArray->size();i++)
@@ -2433,7 +2433,7 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 // 			if (printOut)
 // 			{
 // 				SrVec pos = (*sourceArray)[i];
-// 				LOG("pos = %f %f %f",pos[0],pos[1],pos[2]);
+// 				SmartBody::util::log("pos = %f %f %f",pos[0],pos[1],pos[2]);
 // 			}
 			model->V.push_back((*sourceArray)[i]);										
 		}
@@ -2506,7 +2506,7 @@ void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::strin
 				if (effectId2MaterialId.find(effectId) == effectId2MaterialId.end())
 					effectId2MaterialId.insert(std::make_pair(effectId, materialId));
 				else
-					LOG("ParserOpenCOLLADA::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
+					SmartBody::util::log("ParserOpenCOLLADA::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
 			}
 		}
 		curNode = curNode->getNextSibling();
@@ -2544,7 +2544,7 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 				pictureId2Name.insert(std::make_pair(imageId, imageName));
 			}
 			else
-				LOG("ParserOpenCOLLADA::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
+				SmartBody::util::log("ParserOpenCOLLADA::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
 		}
 		curNode = curNode->getNextSibling();
 	}
@@ -2875,12 +2875,12 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 					if (attrSemantic == "INPUT")
 					{
 						sampler.inputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);	
-						//LOG("sampelr input name = %s",sampler.inputName.c_str());
+						//SmartBody::util::log("sampelr input name = %s",sampler.inputName.c_str());
 					}
 					else if (attrSemantic == "OUTPUT")
 					{
 						sampler.outputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);
-						//LOG("sampelr input name = %s",sampler.outputName.c_str());
+						//SmartBody::util::log("sampelr input name = %s",sampler.outputName.c_str());
 					}
 				}
 				curNode2 = curNode2->getNextSibling();
@@ -2893,10 +2893,10 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 			channelSamplerNameMap.push_back(ColladChannel());
 			ColladChannel& colChannel = channelSamplerNameMap.back();
 			colChannel.sourceName = source.substr(1);
-			//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
+			//SmartBody::util::log("colChannel input name = %s",colChannel.sourceName.c_str());
 			std::vector<std::string> tokens;
 			SmartBody::util::tokenize(target, tokens, "/.");
-			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
+			//SmartBody::util::log("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
 			std::string jname = tokens[0];
 			SkJoint* joint = skeleton.search_joint(jname.c_str());
 			if (joint) jname = joint->jointName();
@@ -2916,7 +2916,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	XercesDOMParser* parser = ParserOpenCOLLADA::getParserFromFile(fileName);
 	if (!parser)
 	{
-		LOG("Could not load from file %s",fileName.c_str());
+		SmartBody::util::log("Could not load from file %s",fileName.c_str());
 		return false;
 	}
 
@@ -2932,7 +2932,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		depth = 0;
 		DOMNode* visualSceneNode = getNode("library_visual_scenes", doc, depth, 2);	
 		if (!visualSceneNode)
-			LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
+			SmartBody::util::log("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 		SkSkeleton skeleton;
 		SkMotion motion;
 		int order;
@@ -2976,7 +2976,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	}
 	else
 	{
-		LOG( "Could not load mesh from file '%s'", fileName.c_str());
+		SmartBody::util::log( "Could not load mesh from file '%s'", fileName.c_str());
 		if (parser)
 			delete parser;
 		return false;
@@ -2998,7 +2998,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	boost::filesystem::path dir(outPathname);
 	if (boost::filesystem::create_directory(dir))
 	{
-		LOG("Folder accessed or created: %s", outPathname.c_str());
+		SmartBody::util::log("Folder accessed or created: %s", outPathname.c_str());
 	}
 
 	std::string fullColladaPathName = outPathname + "/" + colladaName;
@@ -3426,7 +3426,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 			unmatchedIter != allJoints.end();
 			unmatchedIter++)
 		{
-			LOG("Joint %s unbound, adding to skinweights...", (*unmatchedIter).c_str());
+			SmartBody::util::log("Joint %s unbound, adding to skinweights...", (*unmatchedIter).c_str());
 		}
 		int totalInfluences = skinWeight->infJointName.size() + allJoints.size();
 		std::string skinID = skinWeight->sourceMesh+"-skin";

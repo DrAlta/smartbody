@@ -60,7 +60,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	// check to make sure we have properly opened the file
 	if (!metaFile.good())
 	{
-		LOG("ParserASFAMC::parse ERR: Could not open meta file.\n");
+		SmartBody::util::log("ParserASFAMC::parse ERR: Could not open meta file.\n");
 		return false;
 	}
 
@@ -96,7 +96,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG(":version not found...\n");
+					SmartBody::util::log(":version not found...\n");
 					metaFile.close();
 					return false;
 				}
@@ -112,7 +112,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG(":name not found...\n");
+					SmartBody::util::log(":name not found...\n");
 					metaFile.close();
 					return false;
 				}
@@ -125,7 +125,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG(":units not found...\n");
+					SmartBody::util::log(":units not found...\n");
 					metaFile.close();
 					return false;
 				}
@@ -141,11 +141,11 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					char *value = strtok(NULL, " ");
 					if (value != NULL)
 					{
-						LOG("Found parameter %s = %s.", str, value);
+						SmartBody::util::log("Found parameter %s = %s.", str, value);
 					}
 					else
 					{
-						LOG("Problem parsing :units values...\n");
+						SmartBody::util::log("Problem parsing :units values...\n");
 						metaFile.close();
 						return false;
 					}
@@ -218,7 +218,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 							}
 							else
 							{
-								LOG("Unrecognized channel '%s', continuing...", str);
+								SmartBody::util::log("Unrecognized channel '%s', continuing...", str);
 							}
 						}
 					}
@@ -246,7 +246,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					}
 					else
 					{
-						LOG("Unknown token '%s', expected ':bonedata', 'order', 'axis', 'position', 'orientation'...\n", str);
+						SmartBody::util::log("Unknown token '%s', expected ':bonedata', 'order', 'axis', 'position', 'orientation'...\n", str);
 						metaFile.close();
 						return false;
 					}
@@ -264,7 +264,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected ':hierarchy' or 'begin'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected ':hierarchy' or 'begin'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -277,7 +277,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'id'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'id'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -297,14 +297,14 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					}
 					else // assign a name based on the joint number
 					{
-						LOG("Unknown name for joint....\n", str);
+						SmartBody::util::log("Unknown name for joint....\n", str);
 						metaFile.close();
 						return false;
 					}
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'name'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'name'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -323,12 +323,12 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 						posCount++;
 					}
 					curJointInfo->direction = dir;
-//					LOG("Current direction of %s is %f %f %f...\n", cur->getName(), curDirection[0], curDirection[1], curDirection[2]);
+//					SmartBody::util::log("Current direction of %s is %f %f %f...\n", cur->getName(), curDirection[0], curDirection[1], curDirection[2]);
 					state = 10;
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'direction'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'direction'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -344,7 +344,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'length'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'length'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -369,7 +369,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'axis'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'axis'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -394,7 +394,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'dof'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'dof'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -408,7 +408,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'limits'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'limits'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -426,7 +426,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected ':hierarchy' or limit data...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected ':hierarchy' or limit data...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -439,7 +439,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', expected 'begin'...\n", str);
+					SmartBody::util::log("Unknown token '%s', expected 'begin'...\n", str);
 					metaFile.close();
 					return false;
 				}
@@ -455,7 +455,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					SkJoint* parent = skeleton.search_joint(str);
 					if (parent == NULL)
 					{
-						LOG("Unknown parent '%s' when determining joint hierarchy...\n", str);
+						SmartBody::util::log("Unknown parent '%s' when determining joint hierarchy...\n", str);
 						metaFile.close();
 						return false;
 					}
@@ -463,7 +463,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					JointInfo* parentInfo = getJointInfo(str, jointInfoList);
 					if (parentInfo == NULL)
 					{
-						LOG("Unknown parent '%s' when determining joint hierarchy...\n", str);
+						SmartBody::util::log("Unknown parent '%s' when determining joint hierarchy...\n", str);
 						metaFile.close();
 						return false;
 					}
@@ -474,7 +474,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 						childInfo = getJointInfo(str, jointInfoList);
 						if (childInfo == NULL)
 						{
-							LOG("Unknown child '%s' when determining joint hierarchy...\n", str);
+							SmartBody::util::log("Unknown child '%s' when determining joint hierarchy...\n", str);
 							metaFile.close();
 							return false;
 						}
@@ -562,7 +562,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				else
 				{
-					LOG("Unknown token '%s', continuing...", str);
+					SmartBody::util::log("Unknown token '%s', continuing...", str);
 				}
 				break;
 			case 18:
@@ -584,7 +584,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				JointInfo* jointInfo = getJointInfo(str, jointInfoList);
 				if (!jointInfo)
 				{
-					LOG("Unknow joint '%s', continue...", str);
+					SmartBody::util::log("Unknow joint '%s', continue...", str);
 					break;
 				}
 				// get the data
@@ -597,7 +597,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				}
 				if (curChannel != jointInfo->dof.size())
 				{
-					LOG("Unmatched number of channels.");
+					SmartBody::util::log("Unmatched number of channels.");
 				}
 				// assign the frame
 				for (unsigned int i = 0; i < jointInfo->dof.size(); i++)
@@ -607,7 +607,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 						motion.posture(curFrame)[id] = frames[i];
 					else
 					{
-						LOG("getMotionChannelId returning -1.");
+						SmartBody::util::log("getMotionChannelId returning -1.");
 					}
 				}
 				break;
@@ -616,12 +616,12 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	dataFile.close();
 	if (state != 18)
 	{
-		LOG("Motion incompletely parsed, finished at state %d...", state);
+		SmartBody::util::log("Motion incompletely parsed, finished at state %d...", state);
 		dataFile.close();
 	}
 	else
 	{
-		LOG("Finished parsing motion with %d frames...", curFrame);
+		SmartBody::util::log("Finished parsing motion with %d frames...", curFrame);
 	}
 
 	// Get rot order 

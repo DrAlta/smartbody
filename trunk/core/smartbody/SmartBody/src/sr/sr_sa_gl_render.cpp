@@ -1,29 +1,29 @@
-/*  sr_sa_gl_render.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmarBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently UC Merced)
- */
-#include "vhcl.h"
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 # include <sr/sr_gl.h>
 # include <sr/sr_sn.h>
 # include <sr/sr_gl_render_funcs.h>
 # include <sr/sr_sa_render_mode.h>
 # include <sr/sr_sa_gl_render.h>
+#include <sb/SBUtilities.h>
 
 //# define SR_USE_TRACE1 // constructor / destructor
 //# define SR_USE_TRACE2 // render
@@ -47,25 +47,25 @@ struct SrOGLData : public SrSnShapeBase::RenderLibData
 
 SrOGLData::SrOGLData ( SrSnShapeBase* s )
  {
-   //LOG("SrOGLData constructor");
+   //SmartBody::util::log("SrOGLData constructor");
    int i;
    SrArray<SrSaGlRender::RegData>& rfuncs = SrSaGlRender::_rfuncs;
 
    //SR_TRACE2 ( "Initializing render data for "<<s->inst_class_name() );
    
    s->changed ( true );
-   //LOG("s->changed");
+   //SmartBody::util::log("s->changed");
    s->set_renderlib_data ( this );
-   //LOG("s->set_render_lib_data()");
+   //SmartBody::util::log("s->set_render_lib_data()");
 
    // we could use here a sorted array, but as the number of registered classes
    // is normally low (<10), the overhead is not worth.
    for ( i=0; i<rfuncs.size(); i++ )
      if ( sr_compare(rfuncs[i].class_name,s->inst_class_name())==0 ) break;
-   //LOG("after sr_compare, rfunc size = %d",rfuncs.size());
+   //SmartBody::util::log("after sr_compare, rfunc size = %d",rfuncs.size());
    if ( i==rfuncs.size() )
    {
-     LOG("SrSaGlRender: shape [%s] not registered!",s->inst_class_name());
+     SmartBody::util::log("SrSaGlRender: shape [%s] not registered!",s->inst_class_name());
      sr_out.fatal_error("SrSaGlRender: shape [%s] not registered!",s->inst_class_name());
    }
 
@@ -93,7 +93,7 @@ void register_render_function ( const char* class_name, SrSaGlRender::render_fun
 
    rf[i].class_name = class_name;
    rf[i].rfunc = rfunc;
-   //LOG("render function %s is set to %d, _rfuncs size = %d",class_name, i, rf.size());
+   //SmartBody::util::log("render function %s is set to %d, _rfuncs size = %d",class_name, i, rf.size());
  }
 
 SrSaGlRender::SrSaGlRender () 
@@ -101,7 +101,7 @@ SrSaGlRender::SrSaGlRender ()
    //SR_TRACE1 ( "Constructor" );
    if ( _rfuncs.size()==0 ) // no functions registered	
    {  
-      //LOG("register render functions");
+      //SmartBody::util::log("register render functions");
       register_render_function ( "model",    SrGlRenderFuncs::render_model );
       register_render_function ( "lines",    SrGlRenderFuncs::render_lines );
       register_render_function ( "points",   SrGlRenderFuncs::render_points );
@@ -183,19 +183,19 @@ void SrSaGlRender::pop_matrix ()
 bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
  {
    // 1. Ensures that render data is initialized
-   //LOG("SrSAGLRender::shape_apply(), s = %d",s);
+   //SmartBody::util::log("SrSAGLRender::shape_apply(), s = %d",s);
    SrOGLData* ogl = (SrOGLData*) s->get_renderlib_data();
-   //LOG("after s->get_renderlib_data(), ogl = %d", ogl);
+   //SmartBody::util::log("after s->get_renderlib_data(), ogl = %d", ogl);
    if ( !ogl ) {	   
 	   ogl = new SrOGLData ( s );
    }
-   //LOG("check ogl");
+   //SmartBody::util::log("check ogl");
    // 2. Render only if needed
    if ( !s->visible() ) return true;
 
   
    bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
-   //LOG("check isSrModel");
+   //SmartBody::util::log("check isSrModel");
    // 3. Check if lists are up to date
 #if USE_GL_FIXED_PIPELINE // no display list for OpenGL ES Rendering
    if ( !s->haschanged() && !isSrModel)
@@ -217,7 +217,7 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    else
 #endif
    {
-	   //LOG("ogl->rfunc");
+	   //SmartBody::util::log("ogl->rfunc");
 	   ogl->rfunc(s);
    }   
 

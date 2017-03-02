@@ -19,7 +19,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBRigNode.h"
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 
 namespace SmartBody {
 
@@ -75,12 +76,12 @@ double SBSetDrivenKeySequenceNode::getValue(double value, int index)
 
 	if (index >= _numValues)
 	{
-		LOG("Cannot retrieve key for node %d, only %d available.", index, _numValues);
+		SmartBody::util::log("Cannot retrieve key for node %d, only %d available.", index, _numValues);
 		return 0.0;
 	}
 	if (index < 0)
 	{
-		LOG("Bad key value %d, only %d available.", index, _numValues);
+		SmartBody::util::log("Bad key value %d, only %d available.", index, _numValues);
 		return 0.0;
 	}
 

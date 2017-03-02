@@ -1,26 +1,24 @@
-/*
- *  bml_saccade.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2011  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Yuyu Xu, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -36,16 +34,18 @@
 #include "bml_event.hpp"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBUtilities.h>
 
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
+
 BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	MeCtSaccade* saccade_ct = request->actor->saccade_ct;
 	if (!saccade_ct)
 	{
-		LOG("Character %s does not have a saccade controller, so cannot saccade.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a saccade controller, so cannot saccade.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -96,7 +96,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			saccade_ct->setBehaviorMode(MeCtSaccade::Thinking);
 		else
 		{
-			LOG("BML::parse_bml_saccade ERR: this mode not recognized");
+			SmartBody::util::log("BML::parse_bml_saccade ERR: this mode not recognized");
 			return BehaviorRequestPtr(); 
 		}
 	}
@@ -140,7 +140,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			saccade_ct->setValid(false);
 		else
 		{
-			LOG("BML::parse_bml_saccade ERR: this tag not recognized");
+			SmartBody::util::log("BML::parse_bml_saccade ERR: this tag not recognized");
 			return BehaviorRequestPtr();
 		}
 	}

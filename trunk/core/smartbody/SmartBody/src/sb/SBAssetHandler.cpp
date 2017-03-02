@@ -19,12 +19,12 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandler.h"
-#include <vhcl.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -52,9 +52,9 @@ std::string SBAssetHandler::checkPath(const std::string& path)
 	if( !boost::filesystem::exists( pathname ) )
 	{
 #if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" not found.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
 #endif
 		return "";
 	}
@@ -62,9 +62,9 @@ std::string SBAssetHandler::checkPath(const std::string& path)
 	if( boost::filesystem::is_directory( pathname ) ) // path indicates a directory
 	{
 		#if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" is a directory.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
 #endif
 		return "";
 	}

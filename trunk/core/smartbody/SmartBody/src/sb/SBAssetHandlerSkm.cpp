@@ -19,7 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerSkm.h"
-#include <vhcl.h>
+
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/algorithm/string.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -65,7 +66,7 @@ std::vector<SBAsset*> SBAssetHandlerSkm::getAssets(const std::string& path)
 		assets.push_back(motion);
 	}
 	else
-		LOG("Could not read .skm file %s", convertedPath.c_str());
+		SmartBody::util::log("Could not read .skm file %s", convertedPath.c_str());
 
 	return assets;
 }

@@ -60,7 +60,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	// check to make sure we have properly opened the file
 	if (!file.good())
 	{
-		LOG("Could not open file\n");
+		SmartBody::util::log("Could not open file\n");
 		return false;
 	}
 	char line[8192];
@@ -98,7 +98,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					state = 1;
 				else
 				{
-					LOG("HIERARCHY not found...\n");
+					SmartBody::util::log("HIERARCHY not found...\n");
 					file.close();
 					return false;
 				}
@@ -128,14 +128,14 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					}
 					else
 					{
-						LOG("ROOT name not found...\n");
+						SmartBody::util::log("ROOT name not found...\n");
 						file.close();
 						return false;
 					}
 				}
 				else
 				{
-					LOG("ROOT not found...\n");
+					SmartBody::util::log("ROOT not found...\n");
 					file.close();
 					return false;
 				}
@@ -149,7 +149,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("{ not found...\n");
+					SmartBody::util::log("{ not found...\n");
 					file.close();
 					return false;
 				}
@@ -175,7 +175,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("OFFSET not found...\n");
+					SmartBody::util::log("OFFSET not found...\n");
 					file.close();
 					return false;
 				}
@@ -190,14 +190,14 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					// make sure that only the root has > 3 channels
 					if (numChannels > 3 && foundRoot == 2)
 					{
-						//LOG("Too many channels (%d) found for non-root node at %s, reducing to %d...", numChannels, cur->getName(), numChannels - 3);
+						//SmartBody::util::log("Too many channels (%d) found for non-root node at %s, reducing to %d...", numChannels, cur->getName(), numChannels - 3);
 						//cur->setIgnoreChannels(true);
 					}
 					ChannelInfo* channelInfo = new ChannelInfo();
 					channelInfo->numBVHChannels = 0;
 					channelInfo->order = 0;
 					channelInfo->startingChannelIndex = curChannelIndex;
-					//LOG("Found %d channels...\n", numChannels);
+					//SmartBody::util::log("Found %d channels...\n", numChannels);
 					bool hasRotation = false;
 					for (int c = 0; c < numChannels; c++)
 					{
@@ -249,7 +249,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						}
 						else
 						{
-							LOG("Unknown channel: %s...\n", str);;
+							SmartBody::util::log("Unknown channel: %s...\n", str);;
 							file.close();
 							return false;
 						}
@@ -276,7 +276,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("CHANNELS not found...\n");;
+					SmartBody::util::log("CHANNELS not found...\n");;
 					file.close();
 					return false;
 				}
@@ -306,7 +306,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					}
 					else
 					{
-						LOG("ROOT name not found...\n");;
+						SmartBody::util::log("ROOT name not found...\n");;
 						file.close();
 						return false;
 					}
@@ -320,7 +320,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					}
 					else
 					{
-						LOG("End site not found...\n");;
+						SmartBody::util::log("End site not found...\n");;
 						file.close();
 						return false;
 					}
@@ -335,7 +335,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					}
 					else
 					{
-						LOG("} not found...\n");;
+						SmartBody::util::log("} not found...\n");;
 						file.close();
 						return false;
 					}
@@ -346,7 +346,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("JOINT or End Site not found...\n");;
+					SmartBody::util::log("JOINT or End Site not found...\n");;
 					file.close();
 					return false;
 				}
@@ -359,7 +359,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("{ not found for end effector...\n");;
+					SmartBody::util::log("{ not found for end effector...\n");;
 					cerr << "{ not found for end effector..." << endl;
 					file.close();
 					return false;
@@ -378,13 +378,13 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					z = atof(str);
 					cur->endEffectorOffset(SrVec(float(x) * scale, float(y)* scale, float(z) * scale));
 					//cur->setEndEffector(true);
-					//LOG("Found end effector at %s", cur->getName());
+					//SmartBody::util::log("Found end effector at %s", cur->getName());
 					//cout << "Found end effector offset of " << x << " " << y << " " << z << " " << endl;
 					state = 8;
 				}
 				else
 				{
-					LOG("End effector OFFSET not found...\n");;
+					SmartBody::util::log("End effector OFFSET not found...\n");;
 					file.close();
 					return false;
 				}
@@ -397,7 +397,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("} not found for end effector...\n");;
+					SmartBody::util::log("} not found for end effector...\n");;
 					file.close();
 					return false;
 				}
@@ -408,12 +408,12 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					str = strtok(NULL, " \t");
 					numFrames = atoi(str);
-					//LOG("Found %d frames of animation...\n", numFrames);
+					//SmartBody::util::log("Found %d frames of animation...\n", numFrames);
 					state = 10;
 				}
 				else
 				{
-					LOG("Frames: not found...\n");;
+					SmartBody::util::log("Frames: not found...\n");;
 					file.close();
 					return false;
 				}
@@ -424,7 +424,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					str = strtok(NULL, " \t");
 					frameTime = atof(str);
-					//LOG("Frame time is %f...\n", frameTime);
+					//SmartBody::util::log("Frame time is %f...\n", frameTime);
 					//curFrame = 0;
 					state = 11;
 
@@ -460,7 +460,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				}
 				else
 				{
-					LOG("Frame Time: not found...\n");;
+					SmartBody::util::log("Frame Time: not found...\n");;
 					file.close();
 					return false;
 				}
@@ -488,7 +488,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 							
 							if ((size_t)index >= bvhIndex.size())
 							{
-								LOG("Data on frame %d at position %d exceeds channel size of %d.", curFrame, index, bvhIndex.size());
+								SmartBody::util::log("Data on frame %d at position %d exceeds channel size of %d.", curFrame, index, bvhIndex.size());
 								break;
 							}
 
@@ -527,7 +527,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 							}
 							else
 							{
-								LOG("No joint found for index %d and channel #%d on frame %d...\n", index, channelNum, curFrame);
+								SmartBody::util::log("No joint found for index %d and channel #%d on frame %d...\n", index, channelNum, curFrame);
 							}
 							index++;
 						
@@ -558,12 +558,12 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				break;
 			
 			default:
-				LOG("State %d not expected.");
+				SmartBody::util::log("State %d not expected.");
 				file.close();
 				return false;
 		}
 	}
-	//LOG("Finished parsing motion with %d frames...", numFrames);
+	//SmartBody::util::log("Finished parsing motion with %d frames...", numFrames);
 	file.close();
 	//skeleton.recalculateJointList();
 	//skeleton.calculateMatrices(0);	
@@ -666,7 +666,7 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 		SrQuat quat(matrix);
 
 		if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset + 3)
-			LOG("WARNING! CHANNEL ASSIGNMENT AS POSITION %d EXCEEDS CHANNEL SIZE %d. EXPECT CRASH ON DEALLOCATION OF SKMOTION.",  (channelInfo->startingChannelIndex + skChannelOffset + 3), motion.posture_size());
+			SmartBody::util::log("WARNING! CHANNEL ASSIGNMENT AS POSITION %d EXCEEDS CHANNEL SIZE %d. EXPECT CRASH ON DEALLOCATION OF SKMOTION.",  (channelInfo->startingChannelIndex + skChannelOffset + 3), motion.posture_size());
 
 		posture[channelInfo->startingChannelIndex + skChannelOffset] = quat.w;
 		posture[channelInfo->startingChannelIndex + skChannelOffset + 1] = quat.x;

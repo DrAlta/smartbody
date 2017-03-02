@@ -22,6 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sb/SBMotion.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 
 
 namespace SmartBody {
@@ -43,7 +44,7 @@ void SBHandConfiguration::addMotion(std::string motionName)
 
 	if (!motion)
 	{
-		LOG("Unable to find motion named %s",motionName.c_str());
+		SmartBody::util::log("Unable to find motion named %s",motionName.c_str());
 		return;
 	}
 
@@ -57,7 +58,7 @@ void SBHandConfiguration::removeMotion(std::string motionName)
 
 	if (!motion)
 	{
-		LOG("Unable to find motion named %s",motionName.c_str());
+		SmartBody::util::log("Unable to find motion named %s",motionName.c_str());
 		return;
 	}
 
@@ -81,7 +82,7 @@ void SBHandConfiguration::printMotionNames()
 	for (; iter != _motions.end() ; iter++)
 	{
 		SBMotion* motion = *iter;
-		LOG("Motion name is %s", motion->getName().c_str());
+		SmartBody::util::log("Motion name is %s", motion->getName().c_str());
 	}
 }
 
@@ -89,7 +90,7 @@ SBMotion* SBHandConfiguration::getMotion(int i)
 {
 	if (i >= _motions.size())
 	{
-		LOG("i is greater than motion vector size");
+		SmartBody::util::log("i is greater than motion vector size");
 		return NULL;
 	}
 

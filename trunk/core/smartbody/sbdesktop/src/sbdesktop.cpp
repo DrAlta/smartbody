@@ -4,7 +4,7 @@
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
-#include "vhcl.h"
+
 #ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
@@ -231,7 +231,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 		if (!camera)
 		{
-			LOG("No active camera. Camera command not executed.");
+			SmartBody::util::SmartBody::util::log("No active camera. Camera command not executed.");
 			return CMD_FAILURE;
 		}
 		char *cam_cmd = args.read_token();
@@ -260,10 +260,10 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				if (SmartBody::SBScene::getScene()->hasCameraTrack())
 				{
 					SmartBody::SBScene::getScene()->removeCameraTrack();
-					LOG("Removing current tracked object.");
+					SmartBody::util::SmartBody::util::log("Removing current tracked object.");
 						return( CMD_SUCCESS );
 				}
-				LOG("Need to specify an object and a joint to track.");
+				SmartBody::util::SmartBody::util::log("Need to specify an object and a joint to track.");
 				return( CMD_FAILURE );
 			}
 			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
@@ -272,14 +272,14 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				pawn = SmartBody::SBScene::getScene()->getCharacter(name);
 				if (!pawn)
 				{
-					LOG("Object %s was not found, cannot track.", name);
+					SmartBody::util::SmartBody::util::log("Object %s was not found, cannot track.", name);
 					return( CMD_FAILURE );
 				}
 			}
 			char* jointName = args.read_token();
 			if (!jointName || strcmp(jointName, "") == 0)
 			{
-				LOG("Need to specify a joint to track.");
+				SmartBody::util::SmartBody::util::log("Need to specify a joint to track.");
 				return( CMD_FAILURE );
 			}
 			SmartBody::SBSkeleton* skeleton = NULL;
@@ -288,7 +288,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
 			if (!joint)
 			{
-				LOG("Could not find joint %s on object %s.", jointName, name);
+				SmartBody::util::SmartBody::util::log("Could not find joint %s on object %s.", jointName, name);
 				return( CMD_FAILURE );
 			}
 	
@@ -296,7 +296,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			if (hasTracks)
 			{
 				SmartBody::SBScene::getScene()->removeCameraTrack();
-				LOG("Removing current tracked object.");
+				SmartBody::util::SmartBody::util::log("Removing current tracked object.");
 			}
 			SmartBody::SBScene::getScene()->setCameraTrack(name, joint->getName());
 			return CMD_SUCCESS;			
@@ -386,10 +386,10 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
+            SmartBody::util::SmartBody::util::log("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
+            SmartBody::util::SmartBody::util::log("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 
@@ -443,7 +443,7 @@ void cleanup( void )	{
 		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
 		{
-			LOG( "SmartBody NOTE: unexpected exit " );
+			SmartBody::util::SmartBody::util::log( "SmartBody NOTE: unexpected exit " );
 		}
 
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
@@ -463,7 +463,7 @@ void cleanup( void )	{
 	
 	XMLPlatformUtils::Terminate();
 
-	LOG( "SBM: terminated gracefully." );
+	SmartBody::util::SmartBody::util::log( "SBM: terminated gracefully." );
 
 
 #if SBM_REPORT_MEMORY_LEAKS
@@ -564,16 +564,16 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
-		LOG( "SmartBody argument [%d]: '%s'", i, argv[i] );
+		SmartBody::util::SmartBody::util::log( "SmartBody argument [%d]: '%s'", i, argv[i] );
 		s = argv[i];
 
 		if( s == "-pythonpath" )  // argument -pythonpath
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding path path '%s'\n", argv[i] );
+				SmartBody::util::SmartBody::util::log( "    Adding path path '%s'\n", argv[i] );
 				python_lib_path = argv[i];
 			} else {
-				LOG( "ERROR: Expected directory path to follow -pythonpath\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected directory path to follow -pythonpath\n" );
 				// return -1
 			}
 		}
@@ -585,45 +585,45 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding ME path '%s'\n", argv[i] );
+				SmartBody::util::SmartBody::util::log( "    Adding ME path '%s'\n", argv[i] );
 
 				me_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -mepath\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected directory path to follow -mepath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-seqpath" || s == "-scriptpath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding sequence path '%s'\n", argv[i] );
+				SmartBody::util::SmartBody::util::log( "    Adding sequence path '%s'\n", argv[i] );
 
 				seq_paths.push_back( argv[i] );
 				py_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected directory path to follow -seqpath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-pypath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding python script path '%s'\n", argv[i] );
+				SmartBody::util::SmartBody::util::log( "    Adding python script path '%s'\n", argv[i] );
 
 				py_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -pypath\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected directory path to follow -pypath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-audiopath" )  // -audiopath <dirpath> to specify where audio files (.wav and .bml) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Addcore/smartbody/sbm/src/sbm_main.cpping audio path '%s'\n", argv[i] );
+				SmartBody::util::SmartBody::util::log( "    Addcore/smartbody/sbm/src/sbm_main.cpping audio path '%s'\n", argv[i] );
 
 				audio_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -audiopath\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected directory path to follow -audiopath\n" );
 				// return -1
 			}
 		}
@@ -640,23 +640,23 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 					std::string extension = filename.substr(idx+1);
 					if (extension == "py")
 					{
-						LOG( "    Loading Python scrypt '%s'\n", argv[i] );
+						SmartBody::util::SmartBody::util::log( "    Loading Python scrypt '%s'\n", argv[i] );
 						init_pys.push_back( argv[i] );
 					}
 					else
 					{
-						LOG( "    Loading sequence '%s'\n", argv[i] );
+						SmartBody::util::SmartBody::util::log( "    Loading sequence '%s'\n", argv[i] );
 						init_seqs.push_back( argv[i] );
 					}
 				}
 				else
 				{
 					// No extension found
-					LOG( "    Loading sequence '%s'\n", argv[i] );
+					SmartBody::util::SmartBody::util::log( "    Loading sequence '%s'\n", argv[i] );
 					init_seqs.push_back( argv[i] );
 				}
 			} else {
-				LOG( "ERROR: Expected filename to follow -seq\n" );
+				SmartBody::util::SmartBody::util::log( "ERROR: Expected filename to follow -seq\n" );
 				// return -1
 			}
 		}
@@ -681,7 +681,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 		else if ( s.search( "-facebone" ) == 0 )
 		{
-			LOG("-facebone option has been deprecated.");
+			SmartBody::util::SmartBody::util::log("-facebone option has been deprecated.");
 		}
 		else if ( s.search( "-skscale=" ) == 0 )
 		{
@@ -730,7 +730,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 		else
 		{
-			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
+			SmartBody::util::SmartBody::util::log( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
 		}
 	}
 	if( lock_dt_mode )	{ 
@@ -784,16 +784,16 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
 	} else {
 		if( vhmsg_disabled ) {
-			LOG( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
+			SmartBody::util::SmartBody::util::log( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
 			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
-			LOG( "SmartBody error: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
+			SmartBody::util::SmartBody::util::log( "SmartBody error: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
 #else
 			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
 			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
-			LOG( "SmartBody error: ttu_open FAILED\n" );
-			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
+			SmartBody::util::SmartBody::util::log( "SmartBody error: ttu_open FAILED\n" );
+			SmartBody::util::SmartBody::util::log("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
 		SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(false);
@@ -819,7 +819,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		if ( !AUDIO_Init() )
 		{
-			LOG( "ERROR: Audio initialization failed\n" );
+			SmartBody::util::SmartBody::util::log( "ERROR: Audio initialization failed\n" );
 		}
 	}
 
@@ -835,7 +835,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	vector<string>::iterator it;
 
 	if( seq_paths.empty() && py_paths.empty() ) {
-		LOG( "No script paths specified. Adding current working directory to script path.\n" );
+		SmartBody::util::SmartBody::util::log( "No script paths specified. Adding current working directory to script path.\n" );
 		py_paths.push_back( "." );
 	}
 
@@ -879,7 +879,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
-		LOG( "No Python scripts specified. Loading script 'default.py'\n");
+		SmartBody::util::SmartBody::util::log( "No Python scripts specified. Loading script 'default.py'\n");
 		init_pys.push_back( "default.py" );
 	}
 

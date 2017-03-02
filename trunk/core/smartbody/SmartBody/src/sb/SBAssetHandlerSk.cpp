@@ -19,7 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerSk.h"
-#include <vhcl.h>
+
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -28,6 +28,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
+
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
@@ -70,7 +72,7 @@ std::vector<SBAsset*> SBAssetHandlerSk::getAssets(const std::string& path)
 	}
 	else
 	{
-		LOG("Could not load .sk file %s", convertedPath.c_str());
+		SmartBody::util::log("Could not load .sk file %s", convertedPath.c_str());
 		delete skeleton;
 	}
 

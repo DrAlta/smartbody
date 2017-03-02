@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsSim.h>
+#include <sb/SBUtilities.h>
 #include <sbm/ODEPhysicsSim.h>
 
 #ifdef __ANDROID__
@@ -206,7 +207,7 @@ void SBPhysicsManager::applyForceToPawn( std::string pawnName, SrVec force )
 	SBPhysicsObj* phyObj = getPhysicsEngine()->getPhysicsPawn(pawnName);
 	if (phyObj)
 	{
-		LOG("Find phyobj, name = %s", pawnName.c_str());
+		SmartBody::util::log("Find phyobj, name = %s", pawnName.c_str());
 		phyObj->setExternalForce(force);
 	}
 #endif

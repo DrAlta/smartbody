@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSimulationManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBEvent.h>
+#include <sb/SBUtilities.h>
 #include <sbm/ODEPhysicsSim.h>
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_color.h>
@@ -123,7 +124,7 @@ void SBCollisionManager::start()
 			}
 			else // create collision capsules based on skel bones
 			{
-				LOG(character->getName().c_str());
+				SmartBody::util::log(character->getName().c_str());
 				SkSkeleton* sk = character->getSkeleton();
 				const std::vector<SkJoint*>& origJnts = sk->joints();
 				sk->update_global_matrices();
@@ -167,7 +168,7 @@ void SBCollisionManager::start()
 						std::string colObjName = chrName + ":" + j->jointName();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
 						SBGeomObject* obj = createCollisionObject(colObjName,"capsule",SrVec(0, radius, 0),SrVec::null,offset);
-						LOG("SBColMan: col primitive added: %s, len: %f, radius: %f", colObjName.c_str(), offset_len, radius);
+						SmartBody::util::log("SBColMan: col primitive added: %s, len: %f, radius: %f", colObjName.c_str(), offset_len, radius);
 						obj->attachToObj(dynamic_cast<SBTransformObjInterface*>(j));
 						addObjectToCollisionSpace(colObjName);
 					}
@@ -247,7 +248,7 @@ void SBCollisionManager::afterUpdate(double time)
 		for (unsigned int i=0;i<potentialCollisions.size();i++)
 		{
 			// unfiltered
-			//LOG("Collision Pair = %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
+			//SmartBody::util::log("Collision Pair = %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
 			SBGeomObject* g1 = getCollisionObject(potentialCollisions[i].first);
 			SBGeomObject* g2 = getCollisionObject(potentialCollisions[i].second);
 
@@ -261,7 +262,7 @@ void SBCollisionManager::afterUpdate(double time)
 			}
 			
 			// filtered, exclude all collisions within each character/skeleton
-			//LOG("Potential Collision Pair: %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
+			//SmartBody::util::log("Potential Collision Pair: %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
 
 			std::vector<SBGeomContact> contactPts;
 			SBCollisionUtil::collisionDetection(g1,g2,contactPts);
@@ -276,7 +277,7 @@ void SBCollisionManager::afterUpdate(double time)
 					{
 						SBEvent* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
 						eventManager->handleEvent(collisionEvent);
-						//LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
+						//SmartBody::util::log("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 						delete collisionEvent; // free the memory
 
 						// collision resolution
@@ -286,7 +287,7 @@ void SBCollisionManager::afterUpdate(double time)
 							v1[1] = 0.0;
 							SrVec v2 = _velocities[c2->getName()];
 							v2[1] = 0.0;
-							//LOG("v1 len = %f, v2 len = %f",v1.len(),v2.len());
+							//SmartBody::util::log("v1 len = %f, v2 len = %f",v1.len(),v2.len());
 							SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
 							SBGeomContact& contact = contactPts[0];
 							SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
@@ -333,14 +334,14 @@ void SBCollisionManager::afterUpdate(double time)
 					//{
 					//	Event* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
 					//	eventManager->handleEvent(collisionEvent);
-					//	LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
+					//	SmartBody::util::log("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 					//	delete collisionEvent; // free the memory
 					//}
 
 					const std::string& obj1 = potentialCollisions[i].first;
 					const std::string& obj2 = potentialCollisions[i].second;
 
-					//LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
+					//SmartBody::util::log("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 
 					SBEvent* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
 					eventManager->handleEvent(collisionEvent);
@@ -373,7 +374,7 @@ void SBCollisionManager::afterUpdate(double time)
 				
 				if (contactPts.size() > 0)
 				{
-					//LOG("Collision between character %s and character %s",character1->getName().c_str(), character2->getName().c_str());
+					//SmartBody::util::log("Collision between character %s and character %s",character1->getName().c_str(), character2->getName().c_str());
 
 				}
 

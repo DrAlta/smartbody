@@ -24,6 +24,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCommandManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <bml/bml_processor.hpp>
 #include <sbm/rapidxml_utils.hpp>
 #include <bml/BMLObject.h>
@@ -196,7 +197,7 @@ void SBBmlProcessor::vrAgentBML(std::string op, std::string agent, std::string m
 	}
 	else
 	{
-		LOG("vrAgentBML option %s not recognized!", op.c_str());
+		SmartBody::util::log("vrAgentBML option %s not recognized!", op.c_str());
 		return;	
 	}
 }
@@ -228,12 +229,12 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 	std::ostringstream msg;
 	std::string msgId = "";
 	bool all_characters = ( char_id=="*" );
-	//LOG("send_vrX cmd =  %s, bml = %s", cmd, bml.c_str());
+	//SmartBody::util::log("send_vrX cmd =  %s, bml = %s", cmd, bml.c_str());
 	if( seq_id.length()==0 ) {
 		if( echo ) {
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			// don't log a vrX message
-			////LOG("%s %s", cmd, msg.str().c_str());
+			////SmartBody::util::log("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
@@ -247,13 +248,13 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				{
 					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );	
-					//LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+					//SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 					//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 					SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				//LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+				//SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 				//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 				SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 			}
@@ -269,13 +270,13 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\".";
-				////LOG(strstr.str().c_str());
+				////SmartBody::util::log(strstr.str().c_str());
 			}
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\".";
-				////LOG(strstr.str().c_str());
+				////SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 		if( all_characters )
@@ -290,7 +291,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 					std::stringstream strstr;
 					strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-					////LOG(strstr.str().c_str());
+					////SmartBody::util::log(strstr.str().c_str());
 				}
 			}
 		} else {
@@ -298,7 +299,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-				////LOG(strstr.str().c_str());
+				////SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 
@@ -308,7 +309,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
-				////LOG(strstr.str().c_str());
+				////SmartBody::util::log(strstr.str().c_str());
 				return msgId;
 			}
 		} else {
@@ -317,7 +318,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
-				////LOG(strstr.str().c_str());
+				////SmartBody::util::log(strstr.str().c_str());
 				return msgId;
 			}
 		}
@@ -404,7 +405,7 @@ void SBBmlProcessor::interruptCharacter(const std::string& character, double sec
 	SBCharacter* sbCharacter = scene->getCharacter(character);
 	if (!sbCharacter)
 	{
-		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
+		SmartBody::util::log("No character named '%s' found. Interrupt not done.", character.c_str());
 		return;
 	}
 
@@ -419,7 +420,7 @@ void SBBmlProcessor::interruptBML(const std::string& character, const std::strin
 	SBCharacter* sbCharacter = scene->getCharacter(character);
 	if (!sbCharacter)
 	{
-		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
+		SmartBody::util::log("No character named '%s' found. Interrupt not done.", character.c_str());
 		return;
 	}
 
@@ -466,7 +467,7 @@ std::vector<BMLObject*> SBBmlProcessor::parseBML(const std::string& bml)
 				std::map<std::string, BMLObject*>::iterator iter = _bmlHandlers.find(behaviorName);
 				if (iter == _bmlHandlers.end())
 				{
-					LOG("BML parsing problem: cannot find handler for BML instruction: '%s'", behaviorName);
+					SmartBody::util::log("BML parsing problem: cannot find handler for BML instruction: '%s'", behaviorName);
 					continue;
 				}
 				BMLObject* bmlHandlerObject = (*iter).second;

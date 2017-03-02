@@ -1,5 +1,25 @@
-#include "vhcl.h"
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
+#include <sb/SBUtilities.h>
 #include "bml.hpp"
 #include "behavior_scheduler_gesture.hpp"
 
@@ -167,7 +187,7 @@ void BehaviorSchedulerGesture::schedule( BehaviorSyncPoints& behav_syncs, time_s
 	{
 		if (!(syncPointsSet[3] && syncPointsSet[5]))
 		{
-			LOG("BehaviorSchedulerGesture::schedule WARNING: you can only specify stroke and relax or any one of the sync points for GESTURE BML, starting behavior now...");
+			SmartBody::util::log("BehaviorSchedulerGesture::schedule WARNING: you can only specify stroke and relax or any one of the sync points for GESTURE BML, starting behavior now...");
 			start_at = now;
 			for (int x = 0; x < 7; x++)
 			{
@@ -188,7 +208,7 @@ void BehaviorSchedulerGesture::schedule( BehaviorSyncPoints& behav_syncs, time_s
 			double gap = (syncTimes[5] - syncTimes[3]) - (rawTimes[5] - rawTimes[3]);
 			if (gap < 0)
 			{
-				//LOG("sync time stroke->relax time is shorter than motion stroke->relax time by %f, re-adjust...", gap);
+				//SmartBody::util::log("sync time stroke->relax time is shorter than motion stroke->relax time by %f, re-adjust...", gap);
 				syncTimes[5] += fabs(gap);
 				syncTimes[6] += fabs(gap);
 			}
@@ -203,7 +223,7 @@ void BehaviorSchedulerGesture::schedule( BehaviorSyncPoints& behav_syncs, time_s
 	relax->time = syncTimes[5];
 	end->time = syncTimes[6];
 
-	//LOG("BehaviorSchedulerGesture::schedule timing: %f, %f, %f, %f, %f, %f, %f", syncTimes[0], syncTimes[1], syncTimes[2], syncTimes[3], syncTimes[4], syncTimes[5], syncTimes[6]);
+	//SmartBody::util::log("BehaviorSchedulerGesture::schedule timing: %f, %f, %f, %f, %f, %f, %f", syncTimes[0], syncTimes[1], syncTimes[2], syncTimes[3], syncTimes[4], syncTimes[5], syncTimes[6]);
 }
 
 // Part of a transitional move to BehaviorSchedulers

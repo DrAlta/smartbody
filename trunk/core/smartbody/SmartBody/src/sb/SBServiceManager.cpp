@@ -20,6 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SBServiceManager.h"
 #include <sb/SBService.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -56,7 +57,7 @@ void SBServiceManager::addService(SBService* service)
 	std::map<std::string, SBService*>::iterator iter = _services.find(service->getName());
 	if (iter != _services.end())
 	{
-		LOG("Service named %s already exists. Service not added.", service->getName().c_str());
+		SmartBody::util::log("Service named %s already exists. Service not added.", service->getName().c_str());
 		return;
 	}
 
@@ -68,7 +69,7 @@ void SBServiceManager::removeService(const std::string& name)
 	std::map<std::string, SBService*>::iterator iter = _services.find(name);
 	if (iter == _services.end())
 	{
-		LOG("Service named %s does not exist. Service not removed.", name.c_str());
+		SmartBody::util::log("Service named %s does not exist. Service not removed.", name.c_str());
 		return;
 	}
 
@@ -80,7 +81,7 @@ SBService* SBServiceManager::getService(const std::string& name)
 	std::map<std::string, SBService*>::iterator iter = _services.find(name);
 	if (iter == _services.end())
 	{
-		LOG("Service named %s does not exist.", name.c_str());
+		SmartBody::util::log("Service named %s does not exist.", name.c_str());
 		return NULL;
 	}
 

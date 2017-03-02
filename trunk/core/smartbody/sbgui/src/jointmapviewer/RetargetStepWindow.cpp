@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "RetargetStepWindow.h"
 #include "RootWindow.h"
 #include <iostream>
@@ -16,6 +16,7 @@
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include <SBSelectionManager.h>
 #include <sbm/ParserOpenCOLLADA.h>
 
@@ -243,7 +244,7 @@ void RetargetStepWindow::CharacterCB( Fl_Widget* widget, void* data )
 	if (value < 0 || 
 		value >= viewer->_choiceCharacters->size())
 	{
-		LOG("Bad value from character dropdown list. %d", value);
+		SmartBody::util::log("Bad value from character dropdown list. %d", value);
 		return;
 	}
 	viewer->setCharacterName(viewer->_choiceCharacters->text(value));
@@ -347,7 +348,7 @@ void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )
 	SmartBody::SBCharacter* selectChar = scene->getCharacter(charName);
 	if (!selectChar)
 	{
-		LOG("Save Character Fail : No character is selected.");
+		SmartBody::util::log("Save Character Fail : No character is selected.");
 		return;
 	}
 
@@ -358,7 +359,7 @@ void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(defMeshName);
 	if (!defMesh)
 	{
-		LOG("Save Character Fail : the character '%s' doesn't have a deformable mesh.", charName.c_str());
+		SmartBody::util::log("Save Character Fail : the character '%s' doesn't have a deformable mesh.", charName.c_str());
 		return;
 	}
 

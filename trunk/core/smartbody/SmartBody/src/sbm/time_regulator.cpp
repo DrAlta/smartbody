@@ -18,10 +18,11 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sb/SBUtilities.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -69,7 +70,7 @@ double SBM_get_real_time_nodelay( void ) {
 		QueryPerformanceFrequency( &f );
 		inv_freq = 1.0 / (double)f.QuadPart;
 
-//LOG( "SBM_get_real_time: dt:%.18f fps: %.3f\n", inv_freq, (double)f.QuadPart );
+//SmartBody::util::log( "SBM_get_real_time: dt:%.18f fps: %.3f\n", inv_freq, (double)f.QuadPart );
 
 		QueryPerformanceCounter( &c );
 		ref_quad = c.QuadPart;
@@ -133,7 +134,7 @@ double SBM_sleep_wait( double prev_time, double target_dt, bool verbose )	{ // s
 				
 				if( wait_msec > 0 ) {
 					if( verbose && passes )	{
-						LOG( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec", 
+						SmartBody::util::log( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec", 
 							diff, wait_msec 
 						);
 					}
@@ -194,7 +195,7 @@ bool TimeRegulator::update( double in_time ) {
 	
 	if( in_time < 0.0 )	{
 		if( extern_src )	{
-			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to internal" );
+			if( verbose ) SmartBody::util::log( "TimeRegulator::update NOTICE: switch to internal" );
 			start( in_time );
 			abort = true;
 		}
@@ -202,7 +203,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	else	{
 		if( !extern_src )	{
-			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to external" );
+			if( verbose ) SmartBody::util::log( "TimeRegulator::update NOTICE: switch to external" );
 			start( in_time );
 			abort = true;
 		}
@@ -217,29 +218,29 @@ bool TimeRegulator::update( double in_time ) {
 	if( !abort ) {
 		if( loop_dt < 0.0 ) {
 			if( extern_src )	{
-				if( verbose ) LOG( "TimeRegulator::update ERR: negative external increment: %f", loop_dt );
+				if( verbose ) SmartBody::util::log( "TimeRegulator::update ERR: negative external increment: %f", loop_dt );
 			}
 			else
-				LOG( "TimeRegulator::update ERR: negative internal increment!!!!: %f", loop_dt );
+				SmartBody::util::log( "TimeRegulator::update ERR: negative internal increment!!!!: %f", loop_dt );
 			abort = true;
 		}
 		else
 		if( loop_dt == 0.0 )	{
 			if( extern_src )	{
-				if( verbose ) LOG( "TimeRegulator::update NOTICE: zero external increment" );
+				if( verbose ) SmartBody::util::log( "TimeRegulator::update NOTICE: zero external increment" );
 				if( ( ( sleep_dt == 0.0 )&&( eval_dt == 0.0 )&&( sim_dt > 0.0 ) ) == false )	{
 					abort = true;
 				}
 			}
 			else	{
-				LOG( "TimeRegulator::update ERR: zero internal increment!!!!" );
+				SmartBody::util::log( "TimeRegulator::update ERR: zero internal increment!!!!" );
 				abort = true;
 			}
 		}
 	}
 	if( abort ) {
 		out_dt = 0.0;
-		if( verbose ) LOG( "TimeRegulator::update ABORT" );
+		if( verbose ) SmartBody::util::log( "TimeRegulator::update ABORT" );
 		return( false );
 	}
 	
@@ -264,7 +265,7 @@ bool TimeRegulator::update( double in_time ) {
 		prev_real_time = real_time;
 
 		if( do_pause )	{
-			if( verbose ) LOG( "TimeRegulator::update PAUSE" );
+			if( verbose ) SmartBody::util::log( "TimeRegulator::update PAUSE" );
 			do_pause = false;
 			paused = true;
 		}
@@ -272,12 +273,12 @@ bool TimeRegulator::update( double in_time ) {
 			do_resume = true;
 		}
 		if( do_resume )	{
-			if( verbose ) LOG( "TimeRegulator::update RESUME" );
+			if( verbose ) SmartBody::util::log( "TimeRegulator::update RESUME" );
 			do_resume = false;
 			paused = false;
 		}
 		if( do_steps )	{
-			if( verbose ) LOG( "TimeRegulator::update STEP" );
+			if( verbose ) SmartBody::util::log( "TimeRegulator::update STEP" );
 			do_steps--;
 			do_pause = true;
 		}
@@ -295,7 +296,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	
 	out_dt = 0.0;
-	if( verbose ) LOG( "TimeRegulator::update SKIP" );
+	if( verbose ) SmartBody::util::log( "TimeRegulator::update SKIP" );
 	return( false );
 }
 
@@ -312,15 +313,15 @@ void TimeRegulator::update_perf( void )	{
 
 		if( perf_sim_sum > 0.0 ) {
 			double sim_avg = perf_sim_sum / perf_count;
-			LOG( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f", 
-//			LOG( "PERF: REAL dt:%f fps:%f ~ SIM dt:%f fps:%f\n", 
+			SmartBody::util::log( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f", 
+//			SmartBody::util::log( "PERF: REAL dt:%f fps:%f ~ SIM dt:%f fps:%f\n", 
 				avg, 1.0 / avg,
 				sim_avg, 1.0 / sim_avg
 			);
 		}
 		else	{
-			LOG( "PERF: dt:%.3f fps:%.1f", avg, 1.0 / avg );
-//			LOG( "PERF: dt:%f fps:%f\n", avg, 1.0 / avg );
+			SmartBody::util::log( "PERF: dt:%.3f fps:%.1f", avg, 1.0 / avg );
+//			SmartBody::util::log( "PERF: dt:%f fps:%f\n", avg, 1.0 / avg );
 		}
 		perf_real_sum = 0.0;
 		perf_sim_sum = 0.0;
@@ -329,20 +330,20 @@ void TimeRegulator::update_perf( void )	{
 }
 
 void TimeRegulator::print( void )	{
-	LOG( "TimeRegulator( %.3f ): ", real_time );
-	LOG( "   status: %s", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
-	LOG( "    speed: %.3f", speed );
-	LOG( "    sleep: %.4f : %.2f fps", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
-	LOG( "     eval: %.4f : %.2f fps", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
-	LOG( "      sim: %.4f : %.2f fps", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
-	LOG( "   out dt: %.4f : %.2f fps", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
-	LOG( " out time: %.3f", out_time );
+	SmartBody::util::log( "TimeRegulator( %.3f ): ", real_time );
+	SmartBody::util::log( "   status: %s", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
+	SmartBody::util::log( "    speed: %.3f", speed );
+	SmartBody::util::log( "    sleep: %.4f : %.2f fps", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
+	SmartBody::util::log( "     eval: %.4f : %.2f fps", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
+	SmartBody::util::log( "      sim: %.4f : %.2f fps", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
+	SmartBody::util::log( "   out dt: %.4f : %.2f fps", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
+	SmartBody::util::log( " out time: %.3f", out_time );
 }
 
 void TimeRegulator::print_update( int id, double in_time ) {
 
 	bool res = update( in_time );
-	LOG( "[%d]:(%d): in:%f time:%f dt:%f", id, res, in_time, get_time(), get_dt() );
+	SmartBody::util::log( "[%d]:(%d): in:%f time:%f dt:%f", id, res, in_time, get_time(), get_dt() );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +357,7 @@ void test_time_regulator( void )	{
 	tr.start();
 	tr.set_verbose();
 	
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 
 #if 0
 	tr.print_update( c++ );
@@ -365,7 +366,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++ );
 	tr.print_update( c++ );
 
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 	
 	tr.print_update( c++, 1.0 );
 	tr.print_update( c++, 1.1 );
@@ -373,7 +374,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++, 2.2 );
 	tr.print_update( c++, 2.2 );
 
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 
 	tr.print_update( c++ );
 	tr.print_update( c++ );
@@ -381,7 +382,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++ );
 	tr.print_update( c++ );
 
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 	
 	tr.print_update( c++, 1.0 );
 	tr.print_update( c++, 2.0 );
@@ -389,7 +390,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++, 0.0 );
 	tr.print_update( c++, 4.0 );
 
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 	tr.print();
 #endif
 	
@@ -404,7 +405,7 @@ void test_time_regulator( void )	{
 		double r = (double)rand() / (double)RAND_MAX;
 		tr.print_update( i, r );
 	}
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 #endif
 
 #if 0
@@ -412,7 +413,7 @@ void test_time_regulator( void )	{
 	for( int i = 0; i<100; i++ )	{
 		tr.update();
 	}
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 	tr.set_perf( 0.0 );
 #endif
 
@@ -427,7 +428,7 @@ void test_time_regulator( void )	{
 
 		tr.print_update( i, 0.0 );
 	}
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 #endif
 
 #if 0
@@ -443,7 +444,7 @@ void test_time_regulator( void )	{
 
 		tr.print_update( i );
 	}
-	LOG( "=====================================================\n" );
+	SmartBody::util::log( "=====================================================\n" );
 #endif
 }
 

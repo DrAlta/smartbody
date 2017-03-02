@@ -19,8 +19,9 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "nvbg.h"
-#include "vhcl.h"
+
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 
 namespace SmartBody 
 {
@@ -36,30 +37,30 @@ Nvbg::~Nvbg()
 
 void Nvbg::objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
 {
-	LOG("Object event for %s from %s", character.c_str(), name.c_str());
+	SmartBody::util::log("Object event for %s from %s", character.c_str(), name.c_str());
 }
 
 bool Nvbg::execute(std::string character, std::string to, std::string messageId, std::string xml)
 {
-	LOG("Executing NVBG for %s %s %s %s", character.c_str(), to.c_str(), messageId.c_str(), xml.c_str());
+	SmartBody::util::log("Executing NVBG for %s %s %s %s", character.c_str(), to.c_str(), messageId.c_str(), xml.c_str());
 	return true;
 }
 
 bool Nvbg::executeEvent(std::string character, std::string messageId, std::string state)
 {
-	LOG("Executing NVBG action %s's status for %s is %s", messageId.c_str(), character.c_str(), state.c_str());
+	SmartBody::util::log("Executing NVBG action %s's status for %s is %s", messageId.c_str(), character.c_str(), state.c_str());
 	return true;
 }
 
 bool Nvbg::executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
 {
-	LOG("Executing NVBG vrSpeech");
+	SmartBody::util::log("Executing NVBG vrSpeech");
 	return true;
 }
 
 bool Nvbg::executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
 {
-	LOG("Executing NVBG listening feedback from agent speech.");
+	SmartBody::util::log("Executing NVBG listening feedback from agent speech.");
 	return true;
 }
 

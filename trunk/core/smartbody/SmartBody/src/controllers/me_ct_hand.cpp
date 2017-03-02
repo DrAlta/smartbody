@@ -138,7 +138,7 @@ void MeCtHand::pawnAttachImpl()
 	skeletonRef->update_global_matrices();
 	attachedPawn->wo_cache_update();
 	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
-	//LOG("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
+	//SmartBody::util::log("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
 }
 
 void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
@@ -163,7 +163,7 @@ void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 	skeletonRef->update_global_matrices();
 	attachedPawn->wo_cache_update();
 	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
-	LOG("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
+	SmartBody::util::log("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
 	*/
 }
 
@@ -207,7 +207,7 @@ void MeCtHand::updateAttachedPawn()
 	SrMat effectorWorld = attachJoint->gmat();// motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
 	SrMat newWorld = attachMat*effectorWorld;
 	SrVec pos = newWorld.get_translation();
-	//LOG("attached pawn world pos = %f %f %f",pos.x,pos.y,pos.z);
+	//SmartBody::util::log("attached pawn world pos = %f %f %f",pos.x,pos.y,pos.z);
 	attachedPawn->setWorldOffset(newWorld);
 	attachedPawn->updateToColObject();
 }
@@ -224,7 +224,7 @@ void MeCtHand::setGrabState( GrabState state )
 		}
 	}
 	currentGrabState = state;
-	//LOG("current grab state = %d",currentGrabState);
+	//SmartBody::util::log("current grab state = %d",currentGrabState);
 }
 
 void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
@@ -251,7 +251,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		if (!node->child)
 		{
 			FingerID fID = findFingerID(node->getNodeName().c_str());
-			//LOG("finger name = %s\n",node->nodeName.c_str());
+			//SmartBody::util::log("finger name = %s\n",node->nodeName.c_str());
 			FingerChain& fchain = fingerChains[fID];
 			fchain.init(node);			
 			// add constraint
@@ -349,12 +349,12 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 {
 	if (state == GRAB_START)
 	{
-		//LOG("grabStartFrame");
+		//SmartBody::util::log("grabStartFrame");
 		return grabFrame;
 	}
 	else if (state == GRAB_REACH)
 	{
-		//LOG("grabReachFrame");
+		//SmartBody::util::log("grabReachFrame");
 		return grabFrame;
 	}
 	else if (state == GRAB_FINISH)
@@ -376,7 +376,7 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 {	
 	//float dt = 0.001f;
-	//LOG("MeCtHand::controller_evaluate");
+	//SmartBody::util::log("MeCtHand::controller_evaluate");
 	float du = 0.0;
 	if (prev_time == -1.f) // first start
 	{
@@ -395,7 +395,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		bInit = true;
 	}		
 
-	//LOG("hand controller, t = %f",t);
+	//SmartBody::util::log("hand controller, t = %f",t);
 	
 	updateChannelBuffer(frame,tempFrame,true);
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];
@@ -407,8 +407,8 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	float maxAngleDelta = sr_torad(grabSpeed*dt);		
 	
 	//if (maxAngleDelta > 0.01)
-	//LOG("maxAngleDelta = %f",maxAngleDelta);
-	//LOG("handControl grabSpeed = %f",grabSpeed);
+	//SmartBody::util::log("maxAngleDelta = %f",maxAngleDelta);
+	//SmartBody::util::log("handControl grabSpeed = %f",grabSpeed);
 	updateFingerChains(curTargetFrame,maxAngleDelta);
 	//updateFingerChains(curTargetFrame,0.01f);
 

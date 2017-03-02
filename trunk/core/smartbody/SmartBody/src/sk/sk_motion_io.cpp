@@ -1,36 +1,31 @@
-/*
- *  sk_motion_io.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Ashok Basawapatna, USC (no longer)
- *      Ed Fast, USC
- *      Andrew n marshall, USC
- *      Marcus Thiebaux, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 # include <stdlib.h>
 # include <sk/sk_motion.h>
 #include <iostream>
 #include <sstream>
 #include <sb/SBMotion.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBUtilities.h>
 
 using namespace std;
 
@@ -130,7 +125,7 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time) {
 	{
 		std::stringstream strstr;
 		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" line. Expected \"time:\" before value, but recieved \"" << token << "\" (token_type "<<token_type<<").";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	token_type = in.get_token();
@@ -142,7 +137,7 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time) {
 	if( token_type!=SrInput::Real && token_type!=SrInput::Integer ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" time value. Expected number, but recieved \"" << token << "\" (token_type "<<token_type<<").";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	time = token.atof();
@@ -161,7 +156,7 @@ bool parseMetaDataFloat( SrInput& in, SrString name, float& time)
 	if( token_type!=SrInput::Real && token_type!=SrInput::Integer ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" time value. Expected number, but recieved \"" << token << "\" (token_type "<<token_type<<").";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	time = token.atof();
@@ -313,7 +308,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeStart\" has been deprecated in favor of \"stroke_start\" to match BML.";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 				if( parse_timing_metadata( in, token, _time_stroke_start ) )
 					metadata_flags |= STROKE_START;
@@ -324,7 +319,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"emphasis\" has been deprecated in favor of \"stroke_emphasis\" to match BML." << endl;
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 				if( parse_timing_metadata( in, token, _time_stroke_emphasis ) )
 					metadata_flags |= STROKE_EMPH;
@@ -335,7 +330,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"stroke\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
@@ -346,7 +341,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeEnd\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
@@ -405,7 +400,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 					strstr << "Unknown file, line "<<in.curline();
 				}
 				strstr <<": Expected metadata name, but recieved \"" << token << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				continue;
 #endif
 			}
@@ -422,7 +417,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 			{
 				strstr << "WARNING: SkMotion::load(): Timing Metadata incomplete before end of file (metadata_flags: " << metadata_flags << ").";
 			}
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 
 		float lastKeyTime = -1;
@@ -439,7 +434,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 			_time_relax, lastKeyTime
 		);
 		if( synch_points.get_error() )	{
-			LOG( "SkMotion::load ERR: reading synch points in '%s'", in.filename() );
+			SmartBody::util::log( "SkMotion::load ERR: reading synch points in '%s'", in.filename() );
 			synch_points.print_error();
 		}
 	}
@@ -514,7 +509,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 //		}
 //	}
 	
-//	LOG( "SkMotion::load '%s' %d frames\n", name(), frames() );
+//	SmartBody::util::log( "SkMotion::load '%s' %d frames\n", name(), frames() );
 	return true;
 }
 
@@ -561,7 +556,7 @@ bool SkMotion::save ( SrOutput& out )
 	float *pt;
 	int chsize = _channels.size();
 	int chFloatSize = _channels.floats();
-	LOG("chsize = %d, chFloatSize = %d",chsize, chFloatSize);
+	SmartBody::util::log("chsize = %d, chFloatSize = %d",chsize, chFloatSize);
 	for (size_t i=0; i<_frames.size(); i++ )
 	{ out << "kt " << _frames[i].keytime << " fr ";
 		pt = _frames[i].posture;

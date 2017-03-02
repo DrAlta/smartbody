@@ -5,7 +5,7 @@
 #include "minimalwrapper.h"
 #include "Shader.h"
 //vhcl libs
-#include "vhcl.h"
+
 //SmartBody libs
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -208,7 +208,7 @@ extern "C"
 			
 			//if(name == "mesh")
 			//{
-			//	LOG("name = mesh");
+			//	SmartBody::util::log("name = mesh");
 			//}
 			//mesh attribute
 			if ( name == "deformableMeshScale")
@@ -225,7 +225,7 @@ extern "C"
 					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					SrVec scale(vec3Attribute->getValue().x, vec3Attribute->getValue().y, vec3Attribute->getValue().z);
 					meshInstance->setMeshScale(scale);
-					//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+					//SmartBody::util::log("Set mesh scale = %f",doubleAttribute->getValue());
 				}			
 			}
 			else if (name == "deformableMesh" || name == "mesh")
@@ -429,7 +429,7 @@ extern "C"
 			for(int i = 0; i < 6; ++i){
 				std::string textureFileName = "textures/" + textureNames[i];
 				if (!boost::filesystem::exists(boost::filesystem::path(textureFileName)))
-					LOG("Texture %s doesn't exist under same path of mesh %s", textureNames[i].c_str(), textureFileName.c_str());
+					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureNames[i].c_str(), textureFileName.c_str());
 				textureNames_v.push_back(textureNames[i]);
 				textureFileNames_v.push_back(textureFileName);
 			}
@@ -437,7 +437,7 @@ extern "C"
 			texManager.loadCubeMapTextures("skybox", textureNames_v, textureFileNames_v);
 		}
 		tex = texManager.findCubeMapTexture("skybox");
-		LOG("size of cubemap: %d\n", tex->getBufferSize());
+		SmartBody::util::log("size of cubemap: %d\n", tex->getBufferSize());
 #endif
 	}
 
@@ -571,14 +571,14 @@ extern "C"
 				DeformableMesh* mesh = scene->getAssetManager()->getDeformableMesh(meshName);
 				SrBox bbox = mesh->computeBoundingBox();
 				SrVec extent = (bbox.b - bbox.a) * 0.5;
-				//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",pawn->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
+				//SmartBody::util::log("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",pawn->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 				//drawBBox(esContext, bbox.getCenter(), extent);
 			}
 			SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 			if (character){
 				//continue;
 				SrBox bbox = character->getBoundingBox();
-				//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",character->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
+				//SmartBody::util::log("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",character->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 				SrVec extent = (bbox.b - bbox.a) * 0.5;
 				//drawBBox(esContext, bbox.getCenter(), extent);
 			}
@@ -641,11 +641,11 @@ extern "C"
 		}
 		else if (dynamic_cast<SBGeomCapsule*>(colObj))
 		{
-			//LOG("Draw Col Object Capsule");
+			//SmartBody::util::log("Draw Col Object Capsule");
 		}
 		else if (dynamic_cast<SBGeomTriMesh*>(colObj))
 		{
-			//LOG("Draw Col Object Tri Mesh");
+			//SmartBody::util::log("Draw Col Object Tri Mesh");
 		}
 
 	}

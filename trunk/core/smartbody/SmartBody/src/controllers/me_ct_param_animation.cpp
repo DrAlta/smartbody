@@ -140,7 +140,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		{			
 			if (!hasPABlend(PseudoIdleState))
 			{
-				//LOG("no current state, and the state is about to finish, scedule NULL state");
+				//SmartBody::util::log("no current state, and the state is about to finish, scedule NULL state");
 				std::vector<double> weights;
 				ScheduleType scType;
 				scType.transitionLen = curStateData->transitionLength;
@@ -169,12 +169,12 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					errorInfo += "next state: " + nextStateData->state->stateName;
 			else 
 				errorInfo += "next state: null ";
-			LOG("%s", errorInfo.c_str());
+			SmartBody::util::log("%s", errorInfo.c_str());
 
 			if (curStateData == NULL && nextStateData != NULL)
 			{
 				if (nextStateData->state)
-					LOG("would start state %s now", nextStateData->state->stateName.c_str());
+					SmartBody::util::log("would start state %s now", nextStateData->state->stateName.c_str());
 				curStateData = nextStateData;
 				curStateData->active = true;
 				nextStateData = NULL;
@@ -184,7 +184,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			}
 			if (curStateData != NULL && nextStateData == NULL)
 			{
-				LOG("scheduling problem, please check the corresponding time marks for two states.");
+				SmartBody::util::log("scheduling problem, please check the corresponding time marks for two states.");
 				reset();
 				return false;
 			}
@@ -192,14 +192,14 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 		if (!transitionManager->blendingMode)
 		{
-			//LOG("Transition align");
+			//SmartBody::util::log("Transition align");
 			transitionManager->align(curStateData, nextStateData);
 		}
 		else
 		{
 			if (transitionManager->active)
 			{
-				//LOG("Start transition");
+				//SmartBody::util::log("Start transition");
 				SrBuffer<float> buffer1;
 				buffer1.size(frame.buffer().size());
 				buffer1 = frame.buffer();
@@ -239,7 +239,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 							// update base transform mat
 							curBaseMat = curStateData->woManager->getCurrentBaseTransformMat();
 							pos = curBaseMat.get_translation();
-							//LOG("startTransistion In, curBase = %f %f %f",pos[0],pos[1],pos[2]);
+							//SmartBody::util::log("startTransistion In, curBase = %f %f %f",pos[0],pos[1],pos[2]);
 						}
 						else
 						{							
@@ -466,7 +466,7 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 					}
 					else
 					{
-						LOG("Unknown state type. What is this?");
+						SmartBody::util::log("Unknown state type. What is this?");
 					}
 				}
 			}
@@ -515,7 +515,7 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	unit.playSpeed = (float)playSpeed;
 	unit.duration = (float)desireDuration;
 
-	//LOG("unit schedule mode = %d",unit.schedule);
+	//SmartBody::util::log("unit schedule mode = %d",unit.schedule);
 
 	float unitTransitionLen = (float)defaultTransition; // set this to initial default	
 	// override if the default attribute exists
@@ -534,7 +534,7 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	{
 		if (unit.data->stateName != PseudoIdleState)
 		{
-			LOG("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
+			SmartBody::util::log("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
 			unit.weights.resize(unit.data->getNumMotions());
 			for (int i = 0; i < unit.data->getNumMotions(); i++)
 			{
@@ -550,7 +550,7 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	{
 		if (unit.data->stateName != PseudoIdleState && unit.data->getNumMotions() == 0)
 		{
-			LOG("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
+			SmartBody::util::log("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
 			return;
 		}
 	}
@@ -593,7 +593,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	unit.stateTimeTrim = (float)stateTimeTrim;
 	unit.directPlay = directPlay;
 
-	//LOG("unit schedule mode = %d",unit.schedule);
+	//SmartBody::util::log("unit schedule mode = %d",unit.schedule);
 	
 	float unitTransitionLen = (float)defaultTransition; // set this to initial default	
 	// override if the default attribute exists
@@ -617,7 +617,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	{
 		if (unit.data->stateName != PseudoIdleState)
 		{
-			LOG("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
+			SmartBody::util::log("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
 			unit.weights.resize(unit.data->getNumMotions());
 			for (int i = 0; i < unit.data->getNumMotions(); i++)
 			{
@@ -634,7 +634,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	{
 		if (unit.data->stateName != PseudoIdleState && unit.data->getNumMotions() == 0)
 		{
-			LOG("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
+			SmartBody::util::log("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
 			return;
 		}
 	}
@@ -824,7 +824,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - transitionLen))
 					{
 						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->getNormalizeLocalTime();
-						//LOG("adjust transition duration for %s and %s to %f", curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(), actualTransitionTime);
+						//SmartBody::util::log("adjust transition duration for %s and %s to %f", curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(), actualTransitionTime);
 					}
 
 					double easeOutStart = curStateData->timeManager->getDuration() - actualTransitionTime;
@@ -832,10 +832,10 @@ void MeCtParamAnimation::autoScheduling(double time)
 
 					if (actualTransitionTime < 0)
 					{
-						LOG("transition warning, current state %s is too short(%f), next state is %s", curStateData->getStateName().c_str(), curStateData->timeManager->getDuration(), nextStateData->getStateName().c_str());
+						SmartBody::util::log("transition warning, current state %s is too short(%f), next state is %s", curStateData->getStateName().c_str(), curStateData->timeManager->getDuration(), nextStateData->getStateName().c_str());
 					}
 
-					//LOG("easeOutStart = %f, duration = %f",easeOutStart, easeOutDur);
+					//SmartBody::util::log("easeOutStart = %f, duration = %f",easeOutStart, easeOutDur);
 					transitionManager = new PATransitionManager(easeOutStart, easeOutDur);					
 					//transitionManager = new PATransitionManager(curStateData->timeManager->getDuration(), 0.0);
 				}
@@ -843,7 +843,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 		}
 		else
 		{
-			//LOG("state transition from = %s, to = %s, easeOut = %f, easeIn = %f",curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(),data->easeOutStart[0], data->easeInStart);
+			//SmartBody::util::log("state transition from = %s, to = %s, easeOut = %f, easeIn = %f",curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(),data->easeOutStart[0], data->easeInStart);
 			transitionManager = new PATransitionManager(data, curStateData, nextStateData);			
 			nextStateData->timeManager->updateLocalTimes(transitionManager->s2);
 		}

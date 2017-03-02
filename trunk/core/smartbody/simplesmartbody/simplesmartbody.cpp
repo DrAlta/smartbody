@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
@@ -6,6 +6,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 
 class SimpleListener : public SmartBody::SBSceneListener
 {
@@ -16,7 +17,7 @@ class SimpleListener : public SmartBody::SBSceneListener
 	  virtual void OnLogMessage( const std::string & message )
 	  {
 #ifdef WIN32
-		LOG("%s", message.c_str());
+		SmartBody::util::log("%s", message.c_str());
 #else
 		std::cout << message << std::endl;
 #endif
@@ -32,10 +33,10 @@ int main( int argc, char ** argv )
 	std::string mediaPath = "../data";
 
 	// add a message logger to stdout
-	vhcl::Log::StdoutListener* stdoutLog = new vhcl::Log::StdoutListener();
-	vhcl::Log::g_log.AddListener(stdoutLog);
+	SmartBody::util::StdoutListener* stdoutLog = new SmartBody::util::StdoutListener();
+	SmartBody::util::g_log.AddListener(stdoutLog);
 
-	LOG("Loading Python...");
+	SmartBody::util::log("Loading Python...");
 
 	// initialize the Python libraries
 	initPython("../Python27/Libs");
@@ -55,15 +56,15 @@ int main( int argc, char ** argv )
 	scene->addAssetPath("motion", "ChrBrad");
 
 	// load the assets from the indicated locations
-	LOG("Loading Assets...");
+	SmartBody::util::log("Loading Assets...");
 	scene->loadAssets();
 	int numMotions = scene->getNumMotions();
-	LOG("Loaded %d motions...", numMotions);
+	SmartBody::util::log("Loaded %d motions...", numMotions);
 
 	scene->loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/motions/ChrMarine@RunCircleRt01.skm");
 
 	// create a character
-	LOG("Creating the character...");
+	SmartBody::util::log("Creating the character...");
 	SmartBody::SBCharacter* character = scene->createCharacter("mycharacter", "");
 
 	// load the skeleton from one of the available skeleton types
@@ -93,7 +94,7 @@ int main( int argc, char ** argv )
 	// make the character do something
 	scene->getBmlProcessor()->execBML("mycharacter", "<body posture=\"ChrMarine@RunCircleRt01\"/>");
 	
-	LOG("Starting the simulation...");
+	SmartBody::util::log("Starting the simulation...");
 	double lastPrint = 0;
 	sim->start();
 	while (sim->getTime() < 100.0) // run for 100 simulation seconds
@@ -107,7 +108,7 @@ int main( int argc, char ** argv )
 
 		if (sim->getTime() > lastPrint)
 		{
-			LOG("Simulation is at time: %5.2f\n", sim->getTime());
+			SmartBody::util::log("Simulation is at time: %5.2f\n", sim->getTime());
 			lastPrint = sim->getTime() + 10;
 		}
 
@@ -120,7 +121,7 @@ int main( int argc, char ** argv )
 			if (joint)
 			{
 				SrVec position = joint->getPosition();
-				LOG("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
+				SmartBody::util::log("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
 			}
 		}
 	}

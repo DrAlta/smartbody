@@ -22,12 +22,12 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "controllers/me_ct_simple_gaze.h"
 #include "sbm/lin_win.h"
 #include "sb/sbm_pawn.hpp"
+#include <sb/SBUtilities.h>
 
 #include "sbm/gwiz_math.h"
 using namespace gwiz;
 
 #include <sr/sr_alg.h>
-#include <vhcl_log.h>
 #include "sbm/sbm_constants.h"
 
 int G_debug_c_SG = 0;
@@ -66,7 +66,7 @@ quat_t rotation_ray_to_target_orient_SG(
 )	{
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
-		LOG( "rotation_ray_to_target_orient_SG ERR: forward direction has no length\n" );
+		SmartBody::util::log( "rotation_ray_to_target_orient_SG ERR: forward direction has no length\n" );
 		return( quat_t() );
 	}
 	
@@ -88,7 +88,7 @@ quat_t rotation_ray_to_target_point_SG(
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
 		if( heading_only == FALSE ) {
-			LOG( "rotation_ray_to_target_point_SG ERR: forward direction has no length\n" );
+			SmartBody::util::log( "rotation_ray_to_target_point_SG ERR: forward direction has no length\n" );
 		}
 		return( quat_t() );
 	}
@@ -236,27 +236,27 @@ void test_forward_ray( void )	{
 	vector_t Fd( 5.0, -10.0, 1.0 );
 #endif
 
-	LOG( "--- FORWARD RAY TEST:\n" );
+	SmartBody::util::log( "--- FORWARD RAY TEST:\n" );
 	quat_t Q = rotation_ray_to_target_point_SG( X, R, Fo, Fd, 0.0 );
 
-	LOG( "ROTATION:\n" );
+	SmartBody::util::log( "ROTATION:\n" );
 	euler_t E = Q;
 	E.print();
 
-	LOG( "NEW FORWARD DIR:\n" );
+	SmartBody::util::log( "NEW FORWARD DIR:\n" );
 	vector_t newFd = Q * Fd;
 	newFd.normal().print();
 
-	LOG( "FORWARD ORIGIN TO TARGET:\n" );
+	SmartBody::util::log( "FORWARD ORIGIN TO TARGET:\n" );
 	vector_t Td = X - ( R + Q * ( Fo - R ) );
 	Td.normal().print();
 
-	LOG( "DIFF:\n" );
+	SmartBody::util::log( "DIFF:\n" );
 	( Td.normal() - newFd.normal() ).print();
 	
-	LOG( "DIFF HEADING-ONLY:\n" );
+	SmartBody::util::log( "DIFF HEADING-ONLY:\n" );
 	( vector_t( Td.x(), 0.0, Td.z() ).normal() - vector_t( newFd.x(), 0.0, newFd.z() ).normal() ).print();
-	LOG( "---\n" );
+	SmartBody::util::log( "---\n" );
 }
 #endif
 
@@ -358,7 +358,7 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 		}
 		else	{
 			const char *name = joint_p->jointName().c_str();
-			LOG( "MeCtSimpleGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			SmartBody::util::log( "MeCtSimpleGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
 }
@@ -722,8 +722,8 @@ void MeCtSimpleGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->jointName().c_str();
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s\n", name );
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s\n", name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton( joint_p->child( i ), depth + 1 );
@@ -747,8 +747,8 @@ void MeCtSimpleGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int dep
 		vector_t pos = M.translation( gwiz::COMP_M_TR );
 		euler_t rot = M.euler( gwiz::COMP_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -778,8 +778,8 @@ void MeCtSimpleGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int dep
 		vector_t pos = M.translation( gwiz::COMP_M_TR );
 		euler_t rot = M.euler( gwiz::COMP_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -952,12 +952,12 @@ void MeCtSimpleGaze::controller_start( void )	{
 		}
 
 #if 0
-		LOG( "start: [%d]", i );
-		LOG( " c:%.4f x f:%.4f == w: %.4f", 
+		SmartBody::util::log( "start: [%d]", i );
+		SmartBody::util::log( " c:%.4f x f:%.4f == w: %.4f", 
 			local_contrib, local_flex, 
 			joint_arr[ i ].weight 
 		);
-		LOG( " lim: %.4f\n", 
+		SmartBody::util::log( " lim: %.4f\n", 
 			joint_arr[ i ].limit 
 		);
 #endif
@@ -975,14 +975,14 @@ bool MeCtSimpleGaze::controller_evaluate( double t, MeFrameData& frame )	{
 		test_forward_ray();
 #endif
 #if 0
-		LOG( "-- skeleton:\n" );
+		SmartBody::util::log( "-- skeleton:\n" );
 		if( skeleton_ref_p )	{
 			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 //			inspect_skeleton( joint_p );
 //			inspect_skeleton_local_transform( joint_p );
 			inspect_skeleton_world_transform( joint_p );
 		}
-		LOG( "--\n" );
+		SmartBody::util::log( "--\n" );
 #endif
 	}
 #endif
@@ -1070,7 +1070,7 @@ G_debug_SG = 0;
 
 if( G_debug_c_SG )	{
 	G_debug_c_SG--;
-	LOG( "DEBUG %d\n", G_debug_c_SG );
+	SmartBody::util::log( "DEBUG %d\n", G_debug_c_SG );
 }
 
 	return( TRUE );

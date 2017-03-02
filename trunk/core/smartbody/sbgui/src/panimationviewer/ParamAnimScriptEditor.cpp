@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimScriptEditor.h"
 #include <FL/Fl_Hold_Browser.H>
 #include <controllers/me_ct_param_animation.h>

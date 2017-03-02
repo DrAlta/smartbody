@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include <vhcl.h>
+
 #include <controllers/me_ct_channel_writer.hpp>
 
 #include <cstdlib>

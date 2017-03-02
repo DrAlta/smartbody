@@ -31,6 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBEvent.h>
 #include <sb/sbm_character.hpp>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
 
@@ -100,7 +101,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 void MeCtExampleBodyReach::setDefaultReachType( const std::string& reachTypeName )
 {
 	defaultReachType = MeCtReachEngine::getReachType(reachTypeName);	
-//	LOG("default reach type name = %s, id =  %d",reachTypeName.c_str(), defaultReachType);
+//	SmartBody::util::log("default reach type name = %s, id =  %d",reachTypeName.c_str(), defaultReachType);
 }
 
 void MeCtExampleBodyReach::setHandActionState( MeCtReachEngine::HandActionState newState )
@@ -240,7 +241,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		float facing = ((float)acos(dot(targetDir,SrVec(0,0,1))))*180.f/(float)M_PI;
 		if (dot(cross(targetDir,SrVec(0,0,1)),SrVec(0,1,0)) > 0.f)
 			facing = -facing;
-		//LOG("facing = %f\n",facing);
+		//SmartBody::util::log("facing = %f\n",facing);
 		cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(steerTarget.x) + " " + 
 			boost::lexical_cast<std::string>(steerTarget.z) + "\"/>";//+ "\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
 		//rd->curHandAction->sendReachEvent(cmd);			
@@ -254,7 +255,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	}
 	else if (!isMoving && startReach)//currentReachData->startReach) // the object is already close to character, no need to move
 	{		
-		LOG("reach in place\n");
+		SmartBody::util::log("reach in place\n");
 		updateReachType(targetPos);
 		//setFadeIn(0.5f);
 		return true;
@@ -268,7 +269,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		if (dist < character->getHeight()*0.35f)
 		{			
 			// choose the correct hand
-			LOG("reach after locomotion\n");
+			SmartBody::util::log("reach after locomotion\n");
 			updateReachType(targetPos);
 			//currentReachData->startReach = true;
 			startReach = true;
@@ -278,7 +279,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		}
 		else
 		{
-			LOG("[Reach Controller] Warning : Locomotion can not reach the target, dist = %f\n",dist);
+			SmartBody::util::log("[Reach Controller] Warning : Locomotion can not reach the target, dist = %f\n",dist);
 			//currentReachData->startReach = false;
 			startReach = false;
 			isMoving = false;
@@ -417,7 +418,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		currentReachData->grabSpeed = 50.f;
 		
 	currentReachEngine->footIKFix    = footIKFix;
-	//LOG("curReachData linearVel = %f",currentReachData->linearVel);
+	//SmartBody::util::log("curReachData linearVel = %f",currentReachData->linearVel);
 	//if (canReach)
 	if (startReach)
 	{
@@ -439,7 +440,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	SmartBody::SBCharacter* curCharacter = dynamic_cast<SmartBody::SBCharacter*>(currentReachEngine->getCharacter());
 	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" || currentReachData->startReach )
 	{		
-		//LOG("update reach");
+		//SmartBody::util::log("update reach");
 		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);	
 		curCharacter->setBoolAttribute("isReaching", true);	
 #if 0
@@ -450,7 +451,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 			if (postProcessController)
 			{
 				postProcessController->setEnable(false);
-				//LOG("disable IK");
+				//SmartBody::util::log("disable IK");
 			}
 		}
 #endif
@@ -467,7 +468,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 			if (postProcessController)
 			{
 				postProcessController->setEnable(true);
-				//LOG("enable IK");
+				//SmartBody::util::log("enable IK");
 			}
 		}
 #endif
@@ -512,7 +513,7 @@ void MeCtExampleBodyReach::init(SmartBody::SBPawn* pawn)
 		_channels.add(joint->getMappedJointName(), SkChannel::Quat);		
 	}		
 	blendWeight = currentReachEngine->fadingWeight;
-	//LOG("init blend weight = %f\n",blendWeight);	
+	//SmartBody::util::log("init blend weight = %f\n",blendWeight);	
 	MeController::init(pawn);	
 }
 

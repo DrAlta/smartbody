@@ -18,8 +18,6 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl_log.h"
-
 #include <controllers/me_ct_motion.h>
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
@@ -80,12 +78,12 @@ void MeCtMotion::init(SmartBody::SBPawn* pawn, SkMotion* m_p, double time_offset
 //	_duration = _motion->duration() / _twarp;
 
 	MeController::init (pawn);
-	//LOG("before if (_context)");
+	//SmartBody::util::log("before if (_context)");
 	if( _context ) {
 		// Notify _context of channel change.
 		_context->child_channels_updated( this );
 	}
-	//LOG("after if (_context)");
+	//SmartBody::util::log("after if (_context)");
 
 	synch_points.copy_points( m_p->synch_points, time_offset, time_scale );
 #if 1
@@ -244,7 +242,7 @@ void MeCtMotion::controller_map_updated() {
 		int world_offset_ch_y = cChannels.search( SkJointName("world_offset"), SkChannel::YPos );
 		int world_offset_ch_z = cChannels.search( SkJointName("world_offset"), SkChannel::ZPos );
 		int world_offset_ch_q = cChannels.search( SkJointName("world_offset"), SkChannel::Quat );
-//		LOG( "world_offset_ch_x: %d\n", world_offset_ch_x );
+//		SmartBody::util::log( "world_offset_ch_x: %d\n", world_offset_ch_x );
 #endif
 		if (_joints.empty())
 		{
@@ -293,7 +291,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 //	double dur = _duration;
 	double dur = phase_duration();
 //	if( dur < 0.0 )	{
-//		LOG( "no-dur: %s", name() );
+//		SmartBody::util::log( "no-dur: %s", name() );
 //	}
 
 #if 1
@@ -307,7 +305,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	if ( _loop ) {
 		double x = motionTime/dur;
 		int cycleNum = int(x);
-		//LOG("x = %f, cycle Num = %d",x , cycleNum);
+		//SmartBody::util::log("x = %f, cycle Num = %d",x , cycleNum);
 		if ( x > 1.0 )
 		{
 			curMotionTime = dur *( x - cycleNum );
@@ -318,8 +316,8 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			}
 		}
 	} else {
-		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->motion()->getName().c_str(), t, dur);
-		//LOG("%s time %f, motion time %f", this->motion()->getName().c_str(), t, curMotionTime);
+		//SmartBody::util::log("MeCtMotion::controller_evaluate %s time %f, duration %f", this->motion()->getName().c_str(), t, dur);
+		//SmartBody::util::log("%s time %f, motion time %f", this->motion()->getName().c_str(), t, curMotionTime);
 		continuing = motionTime <= dur;
 	}	
 	SmartBody::SBRetarget* retarget = NULL;
@@ -357,7 +355,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//	            &(frame.buffer()[0]),  // pointer to buffer's float array
 	//				&_mChan_to_buff,
 	//	            _play_mode, &_last_apply_frame );	
-	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
+	//SmartBody::util::log("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
 	float motionTime = float(curMotionTime + _offset);
 	// check for prestroke or poststroke hold motion
 	if (_prestrokeHoldDuration > .001)
@@ -531,7 +529,7 @@ void MeCtMotion::checkMotionEvents(double time)
 			manager->handleEvent(motionEvent);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();
-			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
 			_events.pop();
 		}
 		else

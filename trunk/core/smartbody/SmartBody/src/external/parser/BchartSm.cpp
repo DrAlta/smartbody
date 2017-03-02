@@ -540,7 +540,7 @@ bucket(float val, int whichInt, int whichFt)
   assert(whichInt < Feature::numCalcs);
   assert(whichFt < MAXNUMFS);
   float logFac = Feature::logFacs[whichInt][whichFt];
-  float lval = logFac *log(val);
+  float lval = logFac * log(val);
   int lvi = (int)lval;
   lvi++;
   if(lvi <= 14) return lvi;

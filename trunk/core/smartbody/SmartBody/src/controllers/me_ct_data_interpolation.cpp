@@ -87,7 +87,7 @@ double RBFInterpolator::RBFValue(const dVector& p1,const dVector& p2 )
 // 	if (r==0.0)
 // 		return r;
 // 	else
-// 		return r*r*log(r);
+// 		return r*r*SmartBody::util::log(r);
 }
 
 void RBFInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeight& blendWeights )

@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include "bml.hpp"
 
@@ -170,7 +170,7 @@ public:
 	virtual bool shouldPrune( MeController* ct, MeController* parent ) {
 		std::stringstream strstr;
 		strstr << "====================> BmlProcPrunePolicy: pruning " << ct->controller_type() << " \"" << ct->getName() << " from parent " << parent->controller_type() << " \"" << parent->getName() << '"';
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return true;
 	};
 };
@@ -314,7 +314,7 @@ void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const s
 			if( !map_insert_success ) {
 				std::wstringstream wstrstr;
 				wstrstr << "ERROR: BmlRequest::registerBehavior(..): Failed to insert "<<logging_label<<" SyncPoint \""<<sync_id<<"\"." << endl;
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 		}
 	}
@@ -495,7 +495,7 @@ void BmlRequest::gestureRequestProcess()
 					gestures[j]->filtered = true;
 					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					{
-						LOG("Gesture %s filtered because transition time %f from last gesture insufficient to match stroke time %f.", nextMotion->getName().c_str(), transitionTime, gestureInterval);
+						SmartBody::util::log("Gesture %s filtered because transition time %f from last gesture insufficient to match stroke time %f.", nextMotion->getName().c_str(), transitionTime, gestureInterval);
 					}
 
 					// no hold period, transition to next gesture quickly
@@ -578,7 +578,7 @@ void BmlRequest::gestureRequestProcess()
 				{
 					if (j + 1 < tokens.size())
 					{
-						LOG("blend name is %s", tokens[j + 1].c_str());
+						SmartBody::util::log("blend name is %s", tokens[j + 1].c_str());
 						blendObject = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(tokens[j + 1]);
 					}
 				}
@@ -586,7 +586,7 @@ void BmlRequest::gestureRequestProcess()
 				{
 					if (j + 1 < tokens.size())
 					{
-						LOG("x is %s", tokens[j + 1].c_str());
+						SmartBody::util::log("x is %s", tokens[j + 1].c_str());
 						x = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -594,7 +594,7 @@ void BmlRequest::gestureRequestProcess()
 				{
 					if (j + 1 < tokens.size())
 					{
-						LOG("y is %s", tokens[j + 1].c_str());
+						SmartBody::util::log("y is %s", tokens[j + 1].c_str());
 						y = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -602,7 +602,7 @@ void BmlRequest::gestureRequestProcess()
 				{
 					if (j + 1 < tokens.size())
 					{
-						LOG("z is %s", tokens[j + 1].c_str());
+						SmartBody::util::log("z is %s", tokens[j + 1].c_str());
 						z = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -654,7 +654,7 @@ void BmlRequest::gestureRequestProcess()
 				}
 				float offset = localStrokeTime - localStartTime;
 				blends[i]->behav_syncs.sync_start()->set_time(start - offset);
-				LOG("stroke time for blend is %f, start time for blend is %f", start, start - offset);
+				SmartBody::util::log("stroke time for blend is %f, start time for blend is %f", start, start - offset);
 				delete tempBlendData;
 				tempBlendData = NULL;
 			}
@@ -694,8 +694,8 @@ void BmlRequest::gestureRequestProcess()
 
 		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 		{
-			LOG("...");
-			LOG("Processing %s (motion name %s)", gestures[i]->anim_ct->getName().c_str(), motion->getName().c_str());
+			SmartBody::util::log("...");
+			SmartBody::util::log("Processing %s (motion name %s)", gestures[i]->anim_ct->getName().c_str(), motion->getName().c_str());
 		}
 
 		// step 1: adjust gesture's relax time
@@ -739,7 +739,7 @@ void BmlRequest::gestureRequestProcess()
 			blendTime = currGestureStrokeAt - prevGestureRelaxAt;
 			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
-				LOG("Transition directly to stroke");
+				SmartBody::util::log("Transition directly to stroke");
 			}
 		}
 		if (blendTime > 0)	// check the transition speed, decide whether to filter
@@ -776,7 +776,7 @@ void BmlRequest::gestureRequestProcess()
 				if (!motionInList)
 					continue;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					LOG("Motion in list: %s", currGestureList[l].c_str());
+					SmartBody::util::log("Motion in list: %s", currGestureList[l].c_str());
 				motionInList->connect(tempSkel);
 						if (actor->getBoolAttribute("gestureRequest.matchingHandness"))
 				{
@@ -787,11 +787,11 @@ void BmlRequest::gestureRequestProcess()
 					bool leftHand = (prevLMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (lMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
 					bool rightHand = (prevRMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (rMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
 					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-						LOG("PrevMotion: %f, %f CurrMotion: %f, %f", prevLMotionSpeed, prevRMotionSpeed, lMotionSpeed, rMotionSpeed);
+						SmartBody::util::log("PrevMotion: %f, %f CurrMotion: %f, %f", prevLMotionSpeed, prevRMotionSpeed, lMotionSpeed, rMotionSpeed);
 					if (prevMotionActive && motionActive && !leftHand && !rightHand)
 					{
 						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-							LOG("Motion Filtered");
+							SmartBody::util::log("Motion Filtered");
 						motionInList->disconnect();
 						continue;
 					}
@@ -806,7 +806,7 @@ void BmlRequest::gestureRequestProcess()
 				float speedDiffR = rWristSpeed - desiredRWristSpeed;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 				{
-					LOG("lSpd: %f, rSpd: %f, transLSpd: %f, transRSpd: %f, diffL: %f, diffR: %f", lWristSpeed, rWristSpeed, desiredLWristSpeed, desiredRWristSpeed, speedDiffL, speedDiffR);
+					SmartBody::util::log("lSpd: %f, rSpd: %f, transLSpd: %f, transRSpd: %f, diffL: %f, diffR: %f", lWristSpeed, rWristSpeed, desiredLWristSpeed, desiredRWristSpeed, speedDiffL, speedDiffR);
 				}
 				if (fabs(speedDiffL) < fabs(minSpeedDiffL) && fabs(speedDiffR) < fabs(minSpeedDiffR))
 				{
@@ -822,12 +822,12 @@ void BmlRequest::gestureRequestProcess()
 			}
 			if (closestMotion == NULL)
 			{
-				LOG("gestureRequestProcess ERR: cannot find any transition motion");
+				SmartBody::util::log("gestureRequestProcess ERR: cannot find any transition motion");
 			}
 			else if (closestMotion->getName() != sbMotion->getName())
 			{
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					LOG("gestureRequestProcess: after calculating the closest gesture, changing from %s to %s", sbMotion->getName().c_str(), closestMotion->getName().c_str());
+					SmartBody::util::log("gestureRequestProcess: after calculating the closest gesture, changing from %s to %s", sbMotion->getName().c_str(), closestMotion->getName().c_str());
 				motion_ct->init(const_cast<SbmCharacter*>(actor), closestMotion, 0.0, 1.0);
 			}
 			if (fabs(minSpeedDiffL) < actor->getDoubleAttribute("gestureRequest.gestureSpeedThreshold") && 
@@ -842,8 +842,8 @@ void BmlRequest::gestureRequestProcess()
 			}
 			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
-				LOG("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
-				LOG("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
+				SmartBody::util::log("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
+				SmartBody::util::log("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
 			}
 
 			if (!shouldFilter)
@@ -904,13 +904,13 @@ void BmlRequest::gestureRequestProcess()
 						}
 						else
 						{
-							LOG("gestureRequestProcess: ERROR blend time is shorter than desired transition time, should not happen.");
+							SmartBody::util::log("gestureRequestProcess: ERROR blend time is shorter than desired transition time, should not happen.");
 						}
 						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 						{
-							LOG("gestureRequestProcess: desiredRelaxTimeL: %f, desiredRelaxTimeR: %f, actual desiredRelaxTime: %f (local)", desiredTransitionTimeL, desiredTransitionTimeR, desiredTransitionTime);
-							LOG("gestureRequestProcess: desired transition speed %f is lower than current gesture speed %f (l_wrist)", lWristTransitionDistance / blendTime, currLWristSpeed);
-							LOG("gestureRequestProcess: previous gesture %s relax time is being delayed by %f", gestures[j]->anim_ct->getName().c_str(), desiredTransitionTime);
+							SmartBody::util::log("gestureRequestProcess: desiredRelaxTimeL: %f, desiredRelaxTimeR: %f, actual desiredRelaxTime: %f (local)", desiredTransitionTimeL, desiredTransitionTimeR, desiredTransitionTime);
+							SmartBody::util::log("gestureRequestProcess: desired transition speed %f is lower than current gesture speed %f (l_wrist)", lWristTransitionDistance / blendTime, currLWristSpeed);
+							SmartBody::util::log("gestureRequestProcess: previous gesture %s relax time is being delayed by %f", gestures[j]->anim_ct->getName().c_str(), desiredTransitionTime);
 						}
 					}
 					else
@@ -944,23 +944,23 @@ void BmlRequest::gestureRequestProcess()
 		{
 			if (logIndex == 1 && actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
-				LOG("gestureRequestProcess: filter reason -> previous relax is later than current stroke start");
+				SmartBody::util::log("gestureRequestProcess: filter reason -> previous relax is later than current stroke start");
 			}
 			if (logIndex == 0 && actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
-				LOG("gestureRequestProcess: filter reason -> blending time too short");
+				SmartBody::util::log("gestureRequestProcess: filter reason -> blending time too short");
 			}
 			if (gestures[i]->priority > gestures[j]->priority)
 			{
 				gestures[j]->filtered = true;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					LOG("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
+					SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
 			}
 			else
 			{
 				gestures[i]->filtered = true;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					LOG("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
+					SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
 			}
 		}
 	}
@@ -973,14 +973,14 @@ void BmlRequest::gestureRequestProcess()
 //			if (gestures[i]->filtered)
 //				continue;
 			MeCtMotion* final_motion_ct = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
-			LOG("Gesture %s's (%s) timing: %f, %f, %f, %f, %f, %f, %f", final_motion_ct->motion()->getName().c_str(), gestures[i]->anim_ct->getName().c_str(), 
+			SmartBody::util::log("Gesture %s's (%s) timing: %f, %f, %f, %f, %f, %f, %f", final_motion_ct->motion()->getName().c_str(), gestures[i]->anim_ct->getName().c_str(), 
 				gestures[i]->behav_syncs.sync_start()->time(), gestures[i]->behav_syncs.sync_ready()->time(),
 				gestures[i]->behav_syncs.sync_stroke_start()->time(), gestures[i]->behav_syncs.sync_stroke()->time(), gestures[i]->behav_syncs.sync_stroke_end()->time(),
 				gestures[i]->behav_syncs.sync_relax()->time(), gestures[i]->behav_syncs.sync_end()->time());
 
 			if (gestures[i]->behav_syncs.sync_ready()->time() > gestures[i]->behav_syncs.sync_stroke_start()->time())
 			{
-				LOG("gestureRequestProcess: should not be here, ready time is bigger than stroke start!");
+				SmartBody::util::log("gestureRequestProcess: should not be here, ready time is bigger than stroke start!");
 			}
 		}
 	}
@@ -1154,7 +1154,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	this->bml_start->time = now;
 
 	if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-		LOG("DEBUG: BmlRequest::realize(): time = %f", SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+		SmartBody::util::log("DEBUG: BmlRequest::realize(): time = %f", SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 	}
 
 	// Find earliest BehaviorRequest start time schedule before speech
@@ -1173,7 +1173,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 					min_time = min( min_time, behavior->behav_syncs.sync_start()->time() );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					LOG("DEBUG: BmlRequest::realize(): Behavior \"%s\" BehaviorSyncPoints:", behavior->unique_id.c_str());
+					SmartBody::util::log("DEBUG: BmlRequest::realize(): Behavior \"%s\" BehaviorSyncPoints:", behavior->unique_id.c_str());
 					behavior->behav_syncs.printSyncTimes();
 				}
 			} catch( BML::SchedulingException& e ) {
@@ -1186,7 +1186,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		}
 
 		if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-			LOG("DEBUG: BmlRequest::realize(): min_time: %f", min_time);
+			SmartBody::util::log("DEBUG: BmlRequest::realize(): min_time: %f", min_time);
 		}
 
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
@@ -1196,7 +1196,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			if( min_time < now - TIME_DELTA ) {
 				time_sec offset = now - min_time;
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					LOG("DEBUG: BmlRequest::realize(): offset: %f", offset);
+					SmartBody::util::log("DEBUG: BmlRequest::realize(): offset: %f", offset);
 				}
 
 				for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
@@ -1306,7 +1306,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	{
 		std::stringstream strstr;
 		strstr << "DEBUG: BML::BmlRequest::realize(..): "<< actorId<<" BML \""<<msgId<<"\": time = "<<SmartBody::SBScene::getScene()->getSimulationManager()->getTime() <<"; span = "<<span.start<<" to "<<span.end;
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 	}
 	time_sec start_time = span.isSet()? span.start : SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 	time_sec end_time   = span.isSet()? span.end : SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
@@ -1328,7 +1328,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to insert \""<<start_command.str()<<"\" command.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 
 		if (bp->get_bml_feedback())
@@ -1341,7 +1341,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 				std::stringstream strstr;
 					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 
@@ -1371,7 +1371,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		BehaviorRequestPtr behavior = *i;
 
 		// commented out by Ari Shapiro 8/19/10 to make the output less noisy
-		//LOG("Realizing behavior %s", behavior->unique_id.c_str());
+		//SmartBody::util::log("Realizing behavior %s", behavior->unique_id.c_str());
 		behavior->realize( request, scene);
 
 #if USE_CUSTOM_PRUNE_POLICY
@@ -1405,7 +1405,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to insert \""<<end_command.str()<<"\" command.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 
 		if (bp->get_bml_feedback())
@@ -1418,7 +1418,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 				std::stringstream strstr;
 					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 	}
@@ -1431,7 +1431,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to insert \"" << cmd << "\" command";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 
@@ -1448,10 +1448,10 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 
 	if( bp->get_auto_print_sequence() ) {
-		LOG("DEBUG: BML::BmlRequest::realize(..): Sequence\"%s\":", start_seq_name.c_str());
+		SmartBody::util::log("DEBUG: BML::BmlRequest::realize(..): Sequence\"%s\":", start_seq_name.c_str());
 		start_seq->print();
 
-		LOG("DEBUG: BML::BmlRequest::realize(..): Sequence \"%s\": ", cleanup_seq_name.c_str());
+		SmartBody::util::log("DEBUG: BML::BmlRequest::realize(..): Sequence \"%s\": ", cleanup_seq_name.c_str());
 		cleanup_seq->print();
 	}
 
@@ -1460,7 +1460,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	// Added by Yuyu - (09-30-2013)
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBML"))
 	{
-		//LOG("xml body: %s", request->xmlBody.c_str());sync
+		//SmartBody::util::log("xml body: %s", request->xmlBody.c_str());sync
 		std::vector<std::string> gestureBMLAnimations;
 		std::vector<bool>		skippedGestures;
 		// fill all the informations for the behaviors
@@ -1474,7 +1474,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			MeCtMotion* motionCt = dynamic_cast<MeCtMotion*> (gRequest->anim_ct);
 			gestureBMLAnimations.push_back(motionCt->motion()->getName());
 			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
-				LOG("BML gesture use animation: %s, filtered: %s)", motionCt->motion()->getName().c_str(), gRequest->filtered? "true" : "false");
+				SmartBody::util::log("BML gesture use animation: %s, filtered: %s)", motionCt->motion()->getName().c_str(), gRequest->filtered? "true" : "false");
 			skippedGestures.push_back(gRequest->filtered);
 		}
 
@@ -1510,7 +1510,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 				if (skippedGestures[numGestures])
 				{
 					if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
-						LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
+						SmartBody::util::log("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
 					XMLCh* curNodeString = pSerializer->writeToString(curNode);
 					DOMComment* commentNode = xmlDoc->createComment(curNodeString);
 					bmlNode->replaceChild(commentNode, curNode);
@@ -1522,7 +1522,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 		if (gestureBMLAnimations.size() != numGestures)
 		{
-			LOG("ERROR saving out processsed bmls. Number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
+			SmartBody::util::log("ERROR saving out processsed bmls. Number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
 		}
 
 		std::stringstream ss;
@@ -1540,7 +1540,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			ss << fileNameWOExt << "_" << xmlCounter << ".xml";
 		}
 		else
-			LOG("export BML path is not right %s",SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+			SmartBody::util::log("export BML path is not right %s",SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 		XMLCh* outputFile = XMLString::transcode(ss.str().c_str());
 #endif
 		XMLCh* outputFile = XMLString::transcode(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
@@ -1550,20 +1550,20 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		{
 			if (!pSerializer->write(xmlDoc, xmlstream))
 			{
-				LOG("There was a problem writing processed BML file: %s", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+				SmartBody::util::log("There was a problem writing processed BML file: %s", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 			}
 			xmlstream->release();
 		}
 		catch (...)
 		{
-			LOG("When writing file %s, an exception occurred.", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+			SmartBody::util::log("When writing file %s, an exception occurred.", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 			delete xmlstream;
 		}
 		
 		/*
 		XMLCh* theXMLString_Unicode = pSerializer->writeToString(xmlDoc); 
 		std::string outputString = xml_translate_string(theXMLString_Unicode);
-		LOG("Saved out xml is: %s", outputString.c_str());
+		SmartBody::util::log("Saved out xml is: %s", outputString.c_str());
 		*/
 		pSerializer->release();
 	}
@@ -1573,7 +1573,7 @@ void BmlRequest::unschedule( Processor* bp, SmartBody::SBScene* scene, time_sec 
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		LOG("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId.c_str() );
+		SmartBody::util::log("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId.c_str() );
 
 	if( speech_request ) {
 		speech_request->unschedule( scene, request, duration );
@@ -1607,24 +1607,24 @@ void BmlRequest::unschedule( Processor* bp, SmartBody::SBScene* scene, time_sec 
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute \"" << cmd << "\" command";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 
 	if( bp->get_auto_print_sequence() ) {
-		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\"", start_seq_name.c_str());
+		SmartBody::util::log("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\"", start_seq_name.c_str());
 		srCmdSeq* start_seq = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( start_seq_name.c_str() );
 		if( start_seq )
 			start_seq->print();
 		else
-			LOG("WARNING: Cannot find sequence \"%s\"", start_seq_name.c_str());
+			SmartBody::util::log("WARNING: Cannot find sequence \"%s\"", start_seq_name.c_str());
 
-		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\":", cleanup_seq_name.c_str());
+		SmartBody::util::log("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\":", cleanup_seq_name.c_str());
 		srCmdSeq* cleanup_seq =SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( cleanup_seq_name.c_str() );
 		if( cleanup_seq )
 			cleanup_seq->print();
 		else
-			LOG("WARNING: Cannot find sequence \"%s\"", cleanup_seq_name.c_str());
+			SmartBody::util::log("WARNING: Cannot find sequence \"%s\"", cleanup_seq_name.c_str());
 	}
 }
 
@@ -1633,7 +1633,7 @@ void BmlRequest::cleanup( Processor* bp, SmartBody::SBScene* scene )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		LOG("BmlRequest::cleanup(..) %s %s", request->actorId.c_str() , request->requestId.c_str() );
+		SmartBody::util::log("BmlRequest::cleanup(..) %s %s", request->actorId.c_str() , request->requestId.c_str() );
 
 	if( speech_request ) {
 		speech_request->cleanup( scene, request );
@@ -1659,7 +1659,7 @@ void BmlRequest::cleanup( Processor* bp, SmartBody::SBScene* scene )
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute_later \""<<command<<"\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 	SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( start_seq_name.c_str() );
@@ -1675,7 +1675,7 @@ void BmlRequest::cleanup( Processor* bp, SmartBody::SBScene* scene )
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute \"" << cmd << "\" command";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 
@@ -1710,7 +1710,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 	if( id.size() > 0 && hasExistingBehaviorId( id ) ) {
 		std::wstringstream wstrstr;
 		wstrstr <<  "ERROR: BmlRequest::registerBehavior(..): BehaviorRequest id \""<< id <<"\" is already in use!";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+		SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		return false; // duplicate id
 	}
 
@@ -1845,7 +1845,7 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 				{
 					std::wstringstream wstrstr;
 					wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<< key <<" point.  Ignoring..." << e.what();
-					LOG(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 				}				
 			} else {
 				SyncPointPtr parent = mySearchIter->second;
@@ -1857,18 +1857,18 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 							sync->time = parent->time + offset;
 						}
 					} else {
-						LOG("WARNING: parent sync does not have a valid trigger.");
+						SmartBody::util::log("WARNING: parent sync does not have a valid trigger.");
 					}
 				} else {
 					std::wstringstream wstrstr;
 					wstrstr << "ERROR: Map returned invalid parent for key \"" << key << "\"";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
+					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 				}
 			}
 		} else {
 			std::wstringstream wstrstr;
 			wstrstr << "ERROR: Invalid offset \""<<offset_str<<"\" in notation \"" << notation << "\"";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
+			SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else if( index==0 || notation.find(':')==npos ) {
 		float offset;
@@ -1878,7 +1878,7 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 		} else {
 			std::wstringstream wstrstr;
 			wstrstr << "ERROR: Invalid SyncPoint numeric notation \""<<notation<<"\".";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
+			SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else {
 		MapOfSyncPoint::iterator mySearchIter = idToSync.find(notation);
@@ -1888,7 +1888,7 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 		} else {
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: Unknown sync for notation \"" << notation << "\"";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
+			SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		}
 	}
 
@@ -2189,18 +2189,18 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 		SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 		if (!state)
 		{
-			LOG("ParameterizedAnimationRequest::realize_impl ERR: Can't find state name %s", stateName.c_str());
+			SmartBody::util::log("ParameterizedAnimationRequest::realize_impl ERR: Can't find state name %s", stateName.c_str());
 			return;
 		}
 		SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*> (state);
 		if (!state3D)
 		{
-			LOG("ParameterizedAnimationRequest::realize_impl ERR: state %s is not a 3D state.", stateName.c_str());
+			SmartBody::util::log("ParameterizedAnimationRequest::realize_impl ERR: state %s is not a 3D state.", stateName.c_str());
 			return;
 		}
 		if (state3D->getNumKeys() != 4)
 		{
-			LOG("ParameterizedAnimationRequest::realize_impl ERR: state %s has % keys. Parameterized animation state need 4 keys (start, stroke, relax, end).", stateName.c_str(), state3D->getNumKeys());
+			SmartBody::util::log("ParameterizedAnimationRequest::realize_impl ERR: state %s has % keys. Parameterized animation state need 4 keys (start, stroke, relax, end).", stateName.c_str(), state3D->getNumKeys());
 			return;				
 		}
 		std::vector<double> weights;
@@ -2235,7 +2235,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 			startTime = relaxTime - (blendedKey[2] - blendedKey[0]);
 			if (startTime < 0)
 			{
-				LOG("parse_bml_head Warning: parameterized head nod stroke time %f is not big enough for current parameter setting, it needs %f to arrive relax. Put startTime to 0 now.", relaxTime, (blendedKey[2] - blendedKey[0]));
+				SmartBody::util::log("parse_bml_head Warning: parameterized head nod stroke time %f is not big enough for current parameter setting, it needs %f to arrive relax. Put startTime to 0 now.", relaxTime, (blendedKey[2] - blendedKey[0]));
 				startTime = 0;
 			}
 		}
@@ -2653,7 +2653,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, SmartBody::SB
 		std::stringstream strstr;
 		strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "<<
 		        "Sequence with matching ID already exists.";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 
@@ -2672,7 +2672,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, SmartBody::SB
 				std::stringstream strstr;
 				strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "
 				     << "Failed to insert SbmCommand \"" << (command->command) << "\" at time " << (command->time) << "Aborting remaining commands.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				success = false;
 			}
 			delete command;
@@ -2687,7 +2687,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, SmartBody::SB
 			// TODO: Throw RealizingException
 			std::stringstream strstr;
 			strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": " << "Failed to execute sequence \"" << unique_id.c_str() << "\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 

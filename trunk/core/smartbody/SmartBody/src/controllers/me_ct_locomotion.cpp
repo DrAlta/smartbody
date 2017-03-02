@@ -20,7 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
-#include "vhcl.h"
+
 
 #include "controllers/me_ct_locomotion.hpp"
 #include "sbm/mcontrol_util.h"
@@ -176,7 +176,7 @@ int MeCtLocomotion::check_limb_controller_map_updated()
 				index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind );
 				if(index < 0)
 				{
-					LOG("\ni=%d failed to look up buffer index", k);
+					SmartBody::util::log("\ni=%d failed to look up buffer index", k);
 				}
 				limb->limb_joint_info.buff_index.set(i, index);
 				++k;
@@ -208,7 +208,7 @@ void MeCtLocomotion::controller_map_updated()
 			index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind);
 			if(index < 0)
 			{
-				LOG("\ni=%d failed to look up buffer index", i);
+				SmartBody::util::log("\ni=%d failed to look up buffer index", i);
 			}
 			nonlimb_joint_info.buff_index.set(i, index);
 			++k;
@@ -1062,7 +1062,7 @@ int MeCtLocomotion::determine_dominant_limb_index()
 		}
 		if(r < 0.0f) 
 		{
-			LOG("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->get_space_time(), limb_list.get(1)->get_space_time());
+			SmartBody::util::log("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->get_space_time(), limb_list.get(1)->get_space_time());
 			r = 0;
 		}
 		if(r > remnant) 
@@ -1189,7 +1189,7 @@ void MeCtLocomotion::update_pos()
 		}
 		else
 		{
-			LOG("No limb touches the ground");
+			SmartBody::util::log("No limb touches the ground");
 		}
 	}
 	else dis_initialized = true;
@@ -1229,31 +1229,31 @@ SrVec MeCtLocomotion::get_facing_vector()
 
 void MeCtLocomotion::print_info(const std::string& name)
 {
-	LOG("Locomotion status of character: %s", name.c_str());
-	LOG("Animations loaded:");
+	SmartBody::util::log("Locomotion status of character: %s", name.c_str());
+	SmartBody::util::log("Animations loaded:");
 	for(int i = 0; i < locomotion_anims.size(); ++i)
 	{
-		LOG("\t[%d] %s", i, locomotion_anims.get(i)->getName().c_str());
+		SmartBody::util::log("\t[%d] %s", i, locomotion_anims.get(i)->getName().c_str());
 	}
 
-	LOG("Limbs:");
-	LOG("  Total number: %d", limb_list.size());
+	SmartBody::util::log("Limbs:");
+	SmartBody::util::log("  Total number: %d", limb_list.size());
 	MeCtLocomotionLimb* limb;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		limb = limb_list.get(i);
-		LOG("\t%s:", limb->limb_name.get(0));
+		SmartBody::util::log("\t%s:", limb->limb_name.get(0));
 		//limb->print_info();
-		LOG("\tSupport joints:");
+		SmartBody::util::log("\tSupport joints:");
 		for(int j = 0; j < limb->get_support_joint_num(); ++j)
 		{
-			LOG("\t\t%s", (const char*)*(limb->support_joint_list.get(j)));
+			SmartBody::util::log("\t\t%s", (const char*)*(limb->support_joint_list.get(j)));
 		}
 	}
 
-	if(initialized) LOG("Initialized: Yes");
-	else LOG("Initialized: No");
+	if(initialized) SmartBody::util::log("Initialized: Yes");
+	else SmartBody::util::log("Initialized: No");
 
-	if(enabled) LOG("Enabled: Yes");
-	else LOG("Enabled: No");
+	if(enabled) SmartBody::util::log("Enabled: Yes");
+	else SmartBody::util::log("Enabled: No");
 }

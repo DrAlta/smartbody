@@ -42,6 +42,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSceneListener.h>
 #include <sb/SBMotionGraph.h>
 #include <sb/SBParser.h>
+#include <sb/SBUtilities.h>
 #include <controllers/MeCtReachEngine.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -323,7 +324,7 @@ void SBCharacter::addController(int index, SBController* controller)
 	{
 		if (this->getControllerByIndex(c) == controller)
 		{
-			LOG("Controller %s already exists in controller tree for character %s.", controller->getName().c_str(), this->getName().c_str());
+			SmartBody::util::log("Controller %s already exists in controller tree for character %s.", controller->getName().c_str(), this->getName().c_str());
 			return;
 		}
 	}
@@ -379,7 +380,7 @@ SBController* SBCharacter::getControllerByIndex(int index)
 
 	if (index < 0 || index >= (int)ct_tree_p->count_controllers())
 	{
-		LOG("Index %d out of range.", index);
+		SmartBody::util::log("Index %d out of range.", index);
 		return NULL;
 	}
 
@@ -439,7 +440,7 @@ void SBCharacter::setVoice(const std::string& type)
 	}
 	else
 	{
-		LOG("Unknown voice setting '%s'.", type.c_str());
+		SmartBody::util::log("Unknown voice setting '%s'.", type.c_str());
 	}
 
 	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voice"));
@@ -509,7 +510,7 @@ void SBCharacter::setVoiceBackup(const std::string& type)
 	}
 	else
 	{
-		LOG("Unknown voice backup setting '%s'.", type.c_str());
+		SmartBody::util::log("Unknown voice backup setting '%s'.", type.c_str());
 	}
 
 	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceBackup"));
@@ -747,11 +748,11 @@ void SBCharacter::notify(SBSubject* subject)
 						std::string shapeName = attrName.substr(startPos + 1);
 						if (getSkeleton()->getJointByName(channelName))
 						{
-							LOG("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
+							SmartBody::util::log("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
 							continue;
 						}
 						shapeNames.push_back(channelName);
-						LOG("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
+						SmartBody::util::log("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
 					}
 				}
 			}
@@ -1016,7 +1017,7 @@ void SBCharacter::copy( SmartBody::SBCharacter* origChar )
 	SbmCharacter::copy(origChar);
 	if (origChar->getReach()) // original character has reach set
 	{
-		LOG("Build reach for character %s",getName().c_str());
+		SmartBody::util::log("Build reach for character %s",getName().c_str());
 		origChar->getReach()->build(this);
 	}
 	SBObject::copyAllAttributes(origChar);	
@@ -1031,7 +1032,7 @@ void SBCharacter::setReach( SmartBody::SBReach* reach )
 	}
 	else
 	{
-		LOG("Can't set SBReach '%s', the corresponding reach engine is not initialized. Do reach.build() before set to character.", reach->getReachTag().c_str());
+		SmartBody::util::log("Can't set SBReach '%s', the corresponding reach engine is not initialized. Do reach.build() before set to character.", reach->getReachTag().c_str());
 	}
 }
 
@@ -1133,7 +1134,7 @@ SBAPI void SBCharacter::startMotionGraphRandomWalk()
 {
 	if (!_curMotionGraph)
 	{
-		LOG("Cannot start motion graph. No motion graph available.");
+		SmartBody::util::log("Cannot start motion graph. No motion graph available.");
 		return;
 	}
 	std::vector<std::string> nodeNames = _curMotionGraph->getMotionNodeNames();
@@ -1147,32 +1148,32 @@ SBAPI void SBCharacter::startMotionGraph( const std::string& moNodeName )
 {
 	if (!motiongraph_ct)
 	{
-		LOG("Motion Graph Controller is not initialized.");
+		SmartBody::util::log("Motion Graph Controller is not initialized.");
 		return;
 	}
 
 	SBMotionNodeState* motionState = motiongraph_ct->getMotionNodeState();
 	if (!motionState)
 	{
-		LOG("Motion Graph Controller is not initialized.");
+		SmartBody::util::log("Motion Graph Controller is not initialized.");
 		return;
 	}
 
 	if (!_curMotionGraph)
 	{
-		LOG("Cannot start motion graph. No motion graph available.");
+		SmartBody::util::log("Cannot start motion graph. No motion graph available.");
 		return;
 	}
 	SBMotionNode* startNode = _curMotionGraph->getMotionNode(moNodeName);
 	if (!startNode)
 	{
-		LOG("Cannot start motion graph. The motion node '%s' doesn't exist.", moNodeName.c_str());
+		SmartBody::util::log("Cannot start motion graph. The motion node '%s' doesn't exist.", moNodeName.c_str());
 		return;
 	}
 
 	if (motionState->isRunning())
 	{
-		LOG("Motion Graph is running. Stop the motion graph before restarting it.");
+		SmartBody::util::log("Motion Graph is running. Stop the motion graph before restarting it.");
 		return;
 	}
 
@@ -1186,14 +1187,14 @@ SBAPI void SBCharacter::startMotionGraphWithPath( const std::vector<SrVec>& path
 {
 	if (!_curMotionGraph)
 	{
-		LOG("Cannot start motion graph. No motion graph available.");
+		SmartBody::util::log("Cannot start motion graph. No motion graph available.");
 		return;
 	}
 
 	SBMotionNodeState* motionState = motiongraph_ct->getMotionNodeState();
 	if (!motionState)
 	{
-		LOG("Motion Graph Controller is not initialized.");
+		SmartBody::util::log("Motion Graph Controller is not initialized.");
 		return;
 	}
 
@@ -1211,30 +1212,30 @@ SBAPI void SBCharacter::startMotionGraphWithPath( const std::vector<SrVec>& path
 	_curMotionGraph->synthesizePath(moGraphPath, getSkeleton()->getName(), graphEdges);
 	if (graphEdges.size() == 0)
 	{
-		LOG("Error, the resulting graph traversal is empty.");
+		SmartBody::util::log("Error, the resulting graph traversal is empty.");
 		return;
 	}
-	//LOG("Finish synthesize the paths, graph edge size = %d", graphEdges.size());
+	//SmartBody::util::log("Finish synthesize the paths, graph edge size = %d", graphEdges.size());
 	std::string startNodeName = graphEdges[0].first;
 	startMotionGraph(startNodeName);	
 
 	for (unsigned int i=0;i<graphEdges.size();i++)
 	{
 		std::pair<std::string,std::string>& edge = graphEdges[i];			
-		//LOG("Edge %d, name = %s %s", i, edge.first.c_str(), edge.second.c_str());
+		//SmartBody::util::log("Edge %d, name = %s %s", i, edge.first.c_str(), edge.second.c_str());
 		SBMotionTransitionEdge* motionEdge = _curMotionGraph->getMotionEdge(edge.first,edge.second);
 		if (!motionEdge)
 		{
-			LOG("Cannot find edge %s %s",edge.first.c_str(), edge.second.c_str());
+			SmartBody::util::log("Cannot find edge %s %s",edge.first.c_str(), edge.second.c_str());
 		}
-		//LOG("motion edge %d, name = %s", motionEdge, motionEdge->getName().c_str());
+		//SmartBody::util::log("motion edge %d, name = %s", motionEdge, motionEdge->getName().c_str());
 		SBMotionNode* node = _curMotionGraph->getMotionNode(edge.second);	
-		//LOG("Motion node = %d, namae = %s", node, node->getName().c_str());
+		//SmartBody::util::log("Motion node = %d, namae = %s", node, node->getName().c_str());
 		std::vector<float> weights;
 		node->getRandomBlendWeights(weights);
-		//LOG("Node weights size = %d", weights.size());
+		//SmartBody::util::log("Node weights size = %d", weights.size());
 		motionState->addNextTransition(motionEdge, weights);
-		//LOG("After add next transition");
+		//SmartBody::util::log("After add next transition");
 	}
 
 		

@@ -13,6 +13,7 @@
 #include "MeCtBodyReachState.h"
 #include <sb/sbm_character.hpp>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 
 
 
@@ -143,7 +144,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 			effectorUp = -effectorUp;
 	}
 
-	//LOG("preFix = %s, effector up = %f %f %f", preFix.c_str(), effectorUp[0], effectorUp[1], effectorUp[2]);
+	//SmartBody::util::log("preFix = %s, effector up = %f %f %f", preFix.c_str(), effectorUp[0], effectorUp[1], effectorUp[2]);
 
 	SrQuat offsetQuat = SrQuat(effectorUp,SrVec(0,1,0));
 	SrMat offsetMat; offsetQuat.get_mat(offsetMat);
@@ -373,17 +374,17 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->getMappedJointName().c_str()]);
 	cons->targetPos = estate.curIKTargetState.tran;	
-	//LOG("constraint position = %f %f %f",cons->targetPos[0],cons->targetPos[1], cons->targetPos[2]);
+	//SmartBody::util::log("constraint position = %f %f %f",cons->targetPos[0],cons->targetPos[1], cons->targetPos[2]);
 	
 // 	if (curReachState->curStateName() == "Start" || curReachState->curStateName() == "Complete" )
 // 	{
 // 		SrVec ikTarget = rd->reachTarget.getTargetState().tran;
-// 		//LOG("state time = %f",rd->stateTime);
-// 		LOG("ikTarget = %f %f %f",ikTarget[0],ikTarget[1],ikTarget[2]);
-// 		//LOG("targetPos = %f %f %f",cons->targetPos[0],cons->targetPos[1],cons->targetPos[2]);	
+// 		//SmartBody::util::log("state time = %f",rd->stateTime);
+// 		SmartBody::util::log("ikTarget = %f %f %f",ikTarget[0],ikTarget[1],ikTarget[2]);
+// 		//SmartBody::util::log("targetPos = %f %f %f",cons->targetPos[0],cons->targetPos[1],cons->targetPos[2]);	
 // 	}
-	//LOG("gmat %s",rd->gmat.toString().c_str());
-	//LOG("rootPos = %s", refFrame.rootPos.toString().c_str());
+	//SmartBody::util::log("gmat %s",rd->gmat.toString().c_str());
+	//SmartBody::util::log("rootPos = %s", refFrame.rootPos.toString().c_str());
 	ikScenario.ikGlobalMat = rd->gmat;//skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.ikTreeRootPos = refFrame.rootPos;
 	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);		
@@ -503,7 +504,7 @@ SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 			bStop = true;
 		}
 	}
-	LOG("ReachEngine Root Name = %s\n",rootJoint->getName().c_str());
+	SmartBody::util::log("ReachEngine Root Name = %s\n",rootJoint->getName().c_str());
 	return dynamic_cast<SmartBody::SBJoint*>(rootJoint);
 }
 
@@ -543,7 +544,7 @@ ResampleMotion* MeCtReachEngine::createInterpMotion()
 void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight)
 {
 	float du = 0.0;
-	//LOG("reach type = %s, dt = %f",getReachTypeTag().c_str(),dt);
+	//SmartBody::util::log("reach type = %s, dt = %f",getReachTypeTag().c_str(),dt);
 	if (initStart) // first start
 	{		
 		idleMotionFrame = inputFrame;
@@ -584,7 +585,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	ReachStateInterface* nextState = getState(curReachState->nextState(reachData));
 	if (nextState != curReachState)
 	{
-		//LOG("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
+		//SmartBody::util::log("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		reachData->effectorState.startTargetState = reachData->effectorState.curIKTargetState;
 		reachData->effectorState.curBlendState = reachData->effectorState.startTargetState;

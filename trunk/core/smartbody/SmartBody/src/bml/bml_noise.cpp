@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -23,7 +23,7 @@ BehaviorRequestPtr BML::parse_bml_noise( DOMElement* elem, const std::string& un
 	MeCtNoiseController* noise_ct = request->actor->noise_ct;
 	if (!noise_ct)
 	{
-		LOG("Character %s does not have a noise controller, so cannot generate Perlin Noise.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a noise controller, so cannot generate Perlin Noise.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 

@@ -23,6 +23,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include <cstdlib>
 #include <ctime> 
 #include <math.h>
@@ -164,7 +165,7 @@ std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std:
 	const std::vector<std::string>& retAnimations = getGestureListByInfo(lexeme, type, hand, style, posture);
 	if (retAnimations.size() == 0)
 	{
-		LOG("Gesture %s cannot find gesture with type %s, posture %s, hand %s.", getName().c_str(), type.c_str(), posture.c_str(), hand.c_str());
+		SmartBody::util::log("Gesture %s cannot find gesture with type %s, posture %s, hand %s.", getName().c_str(), type.c_str(), posture.c_str(), hand.c_str());
 		return "";
 	}
 	else
@@ -187,7 +188,7 @@ SBGestureMap::GestureInfo& SBGestureMap::getGestureByIndex(int i)
 {
 	if (i < 0 || i >= int(_gestureMaps.size()))
 	{
-		LOG("Index %d out of range of gesture map.", i);
+		SmartBody::util::log("Index %d out of range of gesture map.", i);
 		return defaultGestureInfo;
 	}
 
@@ -212,17 +213,17 @@ void SBGestureMap::validate()
 	std::vector<GestureInfo>::iterator iter = _gestureMaps.begin();
 	for (; iter != _gestureMaps.end(); iter++)
 	{
-		LOG("Gesture: motion='%s' idle='%s' lexeme='%s', type='%s', hand='%s', style='%s'", 
+		SmartBody::util::log("Gesture: motion='%s' idle='%s' lexeme='%s', type='%s', hand='%s', style='%s'", 
 			 iter->_animation.c_str(), iter->_posture.c_str(), iter->_lexeme.c_str(), iter->_type.c_str(), iter->_hand.c_str(), iter->_style.c_str());
 		SBMotion* animation = scene->getMotion(iter->_animation);
 		if (!animation)
 		{
-			LOG("WARNING: Animation '%s' is not loaded.", iter->_animation.c_str());
+			SmartBody::util::log("WARNING: Animation '%s' is not loaded.", iter->_animation.c_str());
 		}
 		SBMotion* idle = scene->getMotion(iter->_posture);
 		if (!idle)
 		{
-			LOG("WARNING: Idle '%s' is not loaded.", iter->_posture.c_str());
+			SmartBody::util::log("WARNING: Idle '%s' is not loaded.", iter->_posture.c_str());
 		}
 	}
 

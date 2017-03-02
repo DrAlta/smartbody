@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include <sb/SBTypes.h>
 #include "sb/sbm_character.hpp"
@@ -117,7 +117,7 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	if( istringstream( str ) >> var )
 		return true; // no error
 	// else
-	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
+	SmartBody::util::log("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }
 #endif
@@ -423,11 +423,11 @@ void SbmCharacter::createStandardControllers()
 	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
 	{
 		eyelid_reg_ct_p->set_use_blink_viseme( true );
-//		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
+//		SmartBody::util::log("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
 	}
 	else
 	{
-//		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
+//		SmartBody::util::log("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
 	}
 	eyelid_reg_ct_p->init(this, true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
@@ -464,7 +464,7 @@ void SbmCharacter::createStandardControllers()
 
 	if (!sbChar)
 	{
-		LOG("Error! SbChar = NULL");
+		SmartBody::util::log("Error! SbChar = NULL");
 	}
 	this->record_ct = new MeCtMotionRecorder(sbChar);
 	std::string recordCtName = getName() + "_recorderController";
@@ -614,11 +614,11 @@ void SbmCharacter::createMinimalControllers()
 	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
 	{
 		eyelid_reg_ct_p->set_use_blink_viseme( true );
-//		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
+//		SmartBody::util::log("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
 	}
 	else
 	{
-//		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
+//		SmartBody::util::log("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
 	}
 	eyelid_reg_ct_p->init(this, true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
@@ -1090,7 +1090,7 @@ int SbmCharacter::init_skeleton() {
 	// use raw channels or channel arrays.
 	const SkJoint* wo_joint_p = get_world_offset_joint();
 	if( !wo_joint_p ) {
-		LOG("ERROR: SbmCharacter lacks world_offset joint after SbmPawn::init_skeleton.");
+		SmartBody::util::log("ERROR: SbmCharacter lacks world_offset joint after SbmPawn::init_skeleton.");
 		return CMD_FAILURE;
 	}
 	const int wo_index = wo_joint_p->index();  // World offest joint index
@@ -1151,7 +1151,7 @@ bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 			prune_ok = prune_policy->shouldPrune( ct, track->animation_parent_ct() );
 
 			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
-				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type().c_str(), ct->getName().c_str());
+				SmartBody::util::log("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type().c_str(), ct->getName().c_str());
 		}
 	}
 
@@ -1171,7 +1171,7 @@ void prune_schedule( SbmCharacter*   actor,
 					SkChannelArray  &raw_channels
 					) {
 						if( LOG_CONTROLLER_TREE_PRUNING ) 
-							LOG("DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \"%s\":", sched->getName().c_str());
+							SmartBody::util::log("DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \"%s\":", sched->getName().c_str());
 
 						typedef MeCtScheduler2::TrackPtr   TrackPtr;
 						typedef MeCtScheduler2::VecOfTrack VecOfTrack;
@@ -1241,7 +1241,7 @@ void prune_schedule( SbmCharacter*   actor,
 
 
 										if( LOG_CONTROLLER_TREE_PRUNING )
-											LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->getName().c_str(), t, v );
+											SmartBody::util::log("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->getName().c_str(), t, v );
 										if( t <= time )
 										{
 											flat_blend_curve = true;
@@ -1251,7 +1251,7 @@ void prune_schedule( SbmCharacter*   actor,
 										} 
 										else 
 										{
-											//						LOG( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
+											//						SmartBody::util::log( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
 
 											v = blend_curve.evaluate( time );
 											if( v == 0.0 )	{
@@ -1307,7 +1307,7 @@ void prune_schedule( SbmCharacter*   actor,
 										if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
 											std::stringstream strstr;
 											strstr << "DEBUG: prune_schedule(..): sched \""<<sched->getName()<<"\", anim_source \""<<anim_source->getName()<<"\": blend_ct without spline knots.";
-											LOG(strstr.str().c_str());
+											SmartBody::util::log(strstr.str().c_str());
 											//blend_ct->print_state(1);  // Prints controller type, name, and blend curve
 										}
 										in_use = false; // A spline with no knots evaluates to 0
@@ -1319,11 +1319,11 @@ void prune_schedule( SbmCharacter*   actor,
 								{
 									std::stringstream strstr;
 									strstr << '\t' << anim_ct_type << " \"" << anim_source->getName() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
-									LOG(strstr.str().c_str());
+									SmartBody::util::log(strstr.str().c_str());
 								}
 								if( !in_use ) {
 									if( LOG_CONTROLLER_TREE_PRUNING )
-										LOG("\t- Pruned (not in use)!!");
+										SmartBody::util::log("\t- Pruned (not in use)!!");
 								} else if( flat_blend_curve ) {  // Ignore tracks with future blend activity or are already not in use
 									// Determine if the animation will be occluded by
 									// (previously visited) higher priority controllers
@@ -1481,7 +1481,7 @@ void prune_schedule( SbmCharacter*   actor,
 										MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
 										if (hasBodyReach)
 										{
-											//LOG("Prune Reach Controller!\n");
+											//SmartBody::util::log("Prune Reach Controller!\n");
 											in_use = false;
 										}
 										else
@@ -1556,23 +1556,23 @@ void prune_schedule( SbmCharacter*   actor,
 											}
 											else {
 												//  TODO: Throttle warnings....
-												LOG("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type().c_str());
+												SmartBody::util::log("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type().c_str());
 											}
 											if( LOG_CONTROLLER_TREE_PRUNING )
 												if (in_use)
-													LOG("\t- Not Pruned (primary ct of type).");
+													SmartBody::util::log("\t- Not Pruned (primary ct of type).");
 												else
-													LOG("\t- Pruned (occluded)!!");
+													SmartBody::util::log("\t- Pruned (occluded)!!");
 								} else {
 									if( LOG_CONTROLLER_TREE_PRUNING )
-										LOG("\t- Not Pruned (future activity).");
+										SmartBody::util::log("\t- Not Pruned (future activity).");
 								}
 							} else {
 								// No animation source
 								in_use = false;
 
 								if( LOG_CONTROLLER_TREE_PRUNING )
-									LOG("\t- Pruned (no anim ct)!!");
+									SmartBody::util::log("\t- Pruned (no anim ct)!!");
 							}
 
 							if (sched == posture_sched_p && !finishedBlending)
@@ -1621,7 +1621,7 @@ int SbmCharacter::prune_controller_tree( )
 	{
 		std::stringstream strstr;
 		strstr << "SbmCharacter \""<<getName()<<"\" prune_controller_tree(..) @ time "<<time<<endl;
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 	}
 
 	// Pointers to the most active controllers of each type.
@@ -2052,8 +2052,8 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 
 	if( joint_p )	{
 		const char *name = joint_p->jointName().c_str();
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s\n", name );
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s\n", name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton( joint_p->child( i ), depth + 1 );
@@ -2077,8 +2077,8 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 		gwiz::vector_t pos = M.translation( gwiz::COMP_M_TR );
 		gwiz::euler_t rot = M.euler( gwiz::COMP_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -2108,8 +2108,8 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 		gwiz::vector_t pos = M.translation( gwiz::COMP_M_TR );
 		gwiz::euler_t rot = M.euler( gwiz::COMP_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { SmartBody::util::log( " " ); }
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -2159,7 +2159,7 @@ int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
 	std::ofstream ostream(file.c_str());
 	if (!ostream.good())
 	{
-		LOG("Cannot open file '%s' for writing .sk file.", file.c_str());
+		SmartBody::util::log("Cannot open file '%s' for writing .sk file.", file.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -2175,7 +2175,7 @@ int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
 	ostream << "\n";
 	ostream << "end\n";
 
-	LOG("Wrote file '%s'.", file.c_str());
+	SmartBody::util::log("Wrote file '%s'.", file.c_str());
 
 	return CMD_SUCCESS;
 
@@ -2392,7 +2392,7 @@ void SbmCharacter::removeAllBlendShapeChannels()
 				SmartBody::SBJoint* sbJointParent = dynamic_cast<SmartBody::SBJoint*> (jointParent);
 				sbJointParent->removeChild(sbJoint);
 				i--;
-				//LOG("remove joint %s", joint->getName().c_str());
+				//SmartBody::util::log("remove joint %s", joint->getName().c_str());
 			}
 		}
 	}
@@ -2406,13 +2406,13 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	if (!sbSkel)
 	{
-		LOG("No skeleton for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
+		SmartBody::util::log("No skeleton for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
 		return;
 	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 	if (!rootJoint)
 	{
-		LOG("No root joint for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
+		SmartBody::util::log("No root joint for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
 		return;
 	}
 
@@ -2443,7 +2443,7 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionNa
 		}
 		else
 		{
-			LOG("Could not find motion named '%s' - no viseme added.", motionName.c_str());
+			SmartBody::util::log("Could not find motion named '%s' - no viseme added.", motionName.c_str());
 		}
 	}
 	else
@@ -2458,19 +2458,19 @@ void SbmCharacter::addBlendShapeChannels(std::vector<std::string>& shapeNames)
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	if (!sbSkel)
 	{
-		LOG("No skeleton for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
+		SmartBody::util::log("No skeleton for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
 		return;
 	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 	if (!rootJoint)
 	{
-		LOG("No root joint for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
+		SmartBody::util::log("No root joint for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
 		return;
 	}
 
 	if (getFaceDefinition() == NULL)
 	{
-		LOG("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
+		SmartBody::util::log("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
 		SmartBody::SBFaceDefinition* defaultFaceDef = SmartBody::SBScene::getScene()->createFaceDefinition("default");
 		defaultFaceDef->setFaceNeutral("");
 		this->setFaceDefinition(defaultFaceDef);
@@ -2498,19 +2498,19 @@ void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	if (!sbSkel)
 	{
-		LOG("No skeleton for character %s. Blend shape %s cannot be added.", this->getName().c_str(), bShapeName.c_str());
+		SmartBody::util::log("No skeleton for character %s. Blend shape %s cannot be added.", this->getName().c_str(), bShapeName.c_str());
 		return;
 	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 	if (!rootJoint)
 	{
-		LOG("No root joint for character %s. Blend shape %d cannot be added.", this->getName().c_str(), bShapeName.c_str());
+		SmartBody::util::log("No root joint for character %s. Blend shape %d cannot be added.", this->getName().c_str(), bShapeName.c_str());
 		return;
 	}
 
 	if (getFaceDefinition() == NULL)
 	{
-		LOG("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
+		SmartBody::util::log("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
 		SmartBody::SBFaceDefinition* defaultFaceDef = SmartBody::SBScene::getScene()->createFaceDefinition("default");
 		defaultFaceDef->setFaceNeutral("");
 		this->setFaceDefinition(defaultFaceDef);
@@ -2523,7 +2523,7 @@ void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 	auJoint->pos()->limits(SkJointPos::X, -10, 10);  // Setting upper bound to 2 allows some exaggeration
 	rootJoint->addChild(auJoint);
 
-	//LOG("Added blend shape channel %s", bShapeName.c_str());
+	//SmartBody::util::log("Added blend shape channel %s", bShapeName.c_str());
 	viseme_channel_count++;
 	updateFaceDefinition();
 }
@@ -2564,13 +2564,13 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	if (!sbSkel)
 	{
-		LOG("No skeleton for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
+		SmartBody::util::log("No skeleton for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
 		return;
 	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 	if (!rootJoint)
 	{
-		LOG("No root joint for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
+		SmartBody::util::log("No root joint for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
 		return;
 	}
 	for (size_t a = 0; a < allUnits.size(); a++)
@@ -2591,7 +2591,7 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 
 void SbmCharacter::setNvbg(SmartBody::Nvbg* nvbg)
 {
-	LOG("set character %s NVBG",getName().c_str());
+	SmartBody::util::log("set character %s NVBG",getName().c_str());
 	_nvbg = nvbg;
 }
 
@@ -2646,12 +2646,12 @@ bool SbmCharacter::checkExamples()
 		if (!state)
 		{
 			numMissing++;
-//			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
+//			SmartBody::util::log("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
 		}
 	}
 	if (numMissing == 0)
 	{
-		//LOG("%s: Steering works under standard config.", this->getName().c_str());
+		//SmartBody::util::log("%s: Steering works under standard config.", this->getName().c_str());
 		if (steerAgent)
 		{
 			PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
@@ -2674,17 +2674,17 @@ bool SbmCharacter::checkExamples()
 		if (!state)
 		{
 			numMissing1++;
-//			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
+//			SmartBody::util::log("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
 		}
 	}
 	if (numMissing1 == 0)
 	{
-		LOG("%s: Steering works under minimal config.", this->getName().c_str());
+		SmartBody::util::log("%s: Steering works under minimal config.", this->getName().c_str());
 		PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 		steersuiteAgent->steeringConfig = PPRAISteeringAgent::MINIMAL;
 		return true;
 	}
-	LOG("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());
+	SmartBody::util::log("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());
 	return false;
 }
 

@@ -19,7 +19,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerAmc.h"
-#include <vhcl.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -28,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include <sbm/ParserASFAMC.h>
 
 namespace SmartBody {
@@ -49,9 +49,9 @@ std::vector<SBAsset*> SBAssetHandlerAmc::getAssets(const std::string& path)
 	if( !boost::filesystem::exists( pathname ) )
 	{
 #if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" not found.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
 #endif
 		return assets;
 	}
@@ -59,9 +59,9 @@ std::vector<SBAsset*> SBAssetHandlerAmc::getAssets(const std::string& path)
 	if( boost::filesystem::is_directory( pathname ) ) // path indicates a directory
 	{
 		#if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" is a directory.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
 #endif
 		return assets;
 	}
@@ -93,14 +93,14 @@ std::vector<SBAsset*> SBAssetHandlerAmc::getAssets(const std::string& path)
 		skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skelName);
 		if (!skeleton)
 		{
-			LOG("No skeleton with name %s could be find to accompany .asf file, %s not loaded.", skelName.c_str(), convertedPath.c_str());
+			SmartBody::util::log("No skeleton with name %s could be find to accompany .asf file, %s not loaded.", skelName.c_str(), convertedPath.c_str());
 			return assets;
 		}
 	}
 
 	if (!skeleton)
 	{
-		LOG(".amc files need accompanying .asf skeleton, %s not loaded.", convertedPath.c_str());
+		SmartBody::util::log(".amc files need accompanying .asf skeleton, %s not loaded.", convertedPath.c_str());
 		return assets;
 	}
 
@@ -115,7 +115,7 @@ std::vector<SBAsset*> SBAssetHandlerAmc::getAssets(const std::string& path)
 	else
 	{
 		delete motion;
-		LOG("Could not load .amc file %s", convertedPath.c_str());
+		SmartBody::util::log("Could not load .amc file %s", convertedPath.c_str());
 	}
 
 	return assets;

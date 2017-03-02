@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBScene.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_param_animation.h>
 
 namespace SmartBody {
@@ -171,13 +172,13 @@ SBAnimationTransition* SBAnimationBlendManager::createTransition(const std::stri
 	SBAnimationBlend* sourceBlend = getBlend(source);
 	if (!sourceBlend)
 	{
-		LOG("Source state %s does not exist. No transition created.", source.c_str());
+		SmartBody::util::log("Source state %s does not exist. No transition created.", source.c_str());
 		return NULL;
 	}
 	SBAnimationBlend* destBlend = getBlend(dest);
 	if (!destBlend)
 	{
-		LOG("Destination state %s does not exist. No transition created.", dest.c_str());
+		SmartBody::util::log("Destination state %s does not exist. No transition created.", dest.c_str());
 		return NULL;
 	}
 	SBAnimationTransition* transition = new SBAnimationTransition(source + "/" + dest);

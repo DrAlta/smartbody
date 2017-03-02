@@ -1,26 +1,24 @@
-/*
- *  bml_gaze.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Wei-Wen Feng, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -44,6 +42,7 @@
 #include <sb/SBReach.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 
@@ -73,7 +72,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 		if (!handCt)
 		{
-			LOG("Handle : %s, controller not found.",handle.c_str());
+			SmartBody::util::log("Handle : %s, controller not found.",handle.c_str());
 		}
 	}
 
@@ -128,7 +127,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	std::string localId = xml_parse_string(BMLDefs::ATTR_ID,elem,"",false);
 	
 	bool bCreateNewController = false;
-	//LOG("grabSpeed = %f",grabVelocity);
+	//SmartBody::util::log("grabSpeed = %f",grabVelocity);
 	if (!handCt)
 	{
 		handCt = new MeCtHand(sbSkel, wristJoint);		
@@ -203,7 +202,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	if (bCreateNewController)
 	{
 		SmartBody::SBSimulationManager* simManager = SmartBody::SBScene::getScene()->getSimulationManager();
-		//LOG("parse_bml_grab, time = %f",simManager->getTime());
+		//SmartBody::util::log("parse_bml_grab, time = %f",simManager->getTime());
 		ct_request.reset( new MeControllerRequest( unique_id, localId, handCt, request->actor->grab_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
 	}	

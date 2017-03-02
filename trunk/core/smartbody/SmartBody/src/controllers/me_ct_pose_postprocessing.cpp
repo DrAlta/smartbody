@@ -80,7 +80,7 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 
 	bool hasConstraint = false;
 	ConstraintMap::iterator ci;
-	//LOG("Counter = %d",counter);
+	//SmartBody::util::log("Counter = %d",counter);
 	for (ci = posConstraint.begin(); ci != posConstraint.end(); ci++)
 	{
 		EffectorConstraint* cons = ci->second;//posConstraint[i];
@@ -88,7 +88,7 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 		if (node)
 			node->targetPos = cons->getPosConstraint();				
 		//if (counter < 10)
-		//	LOG("node %s : target pos = %f %f %f", node->nodeName.c_str(),node->targetPos[0],node->targetPos[1],node->targetPos[2]);
+		//	SmartBody::util::log("node %s : target pos = %f %f %f", node->nodeName.c_str(),node->targetPos[0],node->targetPos[1],node->targetPos[2]);
 	}	
 	counter++;
 
@@ -109,7 +109,7 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 
 	float transitionWeight = _sbChar->getJointTrajBlendWeight();
 	if (transitionWeight > 1.f) transitionWeight = 1.f;
-	//LOG("joint transition weight = %f",transitionWeight);
+	//SmartBody::util::log("joint transition weight = %f",transitionWeight);
 	if (useIKConstraint && transitionWeight > 0.0) //&& ik_scenario.ikEndEffectors.size() != 0)	
 	{	
 		if (firstIKSolve)

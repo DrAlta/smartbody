@@ -18,18 +18,19 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 #include "SbmShader.h"
+#include <sb/SBUtilities.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef WIN32
 #include <direct.h>
 #endif
-#include <vhcl.h>
+
 
 
 #if !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
@@ -116,29 +117,29 @@ void SbmShaderProgram::buildShader()
 	fsID = -1;
 	if (vsShaderStr.size() > 0)
 	{
-		LOG("Create Vertex Shader");
-		//LOG("Vertex Shader Text = %s", vsShaderStr.c_str());
+		SmartBody::util::log("Create Vertex Shader");
+		//SmartBody::util::log("Vertex Shader Text = %s", vsShaderStr.c_str());
 		vsID = glCreateShader(GL_VERTEX_SHADER);
-		//LOG("vsID = %d", vsID);
+		//SmartBody::util::log("vsID = %d", vsID);
 		loadShaderStr(vsID,vsShaderStr.c_str());
-		LOG("After Build Vertex Shader");
+		SmartBody::util::log("After Build Vertex Shader");
 	}	
 	
 	if (fsShaderStr.size() > 0)
 	{
-		LOG("Create Fragment Shader");
-		//LOG("Fragment Shader Text = %s", fsShaderStr.c_str());
+		SmartBody::util::log("Create Fragment Shader");
+		//SmartBody::util::log("Fragment Shader Text = %s", fsShaderStr.c_str());
 		fsID = glCreateShader(GL_FRAGMENT_SHADER);
 		loadShaderStr(fsID,fsShaderStr.c_str());
-		//LOG("fsID = %d", fsID);
-		LOG("After Build Fragment Shader");
+		//SmartBody::util::log("fsID = %d", fsID);
+		SmartBody::util::log("After Build Fragment Shader");
 	}
 
 	printShaderInfoLog(vsID);
-    printShaderInfoLog(fsID);
+	printShaderInfoLog(fsID);
     
 	programID = glCreateProgram();
-	//LOG("programID = %d", programID);
+	//SmartBody::util::log("programID = %d", programID);
 	if (vsID != -1)
 		glAttachShader(programID,vsID);
 	if (fsID != -1)
@@ -166,7 +167,7 @@ void SbmShaderProgram::loadShaderStr( GLuint sID, const char* shaderStr )
 {		
 	glShaderSource(sID, 1, &shaderStr,NULL);	
 	glCompileShader(sID);
-	LOG("Finish compile shader, sid = %d", sID);
+	SmartBody::util::log("Finish compile shader, sid = %d", sID);
 }
 
 
@@ -175,7 +176,7 @@ char * SbmShaderProgram::textFileRead(const char *fn )
 	FILE *fp;
 	char *content = NULL;
 	int count=0;
-	LOG("Loading text files...%s", fn);
+	SmartBody::util::log("Loading text files...%s", fn);
 	if (fn != NULL) {
 		fp = fopen(fn,"rt");
 		if (fp != NULL) {
@@ -191,7 +192,7 @@ char * SbmShaderProgram::textFileRead(const char *fn )
 		} 
 		else
 		{
-			LOG("*** ERROR: Could not open file %s", fn);
+			SmartBody::util::log("*** ERROR: Could not open file %s", fn);
 		}
 	}
 	return content;
@@ -204,12 +205,12 @@ void SbmShaderProgram::printShaderInfoLog( GLuint obj )
 	char *infoLog;
 
 	glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
-	//LOG("printShaderInfoLog, infologLength = %d", infologLength);
+	//SmartBody::util::log("printShaderInfoLog, infologLength = %d", infologLength);
 	if (infologLength > 0)
 	{
 		infoLog = (char *)malloc(infologLength);
 		glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-		LOG("%s\n",infoLog);
+		SmartBody::util::log("%s\n",infoLog);
 		free(infoLog);
 	}
 }
@@ -221,12 +222,12 @@ void SbmShaderProgram::printProgramInfoLog( GLuint obj )
 	char *infoLog;
 
 	glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
-	//LOG("printProgramInfoLog, infologLength = %d", infologLength);
+	//SmartBody::util::log("printProgramInfoLog, infologLength = %d", infologLength);
 	if (infologLength > 0)
 	{
 		infoLog = (char *)malloc(infologLength);
 		glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-		LOG("%s\n",infoLog);
+		SmartBody::util::log("%s\n",infoLog);
 		free(infoLog);
 	}
 }
@@ -241,7 +242,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 	while (glErr != GL_NO_ERROR)
 	{
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
-		LOG("glError %s: %s\n", tag,gluErrorString(glErr));
+		SmartBody::util::log("glError %s: %s\n", tag,gluErrorString(glErr));
 #endif
 		retCode = 1;
 		glErr = glGetError();
@@ -315,7 +316,7 @@ bool SbmShaderManager::initGLExtension()
 #if !defined(MAC_BUILD)	
     if (glewIsSupported("GL_VERSION_3_0"))
 	{
-        LOG("Ready for OpenGL 3.0\n");
+        SmartBody::util::log("Ready for OpenGL 3.0\n");
 		shaderInit = true;
 		shaderSupport = SUPPORT_OPENGL_3_0;
 		return true;
@@ -338,21 +339,21 @@ bool SbmShaderManager::checkShaderInit(int &counter)
 #ifndef __ANDROID__
 	if (glewIsSupported("GL_VERSION_4_0"))
 	{
-		LOG("Ready for OpenGL 4.0.\n");
+		SmartBody::util::log("Ready for OpenGL 4.0.\n");
 		shaderInit = true;
 		shaderSupport = SUPPORT_OPENGL_2_0;
 		return true;
 	}
 	else if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
-		LOG("Ready for OpenGL 2.0.\n");
+		SmartBody::util::log("Ready for OpenGL 2.0.\n");
 		shaderInit = true;
 		shaderSupport = SUPPORT_OPENGL_2_0;
 		return true;
 	}
 	else {
 		//if (counter == 3)
-		LOG("OpenGL 2.0 not supported. GPU Shader will be disabled.\n");
+		SmartBody::util::log("OpenGL 2.0 not supported. GPU Shader will be disabled.\n");
 		//exit(1);
 		counter++;
 		if (counter == 3)
@@ -360,7 +361,7 @@ bool SbmShaderManager::checkShaderInit(int &counter)
 		return false;
 	}
 #else
-	LOG("Ready for OpenGL 3.0.\n");
+	SmartBody::util::log("Ready for OpenGL 3.0.\n");
 	shaderInit = true;
 	shaderSupport = SUPPORT_OPENGL_2_0;
 

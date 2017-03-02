@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBCOMMANDMANAGER_H_
 #define _SBCOMMANDMANAGER_H_
 
-#include <vhcl.h>
 #include <sb/SBObject.h>
 #include <sbm/sr_cmd_map.h>
 #include <sbm/sr_cmd_seq.h>

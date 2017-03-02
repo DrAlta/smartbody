@@ -3,6 +3,8 @@
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
+
 
 #ifdef WIN32
 using namespace glfont;
@@ -192,7 +194,7 @@ void VisemeRTCurveViewer::initFont()
 	if (!label.Create(fontPath.c_str(), textureName))
 	{
 		if(!label.Create(".font.glf", textureName))
-			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
+			SmartBody::util::log("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
 #endif
 	glPopAttrib();

@@ -1,26 +1,24 @@
-/*
- *  bml_target.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 
 #include <iostream>
 #include <sstream>
@@ -29,7 +27,7 @@
 #include "bml_target.hpp"
 #include "sbm/BMLDefs.h"
 #include <sb/SBScene.h>
-
+#include <sb/SBUtilities.h>
 
 #define DEBUG_BML_TARGET				(0)
 
@@ -76,7 +74,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					{
 						std::stringstream strstr;
 						strstr << "DEBUG: BML::parse_target(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
-						LOG(strstr.str().c_str());
+						SmartBody::util::log(strstr.str().c_str());
 					}
 				} else {
 					// Target is a pawn, look at world offset
@@ -87,13 +85,13 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 						{
 							std::stringstream strstr;
 							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
-							LOG(strstr.str().c_str());
+							SmartBody::util::log(strstr.str().c_str());
 						}
 					} else {
 						// TODO: Query World State Protocol (requires event delay)
 						std::stringstream strstr;
 						strstr << "WARNING: BML::parse_target(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
-						LOG(strstr.str().c_str());
+						SmartBody::util::log(strstr.str().c_str());
 						return NULL;
 					}
 				}
@@ -115,14 +113,14 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 						{
 							std::stringstream strstr;
 							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
-							LOG(strstr.str().c_str());
+							SmartBody::util::log(strstr.str().c_str());
 						}
 					}
 					else
 					{
 						std::stringstream strstr;
 						strstr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
-						LOG(strstr.str().c_str());
+						SmartBody::util::log(strstr.str().c_str());
 						return NULL;
 					}
 				}
@@ -136,7 +134,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					return target->get_world_offset_joint();
 				}
 				strstr << "WARNING: BML::parse_target(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				return NULL;
 			}
 
@@ -148,12 +146,12 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 
 			// TODO
 			strstr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<< BMLDefs::ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return NULL;
 		}
 		default: {
 			strstr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<< BMLDefs::ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return NULL;
 		}
 	}  // end switch( tokenizer.countTokens() )

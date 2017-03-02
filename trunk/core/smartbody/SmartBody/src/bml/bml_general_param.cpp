@@ -17,13 +17,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
-#include "vhcl.h"
+
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 #include "sbm/xercesc_utils.hpp"
 #include "bml_general_param.hpp"
@@ -90,7 +91,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	{	
 		std::wstringstream wstrstr;
 		wstrstr<<"WARNING: Cannot find the parameter name! Please check your initialization in Sequence File\n";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+		SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -108,7 +109,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		if(pch == NULL) 
 		{
 			flag = 0; 
-			LOG("WARNING: The input value size is invalid! Size is smaller than required");
+			SmartBody::util::log("WARNING: The input value size is invalid! Size is smaller than required");
 			return BehaviorRequestPtr();
 		}
 		Data_Array[i] = (float)atof(pch);
@@ -123,7 +124,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	if(pch != NULL) 
 	{
 		flag = 0; 
-		LOG("WARNING: The input value size is invalid! Size is larger than required");
+		SmartBody::util::log("WARNING: The input value size is invalid! Size is larger than required");
 		return BehaviorRequestPtr();
 	}
 

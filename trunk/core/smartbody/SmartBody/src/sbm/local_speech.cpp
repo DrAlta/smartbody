@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #define USE_FESTIVAL_RELAY 0
 
@@ -232,7 +232,7 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 
    char * message = transferTxt;
 
-   //LOG("removeXMLTag, message = %s",message);
+   //SmartBody::util::log("removeXMLTag, message = %s",message);
 
 
    std::string actualText = "";
@@ -534,7 +534,7 @@ void CereprocSpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string
 
 void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDir )
 {	
-	LOG("start init cerevoice relay");
+	SmartBody::util::log("start init cerevoice relay");
 	voiceEngine = CPRCEN_engine_new();
 
 	for (int i=0;i<voices.size();i++)	
@@ -543,9 +543,9 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 		std::string fullLicenseName = libPath + "/" + licenses[i];
 		int success = CPRCEN_engine_load_voice(voiceEngine, fullLicenseName.c_str(), NULL, fullVoiceName.c_str(),CPRC_VOICE_LOAD_EMB_AUDIO);
 		if (!success)
-			LOG("Cerevoice Local Relay : load voice %s fail.",fullVoiceName.c_str());
+			SmartBody::util::log("Cerevoice Local Relay : load voice %s fail.",fullVoiceName.c_str());
 		else
-			LOG("Cerevoice Local Relay : load voice %s success.",fullVoiceName.c_str());
+			SmartBody::util::log("Cerevoice Local Relay : load voice %s success.",fullVoiceName.c_str());
 	}
 
 	// if there are any voices that needed to be loaded directly from the license information:
@@ -570,26 +570,26 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 				voiceFile = (*iter2).second;
 		}
 		/*
-		LOG("LOADING VOICE %s WITH:", voice.c_str());
-		LOG("(%s)", licenseText.c_str());
-		LOG("(%s)", signature.c_str());
-		LOG("(%s)", voiceFile.c_str());
+		SmartBody::util::log("LOADING VOICE %s WITH:", voice.c_str());
+		SmartBody::util::log("(%s)", licenseText.c_str());
+		SmartBody::util::log("(%s)", signature.c_str());
+		SmartBody::util::log("(%s)", voiceFile.c_str());
 		*/
 		int success = CPRCEN_engine_load_voice_licensestr(voiceEngine, licenseText.c_str(), signature.c_str(), "", voiceFile.c_str(), CPRC_VOICE_LOAD_EMB_AUDIO);
 		if (!success)
-			LOG("Cerevoice Local Relay : load voice %s with direct engine licensing fail.", voice.c_str());
+			SmartBody::util::log("Cerevoice Local Relay : load voice %s with direct engine licensing fail.", voice.c_str());
 		else
-			LOG("Cerevoice Local Relay : load voice %s with direct engine licensing success.", voice.c_str());
+			SmartBody::util::log("Cerevoice Local Relay : load voice %s with direct engine licensing success.", voice.c_str());
 
 
 	}
 	
 	if (!voiceEngine)
 	{
-		LOG("fail to initialize Cerevoice engine");
+		SmartBody::util::log("fail to initialize Cerevoice engine");
 	}
 	else
-		LOG("Success to initialize Cerevoice engine");
+		SmartBody::util::log("Success to initialize Cerevoice engine");
 	cacheDirectory = cacheDir;
 	set_phonemes_to_visemes();
 }
@@ -603,7 +603,7 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 	char* fileName = const_cast<char*>(cereproc_file_name);
 	CPRCEN_engine_channel_to_file(voiceEngine, chan, fileName, CPRCEN_RIFF); /* File output on channel */
 	// 	/* Speak with streaming input */
-	//LOG("text to speech, voice_id = %s",voice_id.c_str());
+	//SmartBody::util::log("text to speech, voice_id = %s",voice_id.c_str());
 
 	SpeechRequestMessageData xmlMetaData;
 	// Feed in input text, further data is to come
@@ -869,7 +869,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 
 	std::string message_c = message;
 
-	//LOG("Cereproc process speech message = '%s'",message);
+	//SmartBody::util::log("Cereproc process speech message = '%s'",message);
 
    // parse the string
    std::vector< std::string > tokens;
@@ -885,7 +885,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name);
    if (!character)
    {
-	   LOG("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
+	   SmartBody::util::log("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
 	   return;
    }
 
@@ -895,14 +895,14 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    size_t prefix_length = message_c.find( file_name, 0 ) + file_name.length() + 1;
    std::string utterance = message_c.substr( prefix_length );  // strip off the prefix, only using the xml
 
-   //LOG("voice_id = %s", voice_id.c_str());
+   //SmartBody::util::log("voice_id = %s", voice_id.c_str());
    // remove anything after </speech> tag
    size_t postfix_pos = utterance.rfind( "</speech>" );
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
-   //LOG("utterane = %s", utterance.c_str());
+   //SmartBody::util::log("utterane = %s", utterance.c_str());
    //std::string newUtterance = ParseXMLOutput(utterance);
-   //LOG("strippedUtterance = %s", newUtterance.c_str());
+   //SmartBody::util::log("strippedUtterance = %s", newUtterance.c_str());
    //utterance = newUtterance;
 
    // parse out just the sound file name and give it a .wav file type
@@ -915,7 +915,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    /// Generate the audio
    std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
    // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
-   //LOG("Cerevoice reply Cmd = %s",xml.c_str());
+   //SmartBody::util::log("Cerevoice reply Cmd = %s",xml.c_str());
    if ( xml.compare("") != 0 )
    {
       std::string reply = agent_name;
@@ -924,7 +924,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
       reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
       reply += xml;
    
-      //LOG( "REPLY: %s\n", reply.c_str() );
+      //SmartBody::util::log( "REPLY: %s\n", reply.c_str() );
 
 #ifdef _DUMP_COMM_TO_DISK
 	  fprintf(_outfile, "%d: %s\n\n",_dumpCounter - 1,reply.c_str());
@@ -934,7 +934,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 	  
 	  string replyCmd = "RemoteSpeechReply ";
 	  replyCmd = replyCmd + reply; //cmdConst;
-	  //LOG("replyCmd = %s", replyCmd.c_str());
+	  //SmartBody::util::log("replyCmd = %s", replyCmd.c_str());
 	  SmartBody::SBScene::getScene()->command(replyCmd);
 	  //mcu.execute_later(replyCmd.c_str());
       //vhmsg::ttu_notify2( "RemoteSpeechReply", reply.c_str() );
@@ -1060,30 +1060,30 @@ std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const
 
 	//string spoken_text = storeXMLMetaData( utterance );
 	string spoken_text = removeXMLTagsAndNewLines( utterance ,xmlMetaData);
-	//LOG("after store XMLMetaData");
+	//SmartBody::util::log("after store XMLMetaData");
 	//printf("done first time\n");
 	if (!spoken_text.compare("") && spoken_text != "")
 	{
 		puts(spoken_text.append("\n").c_str());
 	}
 	
-	LOG("after spoken text compare, spoken_text = %s",spoken_text.c_str());
+	SmartBody::util::log("after spoken text compare, spoken_text = %s",spoken_text.c_str());
 	if (xmlMetaData.tags.size() <= 0)
 	{
 		spoken_text = TransformTextWithTimes(utterance);
-		LOG("done transforming, spoken_text = %s\n",spoken_text.c_str());
+		SmartBody::util::log("done transforming, spoken_text = %s\n",spoken_text.c_str());
 		if (!spoken_text.compare("") && spoken_text != "")
 		{
 			puts(spoken_text.append("\n").c_str());
 		}
 		spoken_text = removeXMLTagsAndNewLines(spoken_text, xmlMetaData);
 		//spoken_text = storeXMLMetaData( spoken_text );
-		LOG("done second time, spoken_text = %s\n", spoken_text.c_str());
+		SmartBody::util::log("done second time, spoken_text = %s\n", spoken_text.c_str());
 	}
-	//LOG("before remove tab");
+	//SmartBody::util::log("before remove tab");
 	removeTabsFromString(spoken_text);
 
-	//LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
+	//SmartBody::util::log( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
 
 	//festival_say_text(spoken_text.c_str());
 	festival_text_to_wave(spoken_text.c_str(),wave);
@@ -1123,7 +1123,7 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    char * message = (char*)truncatedTxt.c_str();
 
    std::string actualText = "";
-   //LOG("message = %s",message);
+   //SmartBody::util::log("message = %s",message);
    /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
    //xercesc_3_0::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
    MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
@@ -1131,12 +1131,12 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    DOMDocument *doc = parser->getDocument();
    if ( doc )
    {
-	   //LOG("has doc");
+	   //SmartBody::util::log("has doc");
 	   DOMElement *root = doc->getDocumentElement();
 
 	   if ( root ) 
 	   {
-		   //LOG("has root");
+		   //SmartBody::util::log("has root");
 		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
 		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
 		   if ( messageList && messageList->getLength() > 0)
@@ -1159,12 +1159,12 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
 		   }
 		   messageList = root->getElementsByTagName( X("mark"));
-		   //LOG("check messageList = %d",messageList);
+		   //SmartBody::util::log("check messageList = %d",messageList);
 		   /// Store all the book marks in the input message, so that they can be retrieved later
 		   if ( messageList ) 
 		   {
 			   XMLSize_t nLetters = messageList->getLength();
-			   //LOG("has messageList, length = %d",nLetters);
+			   //SmartBody::util::log("has messageList, length = %d",nLetters);
 			   for ( XMLSize_t i = 0; i < nLetters; i++ )
 			   {
 				   DOMNode* node = messageList->item(i);
@@ -1232,17 +1232,17 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 					   else
 					   {
 						   std::string temporaryText = speechString;
-						   //LOG("tempText = %s",temporaryText.c_str());
+						   //SmartBody::util::log("tempText = %s",temporaryText.c_str());
 						   cleanString(temporaryText);
-						   //LOG("tempText after clean = %s",temporaryText.c_str());
+						   //SmartBody::util::log("tempText after clean = %s",temporaryText.c_str());
 						   /// Words can be used to match up which tags we need to see
 							/// Push tag and word into xmlMetaData
 							xmlMetaData.tags.push_back(markString);
 							xmlMetaData.words.push_back(temporaryText);
 							actualText += temporaryText;
-							//LOG("actual text before clean = %s",actualText.c_str());
+							//SmartBody::util::log("actual text before clean = %s",actualText.c_str());
 							cleanString(actualText);
-							//LOG("actual text after clean = %s",actualText.c_str());
+							//SmartBody::util::log("actual text after clean = %s",actualText.c_str());
 					   }
 				   }
 			   }
@@ -1289,7 +1289,7 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
    SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name):
    if (!character)
    {
-	   LOG("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
+	   SmartBody::util::log("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
 	   return;
    }
 	std::string message_id = tokens.at( 2 );
@@ -1310,16 +1310,16 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 	std::string festival_file_name = cacheDirectory + file_name;
 	//Generate the audio
-	//LOG("before reply");
+	//SmartBody::util::log("before reply");
 	string replyXML = generateReply(utterance.c_str(),festival_file_name.c_str());
-	//LOG("after reply, replyXML = %s",replyXML.c_str());
+	//SmartBody::util::log("after reply, replyXML = %s",replyXML.c_str());
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
-	//LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
+	//SmartBody::util::log("remoteSpeechReply = %s",remoteSpeechReply.c_str());
 
 	char full[ _MAX_PATH ];
 	if ( getFullPath( full, const_cast<char*>(festival_file_name.c_str())) == NULL )
 	{
-		LOG("\nError converting path sent from SBM to absolute path\n");
+		SmartBody::util::log("\nError converting path sent from SBM to absolute path\n");
 	}
 #if defined(__ANDROID__)
 	string soundPathName = cacheDirectory + file_name;
@@ -1329,8 +1329,8 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 
 	remoteSpeechReply += soundPathName+"\"/>";
 	remoteSpeechReply += replyXML + "</speak>";
-	//LOG("replyXML = %s\n",replyXML.c_str());
-	//LOG("Sound path name = %s\n",soundPathName.c_str());
+	//SmartBody::util::log("replyXML = %s\n",replyXML.c_str());
+	//SmartBody::util::log("Sound path name = %s\n",soundPathName.c_str());
 
 
 	
@@ -1338,14 +1338,14 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	string replyCmd = "RemoteSpeechReply ";
 	replyCmd = replyCmd + remoteSpeechReply; //cmdConst;
 	//mcu.execute_later("RemoteSpeechReply", cmdConst ); //sends the remote speech command using singleton* MCU_p	
-	//LOG("replyCmd = %s",replyCmd.c_str());
+	//SmartBody::util::log("replyCmd = %s",replyCmd.c_str());
 	mcu.execute_later(replyCmd.c_str());
 }
 
 // void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
 // {
 // 	int ret = festival_eval_command(cmd);
-// 	LOG("%s : ret = %d\n", cmd,ret);	
+// 	SmartBody::util::log("%s : ret = %d\n", cmd,ret);	
 // }
 
 void FestivalSpeechRelayLocal::setVoice(std::string voice)
@@ -1353,7 +1353,7 @@ void FestivalSpeechRelayLocal::setVoice(std::string voice)
 	std::stringstream strstr;
 	strstr << "(voice_" << voice << ")";
 	int ret = festival_eval_command(strstr.str().c_str());
-	//LOG("Voice = %s : ret = %d\n", voice.c_str(),ret);	
+	//SmartBody::util::log("Voice = %s : ret = %d\n", voice.c_str(),ret);	
 
 	festival_eval_command("(Parameter.set `Duration_Method Duration_Default)");		
 	festival_eval_command("(set! after_synth_hooks (list Duration_VirtualHuman))");	
@@ -1480,20 +1480,20 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
 
-	LOG( "Festival Text To Speech Engine:\n\n" );
-	LOG( "Initializing....\n");
-	LOG( "Hooking up VH Module\n");
+	SmartBody::util::log( "Festival Text To Speech Engine:\n\n" );
+	SmartBody::util::log( "Initializing....\n");
+	SmartBody::util::log( "Hooking up VH Module\n");
 
 	std::vector<std::string> festivalCommands;
 	std::ifstream scriptStream(scriptFile.c_str());
 	
-	LOG("Festival lib directory (use -festivalLibDir): %s\n", festivalLibDir.c_str());
-	LOG("Cache directory (use -festivalLibDir)       : %s\n", cache_directory.c_str());
-	LOG("Voice (use -voice)                          : %s\n", voice.c_str());
+	SmartBody::util::log("Festival lib directory (use -festivalLibDir): %s\n", festivalLibDir.c_str());
+	SmartBody::util::log("Cache directory (use -festivalLibDir)       : %s\n", cache_directory.c_str());
+	SmartBody::util::log("Voice (use -voice)                          : %s\n", voice.c_str());
 
 	//if (!scriptFileRead)
 	{
-		LOG("Running default Festival commands\n\n", voice.c_str());
+		SmartBody::util::log("Running default Festival commands\n\n", voice.c_str());
 		//festivalCommands.push_back("(voice_roger_hts2010)");
 		// setting the duration method to be used by festival
 		festivalCommands.push_back("(Parameter.set `Duration_Method Duration_Default)");
@@ -1507,13 +1507,13 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		festivalCommands.push_back(strstr.str());
 	}
 
-	LOG("\n");
+	SmartBody::util::log("\n");
 	for (size_t x = 0; x < festivalCommands.size(); x++)
 	{		
 		int ret = festival_eval_command(festivalCommands[x].c_str());
-		LOG("%s : ret = %d\n", festivalCommands[x].c_str(),ret);		
+		SmartBody::util::log("%s : ret = %d\n", festivalCommands[x].c_str(),ret);		
 	}
-	LOG("\n");	
+	SmartBody::util::log("\n");	
 	
 
 
@@ -1532,7 +1532,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		 makeDirectory( temp.c_str() );
 		}
 	}
-	LOG( "Done Initializing local speech relay\n");	    
+	SmartBody::util::log( "Done Initializing local speech relay\n");	    
 }
 #else
 
@@ -1594,8 +1594,8 @@ local_speech::~local_speech()
 
 void local_speech::sendSpeechCommand(const char* cmd)
 {
-	//LOG("speech cmd = %s",cmd);
-	//LOG("local_speech::sendSpeechCommand");
+	//SmartBody::util::log("speech cmd = %s",cmd);
+	//SmartBody::util::log("local_speech::sendSpeechCommand");
 	char* cmdConst = const_cast<char*>(cmd);
 	//SmartBody::SBScene::getScene()->getCommandManager()->execute_later( cmdConst ); //sends the remote speech command using singleton* MCU_p
 	SBScene::getScene()->getVHMsgManager()->send2( "RemoteSpeechCmd", cmdConst );

@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include "sbm_speech_audiofile.hpp"
 #include "sbm/BMLDefs.h"
 
@@ -125,14 +125,14 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
 		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 	} catch (...) {
-		LOG("Problem parsing XML speech request.");
+		SmartBody::util::log("Problem parsing XML speech request.");
 		return 0;
 	}
 
    SmartBody::SBCharacter * agent = SmartBody::SBScene::getScene()->getCharacter(agentName );
    if ( agent == NULL )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
       return 0;
    }
 
@@ -158,12 +158,12 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 		   abs_p = boost::filesystem::absolute( p );	
 		   if( !boost::filesystem::exists( abs_p ))
 		   {
-			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+			   //SmartBody::util::log( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
 	#else
 		   abs_p = boost::filesystem::complete( p );	
 		   if( !boost::filesystem2::exists( abs_p ))
 		   {
-			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+			   //SmartBody::util::log( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 	#endif
 			   continue;
 		   }
@@ -210,9 +210,9 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
 	{
 #if (BOOST_VERSION > 104400)
-	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
+	  SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
 #else
-	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+	  SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
 #endif
 	  return 0;
 	}
@@ -225,9 +225,9 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
 	{
 #if (BOOST_VERSION > 104400)
-		LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+		SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
 #else
-		LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+		SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
 #endif
 		//mcu.mark("requestSpeechAudio");
 		//return 0;
@@ -270,7 +270,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    SmartBody::SBCharacter * agent = SmartBody::SBScene::getScene()->getCharacter( agentName );
    if ( agent == NULL )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
       return 0;
    }
 
@@ -297,12 +297,12 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		   abs_p = boost::filesystem::absolute( p );	
 		   if( !boost::filesystem::is_directory( abs_p ))
 		   {
-			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+			   //SmartBody::util::log( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
 #else
 		   abs_p = boost::filesystem::complete( p );	
 		   if( !boost::filesystem2::is_directory( abs_p ))
 		   {
-			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+			   //SmartBody::util::log( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 #endif
 			   continue;
 		   }
@@ -335,7 +335,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
  	ReadVisemeDataBML( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
       return 0;
    }
    ReadSpeechTiming( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
@@ -346,7 +346,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
       return 0;
    }
    ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
@@ -358,9 +358,9 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
 #if (BOOST_VERSION > 104400)
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
 #else
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
 #endif
       //return 0;
    }
@@ -903,7 +903,7 @@ void AudioFileSpeech::ReadEmotionData(const char* filename, std::map<std::string
 	std::ifstream emoFile(filename);
 	if (!emoFile.good())
 	{
-		//LOG("Cannot open emotion file %s", filename);
+		//SmartBody::util::log("Cannot open emotion file %s", filename);
 		return;
 	}
 
@@ -930,7 +930,7 @@ void AudioFileSpeech::ReadEmotionData(const char* filename, std::map<std::string
 			if (emotionData.find(emotionType) == emotionData.end())
 			{
 				emotionData.insert(std::make_pair(emotionType, std::vector<float>()));
-				LOG("Found %s emotion curve input for speech", emotionType.c_str());
+				SmartBody::util::log("Found %s emotion curve input for speech", emotionType.c_str());
 			}
 			int frameNumber = atoi(tokens[1].c_str());
 			float time = (float)frameNumber / (float)fps;
@@ -994,14 +994,14 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 		rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 		if (!bmlnode)
 		{
-			LOG( "Could not find <bml> tag in %s.", filename);
+			SmartBody::util::log( "Could not find <bml> tag in %s.", filename);
 		}
 		else
 		{
 			rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
 			if (!curvesnode)
 			{
-				LOG( "Could not find <curves> tag in %s.", filename);
+				SmartBody::util::log( "Could not find <curves> tag in %s.", filename);
 				// revert to normal viseme mode if no curves are found
 				useCurveMode = false;
 			}
@@ -1044,7 +1044,7 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 		rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 		if (!bmlnode)
 		{
-			LOG( "Could not find <bml> tag in %s.", filename);
+			SmartBody::util::log( "Could not find <bml> tag in %s.", filename);
 		}
 
 		rapidxml::xml_node<>* node = bmlnode->first_node("lips");
@@ -1176,7 +1176,7 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", filename );
+      SmartBody::util::log( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", filename );
       //return 0;
    }
 

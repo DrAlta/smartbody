@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include "FLTKListener.h"
 #include <sb/SBPawn.h>
@@ -7,6 +7,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include "CommandWindow.h"
 #include <RootWindow.h>
 #include <fltk_viewer.h>
@@ -268,7 +269,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 #endif
 		if ( name == "deformableMeshScale" || name == "meshScale")
 		{
-			//LOG("name = deformableMeshScale");
+			//SmartBody::util::log("name = deformableMeshScale");
 			bool useDeformableMesh = (name == "deformableMeshScale");
 			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
 			if (vec3Attribute)
@@ -281,7 +282,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 				SrVec scale(vec3Attribute->getValue().x, vec3Attribute->getValue().y, vec3Attribute->getValue().z);
 				meshInstance->setMeshScale(scale);
-				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+				//SmartBody::util::log("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
 		else if (name == "deformableMesh" || name == "mesh")
@@ -678,7 +679,7 @@ void FLTKListener::OnSimulationUpdate()
 	SrCamera * camera = scene->getActiveCamera();
 
 	if(scene->hasConeOfSight() ) {
-//		LOG("coneOfSight is enabled");
+//		SmartBody::util::log("coneOfSight is enabled");
 //		camera->updateConeOfSight();
 
 		//SrCamera* camera = scene->getActiveCamera();
@@ -692,7 +693,7 @@ void FLTKListener::OnSimulationUpdate()
 void FLTKListener::OnLogMessage( const std::string& message )
 {
 #ifdef WIN32
-	LOG("%s", message.c_str());
+	printf("%s", message.c_str());
 #endif
 #ifdef __APPLE__
 	std::cout << message << std::endl;
@@ -707,7 +708,7 @@ void FLTKListener::OnEvent( const std::string& eventName, const std::string& eve
 		window->commandWindow->isShowEvents)
 	{
 #ifdef WIN32
-		LOG("Event: [%s] %s", eventName.c_str(), eventParameters.c_str());
+		SmartBody::util::log("Event: [%s] %s", eventName.c_str(), eventParameters.c_str());
 #endif
 	}
 }

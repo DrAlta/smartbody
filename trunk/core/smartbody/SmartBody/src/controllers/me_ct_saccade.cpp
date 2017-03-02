@@ -1,24 +1,22 @@
-/*
- *  me_ct_saccade.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2011  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Yuyu Xu, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "controllers/me_ct_saccade.h"
 #include <cstdlib>
@@ -30,6 +28,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBAttributeManager.h>
+#include <sb/SBUtilities.h>
 
 using namespace gwiz;
 std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
@@ -198,11 +197,11 @@ void MeCtSaccade::spawning(double t)
 		_time = time + interval;
 
 #if 0
-		LOG("--Next Saccade happens at %f, turning angle=%f, duration=%f, interval=%f, direction=%f", _time, actualRotation.angle(), _dur, interval, _direction);
+		SmartBody::util::log("--Next Saccade happens at %f, turning angle=%f, duration=%f, interval=%f, direction=%f", _time, actualRotation.angle(), _dur, interval, _direction);
 #endif
 	}
 	if (_time == -1.0f)
-		LOG("MeCtSaccade::update ERR: this is not suppose to happen.");
+		SmartBody::util::log("MeCtSaccade::update ERR: this is not suppose to happen.");
 }
 
 
@@ -396,7 +395,7 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 		_idR = frame.toBufferIndex(idR);
 		if (_idL < 0 || _idR < 0)
                 {
-			LOG("MeCtSaccade::initBufferIndex Warning: channel id not correct!");
+			SmartBody::util::log("MeCtSaccade::initBufferIndex Warning: channel id not correct!");
                         _valid = false;
                 }
 
@@ -491,7 +490,7 @@ void MeCtSaccade::setBehaviorMode(BehaviorMode m)
 	if (modeString == "")
 		return;
 
-	//LOG("Saccade mode set to %s", modeString.c_str());
+	//SmartBody::util::log("Saccade mode set to %s", modeString.c_str());
 
 	std::string percentage0 = "saccade." + modeString + ".percentage0";
 	std::string percentage45 = "saccade." + modeString + ".percentage45";

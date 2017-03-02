@@ -23,10 +23,9 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "sbm/gwiz_math.h"
 using namespace gwiz;
 
-#include <vhcl_log.h>
-
 #include "sbm/sbm_constants.h"
 #include <bml/bml.hpp>
+#include <sb/SBUtilities.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -360,7 +359,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 					angle_deg =  -_magnitude * calc_waggle_curve( scale_time, scale_dur, _pitch, _warp, _accel_pow, _decay_pow );
 				}
 				else	{
-					LOG( "MeCtSimpleNod::controller_evaluate ERR: mode %d not recognized" );
+					SmartBody::util::log( "MeCtSimpleNod::controller_evaluate ERR: mode %d not recognized" );
 					return( false );
 				}
 	}
@@ -492,7 +491,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 			prev_out = Q_out.degrees();
 		}
 #endif
-		//LOG("localChan %d, quat = %f %f %f %f", local_channel_index, Q_out.w(), Q_out.x(), Q_out.y(), Q_out.z());
+		//SmartBody::util::log("localChan %d, quat = %f %f %f %f", local_channel_index, Q_out.w(), Q_out.x(), Q_out.y(), Q_out.z());
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
 		buff[ index + 2 ] = (float) Q_out.y();

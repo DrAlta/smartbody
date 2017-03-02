@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBJavascript.h"
 #include "SBJavascriptClass.h"
 #include <sr/sr_camera.h>
