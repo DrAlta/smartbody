@@ -553,6 +553,8 @@ namespace SmartBody
 			.function("setType", &SBEvent::setType)
 			.function("getParameters", &SBEvent::getParameters)
 			.function("setParameters", &SBEvent::setParameters)
+			.function("getSource", &SBEvent::getSource)
+			.function("setSource", &SBEvent::setSource)
 			;
 
 		emscripten::class_<SBEventManager>("SBEventManager")

@@ -2457,13 +2457,14 @@ double SBMotion::getFrameRate()
 	return getDuration() / double(getNumFrames() - 1);
 }
 
-void SBMotion::addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly)
+void SBMotion::addEvent(double time, const std::string& type, const std::string& parameters, const std::string& source, bool onceOnly)
 {
 	SBMotionEvent* motionEvent = new SBMotionEvent();
 	motionEvent->setIsOnceOnly(onceOnly);
 	motionEvent->setTime(time);
 	motionEvent->setType(type);
 	motionEvent->setParameters(parameters);
+	motionEvent->setSource(source);
 	addMotionEvent(motionEvent);
 }
 

@@ -1186,13 +1186,14 @@ bool SBAnimationBlend::validateState()
 	return true;
 }
 
-void SBAnimationBlend::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly)
+void SBAnimationBlend::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, const std::string& source, bool onceOnly)
 {
 	SBMotionEvent* motionEvent = new SBMotionEvent();
 	motionEvent->setIsOnceOnly(onceOnly);
 	motionEvent->setTime(time);
 	motionEvent->setType(type);
 	motionEvent->setParameters(parameters);
+	motionEvent->setSource(source);
 	addEventToMotion(motion, motionEvent);
 }
 

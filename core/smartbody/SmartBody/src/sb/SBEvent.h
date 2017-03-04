@@ -31,16 +31,19 @@ namespace SmartBody {
 class SBEvent
 {
 	public:
-		SBAPI SBEvent() : m_type(""), m_params("") {};
+		SBAPI SBEvent() : m_type(""), m_params(""), m_source("") {};
 		SBAPI ~SBEvent() {}
 		SBAPI virtual void setParameters(std::string params) { m_params = params; }
 		SBAPI virtual std::string getParameters() { return m_params; };
 		SBAPI virtual void setType(std::string type) { m_type = type; }
 		SBAPI virtual std::string getType() { return m_type; }
+		SBAPI virtual void setSource(std::string source) { m_source = source; }
+		SBAPI virtual std::string getSource() { return m_source; }
 	
 	protected:
 		std::string m_type;
 		std::string m_params;
+		std::string m_source;
 };
 
 class SBEventHandler : public SBObject
@@ -80,7 +83,7 @@ class SBEventManager
 		SBAPI ~SBEventManager();
 
 		SBAPI void handleEvent(SBEvent* e);
-		SBAPI SBEvent* createEvent(const std::string& type, const std::string parameters);
+		SBAPI SBEvent* createEvent(const std::string& type, const std::string parameters, const std::string source);
 		SBAPI void addEventHandler(const std::string& type, SBEventHandler* handle);
 		SBAPI void removeEventHandler(const std::string& type);
 		SBAPI int getNumEventHandlers();

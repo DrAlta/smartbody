@@ -746,6 +746,8 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setType", &SBEvent::setType, "Sets the event type.")
 		.def("getParameters", &SBEvent::getParameters, "Returns the event parameters.")
 		.def("setParameters", &SBEvent::setParameters, "Sets the event parameters.")
+		.def("getSource", &SBEvent::getSource, "Returns the event source object string.")
+		.def("setSource", &SBEvent::setSource, "Set the event source object string.")
 		;
 
 	boost::python::class_<SBEventManager>("SBEventManager")

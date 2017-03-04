@@ -203,7 +203,7 @@ class SBMotion : public SkMotion
 		SBAPI std::string getMetaDataString(const std::string& tagName);
 		SBAPI double      getMetaDataDouble(const std::string& tagName);
 		SBAPI std::vector<std::string> getMetaDataTags();
-		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
+		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, const std::string& source, bool onceOnly);
 		int getTransformDepth() const { return transformDepth; }		
 		void setTransformDepth(int depth) { transformDepth = depth; }
 		SBAPI void buildJointTrajectory(const std::string& effectorName, const std::string& refJointName = "base" );
