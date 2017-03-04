@@ -76,13 +76,13 @@ class ParserCOLLADAFast
 		static void parseLibraryControllers(rapidxml::xml_node<>* node, DeformableMesh* mesh, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL, bool hasRootJoint = false);
-		static void parseLibraryAnimations(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);
+		static void parseLibraryAnimations(rapidxml::xml_node<>* node, SkSkeleton& skeleton, std::vector<SmartBody::SBMotion*>& motions, float scale, int& order, bool zaxis = false);
 
 		static void parseNodeAnimation(rapidxml::xml_node<>* node1, std::map<std::string, ColladaFloatArrayFast > &floatArrayMap, float scale, std::map<std::string, ColladaSamplerFast > &samplerMap, std::vector<ColladChannelFast> &channelSamplerNameMap, SkSkeleton &skeleton );
 		static void parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 	
-		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
-		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
+		static void animationPostProcess(SkSkeleton& skeleton, SmartBody::SBMotion* motion);
+		static void animationPostProcessByChannels(SkSkeleton& skeleton, SmartBody::SBMotion* motion, SkChannelArray& motionChannels);
 		static void parseLibraryGeometries(rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, \
 			std::map<std::string, std::string>& materialId2Name, std::map<std::string,
 			std::string>& mtlTexMap, 

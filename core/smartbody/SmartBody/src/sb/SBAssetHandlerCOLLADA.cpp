@@ -137,9 +137,12 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			}
 			
 			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
+
+			std::vector<SBMotion*> motions;
 			if (skmNode)
 			{
-				ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, *motion, 1.0, order, false);
+
+				ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, motions, 1.0, order, false);
 			}
 
 			if (skeleton->getNumJoints() == 0)
@@ -147,14 +150,14 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			else
 				assets.push_back(skeleton);
 
-
-			
-		
-
-			if (motion->getNumFrames() == 0)
-				delete motion;
-			else
-				assets.push_back(motion);
+			for (size_t m = 0; m < motions.size(); m++)
+			{
+				SmartBody::SBMotion* motion = motions[m];
+				if (motion->getNumFrames() == 0)
+					delete motion;
+				else
+					assets.push_back(motion);
+			}
 
 			// parsing geometry
 #if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)

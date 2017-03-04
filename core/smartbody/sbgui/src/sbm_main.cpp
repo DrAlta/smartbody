@@ -390,10 +390,13 @@ int mcu_snapshot_func2(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	}
 	string output_file = args.read_token();
 
-	std::stringstream output_file_os;
-	output_file_os << "snapshot_" << snapshotCounter << ".tga";	// default output name
-	snapshotCounter++;
-	output_file = output_file_os.str();
+	if (output_file == "")
+	{
+		std::stringstream output_file_os;
+		output_file_os << "snapshot_" << snapshotCounter << ".tga";	// default output name
+		snapshotCounter++;
+		output_file = output_file_os.str();
+	}
 
 	int y = rootWindow->curViewer->h();
 	int x = rootWindow->curViewer->w();
