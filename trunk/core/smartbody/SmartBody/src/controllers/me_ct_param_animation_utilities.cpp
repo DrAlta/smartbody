@@ -208,7 +208,8 @@ void PATimeManager::checkEvents()
 			manager->handleEvent(event.first);
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();
-			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			std::string source = event.first->getSource();
+			//SmartBody::util::log("EVENT: %f %s %s %s", time, type.c_str(), params.c_str(), source.c_str());
 			_events.pop();
 		}
 		else

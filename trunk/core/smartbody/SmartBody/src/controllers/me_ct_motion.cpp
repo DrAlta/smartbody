@@ -529,7 +529,8 @@ void MeCtMotion::checkMotionEvents(double time)
 			manager->handleEvent(motionEvent);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();
-			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			std::string source = motionEvent->getSource();
+			//SmartBody::util::log("EVENT: %f %s %s %s", time, type.c_str(), params.c_str(), source.c_str());
 			_events.pop();
 		}
 		else

@@ -275,7 +275,7 @@ void SBCollisionManager::afterUpdate(double time)
 					SBCharacter* c2 = dynamic_cast<SBCharacter*>(g2->getAttachObj());
 					if (c1 && c2)
 					{
-						SBEvent* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
+						SBEvent* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName(), scene->getStringFromObject(c1));
 						eventManager->handleEvent(collisionEvent);
 						//SmartBody::util::log("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 						delete collisionEvent; // free the memory
@@ -343,7 +343,7 @@ void SBCollisionManager::afterUpdate(double time)
 
 					//SmartBody::util::log("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 
-					SBEvent* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
+					SBEvent* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2, potentialCollisions[i].first);
 					eventManager->handleEvent(collisionEvent);
 					delete collisionEvent; // free the memory
 				}

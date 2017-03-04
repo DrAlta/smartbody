@@ -100,6 +100,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);			
 			motionEvent.setParameters(cmd);
+			motionEvent.setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 			manager->handleEvent(&motionEvent);
 #else
@@ -107,6 +108,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			std::string eventType = "collision";
 			motionEvent->setType(eventType);			
 			motionEvent->setParameters(cmd);
+			motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 			manager->handleEvent(motionEvent);
 #endif
@@ -127,6 +129,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);						
 			motionEvent.setParameters(cmd);
+			motionEvent.setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
 			manager->handleEvent(&motionEvent);
 #else
@@ -134,6 +137,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			std::string eventType = "collision";
 			motionEvent->setType(eventType);						
 			motionEvent->setParameters(cmd);
+			motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
 			manager->handleEvent(motionEvent);
 #endif

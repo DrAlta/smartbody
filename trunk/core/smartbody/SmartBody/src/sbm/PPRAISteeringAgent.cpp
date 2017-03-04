@@ -5,7 +5,7 @@ This file is part of Smartbody.
 
 Smartbody is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free So`ftware Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 Smartbody is distributed in the hope that it will be useful,
@@ -677,6 +677,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	std::stringstream strstr;
 	strstr << character->getName() << " " << status;
 	motionEvent->setParameters(strstr.str());
+	motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(character));
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 	//SmartBody::util::log("PPRAISteeringAgent::sendLocomotionEvent Over");
@@ -687,6 +688,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	std::stringstream strstr;
 	strstr << character->getName() << " " << status;
 	motionEvent.setParameters(strstr.str());
+	motionEvent.setSource(SmartBody::SBScene::getScene()->getStringFromObject(character));
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent);
 #endif
@@ -1856,6 +1858,7 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 		std::string cmd = "bml chr " + character->getName() + " success";
 		//cmd = cmd + " facing: " + boost::lexical_cast<std::string>(facing)
 		facingEvent.setParameters(cmd);
+		facingEvent.setSource(SmartBody::SBScene::getScene()->getStringFromObject(character));
 		SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 		manager->handleEvent(&facingEvent);
 		facingAdjust = false; // stop facing adjustment
