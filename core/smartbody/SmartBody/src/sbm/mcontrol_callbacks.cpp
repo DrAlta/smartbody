@@ -1604,7 +1604,9 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		// send the sound event
 		std::stringstream strstr;
 		strstr << soundFile << " " << characterName;
-		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterName);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		std::string characterObjectName = SmartBody::SBScene::getScene()->getStringFromObject(character);
+		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
 		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
 
 		// if internal audio is on, use the internal sound player
