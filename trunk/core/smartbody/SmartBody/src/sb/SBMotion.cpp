@@ -3051,7 +3051,7 @@ void SBMotion::setEmptyMotion(float duration, int numFrames)
 }
 
 
-SBAPI SrQuat SBMotion::getChannelQuat( const std::string& channelName, float t )
+SrQuat SBMotion::getChannelQuat( const std::string& channelName, float t )
 {
 	int idx = _channels.search(channelName, SkChannel::Quat);
 	if (idx < 0) return SrQuat();
@@ -3076,7 +3076,7 @@ SBAPI SrQuat SBMotion::getChannelQuat( const std::string& channelName, float t )
 }
 
 
-SBAPI SrMat SBMotion::getChannelMat( const std::string& channelName, float t )
+SrMat SBMotion::getChannelMat( const std::string& channelName, float t )
 {
 	SrQuat rot = getChannelQuat(channelName,t);
 	SrVec  pos = getChannelPos(channelName,t);
@@ -3090,7 +3090,7 @@ SBAPI SrMat SBMotion::getChannelMat( const std::string& channelName, float t )
 }
 
 
-SBAPI SrVec SBMotion::getChannelPos( const std::string& channelName, float t )
+SrVec SBMotion::getChannelPos( const std::string& channelName, float t )
 {
 	SrVec pos;
 	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame

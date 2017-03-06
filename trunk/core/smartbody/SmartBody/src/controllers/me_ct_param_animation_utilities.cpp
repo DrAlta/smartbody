@@ -19,6 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "controllers/me_ct_param_animation_utilities.h"
+#include "controllers/me_ct_param_animation.h"
 #include <sbm/gwiz_math.h>
 
 #include <sr/sr_euler.h>
@@ -209,7 +210,16 @@ void PATimeManager::checkEvents()
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();
 			std::string source = event.first->getSource();
-			//SmartBody::util::log("EVENT: %f %s %s %s", time, type.c_str(), params.c_str(), source.c_str());
+			if (source == "") // if source isn't present, set the source to the character associated with the blend
+			{
+				MeCtParamAnimation* controller = blendData->getController();
+				if (controller)
+				{
+					std::string sourceStr = SmartBody::SBScene::getScene()->getStringFromObject(controller->getPawn());
+					event.first->setSource(sourceStr);
+				}
+			}
+			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
 			_events.pop();
 		}
 		else
@@ -978,9 +988,9 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	
 }
 
-PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
+PABlendData::PABlendData(MeCtParamAnimation* controller, const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
 {
-	
+	_controller = controller;
 	blendStartOffset = (float)blendOffset;
 	blendEndTrim = (float)blendEndTrim;
 	directPlay = dplay;
@@ -1012,8 +1022,9 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	active = false;
 }
 
-PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
+PABlendData::PABlendData(MeCtParamAnimation* controller, PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
 {
+	_controller = controller;
 	blendStartOffset = (float)blendOffset;
 	blendEndTrim = (float)blendTrim;
 	directPlay = dplay;
@@ -1049,7 +1060,7 @@ PABlendData::~PABlendData()
 }
 
 
-SBAPI bool PABlendData::getTrajPosition( std::string effectorName, float time, SrVec& outPos )
+bool PABlendData::getTrajPosition( std::string effectorName, float time, SrVec& outPos )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	outPos = SrVec(0,0,0);	
@@ -1065,6 +1076,12 @@ SBAPI bool PABlendData::getTrajPosition( std::string effectorName, float time, S
 	}	
 	return true;
 }
+
+MeCtParamAnimation* PABlendData::getController()
+{
+	return _controller;
+}
+
 
 void PABlendData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, bool tranIn )
 {

@@ -45,6 +45,8 @@ struct JointChannelId
 
 class PABlendData;
 
+class MeCtParamAnimation;
+
 class PATimeManager
 {
 	public:
@@ -172,9 +174,9 @@ class PABlendData
 		enum ScheduleMode { Now, Queued };
 
 	public:
-		SBAPI PABlendData();
-		SBAPI PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
-		SBAPI PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
+		SBAPI PABlendData(MeCtParamAnimation* controller);
+		SBAPI PABlendData(MeCtParamAnimation* controller, const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
+		SBAPI PABlendData(MeCtParamAnimation* controller, PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
 		SBAPI ~PABlendData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
@@ -187,6 +189,7 @@ class PABlendData
 		bool isPartialBlending();
 		bool isZeroDState();
 		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);
+		MeCtParamAnimation* getController();
 
 		std::vector<double> weights;
 
@@ -206,6 +209,7 @@ class PABlendData
 		std::string baseJointName;
 		std::vector<std::vector<int> > motionIndex;
 		void updateMotionIndices();
+		MeCtParamAnimation* _controller;
 };
 
 class PATransitionManager

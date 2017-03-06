@@ -1152,6 +1152,10 @@ void SkeletonViewer::setFocusJointName( std::string focusName )
 			std::string jname = skelJointNames[i];
 			std::string origName = skelOriginalNames[i];
 			SkJoint* joint = skeleton->search_joint(jname.c_str());
+			if (!joint)
+			{
+				SmartBody::util::log("Cannot find joint named %s", jname.c_str());
+			}
 			if (focusJointName == jname || focusJointName == origName)
 			{
 				//SmartBody::util::log("focus joint name = %s",jname.c_str());

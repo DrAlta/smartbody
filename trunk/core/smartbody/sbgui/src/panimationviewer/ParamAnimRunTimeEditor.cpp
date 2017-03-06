@@ -169,7 +169,7 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	if (state)
 	{
 		std::vector<double> weights;
-		PABlendData* blendData = new PABlendData(state, weights);
+		PABlendData* blendData = new PABlendData(NULL, state, weights);
 		// memory leak!
 		paramGroup = new ParameterGroup(this->parameterGroup->x(), this->parameterGroup->y(), parameterGroup->w(), parameterGroup->h(), (char*)"", blendData, paWindow);
 		parameterGroup->add(paramGroup);
@@ -236,7 +236,7 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 		}
 		
 		std::vector<double> weights;
-		PABlendData* blendData = new PABlendData(state, weights);
+		PABlendData* blendData = new PABlendData(NULL, state, weights);
 		// memory leak here!
 		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", blendData, editor->paWindow);
 		editor->parameterGroup->add(editor->paramGroup);
