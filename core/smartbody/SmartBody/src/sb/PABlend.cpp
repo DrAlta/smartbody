@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <sb/SBEvent.h>
 #include <sb/SBUtilities.h>
+#include <sb/SBScene.h>
 
 #ifdef USE_TETGEN
 #include <external/tetgen/tetgen.h>
@@ -1300,6 +1301,13 @@ std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& PABlend::getEvents()
 
 void PABlend::addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent)
 {
+	// check for source
+	if (SmartBody::SBScene::getScene()->getObjectFromString(motionEvent->getSource()) == NULL)
+	{
+		SmartBody::util::log("Could not add event to state %s: no source named %s found.", stateName.c_str(), motionEvent->getSource().c_str());
+		return;
+	}
+	
 	// determine the motion index
 	int index = getMotionId(motion);
 	if (index == -1)
