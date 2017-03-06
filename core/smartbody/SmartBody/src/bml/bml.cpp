@@ -619,7 +619,7 @@ void BmlRequest::gestureRequestProcess()
 				{
 					floatWeights.push_back(weights[k]);
 				} 
-				PABlendData* tempBlendData = new PABlendData(blendObject, floatWeights);
+				PABlendData* tempBlendData = new PABlendData(NULL, blendObject, floatWeights);
 				tempBlendData->timeManager->updateWeights();
 				std::vector<double> strokeTimes;
 				std::vector<double> startTimes;
@@ -2233,7 +2233,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 				z = 0;
 
 			state3D->PABlend::getWeightsFromParameters(x, y, z, weights);
-			PABlendData* blendData = new PABlendData(state, weights);
+			PABlendData* blendData = new PABlendData(NULL, state, weights);
 			blendData->timeManager->updateWeights();
 			std::vector<double> blendedKey = blendData->timeManager->getKey();
 			startTime = relaxTime - (blendedKey[2] - blendedKey[0]);
@@ -2242,6 +2242,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 				SmartBody::util::log("parse_bml_head Warning: parameterized head nod stroke time %f is not big enough for current parameter setting, it needs %f to arrive relax. Put startTime to 0 now.", relaxTime, (blendedKey[2] - blendedKey[0]));
 				startTime = 0;
 			}
+			delete blendData;
 		}
 
 		// get partial joint name (mainly skullbase or spine4) Hack for now

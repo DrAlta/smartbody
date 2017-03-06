@@ -321,7 +321,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->blendData = new PABlendData(currentState, weights);
+			editor->blendData = new PABlendData(NULL, currentState, weights);
 			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
@@ -346,7 +346,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->blendData = new PABlendData(currentState, weights);
+			editor->blendData = new PABlendData(NULL, currentState, weights);
 			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
@@ -371,7 +371,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->blendData = new PABlendData(currentState, weights);
+			editor->blendData = new PABlendData(NULL, currentState, weights);
 			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
@@ -398,7 +398,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->blendData = new PABlendData(currentState, weights);
+			editor->blendData = new PABlendData(NULL, currentState, weights);
 			editor->tetraVisualization = new Parameter3DVisualization(editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->tetraVisualization);
 			editor->tetraVisualization->show();
@@ -1251,7 +1251,7 @@ void PABlendEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 				{
 					weights[lastMotionIndex] = 1.;
 				}
-				PABlendData blendData(currentState, weights);
+				PABlendData blendData(NULL, currentState, weights);
 				blendData.timeManager->updateWeights();
 				std::vector<double> times(blendData.state->getNumMotions());
 				blendData.timeManager->getParallelTimes(localTime, times);
@@ -1567,7 +1567,7 @@ void PABlendEditor::scrub(Fl_Widget* widget, void* data)
 		{
 			weights[lastMotionIndex] = 1.;
 		}
-		PABlendData blendData(currentState, weights);
+		PABlendData blendData(NULL, currentState, weights);
 		blendData.timeManager->updateWeights();
 		std::vector<double> times(blendData.state->getNumMotions());
 		blendData.timeManager->getParallelTimes(localTime, times);

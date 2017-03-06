@@ -896,7 +896,7 @@ void PATransitionEditor2::scrub(Fl_Widget* widget, void* data)
 		{
 			weights[lastMotionIndex] = 1.;
 		}
-		PABlendData blendData(currentState, weights);
+		PABlendData blendData(NULL, currentState, weights);
 		blendData.timeManager->updateWeights();
 		std::vector<double> times(blendData.state->getNumMotions());
 		blendData.timeManager->getParallelTimes(localTime, times);

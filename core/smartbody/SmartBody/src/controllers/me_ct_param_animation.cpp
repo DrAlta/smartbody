@@ -856,7 +856,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	PABlendData* module = NULL;
 	if (su.data)
 	{
-		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);		
+		module = new PABlendData(this, su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);		
 		SmartBody::SBAnimationBlend* animBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(su.data);
 		if (animBlend) // set retarget information if it is available
 		{
@@ -902,7 +902,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 	{
-		module = new PABlendData(PseudoIdleState, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);
+		module = new PABlendData(this, PseudoIdleState, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);
 		module->transitionLength = su.transitionLength;
 	}
 	if (_context)
