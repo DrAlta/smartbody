@@ -520,22 +520,38 @@ void MeCtMotion::loadMotionEvents()
 
 void MeCtMotion::checkMotionEvents(double time)
 {
-	while (!_events.empty())
+	int numEventsToProcess = _events.size();
+	int countEvents = 0;
+	while (!_events.empty() &&
+		countEvents < numEventsToProcess)
 	{
-		SmartBody::SBMotionEvent* motionEvent = _events.front();		
-		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
+		SmartBody::SBMotionEvent* motionEvent = _events.front();	
+		_events.pop();
+		countEvents++;
+		if (motionEvent->isEnabled())
 		{
-			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-			manager->handleEvent(motionEvent);
-			std::string type = motionEvent->getType();
-			std::string params = motionEvent->getParameters();
-			std::string source = motionEvent->getSource();
-			//SmartBody::util::log("EVENT: %f %s %s %s", time, type.c_str(), params.c_str(), source.c_str());
-			_events.pop();
-		}
-		else
-		{
-			return;
+			if (time >= motionEvent->getTime())
+			{
+				SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
+				SmartBody::SBMotionEvent motionEventInstance;
+				motionEventInstance.setType(motionEvent->getType());
+				motionEventInstance.setParameters(motionEvent->getParameters());
+
+				SmartBody::SBPawn* pawn = this->getPawn();
+				if (pawn)
+				{
+					std::string pawnStr = SmartBody::SBScene::getScene()->getStringFromObject(pawn);
+					motionEventInstance.setSource(pawnStr);
+				}
+
+				manager->handleEvent(&motionEventInstance);
+
+				//SmartBody::util::log("EVENT: %f %s %s %s", time, type.c_str(), params.c_str(), source.c_str());
+			}
+			else
+			{
+				_events.push(motionEvent);
+			}
 		}
 	}
 }

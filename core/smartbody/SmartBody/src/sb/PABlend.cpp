@@ -1301,13 +1301,6 @@ std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& PABlend::getEvents()
 
 void PABlend::addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent)
 {
-	// check for source
-	if (SmartBody::SBScene::getScene()->getObjectFromString(motionEvent->getSource()) == NULL)
-	{
-		SmartBody::util::log("Could not add event to state %s: no source named %s found.", stateName.c_str(), motionEvent->getSource().c_str());
-		return;
-	}
-	
 	// determine the motion index
 	int index = getMotionId(motion);
 	if (index == -1)
