@@ -29,11 +29,8 @@
 //#include <wes_gl.h>
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
-#else
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#elif !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
-//#include "external/SOIL/SOIL.h"
-#endif
 #endif
 
 

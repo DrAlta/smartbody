@@ -2,7 +2,7 @@
 #define ENABLE_808_TEST			0
 
 #define SBM_REPORT_MEMORY_LEAKS  0
-#define SBM_EMAIL_CRASH_REPORTS  1
+#define SBM_EMAIL_CRASH_REPORTS  0
 
 #include "external/glew/glew.h"
 
