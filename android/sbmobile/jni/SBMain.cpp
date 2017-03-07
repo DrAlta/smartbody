@@ -15,7 +15,7 @@
  */
 
 #include <jni.h>
-
+#include <vhcl.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>

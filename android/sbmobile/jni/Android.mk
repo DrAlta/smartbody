@@ -31,6 +31,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/wsp/wsp/include \
+					$(LOCAL_PATH)/$(SB_LIB_PATH)/boostnumeric \
 					$(LOCAL_PATH)/$(CEREVOICE_LIB_DIR)/cerevoice_eng/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/external/ \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/steerlib/include \
