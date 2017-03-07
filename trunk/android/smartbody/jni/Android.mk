@@ -258,6 +258,7 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
+					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boostnumeric \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/SmartBody/src/external/protobuf/include \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
@@ -562,7 +563,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SB_MY_DIR)/sb/SBCommandManager.cpp \
 	$(SB_MY_DIR)/sb/SBNavigationMeshManager.cpp \
-	$(SB_MY_DIR)/sb/SBAssetHandlerAssimp.cpp \
 	$(SB_MY_DIR)/sb/SBAssetHandler.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerSk.cpp \
