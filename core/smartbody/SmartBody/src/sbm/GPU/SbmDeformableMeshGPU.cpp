@@ -717,6 +717,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	GLuint count = 0;
 	glGenQueries(1, &idQuery);
 
+#if 0
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{
 		GLuint my_sampler_uniform_location = glGetUniformLocation(program,"Transform");	
@@ -726,6 +727,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		glUniform1i(my_sampler_uniform_location, iActiveTex);
 	}
 	else
+#endif
 	{
 		GLuint transformLocation = glGetUniformLocation(program,"Transform");
 		glUniformMatrix4fv(transformLocation,tranBuffer.size(),true,(GLfloat*)getPtr(tranBuffer));
