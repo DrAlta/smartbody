@@ -117,11 +117,11 @@ bml.execBML('ChrRachel', '<body posture="ChrConnor@IdleStand01" ready="0" relax=
 
 # trigger an event at a given motion
 motion1 = scene.getMotion('ChrConnor@IdleStand01_BeatMidRt01')
-motion1.addEvent(0.5, 'motionSpeech', 'beat', 'Rachel', False)
+motion1.addEvent(0.5, 'motionSpeech', 'beat', False)
 motion2 = scene.getMotion('ChrConnor@IdleStand01_NegateRightMidRt01')
-motion2.addEvent(0.3, 'motionSpeech', 'contemplate', 'Rachel', False)
+motion2.addEvent(0.3, 'motionSpeech', 'contemplate', False)
 motion3 = scene.getMotion('ChrConnor@IdleStand01_NoLeftRt01')
-motion3.addEvent(0.3, 'motionSpeech', 'negative', 'Rachel', False)
+motion3.addEvent(0.3, 'motionSpeech', 'negative', False)
 
 last = 0
 delay = 4
