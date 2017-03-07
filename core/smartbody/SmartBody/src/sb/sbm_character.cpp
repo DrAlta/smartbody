@@ -319,16 +319,19 @@ void SbmCharacter::createStandardControllers()
 	std::string paramAnimationName = getName() + "_paramAnimationController";
 	this->param_animation_ct->setName(paramAnimationName.c_str());
 	this->param_animation_ct->ref();
+	this->param_animation_ct->init(this);
 
 	this->param_animation_ct_layer1 = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string paramAnimationName1 = getName() + "_paramAnimationController_Layer1";
 	this->param_animation_ct_layer1->setName(paramAnimationName1.c_str());
 	this->param_animation_ct_layer1->ref();
+	this->param_animation_ct_layer1->init(this);
 
 	this->param_animation_ct_layer2 = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string paramAnimationName2 = getName() + "_paramAnimationController_Layer2";
 	this->param_animation_ct_layer2->setName(paramAnimationName2.c_str());
 	this->param_animation_ct_layer2->ref();
+	this->param_animation_ct_layer2->init(this);
 
 	// basic locomotion
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
