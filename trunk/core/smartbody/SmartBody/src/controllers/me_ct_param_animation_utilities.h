@@ -190,7 +190,6 @@ class PABlendData
 		bool isZeroDState();
 		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);
 		MeCtParamAnimation* getController();
-
 		std::vector<double> weights;
 
 		PATimeManager* timeManager;

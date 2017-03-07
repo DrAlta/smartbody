@@ -1001,13 +1001,6 @@ const bool ascendingTime(SmartBody::SBMotionEvent* a, SmartBody::SBMotionEvent* 
 
 void SkMotion::addMotionEvent(SmartBody::SBMotionEvent* motionEvent)
 {
-	// check for source
-	if (SmartBody::SBScene::getScene()->getObjectFromString(motionEvent->getSource()) == NULL)
-	{
-		SmartBody::util::log("Could not add event to motion %s: no source named %s found.", motionEvent->getMotionName().c_str(), motionEvent->getSource().c_str());
-		return;
-	}
-
 	_motionEvents.push_back(motionEvent);
 	// make sure that the motion events are ordered by time
 	std::sort(_motionEvents.begin(), _motionEvents.end(), ascendingTime);

@@ -198,33 +198,38 @@ void PATimeManager::checkEvents()
 	if (motionIndex >= (int) localTimes.size())
 		return;
 
-	while (!_events.empty())
+	int numEventsToProcess = _events.size();
+	int countEvents = 0;
+	while (!_events.empty() && 
+		    countEvents < numEventsToProcess)
 	{
-		std::pair<SmartBody::SBMotionEvent*, int>& event = _events.front();
+		std::pair<SmartBody::SBMotionEvent*, int> event = _events.front();
+		_events.pop();
 		motionIndex = event.second;
-		// localTime is the parameterized time, determine the local time of the event
-		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
+		countEvents++;
+		if (event.first->isEnabled())
 		{
-			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-			manager->handleEvent(event.first);
-			std::string type = event.first->getType();
-			std::string params = event.first->getParameters();
-			std::string source = event.first->getSource();
-			if (source == "") // if source isn't present, set the source to the character associated with the blend
+			// localTime is the parameterized time, determine the local time of the event
+			if (localTimes[motionIndex] >= event.first->getTime())
 			{
+				SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
+
+				SmartBody::SBMotionEvent motionEventInstance;
+				motionEventInstance.setType(event.first->getType());
+				motionEventInstance.setParameters(event.first->getParameters());
 				MeCtParamAnimation* controller = blendData->getController();
 				if (controller)
 				{
 					std::string sourceStr = SmartBody::SBScene::getScene()->getStringFromObject(controller->getPawn());
-					event.first->setSource(sourceStr);
+					motionEventInstance.setSource(sourceStr);
 				}
+
+				manager->handleEvent(&motionEventInstance);
 			}
-			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
-			_events.pop();
-		}
-		else
-		{
-			return;
+			else
+			{
+				_events.push(event);
+			}
 		}
 	}
 }
