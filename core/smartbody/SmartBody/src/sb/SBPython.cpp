@@ -902,7 +902,8 @@ boost::python::class_<SBObserver>("SBObserver")
 
 }
 
-#ifdef __ANDROID__
+//#ifdef __ANDROID__
+#if 0
 extern "C" {
 	extern void initpyexpat(void);
 	extern void init_functools(void);
@@ -941,7 +942,7 @@ extern "C" {
 	extern void init_locale(void);
 	extern void initparser(void);
 	extern void initmmap(void);
-	extern void initsysSmartBody::util::log(void);
+	extern void initsys(void);
 	extern void initaudioop(void);
 	extern void initimageop(void);
 	extern void init_csv(void);

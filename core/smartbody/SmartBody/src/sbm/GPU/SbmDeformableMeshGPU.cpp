@@ -1381,7 +1381,7 @@ bool SbmDeformableMeshGPU::initBuffer1()
 	{
 		int tranSize = boneJointList.size()*16;
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
-		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
 #endif
 	return true;
@@ -1490,7 +1490,7 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	{
 		int tranSize = boneJointList.size()*16;
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
-		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
 	initGPUVertexBuffer = true;
 	return true;
@@ -1527,7 +1527,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 	{
 		int tranSize = boneJointList.size()*16;
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
-		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
 	return true;
 #endif	
@@ -1675,7 +1675,7 @@ bool SbmDeformableMeshGPUInstance::initBuffer()
 		cleanBuffer();
 		int tranSize = _mesh->boneJointIdxMap.size()*16;
 		//int colorSize = dynamicMesh.size()*3;
-		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 
 		VBODeformPos = new VBOVec3f((char*)"DeformPos", VERTEX_POSITION, _deformPosBuf);
 		VBODeformNormal = new VBOVec3f((char*)"DeformNormal", VERTEX_POSITION, _deformNormalBuf);
