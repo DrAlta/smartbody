@@ -18,8 +18,12 @@ package edu.usc.ict.sbmobile;
 
 // Wrapper for native library
 
+import android.media.MediaPlayer;
+import android.util.Log;
+
 public class SBMobileLib {
 
+     static MediaPlayer _mediaPlayer = null;
      static {
 		 //System.loadLibrary("js");
          System.loadLibrary("python2.7");
@@ -48,4 +52,36 @@ public class SBMobileLib {
 	 public static native boolean  getBoolAttribute(String attrName);
 	 public static native double  getDoubleAttribute(String attrName);
 	 public static native int getIntAttribute(String attrName);
+
+    static void playSound(String soundFile, boolean loopSound)
+    {
+        Log.e("SBM", "SBMobileLib: Playing sound " + soundFile);
+        if (_mediaPlayer != null)
+        {
+            stopSound();
+        }
+        try {
+            _mediaPlayer = new MediaPlayer();
+            _mediaPlayer.setDataSource(soundFile);
+            _mediaPlayer.prepare();
+            if (loopSound)
+                _mediaPlayer.setLooping(true);
+            _mediaPlayer.start();
+        } catch (Exception e) {
+            Log.e("SBM", "SBMobileLib: Problem playing sound " + soundFile);
+            e.printStackTrace();
+        }
+    }
+
+    static void stopSound()
+    {
+        Log.e("SBM", "SBMobileLib: Stop playing sound ");
+        if (_mediaPlayer != null)
+        {
+            if (_mediaPlayer.isPlaying())
+                _mediaPlayer.stop();
+            _mediaPlayer.release();
+            _mediaPlayer = null;
+        }
+    }
 }
