@@ -283,6 +283,9 @@ namespace MsSpeechRelay
             string id = splitargs[3];
             string voice = splitargs[4];
 
+            // beginn of replay msg
+            string replyMessage = "RemoteSpeechReply " + actor + " " + id;
+
             /// Trim path from filename, and add a .wav to it, so that a relative path can be generated
             string fileName = splitargs[5];
 
@@ -320,7 +323,25 @@ namespace MsSpeechRelay
             speechPart.RemoveAttribute("type");
             speechPart.RemoveAttribute("ref");
             speechPart.SetAttribute("version", "1.0");
-            speechPart.SetAttribute("xml:lang", "en-US");
+
+            // let's find out automatically, which culture we need to specifz for the "xml:lang" attribute
+            string strCulture = GetCulture(voice);
+            if (strCulture == "")
+            {
+                /// Send back an error message to whoever wanted the audio
+                replyMessage += " ERROR: Unable to choose suggested voice. Recognized during culture evaluation.";
+                vhmsg.SendMessage(replyMessage);
+                Console.WriteLine("Debug: Sending reply: \"" + replyMessage);
+                return;
+            }
+            else
+            {
+                Console.WriteLine("The culture of the selected voice is " + strCulture);
+                speechPart.SetAttribute("xml:lang", strCulture);
+            }
+            //speechPart.SetAttribute("xml:lang", "en-US");
+            //speechPart.SetAttribute("xml:lang", "de-DE");           
+
 
             /// We want to rename all tags T0, T1, ... as spID:T0...
             /// 
@@ -339,8 +360,7 @@ namespace MsSpeechRelay
             bool allOk = generateAudio(speechPart.OuterXml.Replace("speech","speak"), outputFileName, outputPlayerFilename, voice);
 
             /// Now, send back message to whoever wanted the audio
-            /// 
-            string replyMessage = "RemoteSpeechReply " + actor + " " + id;
+            // begin of msg defined beforehand as: string replyMessage = "RemoteSpeechReply " + actor + " " + id;
             if (allOk)
             {
                 replyMessage += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xmlReply;
@@ -355,6 +375,23 @@ namespace MsSpeechRelay
             {
                 Console.WriteLine("Debug: Sending reply: \"" + replyMessage + "\"\n");
             }
+        }
+
+        /// <summary>
+        /// Get culture of selected voice
+        /// </summary>
+        /// <param name="strVoiceName">name of the voice chosen</param>
+        /// <returns>culture name for xml:lang statement or empty string if voice not found</returns>
+        public string GetCulture(string strVoiceName)
+        {
+            foreach (InstalledVoice v in ttsServer.GetInstalledVoices())
+            {
+                // return the name of the culture used for the 'xml:lang' attribut
+                if (v.VoiceInfo.Name.Replace(" ", "|") == strVoiceName)
+                    return v.VoiceInfo.Culture.Name;
+            }
+            //
+            return "";
         }
 
         /// <summary>
