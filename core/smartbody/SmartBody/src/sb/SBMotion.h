@@ -104,6 +104,12 @@ class SBMotion : public SkMotion
 		SBAPI SrQuat getChannelQuat(const std::string& channelName, float t);
 		SBAPI SrVec  getChannelPos(const std::string& channelName, float t);
 		SBAPI SrMat  getChannelMat(const std::string& channelName, float t);
+		SBAPI SrQuat getChannelQuatFrame(const std::string& channelName, int f);
+		SBAPI SrVec  getChannelPosFrame(const std::string& channelName, int f);
+		SBAPI SrMat  getChannelMatFrame(const std::string& channelName, int f);
+		SBAPI void setChannelQuatFrame(const std::string& channelName, int frame, SrQuat quat);
+		SBAPI void setChannelPosFrame(const std::string& channelName, int frame, SrVec vec);
+		SBAPI void setChannelMatFrame(const std::string& channelName, int frame, SrMat mat);
 
 		SBAPI void addChannel(const std::string& channelName, const std::string& channelType);
 		SBAPI void addFrame(float frameTime, const std::vector<float>& frameData);
@@ -193,6 +199,13 @@ class SBMotion : public SkMotion
 		SBAPI double getTimeStrokeEnd();
 		SBAPI double getTimeRelax();
 		SBAPI double getTimeStop();
+		SBAPI void setTimeStart(double time);
+		SBAPI void setTimeReady(double time);
+		SBAPI void setTimeStrokeStart(double time);
+		SBAPI void setTimeStroke(double time);
+		SBAPI void setTimeStrokeEnd(double time);
+		SBAPI void setTimeRelax(double time);
+		SBAPI void setTimeStop(double time);
 
 		SBAPI bool setSyncPoint(const std::string& syncTag, double time);	
 		SBAPI void validateSyncPoint(const std::string& syncTag);

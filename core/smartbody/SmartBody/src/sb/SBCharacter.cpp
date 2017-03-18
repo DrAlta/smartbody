@@ -187,6 +187,13 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 
 	createVec3Attribute("leftShoulderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightShoulderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.l_hip", 0.f, 0.f, 0.f, true, "Retargeting", 351, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.l_knee", 0.f, 0.f, 0.f, true, "Retargeting", 352, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.l_ankle", 0.f, 0.f, 0.f, true, "Retargeting", 353, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.r_hip", 0.f, 0.f, 0.f, true, "Retargeting", 354, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.r_knee", 0.f, 0.f, 0.f, true, "Retargeting", 355, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("retargetOffset.r_ankle", 0.f, 0.f, 0.f, true, "Retargeting", 356, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+
 	createBoolAttribute("isReaching", false, true, "Reaching", 158, false, false, false, "Whether a character is reaching.");
 
 

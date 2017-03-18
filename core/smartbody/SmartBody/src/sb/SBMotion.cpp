@@ -1448,7 +1448,7 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, std::string parentJointName )
 {
 	 
-	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
+	SBSkeleton* skeleton = SmartBody ::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
 		SmartBody::util::log("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
@@ -1461,6 +1461,8 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 	{
 		jointNameMap[childJoints[i]->getMappedJointName()] = true;
 	}
+	// add the parent joint as well
+	jointNameMap[pjoint->getMappedJointName()] = true;
 	
 	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
@@ -2176,10 +2178,15 @@ void SBMotion::saveToSkm(const std::string& fileName)
 		delete out;
 		return;
 	}
-	std::string oldName = this->getName();
-	this->setName(fileName);
+
+	boost::filesystem::path p(fileName);
+	std::string fname = boost::filesystem::basename(p);
+	std::string extension = boost::filesystem::extension(p);
+
+	std::string mname = fname + extension;
+	this->setName(mname);
 	this->save(*out);
-	this->setName(oldName);
+
 	delete out;
 }
 
@@ -2349,13 +2356,6 @@ void SBMotion::saveToSkmByFrames(const std::string& fileName, int startFrame, in
 	delete newMotion;
 }
 
-/*
-bool SBMotion::move(int startFrame, int endFrame, int position)
-{
-	return true;
-}
-*/
-
 double SBMotion::getTimeStart()
 {
 	return time_start();
@@ -2389,6 +2389,41 @@ double SBMotion::getTimeRelax()
 double SBMotion::getTimeStop()
 {
 	return time_stop();
+}
+
+void SBMotion::setTimeStart(double time)
+{
+	setSyncPoint("start", time);
+}
+
+void SBMotion::setTimeReady(double time)
+{
+	setSyncPoint("ready", time);
+}
+
+void SBMotion::setTimeStrokeStart(double time)
+{
+	setSyncPoint("stroke_start", time);
+}
+
+void SBMotion::setTimeStroke(double time)
+{
+	setSyncPoint("stroke", time);
+}
+
+void SBMotion::setTimeStrokeEnd(double time)
+{
+	setSyncPoint("stroke_stop", time);
+}
+
+void SBMotion::setTimeRelax(double time)
+{
+	setSyncPoint("relax", time);
+}
+
+void SBMotion::setTimeStop(double time)
+{
+	setSyncPoint("stop", time);
 }
 
 double SBMotion::getDuration()
@@ -3116,6 +3151,199 @@ SrVec SBMotion::getChannelPos( const std::string& channelName, float t )
 		pos[i] = q[0];
 	}
 	return pos;
+}
+
+SrQuat SBMotion::getChannelQuatFrame(const std::string& channelName, int f)
+{
+	int idx = _channels.search(channelName, SkChannel::Quat);
+	if (idx < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrQuat();
+	}
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrQuat();
+	}
+
+	if (f < 0 ||
+		f >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return SrQuat();
+	}
+
+	float* p = _frames[f].posture;
+
+	return SrQuat(p[idx], p[idx + 1], p[idx + 2], p[idx + 3]);
+}
+
+SrVec SBMotion::getChannelPosFrame(const std::string& channelName, int f)
+{
+	int idx = _channels.search(channelName, SkChannel::XPos);
+	if (idx < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrVec();
+	}
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrVec();
+	}
+
+	if (f < 0 ||
+		f >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return SrVec();
+	}
+
+	float* p = _frames[f].posture;
+
+	return SrVec(p[idx], p[idx + 1], p[idx + 2]);
+}
+
+SrMat SBMotion::getChannelMatFrame(const std::string& channelName, int f)
+{
+	int idx = _channels.search(channelName, SkChannel::Quat);
+	if (idx < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrVec();
+	}
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return SrVec();
+	}
+
+	if (f < 0 ||
+		f >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return SrVec();
+	}
+
+	SrQuat rot = getChannelQuatFrame(channelName, f);
+	SrVec  pos = getChannelPosFrame(channelName, f);
+	SrMat mat;
+	rot.get_mat(mat);
+	mat.set(12, pos[0]);
+	mat.set(13, pos[1]);
+	mat.set(14, pos[2]);
+
+	return mat;
+}
+
+void SBMotion::setChannelQuatFrame(const std::string& channelName, int frame, SrQuat quat)
+{
+	int idx = _channels.search(channelName, SkChannel::Quat);
+	if (idx < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+
+	if (frame < 0 ||
+		frame >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return;
+	}
+
+	float* p = _frames[frame].posture;
+	p[idx] = quat.w;
+	p[idx + 1] = quat.x;
+	p[idx + 2] = quat.y;
+	p[idx + 3] = quat.z;
+}
+
+void SBMotion::setChannelPosFrame(const std::string& channelName, int frame, SrVec vec)
+{
+	int idx = _channels.search(channelName, SkChannel::XPos);
+	if (idx < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+
+	if (frame < 0 ||
+		frame >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return;
+	}
+
+	float* p = _frames[frame].posture;
+
+	p[idx] = vec.x;
+	p[idx + 1] = vec.y;
+	p[idx + 2] = vec.z;
+}
+
+void SBMotion::setChannelMatFrame(const std::string& channelName, int frame, SrMat mat)
+{
+	int idxq = _channels.search(channelName, SkChannel::Quat);
+	if (idxq < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+	int floatIdxq = _channels.float_position(idxq);
+	if (floatIdxq < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+
+	int idxt = _channels.search(channelName, SkChannel::XPos);
+	if (idxt < 0)
+	{
+		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+	int floatIdxt = _channels.float_position(idxt);
+	if (floatIdxt < 0)
+	{
+		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
+		return;
+	}
+
+	if (frame < 0 ||
+		frame >= this->getNumFrames())
+	{
+		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
+		return;
+	}
+
+	float* p = _frames[frame].posture;
+	p[floatIdxt] = mat[13];
+	p[floatIdxt + 1] = mat[14];
+	p[floatIdxt + 2] = mat[15];
+
+	// convert mat to quat
+	SrQuat quat(mat);
+	p[floatIdxq] = quat.w;
+	p[floatIdxq + 1] = quat.x;
+	p[floatIdxq + 2] = quat.y;
+	p[floatIdxq + 3] = quat.z;
 }
 
 // find the closest key frame with key time < t
