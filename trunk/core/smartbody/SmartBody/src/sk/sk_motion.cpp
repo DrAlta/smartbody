@@ -1794,7 +1794,7 @@ SkMotion* SkMotion::copyMotion()
 std::vector<SkMotion::Frame> SkMotion::data_frames() const
 {
 	std::vector<SkMotion::Frame> frame_copy;
-	for (int i=0; i < _frames.size(); i++)
+	for (size_t i=0; i < _frames.size(); i++)
 	{
 		Frame frame = _frames[i];
 		Frame temp_frame;
@@ -2171,10 +2171,28 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 				mirrorJoint = jointNameMap.find(jointName)->second;
 
 			int index = mchan_arr.float_position(k);
+			// get the mirrored index position
+			int otherIndex = index;
+			std::string jointNameOther = "";
+			if (boost::algorithm::starts_with(jointName, "l_") ||
+				boost::algorithm::starts_with(jointName, "r_"))
+			{
+				jointNameOther = jointName;
+				// get the mirror joint name
+				if (boost::algorithm::starts_with(jointName, "l_"))
+					jointNameOther[0] = 'r';
+				else
+					jointNameOther[0] = 'l';
+
+				int otherChannelIndex = mchan_arr.search(jointNameOther.c_str(), chan.type);
+				if (otherChannelIndex >= 0)
+					otherIndex = mchan_arr.float_position(otherChannelIndex);
+			}
+
 			if (chan.type == SkChannel::XPos)
 			{
 				if (mirrorJoint)
-					new_p[index] = -ref_p[index]; // flip x-translation
+					new_p[index] = -ref_p[otherIndex]; // flip x-translation
 				else
 					new_p[index] = ref_p[index];
 			}
@@ -2182,41 +2200,47 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 			{
 				// flip rotation for y,z axis
 				SrQuat q_orig = SrQuat( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+
+				new_p[index + 0] = (float) q_orig.w;
+				new_p[index + 1] = (float) q_orig.x;
+				new_p[index + 2] = (float) q_orig.y;
+				new_p[index + 3] = (float) q_orig.z;
+
 				SrVec qa = q_orig.axisAngle();
 				SkJoint* joint = skeleton->search_joint(jointName.c_str());
 				if (!joint)
 				{
-					//SmartBody::util::log("Joint %s not found")
 					// joint not found, simply write to channels
 					for (int n=0;n<chan.size();n++)
 						new_p[index+n] = ref_p[index+n];
 				}
 				else
 				{
-					SrQuat final_q = q_orig;	
+					SrQuat q_origOther = SrQuat(ref_p[otherIndex], ref_p[otherIndex + 1], ref_p[otherIndex + 2], ref_p[otherIndex + 3]);
+					SrVec qaOther = q_origOther.axisAngle();
+					SkJoint* jointOther = skeleton->search_joint(jointNameOther.c_str());
+					SrQuat final_qOther = q_origOther;
 					if (mirrorJoint)
 					{
-						SrQuat q_zero = SrQuat(joint->gmatZero());
-						SrQuat q_lzero = SrQuat(joint->gmatZero());
+						SrQuat q_zeroOther = SrQuat(jointOther->gmatZero());
+						SrQuat q_lzeroOther = SrQuat(jointOther->gmatZero());
 						// map left to right joint
-						if (boost::algorithm::starts_with(jointName,"l_") || boost::algorithm::starts_with(jointName,"r_"))
-						{
-							std::string jointNameComp = jointName;
-							jointNameComp[0] = (jointNameComp[0]=='r') ? 'l' : 'r';  // get the mirror joint name	
-							SkJoint* jointComp = skeleton->search_joint(jointNameComp.c_str());
-							if (jointComp)
-								q_lzero = SrQuat(jointComp->gmatZero());
+						if (jointOther)
+							q_zeroOther = SrQuat(jointOther->gmatZero());
 
-						}
-
-						SrVec qa_rot = qa*q_zero;					
+						SrVec qa_rot = qaOther * q_zeroOther;
 						SrQuat qa_temp = SrQuat(qa_rot);
 						euler_t ref_e = euler_t(quat_t(qa_temp.w,qa_temp.x,qa_temp.y,qa_temp.z));														
 						quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
 						vector3_t new_qv = new_q.axisangle();
 						//SrVec new_qa = SrVec(qa_rot.x,-qa_rot.y,-qa_rot.z)*q_lzero.inverse();//SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_zero.inverse();
-						SrVec new_qa = SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_lzero.inverse();				
-						final_q = SrQuat(new_qa);	
+						SrVec new_qa = SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_lzeroOther.inverse();
+						final_qOther = SrQuat(new_qa);
+
+						new_p[index + 0] = (float)final_qOther.w;
+						new_p[index + 1] = (float)final_qOther.x;
+						new_p[index + 2] = (float)final_qOther.y;
+						new_p[index + 3] = (float)final_qOther.z;
 					}																
 					
 #if 0 // print debug info 
@@ -2232,10 +2256,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 						SmartBody::util::log("euler final = %f %f %f",final_euler.x(),final_euler.y(),final_euler.z());
 					}
 #endif
-					new_p[ index + 0 ] = (float)final_q.w;
-					new_p[ index + 1 ] = (float)final_q.x;
-					new_p[ index + 2 ] = (float)final_q.y;
-					new_p[ index + 3 ] = (float)final_q.z;
+				
 				}
 				
 			}
@@ -2245,7 +2266,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 					new_p[index+n] = ref_p[index+n];
 			}
 		}
-		
+		/*
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
@@ -2253,22 +2274,28 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 			if (jointNameMap.find(jointName) == jointNameMap.end()) // skip joint value swapping
 				continue;
 			int index = mchan_arr.float_position(k);
-			if (boost::algorithm::starts_with(jointName,"l_"))
+			if (boost::algorithm::starts_with(jointName, "l_") || 
+				boost::algorithm::starts_with(jointName, "r_"))
 			{
-				std::string jointNameRight = jointName;
-				jointNameRight[0] = 'r';  // get the mirror joint name
-				int rjointIndex = mchan_arr.search( jointNameRight.c_str(), chan.type );
-				if (rjointIndex < 0)
+				std::string jointNameOther = jointName;
+				// get the mirror joint name
+				if (boost::algorithm::starts_with(jointName, "l_"))
+					jointNameOther[0] = 'r';
+				else
+					jointNameOther[0] = 'l';
+
+				int otherJointIndex = mchan_arr.search(jointNameOther.c_str(), chan.type );
+				if (otherJointIndex < 0)
 					continue;
-				int rindex = mchan_arr.float_position(rjointIndex);				
+				int otherIndex = mchan_arr.float_position(otherJointIndex);
 				// swap left and right channels
 				for (int n=0;n<chan.size();n++)
 				{
-					std::swap(new_p[rindex+n],new_p[index+n]);
+					std::swap(new_p[otherIndex + n],new_p[index + n]);
 				}
 			}
-		}
-		
+		}	
+		*/
 	}
 	return mirror_p;
 }

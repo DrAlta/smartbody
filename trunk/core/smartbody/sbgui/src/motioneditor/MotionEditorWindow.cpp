@@ -8,6 +8,7 @@
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include "RootWindow.h"
 
 MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
 {
@@ -383,7 +384,13 @@ void MotionEditorWindow::OnButtonSaveMotion(Fl_Widget* widget, void* data)
 	SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
 	if (!motion)
 		return;
-	motion->saveToSkm(motion->getMotionFileName());
+
+	boost::filesystem::path path(motion->getMotionFileName());
+	
+	std::string rootDir = path.parent_path().string();
+
+	std::string fileLocation = BaseWindow::chooseFile("Save To:", "Motion\t*.skm\n", rootDir);
+	motion->saveToSkm(fileLocation);
 }
 
 void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
