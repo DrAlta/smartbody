@@ -629,7 +629,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 				{
 					// check for single phoneme between pauses, such as "_ A _"
 					if (strcmp(curViseme->id(), "_") == 0 &&
-						strcmp((*visemes)[i - 2]->id(), "_"))
+						strcmp((*visemes)[i - 2]->id(), "_") == 0)
 					{
 						diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), prevViseme->id(), diphoneMap);
 						consecutiveUnfoundCurves = 0;
