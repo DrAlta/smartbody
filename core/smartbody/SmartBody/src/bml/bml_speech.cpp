@@ -610,6 +610,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 	VisemeData* nextViseme = NULL;
 	std::vector<float> visemeTimeMarkers;
 	std::vector<VisemeData*> visemeRawData;
+	int consecutiveUnfoundCurves = 0;
 	for ( size_t i = 0; i < (*visemes).size(); i++ )
 	{
 		if (i > 0)
@@ -621,6 +622,21 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		if (prevViseme != NULL)
 		{
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), diphoneMap);
+			if (!diphone)
+			{
+				consecutiveUnfoundCurves++;
+				if (consecutiveUnfoundCurves > 1)
+				{
+					// check for single phoneme between pauses, such as "_ A _"
+					if (strcmp(curViseme->id(), "_") == 0 &&
+						strcmp((*visemes)[i - 2]->id(), "_"))
+					{
+						diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), prevViseme->id(), diphoneMap);
+						consecutiveUnfoundCurves = 0;
+					}
+				}
+			}
+
 			float blendIval = 0.0f;
 
 			float transitionPadding = (float)character->getDoubleAttribute("diphoneTransition");
