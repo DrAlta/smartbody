@@ -73,6 +73,7 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("IY", "Ih");
 	addPhonemeMapping("JH", "Sh");
 	addPhonemeMapping("K", "Kg");
+	addPhonemeMapping("KG", "Kg");
 	addPhonemeMapping("EL", "L");
 	addPhonemeMapping("L", "L");
 	addPhonemeMapping("M", "BMP");
