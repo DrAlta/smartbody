@@ -339,6 +339,72 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 	return span;
 }
 
+void BmlRequest::faceRequestProcess()
+{
+	if (!actor->getBoolAttribute("gestureRequest.coarticulateFace"))
+		return;
+
+	std::vector<VisemeRequest*> visemes;
+	for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i)
+	{
+		BehaviorRequest* behavior = (*i).get();
+		VisemeRequest* viseme = dynamic_cast<VisemeRequest*> (behavior);
+		if (viseme)
+		{
+			visemes.push_back(viseme);
+		}
+	}
+
+	// check to see if facial movements can be connected together
+	// when one command ends at a particular sync point, and another starts from that same sync point.
+
+	std::set<int> markForRemoval;
+	std::string lastVisemeName = "";
+	for (size_t r = 0; r < visemes.size() - 1; r++)
+	{
+		// ignore behaviors that have been removed
+		std::set<int>::iterator iter = markForRemoval.find(r);
+		if (iter != markForRemoval.end())
+			continue;
+		std::string visemeName = visemes[r]->getVisemeName();
+		BML::BehaviorSpan span = visemes[r]->getBehaviorSpan();
+		BML::time_sec start = span.start;
+		BML::time_sec end = span.end;
+		for (size_t s = r + 1; s < visemes.size(); s++)
+		{
+			std::string nextVisemeName = visemes[s]->getVisemeName();
+			BML::BehaviorSpan nextSpan = visemes[s]->getBehaviorSpan();
+			BML::time_sec nextStart = nextSpan.start;
+			BML::time_sec nextEnd = nextSpan.end;
+
+			if (visemeName == nextVisemeName)
+			{
+				if (fabs(end - nextStart) < .001)
+				{
+					// one starts when the other one ends, so coarticulate them together
+					end = nextSpan.end;
+					// remove the second request
+					markForRemoval.insert(s);
+				}
+				else if (fabs(nextEnd - start) < .001)
+				{
+					// one starts when the other one ends, so coarticulate them together
+					start = nextSpan.start;
+					// remove the second request
+					markForRemoval.insert(s);
+				}
+			}
+		}
+	}
+
+	// remove the unneeded action unit
+	for (std::set<int>::iterator iter = markForRemoval.begin(); iter != markForRemoval.end(); iter++)
+	{
+	}
+
+	
+}
+
 
 void BmlRequest::gestureRequestProcess()
 {
@@ -1362,6 +1428,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		
 	}
 
+	faceRequestProcess();
 	gestureRequestProcess();
 	speechRequestProcess();
 

@@ -104,9 +104,10 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("gestureRequest.gestureSpeedThreshold", 1.5, true, "Gestures", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
 	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Gestures", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
 	createBoolAttribute("gestureRequest.experimentalCoarticulation", false, true, "Gestures", 97, false, false, false, "Experimental coarticulation code.");
-	createDoubleAttribute("gestureRequest.transitionTimeMultiplier", 1.0, true, "Gestures", 97, false, false, false, "Experimental coarticulation code; transition time adjustment.");
-	createBoolAttribute("gestureRequest.experimentalTransitions", false, true, "Gestures", 97, false, false, false, "Experimental transition code.");
-
+	createDoubleAttribute("gestureRequest.transitionTimeMultiplier", 1.0, true, "Gestures", 98, false, false, false, "Experimental coarticulation code; transition time adjustment.");
+	createBoolAttribute("gestureRequest.experimentalTransitions", false, true, "Gestures", 99, false, false, false, "Experimental transition code.");
+	createBoolAttribute("gestureRequest.coarticulateFace", false, true, "Gestures", 101, false, false, false, "Coarticulate facial action units via BML.");
+	
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 
 	std::vector<std::string> gesturePolicyVec;
