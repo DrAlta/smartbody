@@ -152,6 +152,8 @@ namespace BML {
 
 		void cleanup( Processor* bp, SmartBody::SBScene* scene );
 
+		void faceRequestProcess();
+
 		// this function handles all the gesture process in between behaviors' schedule and realize
 		void gestureRequestProcess();
 
