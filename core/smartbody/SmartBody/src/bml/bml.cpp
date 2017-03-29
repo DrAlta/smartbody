@@ -339,10 +339,18 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 	return span;
 }
 
+
+const bool ascendingTime(VisemeRequest* a, VisemeRequest* b)
+{
+	return (a->behav_syncs.sync_start()->time() < b->behav_syncs.sync_start()->time());
+}
+
 void BmlRequest::faceRequestProcess()
 {
 	if (!actor->getBoolAttribute("gestureRequest.coarticulateFace"))
 		return;
+
+	double proximity = actor->getDoubleAttribute("gestureRequest.coarticulateFaceProximity");
 
 	std::vector<VisemeRequest*> visemes;
 	for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i)
@@ -355,37 +363,54 @@ void BmlRequest::faceRequestProcess()
 		}
 	}
 
+	// sort the visemes by earliest start time
+	std::sort(visemes.begin(), visemes.end(), ascendingTime);
+
 	// check to see if facial movements can be connected together
 	// when one command ends at a particular sync point, and another starts from that same sync point.
 	std::string lastVisemeName = "";
-	for (size_t r = 0; r < visemes.size() - 1; r++)
+	int numVisemes = visemes.size();
+	for (int r = 0; r < numVisemes - 1; r++)
 	{
 		// ignore behaviors that have been removed
 		if (visemes[r]->ignore)
 			continue;
 		std::string visemeName = visemes[r]->getVisemeName();
 		double start = visemes[r]->behav_syncs.sync_start()->time();
+		double ready = visemes[r]->behav_syncs.sync_ready()->time();
+		double relax = visemes[r]->behav_syncs.sync_relax()->time();
 		double end = visemes[r]->behav_syncs.sync_end()->time();
 
-		for (size_t s = r + 1; s < visemes.size(); s++)
+		for (size_t s = r + 1; s < numVisemes; s++)
 		{
 			std::string nextVisemeName = visemes[s]->getVisemeName();
 			double nextStart = visemes[s]->behav_syncs.sync_start()->time();
+			double nextReady = visemes[s]->behav_syncs.sync_ready()->time();
+			double nextRelax = visemes[s]->behav_syncs.sync_relax()->time();
 			double nextEnd = visemes[s]->behav_syncs.sync_end()->time();
 
 			if (visemeName == nextVisemeName)
 			{
-				if (fabs(end - nextStart) < .001)
+				if (fabs(end - nextStart) < proximity)
 				{
 					// one starts when the other one ends, so coarticulate them together
+					visemes[r]->behav_syncs.sync_relax()->set_time(nextRelax);
 					visemes[r]->behav_syncs.sync_end()->set_time(nextEnd);
+					// update the current viseme
+					relax = nextRelax;
+					end = nextEnd;
+
 					// remove the second request
 					visemes[s]->ignore = true;
 				}
-				else if (fabs(nextEnd - start) < .001)
+				else if (fabs(nextEnd - start) < proximity)
 				{
 					// one starts when the other one ends, so coarticulate them together
 					visemes[r]->behav_syncs.sync_stroke_start()->set_time(nextStart);
+					visemes[r]->behav_syncs.sync_ready()->set_time(nextReady);
+					// update the current viseme
+					start = nextStart;
+					ready = nextReady;
 
 					// remove the second request
 					visemes[s]->ignore = true;
@@ -1434,7 +1459,8 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 		// commented out by Ari Shapiro 8/19/10 to make the output less noisy
 		//SmartBody::util::log("Realizing behavior %s", behavior->unique_id.c_str());
-		behavior->realize( request, scene);
+		if (!behavior->ignore)
+			behavior->realize( request, scene);
 
 #if USE_CUSTOM_PRUNE_POLICY
 		if( behavior->has_cts() ) {
