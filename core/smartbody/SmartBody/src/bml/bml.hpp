@@ -211,6 +211,7 @@ namespace BML {
 		BehaviorSyncPoints		  behav_syncs;
 		BehaviorSchedulerPtr      scheduler;
 		std::string				  group_id;
+		bool					  ignore;
 
 	private:
         time_sec audioOffset;
