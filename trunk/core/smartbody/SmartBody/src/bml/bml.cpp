@@ -357,52 +357,42 @@ void BmlRequest::faceRequestProcess()
 
 	// check to see if facial movements can be connected together
 	// when one command ends at a particular sync point, and another starts from that same sync point.
-
-	std::set<int> markForRemoval;
 	std::string lastVisemeName = "";
 	for (size_t r = 0; r < visemes.size() - 1; r++)
 	{
 		// ignore behaviors that have been removed
-		std::set<int>::iterator iter = markForRemoval.find(r);
-		if (iter != markForRemoval.end())
+		if (visemes[r]->ignore)
 			continue;
 		std::string visemeName = visemes[r]->getVisemeName();
-		BML::BehaviorSpan span = visemes[r]->getBehaviorSpan();
-		BML::time_sec start = span.start;
-		BML::time_sec end = span.end;
+		double start = visemes[r]->behav_syncs.sync_start()->time();
+		double end = visemes[r]->behav_syncs.sync_end()->time();
+
 		for (size_t s = r + 1; s < visemes.size(); s++)
 		{
 			std::string nextVisemeName = visemes[s]->getVisemeName();
-			BML::BehaviorSpan nextSpan = visemes[s]->getBehaviorSpan();
-			BML::time_sec nextStart = nextSpan.start;
-			BML::time_sec nextEnd = nextSpan.end;
+			double nextStart = visemes[s]->behav_syncs.sync_start()->time();
+			double nextEnd = visemes[s]->behav_syncs.sync_end()->time();
 
 			if (visemeName == nextVisemeName)
 			{
 				if (fabs(end - nextStart) < .001)
 				{
 					// one starts when the other one ends, so coarticulate them together
-					end = nextSpan.end;
+					visemes[r]->behav_syncs.sync_end()->set_time(nextEnd);
 					// remove the second request
-					markForRemoval.insert(s);
+					visemes[s]->ignore = true;
 				}
 				else if (fabs(nextEnd - start) < .001)
 				{
 					// one starts when the other one ends, so coarticulate them together
-					start = nextSpan.start;
+					visemes[r]->behav_syncs.sync_stroke_start()->set_time(nextStart);
+
 					// remove the second request
-					markForRemoval.insert(s);
+					visemes[s]->ignore = true;
 				}
 			}
 		}
 	}
-
-	// remove the unneeded action unit
-	for (std::set<int>::iterator iter = markForRemoval.begin(); iter != markForRemoval.end(); iter++)
-	{
-	}
-
-	
 }
 
 
@@ -1228,6 +1218,9 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		time_sec min_time = numeric_limits<time_sec>::max();
 		for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 			BehaviorRequestPtr behavior = *i;
+			if (behavior->ignore == true)
+				continue;
+
 			try {
 				behavior->schedule( now );
 #if VALIDATE_BEHAVIOR_SYNCS
@@ -2001,7 +1994,8 @@ BehaviorRequest::BehaviorRequest( const std::string& unique_id, const std::strin
 	local_id( local ),
 	audioOffset(TIME_UNSET),
 	required(false),
-	group_id("")
+	group_id(""),
+	ignore(false)
 {
 
 	//std::cout << "BEHAVIOR REQUEST " << unique_id << " WITH " << behav_syncs.size() << " SYNC POINTS" << std::endl;
