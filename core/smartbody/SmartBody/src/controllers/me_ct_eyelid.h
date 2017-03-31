@@ -177,6 +177,9 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		void set_use_blink_viseme(bool val);
 		bool get_use_blink_viseme();
 
+		void setBlinkTime(double time);
+		double getBlinkTime();
+
 		void notify(SBSubject* subject);
 
 	private:
@@ -232,6 +235,8 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		float	LL_value;
 		float	UR_value;
 		float	LR_value;
+
+		float blinkTime;
 		
 		bool  use_blink_viseme;
 		
