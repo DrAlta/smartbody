@@ -227,6 +227,7 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	set_use_blink_viseme(false);
 	upper_lid_smooth = 0.9f;
 	lower_lid_smooth = 0.9f;
+	blinkTime = .25;
 
 
 	setDefaultAttributeGroupPriority("Eyelids", 410);
@@ -241,6 +242,7 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	addDefaultAttributeFloat("eyelid.tightWeightUpper", 0.f, "Eyelids");
 	addDefaultAttributeFloat("eyelid.delayUpper", .3f, "Eyelids");
 	addDefaultAttributeFloat("eyelid.closeAngle", 30.0f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.blinkTime", .25f, "Eyelids");
 
 }
 
@@ -289,9 +291,9 @@ void MeCtEyeLidRegulator::init(SmartBody::SBPawn* pawn,  bool tracking_pitch)	{
 	set_close_angle( closeAngle );
 	
 	curve.insert( 0.0, 0.0 );
-	curve.insert( 0.05, 1.0 );
-	curve.insert( 0.2, 0.33 );
-	curve.insert( 0.25, 0.0 );
+	curve.insert(blinkTime * .333f, 1.0);
+	curve.insert(blinkTime * .666f, .33 );
+	curve.insert(blinkTime, 0.0 );
 	
 	bool usePitchTracking = pawn->getBoolAttribute("eyelid.softeyes");
 	pitch_tracking = usePitchTracking;
@@ -623,7 +625,28 @@ void MeCtEyeLidRegulator::notify(SBSubject* subject)
 			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			set_close_angle((float) attr->getValue());
 		}
+		else if (name == "eyelid.blinkTime")
+		{
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			setBlinkTime(attr->getValue());
+
+		}
 	}
+}
+
+void MeCtEyeLidRegulator::setBlinkTime(double time)
+{
+	blinkTime = time;
+	curve.clear();
+	curve.insert(0.0, 0.0);
+	curve.insert(blinkTime / 4.0, 1.0);
+	curve.insert(blinkTime / 2.0f, .5);
+	curve.insert(blinkTime, 0.0);
+}
+
+double MeCtEyeLidRegulator::getBlinkTime()
+{
+	return blinkTime;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
