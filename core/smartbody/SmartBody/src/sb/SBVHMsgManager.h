@@ -23,6 +23,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
+#include <sb/SBUtilities.h>
 #include <string>
 
 namespace vhcl {
@@ -72,7 +73,7 @@ class SBVHMsgManager : public SBService
 		std::string _port;
 		std::string _server;
 		std::string _scope;
-		vhcl::Log::Listener* _logListener;
+		SmartBody::util::Listener* _logListener;
 };
 
 }

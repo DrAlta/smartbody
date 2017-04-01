@@ -44,10 +44,10 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #endif
 
-class VHMsgLogger : public vhcl::Log::Listener
+class VHMsgLogger : public SmartBody::util::Listener
 {
 	public:
-		VHMsgLogger() : vhcl::Log::Listener()
+		VHMsgLogger() : SmartBody::util::Listener()
 		{
 		}
         
@@ -92,7 +92,7 @@ SBVHMsgManager::~SBVHMsgManager()
 
 	if (_logListener)
 	{
-		vhcl::Log::g_log.RemoveListener(_logListener);	
+		SmartBody::util::g_log.RemoveListener(_logListener);
 	}
 	delete _logListener;
 }
@@ -360,7 +360,7 @@ void SBVHMsgManager::setEnableLogging(bool val)
 	if (val)
 	{
 		_logListener = new VHMsgLogger();
-		vhcl::Log::g_log.AddListener(_logListener);
+		SmartBody::util::g_log.AddListener(_logListener);
 	}
 }
 

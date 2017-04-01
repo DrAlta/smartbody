@@ -626,7 +626,8 @@ void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 		}
 		else
 		{
-			if (boost::filesystem::exists(path))
+			if (boost::filesystem::exists(path) ||
+				boost::filesystem::is_directory(path))
 			{
 				// do nothing
 			}
@@ -1844,6 +1845,14 @@ const std::string SBAssetManager::findFileName(const std::string& type, const st
 		{
 			curFilename = path->next_filename( buffer, filename.c_str() );
 		}
+	}
+
+	// check absolute path
+	FILE* file = fopen(filename.c_str(), "r");
+	if (file)
+	{
+		fclose(file);
+		return filename;
 	}
 
 	return "";
