@@ -53,7 +53,7 @@ namespace SmartBody
 	void printlog(const std::string& message)
 	{
 		string s = message;
-		if (vhcl::EndsWith(s, "\n"))
+		if (s[s.size() - 1] == '\n')
 			s.erase(s.length() - 1);
 		if (s.length() > 0)
 			SmartBody::util::log(message.c_str());
