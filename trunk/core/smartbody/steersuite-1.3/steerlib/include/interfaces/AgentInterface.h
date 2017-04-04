@@ -91,6 +91,8 @@ namespace SteerLib {
 		virtual bool overlaps(const Util::Point & p, float radius) = 0;
 		virtual float computePenetration(const Util::Point & p, float radius) = 0;
 		//@}
+
+		virtual void collectObjectsInVisualField() {};
 	};
 
 

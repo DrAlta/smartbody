@@ -1098,6 +1098,12 @@ void SimulationEngine::addObstacle(SteerLib::ObstacleInterface * newObstacle)
 void SimulationEngine::removeObstacle(SteerLib::ObstacleInterface * obstacleToRemove)
 {
 	_obstacles.erase(obstacleToRemove);
+	
+	// update neighborhood of all agents
+	std::vector<SteerLib::AgentInterface*>::iterator agentIterator;
+	for (agentIterator = _agents.begin(); agentIterator != _agents.end(); ++agentIterator) {
+		(*agentIterator)->collectObjectsInVisualField();
+	}
 }
 
 

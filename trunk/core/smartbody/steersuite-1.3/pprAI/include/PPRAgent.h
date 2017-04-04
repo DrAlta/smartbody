@@ -140,6 +140,8 @@ public:
 
 	void setUseCollisionFreeGoals(bool val);
 	bool isUseCollisionFreeGoals();
+	
+	void collectObjectsInVisualField();
 
 protected:
 	//========================
@@ -163,7 +165,6 @@ protected:
 	
 	// helper functions
 	bool updateReactiveFeelers( FeelerInfo & feelers );  // returns false if the 3 front rays don't intersect anything, even if the rside/lside rays do.
-	void collectObjectsInVisualField();
 	bool reachedCurrentGoal();
 	bool reachedCurrentWaypoint();
 	bool reachedLocalTarget();
