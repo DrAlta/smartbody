@@ -417,8 +417,10 @@ SbmPawn::~SbmPawn()
 		{
 			if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)
 			{
-				SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->removeObstacle(steeringSpaceObj_p);
+				// first delete pawn from underlying grid...
 				SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+				// ..., then delete obstacle itself, so that the neighborhood map can be recomputed with the remaining obstacles
+				SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->removeObstacle(steeringSpaceObj_p);
 			}
 		}
 		delete steeringSpaceObj_p;
