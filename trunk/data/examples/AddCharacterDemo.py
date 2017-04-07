@@ -10,6 +10,9 @@ scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
+scene.loadAssetsFromPath("e:/smartbody/trunk/data/mesh/ChrBrad")
+#scene.rescalePartialMeshSkeleton("ChrBrad.dae", "ChrBrad.dae", 'JtNeckA', 0.4, 0.025)
+
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setScale(1.0)

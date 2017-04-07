@@ -11,11 +11,10 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r6676
+AppVersion=r6750
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
-
 
 [Files]
 ; documentation
@@ -41,18 +40,16 @@ Source: ".\core\smartbody\Python27\Lib\site-packages\scipy\*"; DestDir: "{app}\p
 ; supporting libraries - Ogre 1.8.1
 Source: ".\lib\OgreSDK\bin\*"; DestDir: "{app}\OgreSDK\bin";  Excludes: ".svn";  Flags: recursesubdirs
 Source: ".\lib\OgreSDK\Docs\*"; DestDir: "{app}\OgreSDK\Docs"; Excludes: ".svn";  Flags: recursesubdirs
+Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Excludes: ".svn"; Flags: recursesubdirs
+
 Source: ".\lib\OgreSDK\include\*"; DestDir: "{app}\OgreSDK\include"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\OgreSDK\lib\*"; DestDir: "{app}\OgreSDK\lib"; Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Excludes: ".svn"; Flags: recursesubdirs
-
-
-
 
 ; supporting libraries - Irrlicht 1.8.3
 Source: ".\lib\irrlicht-1.8.3\*"; DestDir: "{app}\irrlicht-1.8.3";  Excludes: ".svn";  Flags: recursesubdirs
-Source: ".\core\irrlichtsmartbody\src\*"; DestDir: "{app}\src\irrlichtsmartbody";  Excludes: ".svn";  Flags: recursesubdirs
 Source: ".\core\irrlichtsmartbody\media\*"; DestDir: "{app}\src\irrlichtsmartbody\media";  Excludes: ".svn";  Flags: recursesubdirs
+Source: ".\core\irrlichtsmartbody\src\*"; DestDir: "{app}\src\irrlichtsmartbody";  Excludes: ".svn";  Flags: recursesubdirs
 
 
 Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Release\libprotobuf.pdb"; DestDir: "{app}\lib"
@@ -145,21 +142,31 @@ Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{ap
 ;Source: ".\lib\assimp-3.1.1\Debug\assimpd.lib"; DestDir: "{app}\lib"
 
 
-
 ; data
 
 ; behaviorsets
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source:  ".\data\behaviorsets\BehaviorSetCommon.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\default-behavior-sets.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetFemaleGestures.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetGestures.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetJumping.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetKicking.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetMaleGestures.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetMaleLocomotion.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetMaleMocapLocomotion.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetMocapReaching.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
+Source:  ".\data\behaviorsets\BehaviorSetReaching.py"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; 
 
-
+Source: ".\data\behaviorsets\FemaleGestures\*"; DestDir: "{app}\data\behaviorsets\FemaleGestures";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\Gestures\*"; DestDir: "{app}\data\behaviorsets\Gestures";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\Gestures2\*"; DestDir: "{app}\data\behaviorsets\Gestures2";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\jumping\*"; DestDir: "{app}\data\behaviorsets\jumping";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\kicking\*"; DestDir: "{app}\data\behaviorsets\kicking";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\MaleGestures\*"; DestDir: "{app}\data\behaviorsets\MaleGestures";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\MaleLocomotion\*"; DestDir: "{app}\data\behaviorsets\MaleLocomotion";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\MaleMocapLocomotion\*"; DestDir: "{app}\data\behaviorsets\MaleMocapLocomotion";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\MocapReaching\*"; DestDir: "{app}\data\behaviorsets\MocapReaching";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\reaching\*"; DestDir: "{app}\data\behaviorsets\reaching";  Excludes: ".svn"; Flags: recursesubdirs
 
 Source: ".\data\examples\*"; DestDir: "{app}\data\examples"; Excludes: "Physics, Terrain, .svn";Flags: recursesubdirs
 Source: ".\data\fonts\*"; DestDir: "{app}\data\fonts";  Excludes: ".svn"; Flags: recursesubdirs
@@ -176,6 +183,7 @@ Source: ".\data\Hand\*"; DestDir: "{app}\data\Hand"; Excludes: ".svn"; Flags: re
 Source: ".\data\cegui\datafiles\*"; DestDir: "{app}\data\cegui\datafiles";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\perceptionneuron\*"; DestDir: "{app}\data\perceptionneuron"; Excludes: ".svn, *.bvh";Flags: recursesubdirs
 Source: ".\data\shaders\*"; DestDir: "{app}\data\shaders"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\SmartBody\src\sbm\GPU\shaderFiles\*"; DestDir: "{app}\data\shaders"; Excludes: ".svn"; Flags: recursesubdirs
 
 Source: "e:\smartbody\externalprograms\vs2015\vc_redist.x86.exe"; DestDir: "{app}"
 
