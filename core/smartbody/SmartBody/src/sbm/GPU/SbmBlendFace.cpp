@@ -187,10 +187,13 @@ void SbmBlendFace::addFaceVertices( std::vector<SrVec> vertices )
 }
 
 
-void SbmBlendFace::initShaderProgram_Dan() {
-	
-	const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendFace.vert";
-	const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendFace.frag";
+void SbmBlendFace::initShaderProgram_Dan()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string shaderPath = scene->getMediaPath() + "/shaders/";
+
+	const std::string shaderVs	= shaderPath + "blendFace.vert";
+	const std::string shaderFs	= shaderPath + "blendFace.frag";
 	//const std::string shaderName= "Blend_Face";
 
 	GLint success = 0;
@@ -255,11 +258,13 @@ void SbmBlendFace::initShaderProgram_Dan() {
 
 void SbmBlendFace::initShaderProgram()
 {
-	const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendFace.vert";
-	const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendFace.frag";
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string shaderPath = scene->getMediaPath() + "/shaders/";
+
+	const std::string shaderVs	= shaderPath + "blendFace.vert";
+	const std::string shaderFs	= shaderPath + "blendFace.frag";
 	//const std::string shaderName= "Blend_Face";
 	
-
 	SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 
 	SbmShaderManager::singleton().buildShaders();
@@ -301,11 +306,8 @@ SbmBlendTextures::~SbmBlendTextures()
 
 GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 {
-#if defined(__ANDROID__)
-	std::string shaderPath = "/sdcard/vhdata/shaders/";
-#else
-	std::string shaderPath = "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/";
-#endif
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string shaderPath = scene->getMediaPath() + "/shaders/";
 
 	if(_shaderName.compare("Blend_Two_Textures") == 0)
 	{

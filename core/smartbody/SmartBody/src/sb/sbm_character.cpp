@@ -1233,7 +1233,7 @@ void prune_schedule( SbmCharacter*   actor,
 										double timeBegin = blend_curve.get_head_param();
 										double valueBegin = blend_curve.get_head_value();
 										// motions that haven't been started yet shouldn't be pruned
-										if (timeBegin > time && valueBegin == 0.0)
+										if (timeBegin > time && fabs(valueBegin) < .00001)
 										{ 
 											// skip this track since it hasn't started yet
 											continue;
@@ -1248,7 +1248,7 @@ void prune_schedule( SbmCharacter*   actor,
 										if( t <= time )
 										{
 											flat_blend_curve = true;
-											if( v == 0.0 ) {
+											if( fabs(v) < .00001 ) {
 												in_use = false;
 											}
 										} 
@@ -1257,7 +1257,7 @@ void prune_schedule( SbmCharacter*   actor,
 											//						SmartBody::util::log( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
 
 											v = blend_curve.evaluate( time );
-											if( v == 0.0 )	{
+											if( fabs(v) < .00001)	{
 												t = blend_curve.get_next_nonzero_value( time );
 												if( t < time )	{
 													flat_blend_curve = true;
@@ -1366,12 +1366,26 @@ void prune_schedule( SbmCharacter*   actor,
 										}
 									} else if( anim_ct_type == MeCtSimpleNod::_type_name )
 									{
-										if(    nod_ct
-											|| (    (gaze_key_cts[MeCtGaze::GAZE_KEY_HEAD]!=NULL)
-											&& (gaze_key_cts[MeCtGaze::GAZE_KEY_NECK]!=NULL) ) )
+										if (gaze_key_cts[MeCtGaze::GAZE_KEY_HEAD] != NULL && 
+											gaze_key_cts[MeCtGaze::GAZE_KEY_NECK] != NULL)
 										{
 											in_use = false;
-										} else {
+										}
+										else if (nod_ct)
+										{
+											// only mark animation for pruning if another nod is using the same axis
+											MeCtSimpleNod* curNod = dynamic_cast<MeCtSimpleNod*>(anim_source);
+											if (nod_ct->isNod() && curNod->isNod())
+												in_use = false;
+											else if (nod_ct->isShake() && curNod->isShake())
+												in_use = false;
+											else if (nod_ct->isTilt() && curNod->isTilt())
+												in_use = false;
+											else
+												nod_ct = (MeCtSimpleNod*)anim_source;
+										}
+										else
+										{
 											nod_ct = (MeCtSimpleNod*)anim_source;
 										}
 									} else if( anim_ct_type == MeCtGaze::CONTROLLER_TYPE ) {
@@ -1507,7 +1521,7 @@ void prune_schedule( SbmCharacter*   actor,
 												double timeBegin = blend_curve.get_head_param();
 												double valueBegin = blend_curve.get_head_value();
 												// motions that haven't been started yet shouldn't be pruned
-												if (timeBegin > time && valueBegin == 0.0)
+												if (timeBegin > time && fabs(valueBegin) < .00001)
 												{ 
 													in_use = true;
 												}
@@ -1616,7 +1630,8 @@ void prune_schedule( SbmCharacter*   actor,
 */
 int SbmCharacter::prune_controller_tree( )
 {
-	
+	if (!getBoolAttribute("controllerPruning"))
+		return 0;
 
 	double time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();  // current time
 
