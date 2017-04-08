@@ -1388,12 +1388,21 @@ bool SBScene::run(const std::string& command)
 	try {
 		//SmartBody::util::log("executePython = %s",command);
 
-		PyRun_SimpleString(command.c_str());
+		int ret = PyRun_SimpleString(command.c_str());
 		//SmartBody::util::log("cmd result = %d",result);
+		if (ret == -1)
+		{
+			SBEvent* event = this->getEventManager()->createEvent("error", command, this->getStringFromObject(this));
+			this->getEventManager()->handleEvent(event);
+			PyErr_Print();
+			PyErr_Clear();
+		}
 
 		return true;
 	} catch (...) {
 		PyErr_Print();
+		SBEvent* event = this->getEventManager()->createEvent("error", command, this->getStringFromObject(this));
+		this->getEventManager()->handleEvent(event);
 		return false;
 	}
 #endif
@@ -1431,12 +1440,21 @@ bool SBScene::runScript(const std::string& script)
 
 			std::stringstream strstr;
 			strstr << "execfile(\"" << curFilename << "\")";
-			PyRun_SimpleString(strstr.str().c_str());
+			int ret = PyRun_SimpleString(strstr.str().c_str());
+			if (ret == -1)
+			{
+				SBEvent* event = this->getEventManager()->createEvent("error", script, this->getStringFromObject(this));
+				this->getEventManager()->handleEvent(event);
+				PyErr_Print();
+				PyErr_Clear();
+			}
 			PyErr_Print();
 			PyErr_Clear();
 			return true;
 		} catch (...) {
-			PyErr_Print();
+			PyErr_Print();			
+			SBEvent* event = this->getEventManager()->createEvent("error", script, this->getStringFromObject(this));
+			this->getEventManager()->handleEvent(event);
 			return false;
 		}
 	}
