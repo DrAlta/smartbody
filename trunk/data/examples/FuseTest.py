@@ -42,9 +42,6 @@ scene.setBoolAttribute("internalAudio", True)
 
 skeleton = scene.getSkeleton(modelName + ".dae")
 
-
-#scene.rescalePartialMeshSkeleton(modelName + ".dae", modelName + ".dae", 'mixamorig_Neck', 0.4, 0.025)
-
 scene.run("mixamo-map2.py")
 
 mixamoMap = scene.getJointMapManager().getJointMap("mixamorig")
@@ -99,8 +96,7 @@ c.setBoolAttribute('usePhoneBigram', True)
 c.setStringAttribute('voiceCode', 'CereVoice|Isabella|-|English|(East|Coast|America)')
 c.setStringAttribute('voice', 'remote')
 
-scene.run("runNVBG.py")
-nvbg = c.getNvbg().nvbg
+
 
 # setup gestures
 #scene.run('BehaviorSetGestures.py')
