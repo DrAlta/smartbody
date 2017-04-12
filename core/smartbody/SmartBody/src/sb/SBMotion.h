@@ -143,6 +143,7 @@ class SBMotion : public SkMotion
 		SBAPI void removeMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
 		SBAPI void pertainMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
 		SBAPI void removeMotionChannels(std::vector<std::string> channelNames);
+		SBAPI SBMotion* removeChannels(std::string motionName, bool isTranslation, std::vector<std::string> jointNames);
 
 		SBAPI SBMotion* getOffset(std::string motionName = "", int index = 0);
 		SBAPI SBMotion* getOffsetParent();
