@@ -457,7 +457,7 @@ void SBMotion::bakeFrames(float fps)
 
 				srLinearCurve* curve = (*iter).second;
 				double value = curve->evaluate(curTime);
-				data.push_back(value);
+				data.push_back((float) value);
 			}
 			else if (channelType == SkChannel::Quat)
 			{
@@ -927,18 +927,122 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 	return copyMotion;
 }
 
-
-
-void SBMotion::removeMotionChannels( std::vector<std::string> channelNames )
+void SBMotion::removeMotionChannels(std::vector<std::string> channelNames)
 {
 	_channels.startChannelNameChange();
-	for (unsigned int i=0;i<channelNames.size();i++)
+	for (unsigned int i = 0; i<channelNames.size(); i++)
 	{
 		std::string newChanName = "deletedChan" + channelNames[i];
-		_channels.changeChannelName(channelNames[i],newChanName);
-	}	
+		_channels.changeChannelName(channelNames[i], newChanName);
+	}
 	_channels.rebuild_hash_table();
 }
+
+
+
+SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, std::vector<std::string> jointNames)
+{
+	SBMotion* newMotion = new SBMotion();
+	newMotion->setName(motionName);
+
+	SkChannelArray& ch = channels();
+	int numFrames = frames();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	newMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());
+	std::string filebase = boost::filesystem::basename(this->getFullFilePath());
+
+	newMotion->filename(filebase.c_str());
+
+	std::set<std::string> toRemoveJoints;
+	for (size_t j = 0; j < jointNames.size(); j++)
+	{
+		toRemoveJoints.insert(jointNames[j]);
+	}
+
+	// preserve only the desired channels
+	SkChannelArray ch2;
+	for (int c = 0; c < ch.size(); c++)
+	{
+		SkChannel& channel = ch.get(c);
+		SkJoint* curJoint = channel.joint;
+		SkChannel::Type cType = channel.type;
+		if (isTranslation) // removing translation channels
+		{
+			if (cType == SkChannel::XPos || cType == SkChannel::YPos || cType == SkChannel::ZPos)
+			{
+				std::set<std::string>::iterator iter = toRemoveJoints.find(curJoint->getName());
+				if (iter != toRemoveJoints.end())
+				{
+					continue;
+				}
+			}
+		}
+		else // removing rotation channels
+		{
+			if (cType == SkChannel::Quat)
+			{
+				std::set<std::string>::iterator iter = toRemoveJoints.find(curJoint->getName());
+				if (iter != toRemoveJoints.end())
+				{
+					continue;
+				}
+			}
+		}
+
+		ch2.add(curJoint->getName(), cType);
+	}
+
+	newMotion->init(ch2);
+
+	float* data = new float[ch2.count_floats()];
+	for (size_t f = 0; f < this->_frames.size(); f++)
+	{
+		float* curFrame = this->_frames[f].posture;
+		int curPos = 0;
+		for (int c = 0; c < ch2.size(); c++)
+		{
+			SkChannel& channel = ch2.get(c);
+			SkChannel::Type channelType = ch2.type(c);
+			int channelIndex = _channels.search(ch2.name(c), channelType);
+			int dataIndex = _channels.float_position(channelIndex);
+			if (channelType == SkChannel::XPos || channelType == SkChannel::YPos || channelType == SkChannel::ZPos)
+			{
+				data[curPos] = curFrame[dataIndex];
+			}
+			else if (channelType == SkChannel::Quat)
+			{
+				for (int p = 0; p < 4; p++)
+				{
+					data[curPos + p] = curFrame[dataIndex + p];
+				}
+			}
+			else
+			{
+				int num = channel.size();
+				for (int p = 0; p < num; p++)
+				{
+					data[curPos + p] = curFrame[dataIndex + p];
+				}
+			}
+			curPos += channel.size();
+		}
+		float keytime = this->_frames[f].keytime;
+		newMotion->insert_frame(f, keytime);
+	}
+	newMotion->setSyncPoint("start", this->getTimeStart());
+	newMotion->setSyncPoint("ready", this->getTimeReady());
+	newMotion->setSyncPoint("stroke_start", this->getTimeStrokeStart());
+	newMotion->setSyncPoint("stroke", this->getTimeStroke());
+	newMotion->setSyncPoint("stroke_stop", this->getTimeStrokeEnd());
+	newMotion->setSyncPoint("relax", this->getTimeRelax());
+	newMotion->setSyncPoint("stop", this->getTimeStop());
+
+	delete data;
+
+	return newMotion;
+}
+
+
 
 void SBMotion::pertainMotionChannelsByEndJoints( std::string skelName, std::vector<std::string>& endJoints )
 {
