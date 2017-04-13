@@ -970,7 +970,7 @@ SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, s
 		{
 			if (cType == SkChannel::XPos || cType == SkChannel::YPos || cType == SkChannel::ZPos)
 			{
-				std::set<std::string>::iterator iter = toRemoveJoints.find(curJoint->getName());
+				std::set<std::string>::iterator iter = toRemoveJoints.find(ch.name(c));
 				if (iter != toRemoveJoints.end())
 				{
 					continue;
@@ -981,7 +981,7 @@ SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, s
 		{
 			if (cType == SkChannel::Quat)
 			{
-				std::set<std::string>::iterator iter = toRemoveJoints.find(curJoint->getName());
+				std::set<std::string>::iterator iter = toRemoveJoints.find(ch.name(c));
 				if (iter != toRemoveJoints.end())
 				{
 					continue;
@@ -989,7 +989,7 @@ SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, s
 			}
 		}
 
-		ch2.add(curJoint->getName(), cType);
+		ch2.add(ch.name(c), cType);
 	}
 
 	newMotion->init(ch2);
@@ -1028,6 +1028,8 @@ SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, s
 		}
 		float keytime = this->_frames[f].keytime;
 		newMotion->insert_frame(f, keytime);
+		float* fp = newMotion->posture(f);
+		memcpy(fp, data, sizeof(float)*newMotion->posture_size());
 	}
 	newMotion->setSyncPoint("start", this->getTimeStart());
 	newMotion->setSyncPoint("ready", this->getTimeReady());
