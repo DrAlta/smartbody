@@ -1007,6 +1007,8 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
 	// load all array of floats with corresponding channel names and sample rates
+	SkChannelArray& skChannels = skeleton.channels();
+
 	while (curNode)
 	//for (unsigned int i = 0; i < list->getLength(); i++)
 	{
@@ -1022,7 +1024,6 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 		std::string node1Name = node1->name();
 		if (node1Name == "animation")
 		{
-			SkChannelArray& skChannels = skeleton.channels();
 			SmartBody::SBMotion* motion = new SmartBody::SBMotion();
 			
 			rapidxml::xml_attribute<>* idNode = node1->first_attribute("id");
@@ -1035,9 +1036,6 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 			motions.push_back(motion);
 			motion->init(skChannels);
 			SkChannelArray& motionChannels = motion->channels();
-
-
-
 
 			std::set<int> quatIDSet;
 			std::vector<int> quatIDList;
@@ -1063,7 +1061,14 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 			{
 				ColladChannelFast& colChannel = *mi;
 				SkJoint* joint = skeleton.search_joint(colChannel.targetJointName.c_str());
-				if (!joint) continue; // joint does not exist in the skeleton
+				if (!joint)
+				{
+					SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(&skeleton);
+					SmartBody::SBJoint* j = sbskel->createJoint(colChannel.targetJointName, NULL);
+					joint = j;
+					
+					motion->insert_channel(motionChannels.size(), colChannel.sourceName.c_str(), SkChannel::XPos, NULL);
+				}
 				if (samplerMap.find(colChannel.sourceName) == samplerMap.end()) continue; // sampler does not exist
 				ColladaSamplerFast& sampler = samplerMap[colChannel.sourceName];
 				if (floatArrayMap.find(sampler.inputName) == floatArrayMap.end() || floatArrayMap.find(sampler.outputName) == floatArrayMap.end())
@@ -1276,8 +1281,6 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 					}
 				}
 			}
-
-
 
 			double duration = double(motion->duration());
 			motion->synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0 / 3.0, duration);
@@ -2953,7 +2956,9 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 			SkJoint* joint = skeleton.search_joint(jname.c_str());
 			if (joint) jname = joint->jointName();
 			colChannel.targetJointName = jname;
-			colChannel.targetType = tokens[1];					
+			colChannel.targetType = "translateX";
+			if (tokens.size() > 1)
+				colChannel.targetType = tokens[1];					
 		}
 		else if (node2Name == "animation") // for some reasons this kind of recursion does happen in some OpenCollada files
 		{
