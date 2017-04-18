@@ -123,10 +123,12 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createBoolAttribute("emotion_automatic", 0, false, "Basic", 71, false, false, false, "");
 	*/
 
-	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.3, true, "Behaviors", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
+	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.3, true, "Behaviors", 97, false, false, false, "Delay all bml schedules by a fixed amount.");
 	bmlDelayAttr->setMin(0.0);
-	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Behaviors", 99, false, false, false, "Delay visemes by a fixed amount.");
+	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Behaviors", 98, false, false, false, "Delay visemes by a fixed amount.");
 	visemeDelayAttr->setMin(0.0);
+	createBoolAttribute("controllerPruning", true, true, "Behaviors", 99, false, false, false, "Disables controller pruning.");
+
 	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("phoneBigramAnimation", true, true, "Lip Sync", 101, false, false, false, "Use phone bigram animation as opposed to diphone animation");
 	createDoubleAttribute("diphoneTransition", 0.1, true, "Lip Sync", 102, false, false, false, "transition overlap between diphone");
