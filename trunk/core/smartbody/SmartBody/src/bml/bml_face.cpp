@@ -62,12 +62,18 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 		std::string visemeNameString;
 		if( !visemeSide.empty() && !stringICompare(visemeSide,"BOTH") )	{
 			int sideSignal = 0;
-			if( stringICompare(visemeSide, xml_translate_string( BMLDefs::DIR_LEFT )) ) sideSignal = 1;
-			if( stringICompare(visemeSide,xml_translate_string( BMLDefs::DIR_RIGHT )) ) sideSignal = 1;			
+			if (stringICompare(visemeSide, xml_translate_string(BMLDefs::DIR_LEFT)))
+			{
+				sideSignal = 1;
+				visemeNameString = "au_" + auString + "_left";
+			}
+			if (stringICompare(visemeSide, xml_translate_string(BMLDefs::DIR_RIGHT)))
+			{
+				sideSignal = 1;
+				visemeNameString = "au_" + auString + "_right";
+			}
 
-			if( sideSignal )
-				visemeNameString = "au_" + auString + "_" + visemeSide;
-			else
+			if (!sideSignal )
 			{
 				SmartBody::util::log( "WARNING: BML::parse_bml_face(): Please check the side specification input" );
 				return BehaviorRequestPtr();
