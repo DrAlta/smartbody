@@ -8,7 +8,7 @@ import datetime
 from UserList import UserList
 from UserDict import UserDict
 
-from test.test_support import run_unittest, check_py3k_warnings
+from test.test_support import run_unittest, check_py3k_warnings, have_unicode
 
 with check_py3k_warnings(
         ("tuple parameter unpacking has been removed", SyntaxWarning),
@@ -17,7 +17,10 @@ with check_py3k_warnings(
     from test import inspect_fodder2 as mod2
 
 # C module for test_findsource_binary
-import unicodedata
+try:
+    import unicodedata
+except ImportError:
+    unicodedata = None
 
 # Functions tested in this suite:
 # ismodule, isclass, ismethod, isfunction, istraceback, isframe, iscode,
@@ -220,8 +223,23 @@ class TestRetrievingSourceCode(GetSourceBase):
                          [('FesteringGob', mod.FesteringGob),
                           ('MalodorousPervert', mod.MalodorousPervert),
                           ('ParrotDroppings', mod.ParrotDroppings),
-                          ('StupidGit', mod.StupidGit)])
-        tree = inspect.getclasstree([cls[1] for cls in classes], 1)
+                          ('StupidGit', mod.StupidGit),
+                          ('Tit', mod.MalodorousPervert),
+                         ])
+        tree = inspect.getclasstree([cls[1] for cls in classes])
+        self.assertEqual(tree,
+                         [(mod.ParrotDroppings, ()),
+                          [(mod.FesteringGob, (mod.MalodorousPervert,
+                                                  mod.ParrotDroppings))
+                           ],
+                          (mod.StupidGit, ()),
+                          [(mod.MalodorousPervert, (mod.StupidGit,)),
+                           [(mod.FesteringGob, (mod.MalodorousPervert,
+                                                   mod.ParrotDroppings))
+                            ]
+                           ]
+                          ])
+        tree = inspect.getclasstree([cls[1] for cls in classes], True)
         self.assertEqual(tree,
                          [(mod.ParrotDroppings, ()),
                           (mod.StupidGit, ()),
@@ -403,6 +421,12 @@ class TestBuggyCases(GetSourceBase):
         linecache.cache[co.co_filename] = (1, None, lines, co.co_filename)
         self.assertEqual(inspect.findsource(co), (lines,0))
         self.assertEqual(inspect.getsource(co), lines[0])
+
+    def test_findsource_without_filename(self):
+        for fname in ['', '<string>']:
+            co = compile('x=1', fname, "exec")
+            self.assertRaises(IOError, inspect.findsource, co)
+            self.assertRaises(IOError, inspect.getsource, co)
 
 
 class _BrokenDataDescriptor(object):
@@ -777,7 +801,8 @@ class TestGetcallargsFunctions(unittest.TestCase):
             self.assertEqualException(f, '2, c=3')
             self.assertEqualException(f, '2, 3, c=4')
             self.assertEqualException(f, '2, c=4, b=3')
-            self.assertEqualException(f, '**{u"\u03c0\u03b9": 4}')
+            if have_unicode:
+                self.assertEqualException(f, '**{u"\u03c0\u03b9": 4}')
             # f got multiple values for keyword argument
             self.assertEqualException(f, '1, a=2')
             self.assertEqualException(f, '1, **{"a":2}')
