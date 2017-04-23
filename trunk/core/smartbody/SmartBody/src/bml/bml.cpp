@@ -381,7 +381,7 @@ void BmlRequest::faceRequestProcess()
 		double relax = visemes[r]->behav_syncs.sync_relax()->time();
 		double end = visemes[r]->behav_syncs.sync_end()->time();
 
-		for (size_t s = r + 1; s < numVisemes; s++)
+		for (int s = r + 1; s < numVisemes; s++)
 		{
 			std::string nextVisemeName = visemes[s]->getVisemeName();
 			double nextStart = visemes[s]->behav_syncs.sync_start()->time();

@@ -1,4 +1,4 @@
-#-*- coding: ISO-8859-1 -*-
+#-*- coding: iso-8859-1 -*-
 # pysqlite2/test/regression.py: pysqlite regression tests
 #
 # Copyright (C) 2006-2007 Gerhard Häring <gh@ghaering.de>
@@ -73,7 +73,7 @@ class RegressionTests(unittest.TestCase):
     def CheckStatementFinalizationOnCloseDb(self):
         # pysqlite versions <= 2.3.3 only finalized statements in the statement
         # cache when closing the database. statements that were still
-        # referenced in cursors weren't closed an could provoke "
+        # referenced in cursors weren't closed and could provoke "
         # "OperationalError: Unable to close due to unfinalised statements".
         con = sqlite.connect(":memory:")
         cursors = []
@@ -118,7 +118,7 @@ class RegressionTests(unittest.TestCase):
 
     def CheckUnicodeConnect(self):
         """
-        With pysqlite 2.4.0 you needed to use a string or a APSW connection
+        With pysqlite 2.4.0 you needed to use a string or an APSW connection
         object for opening database connections.
 
         Formerly, both bytestrings and unicode strings used to work.
@@ -159,7 +159,8 @@ class RegressionTests(unittest.TestCase):
 
     def CheckCursorConstructorCallCheck(self):
         """
-        Verifies that cursor methods check wether base class __init__ was called.
+        Verifies that cursor methods check whether base class __init__ was
+        called.
         """
         class Cursor(sqlite.Cursor):
             def __init__(self, con):
@@ -177,7 +178,8 @@ class RegressionTests(unittest.TestCase):
 
     def CheckConnectionConstructorCallCheck(self):
         """
-        Verifies that connection methods check wether base class __init__ was called.
+        Verifies that connection methods check whether base class __init__ was
+        called.
         """
         class Connection(sqlite.Connection):
             def __init__(self, name):
@@ -284,6 +286,77 @@ class RegressionTests(unittest.TestCase):
         with self.assertRaises(sqlite.ProgrammingError):
             cur.executemany("insert into b (baz) values (?)",
                             ((i,) for i in foo()))
+
+    def CheckConvertTimestampMicrosecondPadding(self):
+        """
+        http://bugs.python.org/issue14720
+
+        The microsecond parsing of convert_timestamp() should pad with zeros,
+        since the microsecond string "456" actually represents "456000".
+        """
+
+        con = sqlite.connect(":memory:", detect_types=sqlite.PARSE_DECLTYPES)
+        cur = con.cursor()
+        cur.execute("CREATE TABLE t (x TIMESTAMP)")
+
+        # Microseconds should be 456000
+        cur.execute("INSERT INTO t (x) VALUES ('2012-04-04 15:06:00.456')")
+
+        # Microseconds should be truncated to 123456
+        cur.execute("INSERT INTO t (x) VALUES ('2012-04-04 15:06:00.123456789')")
+
+        cur.execute("SELECT * FROM t")
+        values = [x[0] for x in cur.fetchall()]
+
+        self.assertEqual(values, [
+            datetime.datetime(2012, 4, 4, 15, 6, 0, 456000),
+            datetime.datetime(2012, 4, 4, 15, 6, 0, 123456),
+        ])
+
+    def CheckInvalidIsolationLevelType(self):
+        # isolation level is a string, not an integer
+        self.assertRaises(TypeError,
+                          sqlite.connect, ":memory:", isolation_level=123)
+
+
+    def CheckNullCharacter(self):
+        # Issue #21147
+        con = sqlite.connect(":memory:")
+        self.assertRaises(ValueError, con, "\0select 1")
+        self.assertRaises(ValueError, con, "select 1\0")
+        cur = con.cursor()
+        self.assertRaises(ValueError, cur.execute, " \0select 2")
+        self.assertRaises(ValueError, cur.execute, "select 2\0")
+
+    def CheckCommitCursorReset(self):
+        """
+        Connection.commit() did reset cursors, which made sqlite3
+        to return rows multiple times when fetched from cursors
+        after commit. See issues 10513 and 23129 for details.
+        """
+        con = sqlite.connect(":memory:")
+        con.executescript("""
+        create table t(c);
+        create table t2(c);
+        insert into t values(0);
+        insert into t values(1);
+        insert into t values(2);
+        """)
+
+        self.assertEqual(con.isolation_level, "")
+
+        counter = 0
+        for i, row in enumerate(con.execute("select c from t")):
+            con.execute("insert into t2(c) values (?)", (i,))
+            con.commit()
+            if counter == 0:
+                self.assertEqual(row[0], 0)
+            elif counter == 1:
+                self.assertEqual(row[0], 1)
+            elif counter == 2:
+                self.assertEqual(row[0], 2)
+            counter += 1
+        self.assertEqual(counter, 3, "should have returned exactly three rows")
 
 
 def suite():

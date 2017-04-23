@@ -8,6 +8,7 @@ import sys
 import os
 import codecs
 import operator
+import re
 import StringIO
 import tempfile
 import shutil
@@ -49,9 +50,9 @@ class TestRefactoringTool(unittest.TestCase):
 
     def test_print_function_option(self):
         rt = self.rt({"print_function" : True})
-        self.assertTrue(rt.grammar is pygram.python_grammar_no_print_statement)
-        self.assertTrue(rt.driver.grammar is
-                        pygram.python_grammar_no_print_statement)
+        self.assertIs(rt.grammar, pygram.python_grammar_no_print_statement)
+        self.assertIs(rt.driver.grammar,
+                      pygram.python_grammar_no_print_statement)
 
     def test_write_unchanged_files_option(self):
         rt = self.rt()
@@ -226,8 +227,8 @@ from __future__ import print_function"""
                                     actually_write=False)
         # Testing that it logged this message when write=False was passed is
         # sufficient to see that it did not bail early after "No changes".
-        message_regex = r"Not writing changes to .*%s%s" % (
-                os.sep, os.path.basename(test_file))
+        message_regex = r"Not writing changes to .*%s" % \
+                re.escape(os.sep + os.path.basename(test_file))
         for message in debug_messages:
             if "Not writing changes" in message:
                 self.assertRegexpMatches(message, message_regex)
@@ -270,6 +271,10 @@ from __future__ import print_function"""
     def test_file_encoding(self):
         fn = os.path.join(TEST_DATA_DIR, "different_encoding.py")
         self.check_file_refactoring(fn)
+
+    def test_false_file_encoding(self):
+        fn = os.path.join(TEST_DATA_DIR, "false_encoding.py")
+        data = self.check_file_refactoring(fn)
 
     def test_bom(self):
         fn = os.path.join(TEST_DATA_DIR, "bom.py")

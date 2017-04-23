@@ -17,6 +17,8 @@ from distutils.dir_util import mkpath
 from distutils.dep_util import newer_group
 from distutils.util import split_quoted, execute
 from distutils import log
+# following import is for backward compatibility
+from distutils.sysconfig import customize_compiler
 
 class CCompiler:
     """Abstract base class to define the interface that must be implemented
@@ -716,7 +718,7 @@ class CCompiler:
         raise NotImplementedError
 
     def library_option(self, lib):
-        """Return the compiler option to add 'dir' to the list of libraries
+        """Return the compiler option to add 'lib' to the list of libraries
         linked into the shared library or executable.
         """
         raise NotImplementedError
@@ -840,8 +842,9 @@ main (int argc, char **argv) {
     def library_filename(self, libname, lib_type='static',     # or 'shared'
                          strip_dir=0, output_dir=''):
         assert output_dir is not None
-        if lib_type not in ("static", "shared", "dylib"):
-            raise ValueError, "'lib_type' must be \"static\", \"shared\" or \"dylib\""
+        if lib_type not in ("static", "shared", "dylib", "xcode_stub"):
+            raise ValueError, ("""'lib_type' must be "static", "shared", """
+                               """"dylib", or "xcode_stub".""")
         fmt = getattr(self, lib_type + "_lib_format")
         ext = getattr(self, lib_type + "_lib_extension")
 
