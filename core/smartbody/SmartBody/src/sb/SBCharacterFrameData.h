@@ -26,6 +26,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {
 #endif 
 
+#include <cstddef>
+
 
 // This struct is used by SBCharacter::GetFrameDataMarshalFriendly() and SBM_GetCharacter().
 // It is useful for when you want a character's entire skeleton data for the current frame in one call.
