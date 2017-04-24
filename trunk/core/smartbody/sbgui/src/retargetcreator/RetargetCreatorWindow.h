@@ -4,6 +4,7 @@
 #define RetargetCreatorWindow_h
 
 #include <vector>
+#include <string>
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
