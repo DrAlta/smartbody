@@ -3319,20 +3319,20 @@ SrMat SBMotion::getChannelMatFrame(const std::string& channelName, int f)
 	if (idx < 0)
 	{
 		SmartBody::util::log("Motion %s does not have channel %s.", this->getName().c_str(), channelName.c_str());
-		return SrVec();
+		return SrMat();
 	}
 	int floatIdx = _channels.float_position(idx);
 	if (floatIdx < 0)
 	{
 		SmartBody::util::log("Motion %s can't locate float position for channel %s.", this->getName().c_str(), channelName.c_str());
-		return SrVec();
+		return SrMat();
 	}
 
 	if (f < 0 ||
 		f >= this->getNumFrames())
 	{
 		SmartBody::util::log("Motion %s only has %d frames.", this->getName().c_str(), this->getNumFrames());
-		return SrVec();
+		return SrMat();
 	}
 
 	SrQuat rot = getChannelQuatFrame(channelName, f);

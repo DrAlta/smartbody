@@ -1,6 +1,7 @@
 #include "SBUtilities.h"
 #include <algorithm>
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
 
 // from: http://oopweb.com/CPP/Documents/CPPHOWTO/Volume/C++Programming-HOWTO-7.html
 void SmartBody::util::tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)

@@ -181,7 +181,7 @@ float SteerSuiteEngineDriver::collisionPenetration( SrVec pos, float radius, Ste
 		// this way, collisionKey will be unique across all objects in the spatial database.
 		//unsigned int collisionKey = reinterpret_cast<unsigned int>((*neighbor));
 		SpatialDatabaseItemPtr item = (*neighbor);
-		intptr_t collisionKey = reinterpret_cast<intptr_t>(item);
+		int* collisionKey = reinterpret_cast<int*>(item);
 		float penetration = 0.0f;
 		penetration = (*neighbor)->computePenetration(steerPt, radius);
 		if (penetration > maxPenetration)

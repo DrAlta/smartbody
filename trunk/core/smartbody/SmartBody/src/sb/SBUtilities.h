@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <stdarg.h>
 
 namespace SmartBody {
 
