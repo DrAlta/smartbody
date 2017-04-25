@@ -633,8 +633,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBDebuggerUtility.cpp
         ./src/sb/SBFaceShiftManager.cpp
         ./src/sb/SBRealtimeManager.cpp
-		./src/sb/SBRigNode.cpp
-		./src/sb/SBUtilities.cpp
+	./src/sb/SBRigNode.cpp
+	./src/sb/SBUtilities.cpp
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
