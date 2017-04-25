@@ -48,7 +48,11 @@ SBMotionFrameBuffer::SBMotionFrameBuffer()
 
 SBMotionFrameBuffer::~SBMotionFrameBuffer()
 {
-
+	motionFrameBuffer.size(0);
+	channelIdxMap.clear();
+	quatChannelNames.clear();
+	posChannelNames.clear();
+	
 }
 
 void SBMotionFrameBuffer::initFrameBuffer( SkChannelArray& channelArray, std::vector<std::string>& affectedChannelList )

@@ -1401,6 +1401,7 @@ bool SBScene::run(const std::string& command)
 		return true;
 	} catch (...) {
 		PyErr_Print();
+		PyErr_Clear();
 		SBEvent* event = this->getEventManager()->createEvent("error", command, this->getStringFromObject(this));
 		this->getEventManager()->handleEvent(event);
 		return false;
@@ -1453,6 +1454,7 @@ bool SBScene::runScript(const std::string& script)
 			return true;
 		} catch (...) {
 			PyErr_Print();			
+			PyErr_Clear();
 			SBEvent* event = this->getEventManager()->createEvent("error", script, this->getStringFromObject(this));
 			this->getEventManager()->handleEvent(event);
 			return false;
