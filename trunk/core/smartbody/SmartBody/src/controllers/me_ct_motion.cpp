@@ -335,6 +335,23 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			SrQuat rShlderQuat(rightSholderRot);
 			retarget->addJointRotOffset("l_shoulder",lShlderQuat);
 			retarget->addJointRotOffset("r_shoulder",rShlderQuat);
+
+		/*	std::vector<std::string> jointNames;
+			jointNames.push_back("r_hip");
+			jointNames.push_back("r_knee");
+			jointNames.push_back("r_ankle");
+			jointNames.push_back("l_hip");
+			jointNames.push_back("l_knee");
+			jointNames.push_back("l_ankle");
+
+			for (size_t j = 0; j < jointNames.size(); j++)
+			{
+				SrVec rot = _character->getVec3Attribute("retargetOffset." + jointNames[j]);
+				SrQuat quat(rot);
+				retarget->addJointRotOffset(jointNames[j], quat);
+			}
+		*/
+
 		}
 	}
 
@@ -356,17 +373,17 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//				&_mChan_to_buff,
 	//	            _play_mode, &_last_apply_frame );	
 	//SmartBody::util::log("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
-	float motionTime = float(curMotionTime + _offset);
+	float adjMotionTime = float(curMotionTime + _offset);
 	// check for prestroke or poststroke hold motion
 	if (_prestrokeHoldDuration > .001)
 	{
 		double prestrokeHoldPeriodStart = _prestrokeHoldTime;
 		double prestrokeHoldPeriodEnd = _prestrokeHoldTime + _prestrokeHoldDuration;
 
-		if (motionTime > prestrokeHoldPeriodStart &&
-			motionTime <= prestrokeHoldPeriodEnd)
+		if (adjMotionTime > prestrokeHoldPeriodStart &&
+			adjMotionTime <= prestrokeHoldPeriodEnd)
 		{
-			motionTime = prestrokeHoldPeriodEnd;
+			adjMotionTime = prestrokeHoldPeriodEnd;
 		}
 	}
 
@@ -377,31 +394,18 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		double holdPeriodStart = _holdTime;
 		double holdPeriodEnd = _holdTime + _holdDuration;
 		 
-		if (motionTime > holdPeriodStart &&
-			motionTime <= holdPeriodEnd)
+		if (adjMotionTime > holdPeriodStart &&
+			adjMotionTime <= holdPeriodEnd)
 		{
-			motionTime = _holdTime;
-			
+			adjMotionTime = _holdTime;
 		}
-		else if (motionTime > holdPeriodEnd)
+		else if (adjMotionTime > holdPeriodEnd)
 		{
-			motionTime = _holdTime;// motionTime - _holdDuration;
-		}
-	}
-
-	if (_prestrokeHoldDuration > .001)
-	{
-		double prestrokeHoldPeriodStart = _prestrokeHoldTime;
-		double prestrokeHoldPeriodEnd = _prestrokeHoldTime + _prestrokeHoldDuration;
-
-		if (motionTime > prestrokeHoldPeriodStart &&
-			motionTime <= prestrokeHoldPeriodEnd)
-		{
-			motionTime = _prestrokeHoldTime;
+			adjMotionTime = _holdTime;// adjMotionTime - _holdDuration;
 		}
 	}
 
-	_motion->apply( motionTime,
+	_motion->apply(adjMotionTime,
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, _isAdditive, retarget );
@@ -444,7 +448,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 				continue;			
 
 			SrVec trajOffset;
-			bool hasTraj = sbMotion->getTrajPosition(jointConsNames[i],motionTime,trajOffset);
+			bool hasTraj = sbMotion->getTrajPosition(jointConsNames[i], adjMotionTime,trajOffset);
 			if (!hasTraj)
 			{	
 				trajRecord->isEnable = false;
