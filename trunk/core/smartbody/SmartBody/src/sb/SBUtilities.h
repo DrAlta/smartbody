@@ -99,6 +99,7 @@ namespace SmartBody {
 			SBAPI void Log(const char * message, ...);
 
 			SBAPI void vLog(const char * message, va_list argPtr);
+			SBAPI void vLogSimple(const char * message);
 		};
 
 
@@ -106,6 +107,7 @@ namespace SmartBody {
 		SBAPI extern Logger g_log;
 
 		SBAPI void log(const char * message, ...);
+		SBAPI void logSimple(const char * message);
 	}
 
 };
