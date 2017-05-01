@@ -22,9 +22,10 @@ extern "C"
     void SBInitialize();
     void SBInitGraphics(ESContext* esContext);
 	void SBInitScene(const char* initScriptName);
-    void SBSetupDrawing(int w, int h);
+    void SBSetupDrawing(int w, int h, ESContext* esContext);
 
     void SBDrawFrame_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
+    void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
     void SBDrawCharacters_ES20(ESContext *esContext);
 	void SBDrawBackground(ESContext* esContext);
     void SBDrawPawns(ESContext *esContext);

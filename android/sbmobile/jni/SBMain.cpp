@@ -32,7 +32,7 @@
 #include <string>
 #include <sys/time.h>
 #include "SBWrapper.h"
-
+#include "SBMobile.h"
 #include "esUtil.h"
 
 ESContext esContext;
@@ -58,6 +58,7 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_step(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env, jobject obj);	
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
 
@@ -67,8 +68,9 @@ extern "C" {
 	JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLog(JNIEnv * env, jobject obj);
     JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName);
 	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getBoolAttribute(JNIEnv * env, jobject obj, jstring attrName);
-	JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getDoubleAttribute(JNIEnv * env, jobject obj, jstring attrName);   
-    };
+	JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getDoubleAttribute(JNIEnv * env, jobject obj, jstring attrName);  
+	JNIEXPORT jint JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNIEnv * env, jobject obj, jstring attrName); 
+};
 
 JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName)
 {
@@ -94,7 +96,7 @@ JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getDoubleAttribu
     return (jdouble) val;
 }
 
-JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNIEnv * env, jobject obj, jstring attrName)
+JNIEXPORT jint JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNIEnv * env, jobject obj, jstring attrName)
 {
 	const char* attrNameStr = (env)->GetStringUTFChars( attrName , NULL ) ;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -117,7 +119,9 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEn
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height)
 {	
-	SBSetupDrawing(width,height);
+	esContext.width = width;
+	esContext.height = height;
+	SBSetupDrawing(width,height, &esContext);
 	curW = width;
 	curH = height;
 }
@@ -129,22 +133,24 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setup(JNIEnv * env,
 	const char* mediaPathStr = (env)->GetStringUTFChars( mediaPath , NULL ) ;
 	//SBSetup("/sdcard/vhdata/","setup.py");
 	SBSetup(mediaPathStr,"setup.py");
+	if (!SBMobile::jvm)
+	{
+		int hasJVM = env->GetJavaVM(&SBMobile::jvm);
+	}
+	esInitContext(&esContext);	
+	SBInitialize(); // initialize smartbody with media path
+	initSBMobilePythonModule(); // initialize Python APIs for SBMobile to enable video/audio playback through JNI
+	sbInit = true;
 }
 
 
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_init(JNIEnv * env, jobject obj)
-{	
-	esInitContext(&esContext);	
-	if (sbInit) // don't need to setup twice
-		return;
-
-	SBInitialize(); // initialize smartbody with media path
+{		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->addAssetPath("script", "scripts");
 	SBInitScene("init.py");		
-	vhcl::Log::g_log.AddListener(&androidListener);	
-	sbInit = true;
+	vhcl::Log::g_log.AddListener(&androidListener);		
 	LOG("Initializing Done");
 }
 
@@ -159,6 +165,19 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env
 	SrMat id;
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	SBDrawFrame_ES20(curW, curH, &esContext, id);
+}
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height)
+{	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if(!scene)
+		return;
+	if (!sbInit)
+		return;
+	SrMat id;
+	SBDrawFBOTex_ES20(width, height, &esContext, id);
+	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
+	//SBDrawFrame_ES20(curW, curH, &esContext, id);
 }
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr)

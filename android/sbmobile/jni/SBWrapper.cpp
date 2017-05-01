@@ -297,7 +297,7 @@ void setupLights()
 	#endif
 }
 
-void SBSetupDrawing(int w, int h)
+void SBSetupDrawing(int w, int h, ESContext *esContext)
 {   
 	glViewport(0, 0, w, h);
 	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -312,7 +312,8 @@ void SBSetup(const char* mediapath, const char* setupScript)
 	XMLPlatformUtils::Initialize();
 	LOG("media path%s", mediapath);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	initPython("../../Python26/Libs");
+	std::string mpath = mediapath;
+	initPython(mpath + "pythonLib_27/Lib");
 	scene->setMediaPath(mediapath);
 	scene->addAssetPath("script", ".");
 	scene->runScript(setupScript);
@@ -334,6 +335,9 @@ void SBInitGraphics(ESContext *esContext) {
 	//LOG("Before shaderInit");
 	shaderInit(esContext);
 	//LOG("After shaderInit");
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
+	scene->createIntAttribute("renderer.fboTexID",- 1, true,"",40,false,false,false,"texture id attached with the current fbo. For fast video recording.");
+	scene->setIntAttribute("renderer.fboTexID", esContext->fboTexID);
 }
 
 
@@ -363,10 +367,15 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	texm.updateTexture();
 
+
+	bool useRenderTarget = true;
+	if (useRenderTarget)
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
 	// clear background
 	//glClearColor( 0.0f,0.0f,0.0f,1.0f );
-	glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
+	//glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
+	glClearColor(0.33f, 0.78f, 0.95f, 1.f);
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -404,7 +413,27 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//draw lights
 	//LOG("After SBDrawCharacters_ES20");
 	drawLights(esContext);
+	if (useRenderTarget)
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		/*
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		drawBackgroundTexID(esContext->fboTexID, esContext);		
+		*/
+		SBDrawFBOTex_ES20(width, height, esContext, eyeView);
+	}
 	//LOG("After drawLights");
+}
+
+void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
+{
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glViewport( 0, 0, w, h);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	drawBackgroundTexID(esContext->fboTexID, esContext);
 }
 
 void SBDrawCharacters_ES20(ESContext *esContext) {
@@ -708,8 +737,10 @@ void SBUpdate(float t)
 			LOG("ttu_poll ERROR\n" );
 		}
 	}
-    sim->update();
-    scene->update();
+    //sim->update();
+    bool update_sim = scene->getSimulationManager()->updateTimer();
+    if (update_sim)
+    	scene->update();
 }
     
 void SBExecuteCmd(const char* command)

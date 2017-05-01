@@ -256,7 +256,8 @@ extern "C"
 				"   vec3 normal = normalize((uMVMatrix * vec4(aNormal, c_zero)).xyz);  \n"
 				"   vec3 nlightDir = normalize((uMVMatrix * uLights[i].position).xyz);\n"
 				"   float ndotl = max(dot(normal, nlightDir), c_zero);					\n"
-				"   computedColor += (ndotl * uLights[i].diffuse * uMtrl.diffuse);	\n"
+				"   //computedColor += (ndotl * uLights[i].diffuse * uMtrl.diffuse);	\n"
+				"   computedColor += ndotl;	\n"
 				"   return computedColor;											\n"
 				"}																    \n"
 				"void main()						\n"
@@ -270,7 +271,7 @@ extern "C"
 				"	for(int i = 0; i < numOfLights; i++){						    \n"
 				"		shadeColor += calculateDirectionalShading(i);				\n"
 				"	}																\n"
-				"	vComputedLightColor = shadeColor;						\n"
+				"	vComputedLightColor = vec4(shadeColor.rgb, 1.0);						\n"
 				"}																    \n"
 
 ;
@@ -315,10 +316,10 @@ extern "C"
 		"{																	\n"
 		"  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
 		"  vec4 lightColor = vec4(1.0,1.0,1.0,1.0);							\n"
-		"  if (blendTextureWithLight==1)									\n"
-		"		lightColor = vComputedLightColor;										\n"
+		"  //if (blendTextureWithLight==1)									\n"
+		"  lightColor = vComputedLightColor;										\n"
 		"  if (texColor.a < 0.2) discard;                                   \n"
-		"  gl_FragColor  = texColor * lightColor;							\n"
+		"  gl_FragColor  = lightColor;//texColor * lightColor;							\n"
 		"  //gl_FragColor  =  vec4(1.0,0,0,1.0);                   			\n"
 		"  //gl_FragColor  =  texColor;                   			\n"
 		"}																	\n"
@@ -352,7 +353,7 @@ extern "C"
                     "   vec3 pos = vec3(aPosition.xyz)* 1.0;						\n"
                     "	vec4 skinPos = vec4(pos.xyz,1.0);		                        \n"
                     "	gl_Position = uMVPMatrix * skinPos;								\n"
-                    "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,0.0)));          \n"
+                    "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
                     "   mat3 tangentMat;                                                \n"
                     "   tangentMat[0] = (uMVMatrix * vec4(aTangent,0.0)).xyz;            \n"
                     "   tangentMat[2] = (uMVMatrix * vec4(aNormal,0.0)).xyz;           \n"
@@ -374,6 +375,7 @@ extern "C"
                     "struct material {								\n"
                     "	vec4	ambient;							\n"
                     "	vec4    diffuse;							\n"
+                    "	float   shininess;							\n"
                     "};												\n"
                     "struct lightSource {							\n"
                     "	mediump vec4	position;							\n"
@@ -387,29 +389,33 @@ extern "C"
                     "uniform   lightSource uLights[numOfLights];    \n"
                     "uniform   material	uMtrl;						\n"
                     ""
-                    "vec4 calculateLighting(vec4 lightDiffuse, vec4 specularColor, vec3 normal, vec3 vlightDir, vec3 vHalfVec) {							\n"
+                    "vec4 calculateLighting(vec4 lightDiffuse, vec4 specularColor, vec3 normal, vec3 vlightDir, vec3 vHalfVec, vec3 tcolor) {							\n"
                     "	vec4 computedColor = vec4(0.0, 0.0, 0.0, 0.0);		\n"
                     "   float ndotl = max(dot(normal, vlightDir), 0.0);					\n"
-                    "   computedColor += (ndotl * lightDiffuse * uMtrl.diffuse);	\n"
-                    "   float specularIntensity = pow (max (dot (vHalfVec, normal), 0.0), 4.0);\n"
+                    //"   computedColor += (lightDiffuse.xyz * uMtrl.diffuse.xyz * tcolor * ndotl);	\n"
+                    "   computedColor += (lightDiffuse.xyz * tcolor * ndotl);	\n"
+                    "   float specularIntensity = pow (max (dot (normalize(vHalfVec), normal), 0.0), uMtrl.shininess + 1.0);\n"
                     "   computedColor += (specularIntensity * specularColor);        \n"
                     //"   computedColor += (specularIntensity * vec4(1.0,1.0,1.0,1.0));        \n"
+                    //"   computedColor += ndotl;        \n"
                     "   return computedColor;											\n"
                     "}																    \n"
                     "void main()														\n"
                     "{																	\n"
                     "  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
 					"  //if (texColor.a < 0.8) discard;                                   \n"
+					"  if (texColor.a < 0.2) discard;                                   \n"
                     "  vec3 normal = 2.0 * texture2D(normalTexture, vTexCoord.st).rgb - 1.0;\n"
                     "  vec4 specularColor = texture2D( specularTexture, vTexCoord );				\n"
                     "  normal = normalize (normal);                                  \n"
                     "  vec4 vComputedLightColor = vec4(0.0,0.0,0.0,0.0);             \n"
                     "  for (int i=0;i<numOfLights; i++)                              \n"
                     "  {                                                             \n"
-                    "       vComputedLightColor += calculateLighting(uLights[i].diffuse, specularColor, normal, lightDir[i], halfVec[i]); \n"
+                    "       vComputedLightColor += calculateLighting(uLights[i].diffuse, specularColor, normal, lightDir[i], halfVec[i], texColor.xyz); \n"
                     "  }                                                             \n"
                     "  vComputedLightColor.a = 1.0;                                  \n"
-                    "  gl_FragColor  = texColor * vComputedLightColor;				 \n"
+                    //"  gl_FragColor  = texColor * vComputedLightColor;				 \n"
+                    "  gl_FragColor  = vComputedLightColor;				 \n"
                     "  //gl_FragColor  =  vec4(normal,1.0);                   			     \n"
                     "}																	\n"
 
@@ -607,9 +613,8 @@ extern "C"
 			userData->programObject = esLoadProgram(vShaderLimitedStr, fShaderStr);
 #else
         maxVUniforms = 2048; // fake the maxVUniform for non-GPU skinning
-		userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
-        //userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
-
+		//userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
+        userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
 #endif
 		
 		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
@@ -645,8 +650,10 @@ extern "C"
 			//material
 			userData->mtrlAmbientLoc = glGetUniformLocation(userData->programObject, "uMtrl.ambient");
 			userData->mtrlDiffuseLoc = glGetUniformLocation(userData->programObject, "uMtrl.diffuse");
+			userData->mtrlShininessLoc = glGetUniformLocation(userData->programObject, "uMtrl.shininess");
 			glUniform4f(userData->mtrlAmbientLoc, 0.2, 0.2, 0.2, 1.0);
 			glUniform4f(userData->mtrlDiffuseLoc, 0.8, 0.8, 0.8, 1.0);
+			glUniform1f(userData->mtrlShininessLoc, 4.0);
 			
 		}
 #if GPU_SKINNING
@@ -663,6 +670,28 @@ extern "C"
 		glGenBuffers(1, &userData->subMeshTriObject);
 		glGenBuffers(1, &userData->boneWeightObject);
 		glGenBuffers(1, &userData->boneIdObject);
+
+
+		// setup render target
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
+   		std::string fboName = "renderFBO";
+   		std::string fboTexName = "fboTex";
+      
+      	SbmTexture* fboTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, fboTexName.c_str());
+		fboTex->createEmptyTexture(esContext->width, esContext->height, 4, GL_FLOAT);
+		fboTex->buildTexture(false, true);
+   		esContext->fboID  = texManager.createFBO(fboName.c_str());   
+   		esContext->fboTexID = fboTex->getID();
+
+   		glGenRenderbuffers(1, &esContext->fboDepthBuf);
+   		glBindRenderbuffer(GL_RENDERBUFFER, esContext->fboDepthBuf);
+   		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, esContext->width, esContext->height);
+
+
+   		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
+   		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, esContext->fboDepthBuf);
+   		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex->getID(), 0);
+   		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 
 		//sphere part
@@ -844,13 +873,18 @@ extern "C"
 			return; // no background image
 		}
 
+		drawBackgroundTexID(tex->getID(), esContext);
+	}
+
+	void SHADER_API drawBackgroundTexID(GLuint backgroundTexID, ESContext *esContext)
+	{
 		BackgroundData *backData = (BackgroundData*)esContext->backgroundData;
 		glUseProgram ( backData->programObject );
 		
 		glm::mat4 projMat = glm::ortho<float>(-1,1,-1,1);
 		
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex->getID());
+		glBindTexture(GL_TEXTURE_2D, backgroundTexID);
 		glUniform1i (backData->samplerLoc, 0);
 		float z_max = -(1.f - 0.0001f);//gwiz::epsilon8());
 		SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
@@ -968,6 +1002,7 @@ extern "C"
 				texturesType = shape->getCharacter()->getStringAttribute("texturesType");	
 			//printf("textureType = %s", texturesType.c_str());
 
+			
 			if( texturesType == "static" || texturesType == "dynamic")
 			{
 				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
@@ -1115,6 +1150,12 @@ extern "C"
 			if (shape->getCharacter())
 				texturesType = shape->getCharacter()->getStringAttribute("texturesType");
 			//printf("textureType = %s", texturesType.c_str());
+
+			float color[4];
+			float shininess = subMesh->material.shininess;
+			subMesh->material.diffuse.get(color);	
+			glUniform4f(userData->mtrlDiffuseLoc, color[0], color[1], color[2], 1.0);
+			glUniform1f(userData->mtrlShininessLoc, shininess);
 
 			if( texturesType == "static" || texturesType == "dynamic")
 			{

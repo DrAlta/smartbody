@@ -44,6 +44,7 @@ public class SBMobileLib {
      public static native String getLog();
      public static native void step();
      public static native void render();
+    public static native void renderFBOTex(int width, int height);
      public static native void renderCardboard(float eyeView[]);
      public static native void reloadTexture();
      public static native void surfaceChanged(int width, int height);
