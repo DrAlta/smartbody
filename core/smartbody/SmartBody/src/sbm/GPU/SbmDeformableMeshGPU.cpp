@@ -252,13 +252,6 @@ std::string shaderVS_Weight4 =
 	mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1);\n\
 	vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
 	gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
-	//vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(pos.xyz,1.0);\n\
-	//gl_Position = gl_ModelViewProjectionMatrix*vec4(pos.xyz,1.0);\n\
-	//dist[0] = 0.0;\n\
-	//vec3 posDir = vec3(gl_LightSource[1].position);// - gl_ModelViewMatrix * vec4(skin[0].xyz,1.0));\n\
-	//dist[1] = 0.0;//length(posDir);\n\
-	//lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
-	//halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
 	for (int i=0;i<numLights;i++)\n\
 	{\n\
 	vec3 posDir = vec3(gl_LightSource[i].position);\n\
@@ -268,17 +261,9 @@ std::string shaderVS_Weight4 =
 	}\n\
 	int colorIdx = int(gl_Vertex.w); \n\
 	gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-	//if (updateNormal == 1 )\n\
-	//{\n\
-	//normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
-	//tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
-	//bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
-	//}\n\
-	//else {\n\
 	normal = normalize(gl_NormalMatrix * gl_Normal.xyz);\n\
 	tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
 	bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
-	//}\n\
 	}\n";
 
 std::string shaderBasicFS =
@@ -324,9 +309,9 @@ void main (void)\n\
 	float NdotL,NdotHV;\n\
 	float att;\n\
 	vec4 color = vec4(ambient,1.0);	\n\
-	vec3 newtv = normalize(tv - bv*dot(tv,bv));\n\
-	vec3 newbv = normalize(bv);\n\
-	vec3 newn  = normalize(normal);//normalize(cross(tv,bv));\n\
+	vec3 newtv = tv;//normalize(tv - bv*dot(tv,bv));\n\
+	vec3 newbv = bv;//normalize(bv);\n\
+	vec3 newn  = normal;//normalize(normal);//normalize(cross(tv,bv));\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
 	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
@@ -361,11 +346,12 @@ void main (void)\n\
 			//color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
 			color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
 			//color += vec4(texColor.xyz*NdotL,0);\n\
+			//color += NdotL;\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, 10),0);\n\
-			color += vec4(specMat.rgb*pow(NdotHV, (shineness+1.0)*glossy),0);\n\
-			//color += vec4(specMat.rgb*pow(NdotHV, 20.0),0);\n\
+			//color += vec4(specMat.rgb*pow(NdotHV, (shineness+1.0)*glossy),0);\n\
+			color += vec4(specMat.rgb*pow(NdotHV, (shineness+1.0)),0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
