@@ -2483,6 +2483,7 @@ void DeformableMeshInstance::blendShapes()
 				SmartBody::SBSkeleton* sbSkel	= _character->getSkeleton();
 				if (sbSkel && mappedCName != "")
 				{
+					//SmartBody::util::log("blendShape, mappedCName = %s", mappedCName.c_str());
 					SmartBody::SBJoint* joint = sbSkel->getJointByName(mappedCName);
 					if (joint)
 					{
@@ -2496,17 +2497,25 @@ void DeformableMeshInstance::blendShapes()
 						// multiplier
 						w = w * wLimit;
 					}
+					else
+					{
+						//SmartBody::util::log("mappedCName = %s, can't find joint...", mappedCName.c_str());
+					}
 				}
+				//SmartBody::util::log("character has channel = '%s', mappedCName = '%s'", ss.str().c_str(), mappedCName.c_str());
 			}
 			else
+			{
+				//SmartBody::util::log("Error, character doesn't have channel = %s", ss.str().c_str());
 				continue;
+			}
 
 			// Stores weights of each face
 			weights[i]		= w;
 
 
 			//std::cerr << "weights[" << i << "]: " << w << "\n";
-
+			//SmartBody::util::log("weights[%s] = %f", (const char*)targets[i]->shape().name, w);
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
 				//SmartBody::util::log("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
@@ -3053,12 +3062,13 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 		SrModel& baseModel = writeToBaseModel->shape();
 
 		std::vector<SrVec>& newPosBuf = (_mesh->isSkinnedMesh()) ? _restPosBuf : _deformPosBuf;
+		std::vector<SrVec>& origPosBuf = _mesh->posBuf;
 		for (unsigned int i = 0; i < baseModel.V.size(); i++)
 		{
 			int iVtx = vtxBaseIdx + i;
 			SrVec& basePos = baseModel.V[i];
 			newPosBuf[iVtx] = basePos;
-
+			SrVec& origPos = origPosBuf[iVtx];
 			if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
 			{
 				std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
@@ -3069,6 +3079,8 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 					newPosBuf[idx] = basePos;	// Here copies blended vertices position
 				}
 			}			
+			//if (origPos[0] != basePos[0] || origPos[1] != basePos[1] || origPos[2] != basePos[2])
+			//	SmartBody::util::log("iVtx = %d, orig Pos = %s, new Pos = %s", iVtx, origPosBuf[iVtx].toString().c_str(), basePos.toString().c_str());
 			if (mergeBoundary && vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
 			{
 			 	std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];

@@ -688,7 +688,7 @@ void SBScene::update()
 				cmd = seq->pop( (float) getSimulationManager()->getTime() );
 				if (cmd != "")			
 				{
-					//SmartBody::util::log("execute command = %s",cmd);
+					//SmartBody::util::log("execute command = %s",cmd.c_str());
 					this->getProfiler()->mark("commands", 1, cmd.c_str() );
 					int err = getCommandManager()->execute( (char*)  cmd.c_str() );
 					if( err != CMD_SUCCESS )

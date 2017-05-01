@@ -902,8 +902,8 @@ boost::python::class_<SBObserver>("SBObserver")
 
 }
 
-//#ifdef __ANDROID__
-#if 0
+#ifdef __ANDROID__
+//#if 0
 extern "C" {
 	extern void initpyexpat(void);
 	extern void init_functools(void);
@@ -922,43 +922,43 @@ extern "C" {
 	extern void init_sha512(void);
 	extern void initselect(void);
 	extern void initfcntl(void);
-        extern void init_struct(void);
-	extern void init_ctypes_test(void);
+    extern void init_struct(void);
+	//extern void init_ctypes_test(void);
 	extern void init_weakref(void);
 	extern void initarray(void);
 	extern void initstrop(void);
-	extern void initfuture_builtins(void);
+	//extern void initfuture_builtins(void);
 	extern void init_random(void);
 	extern void init_bisect(void);
-	extern void init_heapq(void);
-	extern void init_fileio(void);
+	//extern void init_heapq(void);
+	//extern void init_fileio(void);
 	extern void init_bytesio(void);
 	extern void init_functools(void);
-	extern void init_json(void);
-	extern void init_testcapi(void);
-	extern void init_hotshot(void);
-	extern void init_lsprof(void);
-	extern void initunicodedata(void);
-	extern void init_locale(void);
+	//extern void init_json(void);
+	//extern void init_testcapi(void);
+	//extern void init_hotshot(void);
+	//extern void init_lsprof(void);
+	//extern void initunicodedata(void);
+	//extern void init_locale(void);
 	extern void initparser(void);
-	extern void initmmap(void);
-	extern void initsys(void);
-	extern void initaudioop(void);
-	extern void initimageop(void);
-	extern void init_csv(void);
-	extern void inittermios(void);
-	extern void initresource(void);
+	//extern void initmmap(void);
+	//extern void initsyslog(void);
+	//extern void initaudioop(void);
+	//extern void initimageop(void);
+	//extern void init_csv(void);
+	//extern void inittermios(void);
+	//extern void initresource(void);
 	extern void initbinascii(void);
-	extern void init_multibytecodec(void);
-	extern void init_codecs_kr(void);
-	extern void init_codecs_jp(void);
-	extern void init_codecs_cn(void);
-	extern void init_codecs_tw(void);
-	extern void init_codecs_hk(void);
-	extern void init_codecs_iso2022(void);
-	extern void init_multiprocessing(void);
+	//extern void init_multibytecodec(void);
+	//extern void init_codecs_kr(void);
+	//extern void init_codecs_jp(void);
+	//extern void init_codecs_cn(void);
+	//extern void init_codecs_tw(void);
+	//extern void init_codecs_hk(void);
+	//extern void init_codecs_iso2022(void);
+	//extern void init_multiprocessing(void);
 	extern void init_elementtree(void);
-	extern void init_ctypes(void);
+	//extern void init_ctypes(void);
 	extern void init_hashlib(void);
 }
 #endif
@@ -1000,8 +1000,8 @@ void initPython(std::string pythonLibPath)
 #endif
 #endif	
 	//SmartBody::util::log("After SetProgramName");
-//#ifdef __ANDROID__
-#if 0
+#ifdef __ANDROID__
+//#if 0
 	appendPythonModule("pyexpat", initpyexpat);
 	appendPythonModule("_functools", init_functools);
 	appendPythonModule("itertools", inititertools);
@@ -1021,42 +1021,42 @@ void initPython(std::string pythonLibPath)
 	appendPythonModule("select", initselect);
 	appendPythonModule("fcntl", initfcntl);
 	appendPythonModule("_struct", init_struct);
-	appendPythonModule("_ctypes_test", init_ctypes_test);
+	//appendPythonModule("_ctypes_test", init_ctypes_test);
 	appendPythonModule("_weakref", init_weakref);
 	appendPythonModule("array", initarray);
 	appendPythonModule("strop", initstrop);
-	appendPythonModule("future_builtins", initfuture_builtins);
+	//appendPythonModule("future_builtins", initfuture_builtins);
 	appendPythonModule("_random", init_random);
 	appendPythonModule("_bisect", init_bisect);
-	appendPythonModule("_heapq", init_heapq);
-	appendPythonModule("_fileio", init_fileio);
+	//appendPythonModule("_heapq", init_heapq);
+	//appendPythonModule("_fileio", init_fileio);
 	appendPythonModule("_functools", init_functools);
-	appendPythonModule("_json", init_json);
+	//appendPythonModule("_json", init_json);
 
-	appendPythonModule("_testcapi", init_testcapi);
-	appendPythonModule("_hotshot", init_hotshot);
-	appendPythonModule("_lsprof", init_lsprof);
-	appendPythonModule("_locale", init_locale);
-	appendPythonModule("_csv", init_csv);
-	appendPythonModule("unicodedata", initunicodedata);
+	//appendPythonModule("_testcapi", init_testcapi);
+	//appendPythonModule("_hotshot", init_hotshot);
+	//appendPythonModule("_lsprof", init_lsprof);
+	//appendPythonModule("_locale", init_locale);
+	//appendPythonModule("_csv", init_csv);
+	//appendPythonModule("unicodedata", initunicodedata);
 	appendPythonModule("parser", initparser);
-	appendPythonModule("mmap", initmmap);
-	appendPythonModule("syslog", initsyslog);
-	appendPythonModule("audioop", initaudioop);
-	appendPythonModule("imageop", initimageop);
-	appendPythonModule("termios", inittermios);
-	appendPythonModule("resource", initresource);
+	//appendPythonModule("mmap", initmmap);
+	//appendPythonModule("syslog", initsyslog);
+	//appendPythonModule("audioop", initaudioop);
+	//appendPythonModule("imageop", initimageop);
+	//appendPythonModule("termios", inittermios);
+	//appendPythonModule("resource", initresource);
 	appendPythonModule("binascii", initbinascii);	
-	appendPythonModule("_multibytecodec", init_multibytecodec);	
-	appendPythonModule("_codecs_kr", init_codecs_kr);
-	appendPythonModule("_codecs_jp", init_codecs_jp);
-	appendPythonModule("_codecs_cn", init_codecs_cn);
-	appendPythonModule("_codecs_tw", init_codecs_tw);
-	appendPythonModule("_codecs_hk", init_codecs_hk);
-	appendPythonModule("_codecs_iso2022", init_codecs_iso2022);
-	appendPythonModule("_multiprocessing", init_multiprocessing);
+	//appendPythonModule("_multibytecodec", init_multibytecodec);	
+	//appendPythonModule("_codecs_kr", init_codecs_kr);
+	//appendPythonModule("_codecs_jp", init_codecs_jp);
+	//appendPythonModule("_codecs_cn", init_codecs_cn);
+	//appendPythonModule("_codecs_tw", init_codecs_tw);
+	//appendPythonModule("_codecs_hk", init_codecs_hk);
+	//appendPythonModule("_codecs_iso2022", init_codecs_iso2022);
+	//appendPythonModule("_multiprocessing", init_multiprocessing);
 	appendPythonModule("_elementtree", init_elementtree);
-	appendPythonModule("_ctypes", init_ctypes);
+	//appendPythonModule("_ctypes", init_ctypes);
 	//appendPythonModule("_hashlib", init_hashlib);
 #endif
 	//SmartBody::util::log("After appendPythonModule");
@@ -1124,7 +1124,7 @@ void setupPython()
 {
 #ifndef SB_NO_PYTHON
 	try {
-	#ifdef PYLOG
+#ifdef PYLOG
 #ifdef __ANDROID__
 		const char* pyfilename = "/sdcard/sbmmedia/pylog.txt";
 #else

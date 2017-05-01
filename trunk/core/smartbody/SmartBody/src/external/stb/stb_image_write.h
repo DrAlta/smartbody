@@ -13,7 +13,7 @@
 ABOUT:
 
    This header file is a library for writing images to C stdio. It could be
-   adapted to write to memory or a general streaming interface; let me know.
+   adapted to write to memory or a general streaming interface; let me know.flip
 
    The PNG output is not optimal; it is 20-50% larger than the file
    written by a decent optimizing implementation. This library is designed

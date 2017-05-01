@@ -262,6 +262,7 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 	int jointSize = _joints.size();
 	if ( jointSize > 0 && jointMapSize != jointSize)
 	{
+		//SmartBody::util::log("joint size = %d, joint map size = %d", jointSize, jointMapSize);
 		updateJointMap();
 	}
 
@@ -497,25 +498,35 @@ void SkSkeleton::clearJointValues()
 
 void SkSkeleton::updateJointMap()
 {
+	//SmartBody::util::log("Update Joint Map : %s, jointMap size = %d", getJointMapName().c_str(), _jointMap.size());
 	_jointMap.clear();
-	int jointSize = _joints.size();
+	//SmartBody::util::log("After cleanup jointMap");
+	int jointSize = _joints.size();	
 	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(getJointMapName());	
 	for (int i = 0; i < jointSize; i++)
 	{
 		std::string jname = _joints[i]->jointName();
 		_joints[i]->updateMappedJointName();
 		if (jointMap)
-		{
+		{			
 			const std::string& mappedName = jointMap->getMapTarget(jname);	
+
+			//SmartBody::util::log("Has JointMap, origName = %s, mappedName = %s", jname.c_str(), mappedName.c_str());
+
 			if (mappedName != "")
 				jname = mappedName;
+			//SmartBody::util::log("After mapped name, jname = %s", jname.c_str());
 		}
+		//SmartBody::util::log("Before search jname = %s", jname.c_str());
 		std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(jname);
+		//SmartBody::util::log("After search jname = %s", jname.c_str());
 		//if (iter != _jointMap.end())
 		//	SmartBody::util::log("Found duplicate joint name %s", jname.c_str());
+		//SmartBody::util::log("Insert joint name %s, _joint[%d] = %s", jname.c_str(), i, _joints[i]->getName().c_str());
 		_jointMap.insert(std::pair<std::string, SkJoint*>(jname, _joints[i]));
 
 	}
+	//nSmartBody::util::log("Done update Joint Map : %s", getJointMapName().c_str());
 }
 SrVec SkSkeleton::getFacingDirection()
 {

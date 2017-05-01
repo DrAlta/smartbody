@@ -55,7 +55,7 @@ namespace SmartBody {
 		};
 
 
-#ifdef ANDROID_BUILD
+#ifdef __ANDROID__
 		class AndroidListener : public Listener
 		{
 		public:
