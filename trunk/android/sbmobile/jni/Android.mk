@@ -41,7 +41,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
 #LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -DUSE_CEREVOICE
-LOCAL_SRC_FILES :=  SBMain.cpp Shader.cpp esUtil.c AppListener.cpp SBWrapper.cpp
+LOCAL_SRC_FILES :=  SBMain.cpp Shader.cpp esUtil.c AppListener.cpp SBWrapper.cpp SBMobile.cpp
 LOCAL_LDLIBS    := -landroid -llog -lGLESv3
 LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt openal alut tremolo sndfile $(CEREVOICE_LIBS) 
 LOCAL_SHARED_LIBRARIES := python-prebuilt-share 

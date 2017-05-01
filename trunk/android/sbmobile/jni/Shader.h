@@ -19,6 +19,7 @@ extern "C"
 	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight);
 	void SHADER_API drawMeshStatic(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight);
 	void SHADER_API drawBackground(std::string backgroundName, ESContext *esContext);
+	void SHADER_API drawBackgroundTexID(GLuint backgroundTexID, ESContext *esContext);
 
 	void SHADER_API drawSphere(ESContext *esContext, SrVec pos, float r, int p, SrVec color);
 	void SHADER_API drawBox(ESContext *esContext, SrVec pos, SrVec extent, SrVec color);

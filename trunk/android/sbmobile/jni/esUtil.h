@@ -71,6 +71,11 @@ typedef struct _escontext
    void*	   shapeData;
    void*       backgroundData;
 
+   // fbo data
+   GLuint fboTexID;
+   GLuint fboID;
+   GLuint fboDepthBuf;
+
    /// Window width
    GLint       width;
 
@@ -145,6 +150,7 @@ typedef struct
    //material
    GLint mtrlAmbientLoc;
    GLint mtrlDiffuseLoc;
+   GLint mtrlShininessLoc;
 
    //VBOs
    GLuint meshPosObject;
@@ -154,6 +160,8 @@ typedef struct
    GLuint subMeshTriObject;
    GLuint boneWeightObject;
    GLuint boneIdObject;
+
+   
 } UserData;
 
 
