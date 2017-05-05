@@ -469,16 +469,28 @@ void BmlRequest::gestureRequestProcess()
 				if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
 				{
 					// remove the lower priority gesture
-					if (gestures[i]->priority >= gestures[j]->priority)
+					if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 					{
-						gestures[j]->filtered = true;
-						continue;
+						int which = rand() % 2;
+						if (which == 0)
+							gestures[j]->filtered = true;
+						else
+							gestures[i]->filtered = true;
 					}
 					else
 					{
-						gestures[i]->filtered = true;
-						break;
+						if (gestures[i]->priority >= gestures[j]->priority)
+						{
+							gestures[j]->filtered = true;
+							continue;
+						}
+						else
+						{
+							gestures[i]->filtered = true;
+							break;
+						}
 					}
+
 				}
 			}
 		}
@@ -1031,18 +1043,41 @@ void BmlRequest::gestureRequestProcess()
 			{
 				SmartBody::util::log("gestureRequestProcess: filter reason -> blending time too short");
 			}
-			if (gestures[i]->priority > gestures[j]->priority)
+
+			if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 			{
-				gestures[j]->filtered = true;
-				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
+				int which = rand() % 2;
+				if (which == 0)
+				{
+					gestures[j]->filtered = true;
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
+				}
+				else
+				{
+					gestures[i]->filtered = true;
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
+				}
 			}
 			else
 			{
-				gestures[i]->filtered = true;
-				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-					SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
+				if (gestures[i]->priority > gestures[j]->priority)
+				{
+					gestures[j]->filtered = true;
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
+				}
+				else
+				{
+					gestures[i]->filtered = true;
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
+				}
 			}
+
+
+
 		}
 	}
 
