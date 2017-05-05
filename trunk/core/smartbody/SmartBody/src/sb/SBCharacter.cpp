@@ -107,7 +107,8 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("gestureRequest.transitionTimeMultiplier", 1.0, true, "Gestures", 98, false, false, false, "Experimental coarticulation code; transition time adjustment.");
 	createBoolAttribute("gestureRequest.experimentalTransitions", false, true, "Gestures", 99, false, false, false, "Experimental transition code.");
 	createBoolAttribute("gestureRequest.coarticulateFace", false, true, "Gestures", 101, false, false, false, "Coarticulate facial action units via BML.");
-	createDoubleAttribute("gestureRequest.coarticulateFaceProximity", .5, true, "Gestures", 101, false, false, false, "Coarticulate facial action units via BML when within this time of each other.");
+	createDoubleAttribute("gestureRequest.coarticulateFaceProximity", .5, true, "Gestures", 102, false, false, false, "Coarticulate facial action units via BML when within this time of each other.");
+	createBoolAttribute("gestureRequest.coarticulateRandomPriority", false, true, "Gestures", 103, false, false, false, "Randomize gesture priority.");
 
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 
