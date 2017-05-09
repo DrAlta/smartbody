@@ -371,9 +371,17 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 }
 
 void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, SmartBody::SBScene* scene,
-                                         size_t& behavior_ordinal, bool required ) {
+                                         size_t& behavior_ordinal, bool required )
+{
+	if (request->actor->getBoolAttribute("gestureRequest.useLastRandomGesture"))
+	{
+		// copy the last set of random choices to be queried
+		request->actor->setStringAttribute("gestureRequest.curGestureRandom", request->actor->getStringAttribute("gestureRequest.lastGestureRandom"));
+	}
+	request->actor->setStringAttribute("gestureRequest.lastGestureRandom", "");
+	request->actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", 0);
 
-	
+
 	// look for BML behavior command tags
 	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {

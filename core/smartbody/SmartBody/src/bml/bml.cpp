@@ -423,6 +423,17 @@ void BmlRequest::faceRequestProcess()
 
 void BmlRequest::gestureRequestProcess()
 {
+	bool useLastGestureChoices = actor->getBoolAttribute("gestureRequest.useLastRandomGesture");
+	std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
+
+	std::vector<int> lastChoices;
+	std::vector<std::string> tokens;
+	SmartBody::util::tokenize(str, tokens, "|");
+	for (size_t t = 0; t < tokens.size(); t++)
+	{
+		lastChoices.push_back(atoi(tokens[t].c_str()));
+	}
+	
 	if (actor->getBoolAttribute("gestureRequest.experimentalCoarticulation"))
 	{
 		std::vector<GestureRequest*> gestures;
@@ -471,7 +482,32 @@ void BmlRequest::gestureRequestProcess()
 					// remove the lower priority gesture
 					if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 					{
-						int which = rand() % 2;
+						int which = 0;
+						if (useLastGestureChoices)
+						{
+							int lastChoiceIndex = actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
+							if (int(lastChoices.size()) > lastChoiceIndex)
+							{
+								which = lastChoices[lastChoiceIndex];
+								lastChoiceIndex++;
+								actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex);
+							}
+							else
+							{
+								which = 0;
+							}
+							
+						}
+						else
+						{
+							which = rand() % 2;
+						}
+						std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
+						if (str != "")
+							str += "|";
+						str += std::to_string(which);
+						actor->setStringAttribute("gestureRequest.lastGestureRandom", str);
+						
 						if (which == 0)
 							gestures[j]->filtered = true;
 						else
@@ -517,7 +553,7 @@ void BmlRequest::gestureRequestProcess()
 				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke_end()->time();
 				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
 				double nextFullStrokeTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
-
+				
 				if (nextFullStrokeTime <= 0.0) // bad metadata information, can't coarticuate gesture
 					continue;
 
@@ -757,7 +793,7 @@ void BmlRequest::gestureRequestProcess()
 		return;
 	}
 
-	// handle gesture transition
+	// handle gesture tracoarticulateRandomPrioritynsition
 	if (!actor->getBoolAttribute("gestureRequest.autoGestureTransition"))
 		return;
 
@@ -1046,7 +1082,33 @@ void BmlRequest::gestureRequestProcess()
 
 			if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 			{
-				int which = rand() % 2;
+				int which = 0;
+				if (useLastGestureChoices)
+				{
+					int lastChoiceIndex = actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
+					if (int(lastChoices.size()) > lastChoiceIndex)
+					{
+						which = lastChoices[lastChoiceIndex];
+						lastChoiceIndex++;
+						actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex);
+						
+					}
+					else
+					{
+						which = 0;
+					}
+
+				}
+				else
+				{
+					which = rand() % 2;
+				}
+				std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
+				if (str != "")
+					str += "|";
+				str += std::to_string(which);
+				actor->setStringAttribute("gestureRequest.lastGestureRandom", str);
+
 				if (which == 0)
 				{
 					gestures[j]->filtered = true;

@@ -151,7 +151,19 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		{
 			posture = "";
 		}
-		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"));
+		int useIndex = -1;
+		if (request->actor->getBoolAttribute("gestureRequest.useLastRandomGesture"))
+			useIndex = request->actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
+		int appliedIndex = 0;
+		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"), useIndex, appliedIndex);
+		if (useIndex > -1)
+			request->actor->setBoolAttribute("gestureRequest.useLastRandomGesture", useIndex + 1);
+		std::string str = request->actor->getStringAttribute("gestureRequest.lastGestureRandom");
+		if (str != "")
+			str += "|";
+		str += std::to_string(appliedIndex);
+		request->actor->setStringAttribute("gestureRequest.lastGestureRandom", str);
+
 		animationList = gestureMap->getGestureListByInfo(lexeme, type, mode, style, posture);
 		if (animationName == "")
 		{
