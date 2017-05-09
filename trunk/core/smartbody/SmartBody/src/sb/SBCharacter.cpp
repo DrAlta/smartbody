@@ -109,6 +109,10 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createBoolAttribute("gestureRequest.coarticulateFace", false, true, "Gestures", 101, false, false, false, "Coarticulate facial action units via BML.");
 	createDoubleAttribute("gestureRequest.coarticulateFaceProximity", .5, true, "Gestures", 102, false, false, false, "Coarticulate facial action units via BML when within this time of each other.");
 	createBoolAttribute("gestureRequest.coarticulateRandomPriority", false, true, "Gestures", 103, false, false, false, "Randomize gesture priority.");
+	createStringAttribute("gestureRequest.lastGestureRandom", "", true, "Gestures", 104, false, false, false, "Last set of randomized gestures choices. Used to replay the BML file exactly as before.");
+	createStringAttribute("gestureRequest.curGestureRandom", "", true, "Gestures", 104, false, false, false, "Current set of randomized gestures choices. Used to replay the BML file exactly as before.");
+	createIntAttribute("gestureRequest.lastGestureRandomIndex", 0, true, "Gestures", 105, false, false, false, "Last set of randomized gestures choices. Used to replay the BML file exactly as before.");
+	createBoolAttribute("gestureRequest.useLastRandomGesture", false, true, "Gestures", 106, false, false, false, "Determines if the last gesture random selections should be applied to the next gesture choices.");
 
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 

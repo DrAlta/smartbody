@@ -160,7 +160,7 @@ std::vector<std::string> SBGestureMap::getGestureListByInfo(const std::string& l
  *  user can only input type and get the result
  *	posture always has to match
  */
-std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy)
+std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy, int useIndex, int& appliedIndex)
 {
 	const std::vector<std::string>& retAnimations = getGestureListByInfo(lexeme, type, hand, style, posture);
 	if (retAnimations.size() == 0)
@@ -170,17 +170,31 @@ std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std:
 	}
 	else
 	{
+		if (useIndex > -1)
+		{
+			appliedIndex = useIndex;
+			if (retAnimations.size() > useIndex)
+				return retAnimations[useIndex];
+			SmartBody::util::log("Index %d is out of range of animation list.", useIndex);
+		}
 		if (policy == "random")
 		{
 			int id = rand() % retAnimations.size();
 			if (id == retAnimations.size())
 				id = id - 1;
+			appliedIndex = id;
 			return retAnimations[id];
 		}
 		else if (policy == "first")
+		{
+			appliedIndex = 0;
 			return retAnimations[0];
+		}
 		else
+		{
+			appliedIndex = 0;
 			return retAnimations[0];
+		}
 	}
 }
 
