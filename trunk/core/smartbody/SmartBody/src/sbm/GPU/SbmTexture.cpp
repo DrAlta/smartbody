@@ -217,10 +217,10 @@ SBAPI SbmTexture* SbmTextureManager::createTexture(int type, const char* texture
 	return tex;
 }
 
-SBAPI GLuint SbmTextureManager::createFBO( const char* fboName )
+SBAPI GLuint SbmTextureManager::createFBO( const char* fboName, bool recreateFBO )
 {
     std::string strFBO = fboName;
-    if (FBOMap.find(strFBO) == FBOMap.end())
+    if (FBOMap.find(strFBO) == FBOMap.end() || recreateFBO)
     {
         GLuint fboID;
         glGenFramebuffers(1, &fboID);

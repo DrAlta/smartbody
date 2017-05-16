@@ -66,6 +66,16 @@ namespace std
 }*/
 //extern std::wostream &std::wcout;
 //extern std::wostream &std::wcerr;
+namespace std {
+
+	template <typename T>
+	std::string to_string(T value)
+	{
+		std::ostringstream os;
+		os << value;
+		return os.str();
+	}
+};
 #endif
 
 namespace SmartBody {

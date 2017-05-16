@@ -85,7 +85,7 @@ public:
 	SBAPI void createBlackTexture(const char* textureName, int width = 1, int height = 1);
 	SBAPI void createColorTexture(const char* textureName, SrColor initColor, int width = 1, int height = 1);
 	
-	SBAPI GLuint createFBO(const char* fboName);
+	SBAPI GLuint createFBO(const char* fboName, bool recreateFBO = true);
 
 	SBAPI void updateEnvMaps();
 	void releaseAllTextures();	

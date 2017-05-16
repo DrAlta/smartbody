@@ -109,10 +109,10 @@ SrCamera* getCamera()
 	return SmartBody::SBScene::getScene()->getActiveCamera();
 }
 
-
+#endif
 
 ////////////////////////////////////////////
-
+#if 0
 void PyLogger::pa()
 {
 	strBuffer += "a";		

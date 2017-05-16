@@ -591,6 +591,20 @@ void SmartBody::util::Logger::vLog(const char * message, va_list argPtr)
 	}
 }
 
+void SmartBody::util::Logger::vLogSimple(const char * message)
+{
+	if (!IsEnabled())
+		return;
+
+	std::string s = message;
+	s.append("\n");
+
+	for (size_t i = 0; i < m_listeners.size(); i++)
+	{
+		m_listeners[i]->OnMessage(s);
+	}
+}
+
 #endif  // ANDROID_BUILD
 
 
