@@ -75,10 +75,6 @@ const bool LOG_METHODS						= false;
 const bool LOG_CONTROLLER_SCHEDULE			= false;
 const bool LOG_REQUEST_REALIZE_TIME_SPAN	= false;
 
-#ifdef __ANDROID__ // android does not support wstring by default. Thus we need to explicitly define these template class.
-//std::wostream &std::wcout;
-//std::wostream &std::wcerr;
-#endif
 
 
 
@@ -1106,7 +1102,9 @@ void BmlRequest::gestureRequestProcess()
 				std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
 				if (str != "")
 					str += "|";
+
 				str += std::to_string(which);
+
 				actor->setStringAttribute("gestureRequest.lastGestureRandom", str);
 
 				if (which == 0)
