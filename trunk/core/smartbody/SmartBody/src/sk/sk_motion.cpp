@@ -2132,7 +2132,7 @@ void SkMotion::smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask
 }
 
 
-SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton )
+SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton, std::vector<std::string> from, std::vector<std::string> to)
 {
 	std::map<std::string,bool> jointNameMap;
 	for (unsigned int i=0; i<skeleton->joints().size();i++)
@@ -2140,10 +2140,10 @@ SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton )
 		SkJoint* joint = skeleton->joints()[i];
 		jointNameMap[joint->getMappedJointName()] = true;
 	}
-	return buildMirrorMotionJoints(skeleton,jointNameMap);
+	return buildMirrorMotionJoints(skeleton, jointNameMap, from, to);
 }
 
-SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameMap)
+SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameMap, std::vector<std::string> from, std::vector<std::string> to)
 {	
 	SkChannelArray& mchan_arr = this->channels();
 	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
@@ -2174,19 +2174,34 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 			// get the mirrored index position
 			int otherIndex = index;
 			std::string jointNameOther = "";
-			if (boost::algorithm::starts_with(jointName, "l_") ||
-				boost::algorithm::starts_with(jointName, "r_"))
+			bool found = false;
+			for (size_t n = 0; n < from.size(); n++)
 			{
-				jointNameOther = jointName;
-				// get the mirror joint name
-				if (boost::algorithm::starts_with(jointName, "l_"))
-					jointNameOther[0] = 'r';
-				else
-					jointNameOther[0] = 'l';
-
+				if (boost::algorithm::starts_with(jointName, from[n]))
+				{
+					found = true;
+					jointNameOther = jointName;
+					// substitute one part for another
+					jointNameOther.replace(0, from[n].length(), to[n]);
+					break;
+				}
+				if (boost::algorithm::starts_with(jointName, to[n]))
+				{
+					found = true;
+					jointNameOther = jointName;
+					// substitute one part for another
+					jointNameOther.replace(0, to[n].length(), from[n]);
+					break;
+				}
+			}
+			if (found)
+			{
 				int otherChannelIndex = mchan_arr.search(jointNameOther.c_str(), chan.type);
 				if (otherChannelIndex >= 0)
+				{
 					otherIndex = mchan_arr.float_position(otherChannelIndex);
+					mirrorJoint = true;
+				}
 			}
 
 			if (chan.type == SkChannel::XPos)

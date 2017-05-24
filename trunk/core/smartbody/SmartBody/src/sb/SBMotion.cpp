@@ -1509,6 +1509,49 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 	return cleanMotion;	
 }
 
+SBMotion* SBMotion::mirror2(std::string name, std::string skeletonName, std::vector<std::string> from, std::vector<std::string> to)
+{
+
+	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
+	if (!skeleton)
+	{
+		SmartBody::util::log("Skeleton %s not found. Mirror motion %s not built.", skeletonName.c_str(), name.c_str());
+		return NULL;
+	}
+	SkMotion* motion = buildMirrorMotion(skeleton, from, to);
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	if (sbmotion)
+	{
+		std::string motionName = "";
+		if (name == "")
+		{
+			motionName = sbmotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_mirror";
+		}
+		else
+			motionName = name;
+		sbmotion->setName(motionName.c_str());
+
+		bool success = SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		if (!success)
+		{
+			delete sbmotion;
+			sbmotion = NULL;
+			return NULL;
+		}
+	}
+
+	// create a trail indicating that this motion was mirrored
+	sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
+	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
+
+	sbmotion->setTransformDepth(getTransformDepth() + 1); // increment the depth counter 
+	return sbmotion;
+}
+
+
+
 SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 {
 	 
@@ -1518,7 +1561,11 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 		SmartBody::util::log("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
 		return NULL;
 	}
-	SkMotion* motion = buildMirrorMotion(skeleton);
+	std::vector<std::string> from;
+	from.push_back("l_");
+	std::vector<std::string> to;
+	to.push_back("r_");
+	SkMotion* motion = buildMirrorMotion(skeleton, from, to);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
@@ -1570,7 +1617,12 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 	// add the parent joint as well
 	jointNameMap[pjoint->getMappedJointName()] = true;
 	
-	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap);
+	std::vector<std::string> from;
+	from.push_back("l_");
+	std::vector<std::string> to;
+	to.push_back("r_");
+
+	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap, from, to);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
