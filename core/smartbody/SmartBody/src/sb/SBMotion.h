@@ -137,6 +137,7 @@ class SBMotion : public SkMotion
 		SBAPI SBMotion* duplicateCycle(int num, std::string name);
 
 		SBAPI SBMotion* mirror(std::string name, std::string skeletonName);
+		SBAPI SBMotion* mirror2(std::string name, std::string skeletonName, std::vector<std::string> from, std::vector<std::string> to);
 		SBAPI SBMotion* mirrorChildren(std::string name, std::string skeletonName, std::string parentJointName);
 		SBAPI SBMotion* smoothCycle(std::string name, float timeInterval);
 		SBAPI SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap);	

@@ -246,8 +246,8 @@ public :
 	
 
 	// Build and return a mirror motion from the motion. The mirror axis is assumed to be y-z plane with the character center at origin.
-	SkMotion* buildMirrorMotion(SkSkeleton* skeleton);
-	SkMotion* buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameList);
+	SkMotion* buildMirrorMotion(SkSkeleton* skeleton, std::vector<std::string> from, std::vector<std::string> to);
+	SkMotion* buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameList, std::vector<std::string> from, std::vector<std::string> to);
 
 	// smooth out the window between [0,timeInterval] and [duration-timeInterval, duration] so the motion will look smooth when cycling
 	SkMotion* buildSmoothMotionCycle(float timeInterval);
