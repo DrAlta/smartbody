@@ -2235,7 +2235,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 					SrVec qaOther = q_origOther.axisAngle();
 					SkJoint* jointOther = skeleton->search_joint(jointNameOther.c_str());
 					SrQuat final_qOther = q_origOther;
-					if (mirrorJoint)
+					if (found)
 					{
 						SrQuat q_zeroOther = SrQuat(jointOther->gmatZero());
 						SrQuat q_lzeroOther = SrQuat(jointOther->gmatZero());
