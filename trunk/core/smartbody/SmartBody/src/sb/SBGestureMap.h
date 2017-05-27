@@ -33,6 +33,13 @@ class SBGestureMap : public SBObject
 	public:
 		SBAPI struct GestureInfo
 		{
+			std::string getAnimation() { return _animation; };
+			std::string getLexeme() { return _lexeme; };
+			std::string getType() { return _type; };
+			std::string getHand() { return _hand; };
+			std::string getStyle() { return _style; };
+			std::string getPosture() { return _posture; };
+
 			std::string _animation;
 			std::string _lexeme;
 			std::string _type;

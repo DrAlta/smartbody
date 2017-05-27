@@ -157,29 +157,29 @@ BOOST_PYTHON_MODULE(SmartBody)
 #if 1
 	boost::python::docstring_options local_docstring_options(true, true, false);
 
-    boost::python::class_<std::vector<std::string> >("StringVec")
-        .def(boost::python::vector_indexing_suite<std::vector<std::string> >())
-    ;
+	boost::python::class_<std::vector<std::string> >("StringVec")
+		.def(boost::python::vector_indexing_suite<std::vector<std::string> >())
+		;
 
 	boost::python::class_<std::vector<float> >("FloatVec")
-        .def(boost::python::vector_indexing_suite<std::vector<float> >())
-    ;
+		.def(boost::python::vector_indexing_suite<std::vector<float> >())
+		;
 
 	boost::python::class_<std::vector<SrVec> >("VecArray")
 		.def(boost::python::vector_indexing_suite<std::vector<SrVec> >())
-	;
+		;
 
 	boost::python::class_<std::vector<int> >("IntVec")
-        .def(boost::python::vector_indexing_suite<std::vector<int> >())
-    ;
+		.def(boost::python::vector_indexing_suite<std::vector<int> >())
+		;
 
 	boost::python::class_<std::vector<double> >("DoubleVec")
-        .def(boost::python::vector_indexing_suite<std::vector<double> >())
-    ;
+		.def(boost::python::vector_indexing_suite<std::vector<double> >())
+		;
 
 	boost::python::class_<std::vector<SBAsset*> >("AssetVec")
-        .def(boost::python::vector_indexing_suite<std::vector<SBAsset*> >())
-    ;
+		.def(boost::python::vector_indexing_suite<std::vector<SBAsset*> >())
+		;
 
 
 
@@ -187,9 +187,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("__len__", &QuatMap::size)
 		.def("clear", &QuatMap::clear)
 		.def("__getitem__", &map_item<QuatMap>::get,
-		boost::python::return_value_policy<boost::python::return_by_value>())
+			boost::python::return_value_policy<boost::python::return_by_value>())
 		.def("__setitem__", &map_item<QuatMap>::set,
-		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+			boost::python::with_custodian_and_ward<1, 2>()) // to let container keep value
 		.def("__delitem__", &map_item<QuatMap>::del)
 		;
 
@@ -197,9 +197,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("__len__", &VecMap::size)
 		.def("clear", &VecMap::clear)
 		.def("__getitem__", &map_item<VecMap>::get,
-		boost::python::return_value_policy<boost::python::return_by_value>())
+			boost::python::return_value_policy<boost::python::return_by_value>())
 		.def("__setitem__", &map_item<VecMap>::set,
-		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+			boost::python::with_custodian_and_ward<1, 2>()) // to let container keep value
 		.def("__delitem__", &map_item<VecMap>::del)
 		;
 
@@ -207,28 +207,28 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("__len__", &StringMap::size)
 		.def("clear", &StringMap::clear)
 		.def("__getitem__", &map_item<StringMap>::get,
-		boost::python::return_value_policy<boost::python::return_by_value>())
+			boost::python::return_value_policy<boost::python::return_by_value>())
 		.def("__setitem__", &map_item<StringMap>::set,
-		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+			boost::python::with_custodian_and_ward<1, 2>()) // to let container keep value
 		.def("__delitem__", &map_item<StringMap>::del)
 		;
 
-	
+
 
 	//boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
-	
+
 
 	// characters
 
 //#ifndef __ANDROID__
 
-	
+
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
 
-	
 
-	
+
+
 
 	//#endif
 
@@ -258,7 +258,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("pw", &PyLogger::pw, "Prints an w");
 	boost::python::def("px", &PyLogger::px, "Prints an x");
 	boost::python::def("py", &PyLogger::py, "Prints an y");
-	boost::python::def("pz", &PyLogger::pz, "Prints an z");	
+	boost::python::def("pz", &PyLogger::pz, "Prints an z");
 	boost::python::def("p1", &PyLogger::p1, "Prints an 1");
 	boost::python::def("p2", &PyLogger::p2, "Prints an 2");
 	boost::python::def("p3", &PyLogger::p3, "Prints an 3");
@@ -282,14 +282,14 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("slash", &PyLogger::slash, "Prints a /");
 	boost::python::def("backslash", &PyLogger::backslash, "Prints a \\");
 	boost::python::def("comma", &PyLogger::comma, "Prints a ,");
-	boost::python::def("colon", &PyLogger::colon,"Prints a :");
+	boost::python::def("colon", &PyLogger::colon, "Prints a :");
 	boost::python::def("semicolon", &PyLogger::semicolon, "Prints a ;");
 	boost::python::def("equal", &PyLogger::equal, "Prints an =");
 	boost::python::def("less", &PyLogger::less, "Prints a ");
-	boost::python::def("more", &PyLogger::more, "Prints a >");	
-	
-	boost::python::def("pspace", &PyLogger::pspace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
-	boost::python::def("pnon", &PyLogger::pnon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("more", &PyLogger::more, "Prints a >");
+
+	boost::python::def("pspace", &PyLogger::pspace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pnon", &PyLogger::pnon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
 	boost::python::def("outlog", &PyLogger::outlog, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
 #endif
 
@@ -314,16 +314,16 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 */
 
-	
-boost::python::class_<SBSubject>("SBSubject")
-		.def("notifyObservers", &SBSubject::notifyObservers,"Notifies all observers of this subject.")
-		.def("registerObserver", &SBSubject::registerObserver,"Registers an observer to this subject.")
-		.def("unregisterObserver", &SBSubject::unregisterObserver,"Unregisters an observer from this subject.")
+
+	boost::python::class_<SBSubject>("SBSubject")
+		.def("notifyObservers", &SBSubject::notifyObservers, "Notifies all observers of this subject.")
+		.def("registerObserver", &SBSubject::registerObserver, "Registers an observer to this subject.")
+		.def("unregisterObserver", &SBSubject::unregisterObserver, "Unregisters an observer from this subject.")
 		;
 
-boost::python::class_<SBObserver>("SBObserver")
-		.def("addDependency", &SBObserver::addDependency,"Adds a dependency on a subject.")
-		.def("removeDependency", &SBObserver::removeDependency,"Removes a dependency on a subject.")
+	boost::python::class_<SBObserver>("SBObserver")
+		.def("addDependency", &SBObserver::addDependency, "Adds a dependency on a subject.")
+		.def("removeDependency", &SBObserver::removeDependency, "Removes a dependency on a subject.")
 		.def("hasDependency", &SBObserver::hasDependency, "Returns True if there is a dependency on the given subject.")
 		.def("notify", &SBObserver::notify, "Notifies the observer of the subject.")
 		;
@@ -335,7 +335,7 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<SBObject>("SBObject")
 		.def("getName", &SBObject::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the object.")
 		.def("setName", &SBObject::setName, "Sets the name of the object.")
-		.def("getNumAttributes", &SBObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
+		.def("getNumAttributes", &SBObject::getNumAttributes, "Returns the number of attributes associated with this object.")
 		.def("getAttributeNames", &SBObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
 		.def("getAttribute", &SBObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
 		.def("clearAttributes", &SBObject::clearAttributes, "Clear all the attributes associated with this object.")
@@ -359,7 +359,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setVec3", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
 		.def("setMatrix", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
 		.def("setAction", &SBObject::setActionAttribute, "Sets a action attribute of a given name.")
-		.def("getBool", &SBObject::getBoolAttribute, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the value of a boolean attribute of a given name to the given value.")
+		.def("getBool", &SBObject::getBoolAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a boolean attribute of a given name to the given value.")
 		.def("getInt", &SBObject::getIntAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of an integer attribute of a given name to the given value.")
 		.def("getDouble", &SBObject::getDoubleAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a floating point attribute of a given name to the given value.")
 		.def("getString", &SBObject::getStringAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a string attribute of a given name to the given value.")
@@ -389,8 +389,8 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("execBML", &SBBmlProcessor::execBML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
 		.def("execBMLFile", &SBBmlProcessor::execBMLFile, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute the BML instructions contained in a file for a given character.")
 		.def("execXML", &SBBmlProcessor::execXML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic XML instruction to a given character. Adds the <?xml..> header.")
-		.def("execXMLFile", &SBBmlProcessor::execXMLFile , boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic XML instructions contained in a file to a given character.")
-		.def("execBMLAt", &SBBmlProcessor::execBMLAt,  "Execute a generic BML instruction to a given character at a time in the future. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
+		.def("execXMLFile", &SBBmlProcessor::execXMLFile, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic XML instructions contained in a file to a given character.")
+		.def("execBMLAt", &SBBmlProcessor::execBMLAt, "Execute a generic BML instruction to a given character at a time in the future. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
 		.def("execBMLFileAt", &SBBmlProcessor::execBMLFileAt, "Execute the BML instructions contained in a file for a given character at a time in the future..")
 		.def("execXMLAt", &SBBmlProcessor::execXMLAt, "Execute a generic XML instruction to a given character at a time in the future.. Adds the <?xml..> header.")
 		.def("interruptCharacter", &SBBmlProcessor::interruptCharacter, "Interrupts all BML behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
@@ -441,15 +441,15 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")
 		.def("createPhysicsCharacter", &SBPhysicsManager::createPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics character.")
 		.def("createPhysicsPawn", &SBPhysicsManager::createPhysicsPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics rigid body and attach it to the pawn.")
-		.def("getPhysicsEngine", &SBPhysicsManager::getPhysicsSimulationEngine, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return the current physics engine")  
-		.def("getPhysicsCharacter", &SBPhysicsManager::getPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based character")  
-		.def("getPhysicsJoint", &SBPhysicsManager::getPhysicsJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based joint")  
-		.def("getJointObj", &SBPhysicsManager::getJointObj, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based body link") 
+		.def("getPhysicsEngine", &SBPhysicsManager::getPhysicsSimulationEngine, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return the current physics engine")
+		.def("getPhysicsCharacter", &SBPhysicsManager::getPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based character")
+		.def("getPhysicsJoint", &SBPhysicsManager::getPhysicsJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based joint")
+		.def("getJointObj", &SBPhysicsManager::getJointObj, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based body link")
 		.def("getPhysicsPawn", &SBPhysicsManager::getPhysicsPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a rigid body pawn")
 		.def("applyForceToPawn", &SBPhysicsManager::applyForceToPawn, "Apply force to a physics pawn")
 		.def("applyForceToCharacter", &SBPhysicsManager::applyForceToCharacter, "Apply force to a joint of the physics character")
-		.def("start", &SBPhysicsManager::start, "Start the physics simulation.(not implemented yet)") 
-		.def("stop", &SBPhysicsManager::stop, "Stop the physics simulation.(not implemented yet)")		
+		.def("start", &SBPhysicsManager::start, "Start the physics simulation.(not implemented yet)")
+		.def("stop", &SBPhysicsManager::stop, "Stop the physics simulation.(not implemented yet)")
 		;
 
 	boost::python::class_<SBBoneBusManager, boost::python::bases<SBService> >("SBBoneBusManager")
@@ -460,7 +460,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getSteerStateNamePrefix", &SBSteerAgent::getSteerStateNamePrefix, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the animation state name prefix used for steering, only applies to steering type locomotion.")
 		.def("setSteerType", &SBSteerAgent::setSteerType, "Sets the type of steering locomotion, can be one of the following: basic, example, procedural")
 		.def("getSteerType", &SBSteerAgent::getSteerType, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the type of steering locomotion, is one of the following: basic, example, procedural")
-		.def("getCharacter", &SBSteerAgent::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")		
+		.def("getCharacter", &SBSteerAgent::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")
 		;
 
 
@@ -490,10 +490,10 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getVisemeNames", &SBDiphone::getVisemeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the viseme names.")
 		.def("getNumVisemes", &SBDiphone::getNumVisemes, "Return the number of viseme.")
 		.def("getFromPhonemeName", &SBDiphone::getFromPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return FROM phoneme name.")
-		.def("getToPhonemeName", &SBDiphone::getToPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return TO phoneme name.")		
+		.def("getToPhonemeName", &SBDiphone::getToPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return TO phoneme name.")
 		;
 
-		boost::python::class_<SBBehaviorSetManager>("SBBehaviorSetManager")
+	boost::python::class_<SBBehaviorSetManager>("SBBehaviorSetManager")
 		.def("createBehaviorSet", &SBBehaviorSetManager::createBehaviorSet, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a behavior set.")
 		.def("getBehaviorSets", &SBBehaviorSetManager::getBehaviorSets, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets all the behavior sets.")
 		.def("getBehaviorSet", &SBBehaviorSetManager::getBehaviorSet, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets a behavior set with a given name.")
@@ -534,14 +534,14 @@ boost::python::class_<SBObserver>("SBObserver")
 		;
 
 
-/*
-	boost::python::class_<Viseme>("Viseme")		
-		.def("getName", &Viseme::getVisemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Get the viseme name. \n Input: NULL \n Output: viseme name")
-		.def("getCharacterName", &Viseme::getCharName, boost::python::return_value_policy<boost::python::return_by_value>(), "Get the character name. \n Input: NULL \n Output: character name")
-		.def("setWeight", &Viseme::setWeight, "Set the weight for current viseme in non-curve mode. \n Input: a list including weight, duration, rampup time, rampdown time e.g. [1,3,1,1] \n Output: NULL")
-		.def("setCurve", &Viseme::setCurve, "Set the curve for current viseme in curve mode. \n Input: number of keys, a list of keys e.g. (3, [1,0,3,1,5,0]) \n Output: NULL")
-		;
-*/
+	/*
+		boost::python::class_<Viseme>("Viseme")
+			.def("getName", &Viseme::getVisemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Get the viseme name. \n Input: NULL \n Output: viseme name")
+			.def("getCharacterName", &Viseme::getCharName, boost::python::return_value_policy<boost::python::return_by_value>(), "Get the character name. \n Input: NULL \n Output: character name")
+			.def("setWeight", &Viseme::setWeight, "Set the weight for current viseme in non-curve mode. \n Input: a list including weight, duration, rampup time, rampdown time e.g. [1,3,1,1] \n Output: NULL")
+			.def("setCurve", &Viseme::setCurve, "Set the curve for current viseme in curve mode. \n Input: number of keys, a list of keys e.g. (3, [1,0,3,1,5,0]) \n Output: NULL")
+			;
+	*/
 
 	boost::python::class_<SBFaceDefinition>("SBFaceDefinition")
 		.def("getName", &SBFaceDefinition::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns name of the face definition.")
@@ -572,11 +572,11 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setDebug", &SBController::setDebug, "Sets the debug state for this controller.")
 		.def("isDebug", &SBController::isDebug, "Is the controller in a debug state?")
 		.def("getDuration", &SBController::getDuration, "Gets the controller's duration.")
-		.def("getChannelValue", &SBController::getChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's value.")
-		.def("getChannelPos", &SBController::getChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's translation value.")
-		.def("getChannelQuat", &SBController::getChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's rotation value.")
-		.def("setChannelValue", &SBController::setChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's value.")
-		.def("setChannelPos", &SBController::setChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's translation value.")
+		.def("getChannelValue", &SBController::getChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the channel's value.")
+		.def("getChannelPos", &SBController::getChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the channel's translation value.")
+		.def("getChannelQuat", &SBController::getChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the channel's rotation value.")
+		.def("setChannelValue", &SBController::setChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's value.")
+		.def("setChannelPos", &SBController::setChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's translation value.")
 		.def("setChannelQuat", &SBController::setChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
 		.def("setChannelQuatGlobal", &SBController::setChannelQuatGlobal, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
 		.def("getCharacterName", &SBController::getCharacterName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the controlling character's name.")
@@ -585,30 +585,30 @@ boost::python::class_<SBObserver>("SBObserver")
 
 		;
 
-	boost::python::class_<MeCtNewLocomotion, boost::python::bases<SBController,SBObject> >("SBNewLocomotion")
+	boost::python::class_<MeCtNewLocomotion, boost::python::bases<SBController, SBObject> >("SBNewLocomotion")
 		.def(boost::python::init<>())
 		.def("reset", &MeCtNewLocomotion::reset, "Resets.")
 		.def("setDesiredHeading", &MeCtNewLocomotion::setDesiredHeading, "Sets the desired heading")
 		.def("loopMotion", &MeCtNewLocomotion::loopMotion, "Checks a loop")
 		;
 
-	boost::python::class_<MeCtScheduler2, boost::python::bases<SBController> > ("SchedulerController")
+	boost::python::class_<MeCtScheduler2, boost::python::bases<SBController> >("SchedulerController")
 		.def("getNumTracks", &MeCtScheduler2::count_children, "Returns the number of children/tracks.")
 		;
 
-	boost::python::class_<MeCtMotion, boost::python::bases<SBController> > ("MotionController")
+	boost::python::class_<MeCtMotion, boost::python::bases<SBController> >("MotionController")
 		//	.def("getMotion", &MeCtMotion::motion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion associated with this motion controller.")
 		;
 
-	boost::python::class_<MeCtEyeLid, boost::python::bases<SBController> > ("EyelidController")
+	boost::python::class_<MeCtEyeLid, boost::python::bases<SBController> >("EyelidController")
 		;
 
-	boost::python::class_<MeCtGaze, boost::python::bases<SBController> > ("GazeController")
+	boost::python::class_<MeCtGaze, boost::python::bases<SBController> >("GazeController")
 		;
 
 	//boost::python::class_<MeCtReach, boost::python::bases<SBController> > ("ReachController")	;
 
-	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> > ("CurveWriterController")
+	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> >("CurveWriterController")
 		;
 
 
@@ -629,22 +629,22 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("isFadingOut", &GazeBehavior::isFadingOut, "Returns true if the gaze controller is currently fading out.")
 		.def("isFadedOut", &GazeBehavior::isFadedOut, "Returns true if the gaze controller is currently faded out and thus not active.")
 		.def("getHandle", &GazeBehavior::getHandle, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the handle name of the gaze, or an empty string if it has no handle.")
-;
+		;
 
 	boost::python::class_<LocomotionBehavior, boost::python::bases<SBBehavior> >("LocomotionBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getLocomotionTarget", &LocomotionBehavior::getLocomotionTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the locomotion target as a vector.")
-	;
+		;
 
 	boost::python::class_<PostureBehavior, boost::python::bases<SBBehavior> >("PostureBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getPosture", &PostureBehavior::getPosture, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current posture.")
-	;
+		;
 
 	boost::python::class_<SpeechBehavior, boost::python::bases<SBBehavior> >("SpeechBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
-	;
+		;
 
 
 	pythonFuncsCharacter();
@@ -660,7 +660,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("build", &SBReach::build, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Constructs the reach engine using the exisiting motions.")
 		.def("setGrabHandMotion", &SBReach::setGrabHandMotion, "Sets the hand pose to be used during grasping.")
 		.def("getGrabHandMotion", &SBReach::getGrabHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used during grasping.")
-		.def("setReleaseHandMotion", &SBReach::setReleaseHandMotion,  "Sets the hand pose to be used when releasing an object.")
+		.def("setReleaseHandMotion", &SBReach::setReleaseHandMotion, "Sets the hand pose to be used when releasing an object.")
 		.def("getReleaseHandMotion", &SBReach::getReleaseHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when releasing an object.")
 		.def("setReachHandMotion", &SBReach::setReachHandMotion, "Sets the hand pose to be used when reaching for an object.")
 		.def("getReachHandMotion", &SBReach::getReachHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when reaching for an object.")
@@ -674,7 +674,7 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<SBReachManager>("SBReachManager")
 		.def("createReach", &SBReachManager::createReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a reach engine for a character.")
 		.def("createReachWithTag", &SBReachManager::createReachWithTag, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a reach engine for a character with specified tag.")
-		.def("removeReach", &SBReachManager::removeReach, "Removes a reach engine for a character")		
+		.def("removeReach", &SBReachManager::removeReach, "Removes a reach engine for a character")
 		.def("getNumReaches", &SBReachManager::getNumReaches, "Returns the number of reach engines present.")
 		.def("getReach", &SBReachManager::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a reach engine for a given character.")
 		;
@@ -682,6 +682,12 @@ boost::python::class_<SBObserver>("SBObserver")
 
 
 	boost::python::class_<SBGestureMap::GestureInfo >("GestureInfo")
+		.def("getAnimation", &SBGestureMap::GestureInfo::getAnimation, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getLexeme", &SBGestureMap::GestureInfo::getLexeme, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getType", &SBGestureMap::GestureInfo::getType, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getHand", &SBGestureMap::GestureInfo::getHand, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getStyle", &SBGestureMap::GestureInfo::getStyle, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getPosture", &SBGestureMap::GestureInfo::getPosture, boost::python::return_value_policy<boost::python::return_by_value>(), "")
 		;
 
 	boost::python::class_<SBGestureMap>("SBGestureMap")
