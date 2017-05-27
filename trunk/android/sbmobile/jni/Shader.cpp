@@ -39,8 +39,8 @@
 #import <OpenGLES/ES1/glext.h>
 #elif defined(EMSCRIPTEN)
 #include <EGL/egl.h>
-#include <GLES/gl.h>
-#include <GLES2/gl2.h>
+//#include <GLES/gl.h>
+#include <GLES3/gl3.h>
 #endif
 
 #define MAX_VERTEX_UNIFORM_1024 1024
@@ -336,13 +336,15 @@ extern "C"
                     "};												\n"
                     "const int numOfLights = 4;						\n"
                     "attribute vec4 aPosition;						\n"
-                    "attribute vec3 aNormal, aTangent;				\n"
+                    "attribute vec3 aNormal;						\n"
+					"attribute vec3 aTangent;						\n"
                     "uniform   mat4 uMVPMatrix;						\n"
                     "uniform   mat4 uMVMatrix;						\n"
                     "attribute vec2 aTexCoord;						\n"
                     "uniform   lightSource uLights[numOfLights];    \n"
                     "varying   vec2 vTexCoord;						\n"
-                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];  \n"
+                    "varying   vec3 lightDir[numOfLights];			\n"
+					"varying   vec3 halfVec[numOfLights];  			\n"
                     "uniform   float uMeshScale;					\n"
                     "const float c_zero = 0.0;											\n"
                     "const float c_one  = 1.0;											\n"
@@ -378,22 +380,25 @@ extern "C"
                     "	float   shininess;							\n"
                     "};												\n"
                     "struct lightSource {							\n"
-                    "	mediump vec4	position;							\n"
-                    "	mediump vec4	ambient;							\n"
-                    "	mediump vec4	diffuse;							\n"
+                    "	mediump vec4	position;					\n"
+                    "	mediump vec4	ambient;					\n"
+                    "	mediump vec4	diffuse;					\n"
                     "};												\n"
                     "const int numOfLights = 4;						\n"
-                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];\n"
-                    "varying   vec2 vTexCoord;											\n"
-                    "uniform   sampler2D sTexture, normalTexture, specularTexture;			            \n"
-                    "uniform   lightSource uLights[numOfLights];    \n"
-                    "uniform   material	uMtrl;						\n"
+                    "varying vec3 lightDir[numOfLights];			\n"
+					"varying vec3 halfVec[numOfLights];				\n"
+                    "varying vec2 vTexCoord;						\n"
+                    "uniform sampler2D sTexture;					\n"
+					"uniform sampler2D normalTexture;				\n"
+					"uniform sampler2D specularTexture;			    \n"
+                    "uniform lightSource uLights[numOfLights];    \n"
+                    "uniform material	uMtrl;						\n"
                     ""
                     "vec4 calculateLighting(vec4 lightDiffuse, vec4 specularColor, vec3 normal, vec3 vlightDir, vec3 vHalfVec, vec3 tcolor) {							\n"
                     "	vec4 computedColor = vec4(0.0, 0.0, 0.0, 0.0);		\n"
                     "   float ndotl = max(dot(normal, vlightDir), 0.0);					\n"
                     //"   computedColor += (lightDiffuse.xyz * uMtrl.diffuse.xyz * tcolor * ndotl);	\n"
-                    "   computedColor += (lightDiffuse.xyz * tcolor * ndotl);	\n"
+                    "   computedColor += vec4((lightDiffuse.xyz * tcolor * ndotl), 0);	\n"
                     "   float specularIntensity = pow (max (dot (normalize(vHalfVec), normal), 0.0), uMtrl.shininess + 1.0);\n"
                     "   computedColor += (specularIntensity * specularColor);        \n"
                     //"   computedColor += (specularIntensity * vec4(1.0,1.0,1.0,1.0));        \n"
@@ -421,6 +426,7 @@ extern "C"
 
     ;
 	char vShaderStrSphere[] = 
+	
 		"struct lightSource {				\n"
 		"	vec4	position;				\n"
 		"	vec4	ambient;				\n"

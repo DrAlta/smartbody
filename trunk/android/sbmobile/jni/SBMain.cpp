@@ -17,11 +17,6 @@
 #include <jni.h>
 #include <vhcl.h>
 #include <sb/SBScene.h>
-#include <sb/SBSimulationManager.h>
-#include <sb/SBCommandManager.h>
-#include <sb/SBCharacter.h>
-#include <sb/SBSkeleton.h>
-#include <sb/SBAssetManager.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <sbm/GPU/SbmTexture.h>
@@ -237,7 +232,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_executeSB(JNIEnv * 
 JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLog( JNIEnv * env, jobject obj )
 {	
 	if (!sbInit)
-		return;
+		return env->NewStringUTF("");;
 	std::string logStr = "No Text";
 	logStr = androidListener.getLogs();	
 	return env->NewStringUTF(logStr.c_str());
