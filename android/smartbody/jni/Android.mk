@@ -14,7 +14,7 @@ CEREVOICE_LIB_DIR := ../../cerevoice_lib
 LIB_DIR := ../../../lib
 
 
-ifeq ($(USE_CEREVOICE),false)
+ifeq ($(USE_CEREVOICE),true)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerevoice-eng
