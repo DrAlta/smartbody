@@ -39,8 +39,8 @@
 #import <OpenGLES/ES1/glext.h>
 #elif defined(EMSCRIPTEN)
 #include <EGL/egl.h>
-//#include <GLES/gl.h>
-#include <GLES3/gl3.h>
+#include <GLES/gl.h>
+#include <GLES2/gl2.h>
 #endif
 
 #define MAX_VERTEX_UNIFORM_1024 1024
@@ -272,7 +272,51 @@ extern "C"
 				"		shadeColor += calculateDirectionalShading(i);				\n"
 				"	}																\n"
 				"	vComputedLightColor = vec4(shadeColor.rgb, 1.0);						\n"
-				"}																    \n"
+				"}																    \n";
+
+
+	 char vShaderNormalMapStr[] =
+                    //"precision mediump float;                       \n"
+                    "struct lightSource {							\n"
+                    "	mediump vec4	position;							\n"
+                    "	mediump vec4	ambient;							\n"
+                    "	mediump vec4	diffuse;							\n"
+                    "};												\n"
+                    "const int numOfLights = 4;						\n"
+                    "attribute vec4 aPosition;						\n"
+                    "attribute vec3 aNormal, aTangent;				\n"
+                    "uniform   mat4 uMVPMatrix;						\n"
+                    "uniform   mat4 uMVMatrix;						\n"
+                    "attribute vec2 aTexCoord;						\n"
+                    "uniform   lightSource uLights[numOfLights];    \n"
+                    "varying   vec2 vTexCoord;						\n"
+                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];  \n"
+                    "uniform   float uMeshScale;					\n"
+                    "const float c_zero = 0.0;											\n"
+                    "const float c_one  = 1.0;											\n"
+                    "void main()						\n"
+                    "{									\n"
+                    "	gl_PointSize = 2.0;				\n"
+                    "   vTexCoord = aTexCoord;			\n"
+                    "   vec3 pos = vec3(aPosition.xyz)* 1.0;						\n"
+                    "	vec4 skinPos = vec4(pos.xyz,1.0);		                        \n"
+                    "	gl_Position = uMVPMatrix * skinPos;								\n"
+                    
+                    "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
+                    "   mat3 tangentMat;                                                \n"
+                    "   tangentMat[0] = (uMVMatrix * vec4(aTangent,0.0)).xyz;            \n"
+                    "   tangentMat[2] = (uMVMatrix * vec4(aNormal,0.0)).xyz;           \n"
+                    "   tangentMat[1] = cross(tangentMat[0], tangentMat[2]);            \n"
+                    "   vec3 eyeVec = normalize(vertexPos*tangentMat);                  \n"
+                    "   for (int i=0;i<numOfLights;i++)                                \n"
+                    "   {                                                              \n"
+                    "       vec3 v = normalize((uMVMatrix * vec4(uLights[i].position.xyz,0)).xyz); \n"
+                    "       lightDir[i] = normalize(v*tangentMat);                     \n"
+                    "       halfVec[i] = normalize(lightDir[i]+eyeVec);                \n"
+                    "   }                                                              \n"                    
+                    "}																    \n"
+
+    ;
 
 ;
 
@@ -317,88 +361,45 @@ extern "C"
 		"  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
 		"  vec4 lightColor = vec4(1.0,1.0,1.0,1.0);							\n"
 		"  //if (blendTextureWithLight==1)									\n"
-		"  lightColor = vComputedLightColor;										\n"
+		"  //lightColor = vComputedLightColor;										\n"
 		"  if (texColor.a < 0.2) discard;                                   \n"
-		"  gl_FragColor  = lightColor;//texColor * lightColor;							\n"
+		"  //gl_FragColor  = lightColor;//texColor * lightColor;							\n"
 		"  //gl_FragColor  =  vec4(1.0,0,0,1.0);                   			\n"
-		"  //gl_FragColor  =  texColor;                   			\n"
+		"  gl_FragColor  =  texColor;                   			\n"
 		"}																	\n"
 
 		;
 
 
-    char vShaderNormalMapStr[] =
-                    "precision mediump float;                       \n"
-                    "struct lightSource {							\n"
-                    "	mediump vec4	position;							\n"
-                    "	mediump vec4	ambient;							\n"
-                    "	mediump vec4	diffuse;							\n"
-                    "};												\n"
-                    "const int numOfLights = 4;						\n"
-                    "attribute vec4 aPosition;						\n"
-                    "attribute vec3 aNormal;						\n"
-					"attribute vec3 aTangent;						\n"
-                    "uniform   mat4 uMVPMatrix;						\n"
-                    "uniform   mat4 uMVMatrix;						\n"
-                    "attribute vec2 aTexCoord;						\n"
-                    "uniform   lightSource uLights[numOfLights];    \n"
-                    "varying   vec2 vTexCoord;						\n"
-                    "varying   vec3 lightDir[numOfLights];			\n"
-					"varying   vec3 halfVec[numOfLights];  			\n"
-                    "uniform   float uMeshScale;					\n"
-                    "const float c_zero = 0.0;											\n"
-                    "const float c_one  = 1.0;											\n"
-                    "void main()						\n"
-                    "{									\n"
-                    "	gl_PointSize = 2.0;				\n"
-                    "   vTexCoord = aTexCoord;			\n"
-                    "   vec3 pos = vec3(aPosition.xyz)* 1.0;						\n"
-                    "	vec4 skinPos = vec4(pos.xyz,1.0);		                        \n"
-                    "	gl_Position = uMVPMatrix * skinPos;								\n"
-                    "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
-                    "   mat3 tangentMat;                                                \n"
-                    "   tangentMat[0] = (uMVMatrix * vec4(aTangent,0.0)).xyz;            \n"
-                    "   tangentMat[2] = (uMVMatrix * vec4(aNormal,0.0)).xyz;           \n"
-                    "   tangentMat[1] = cross(tangentMat[0], tangentMat[2]);            \n"
-                    "   vec3 eyeVec = normalize(vertexPos*tangentMat);                  \n"
-                    "   for (int i=0;i<numOfLights;i++)                                \n"
-                    "   {                                                              \n"
-                    "       vec3 v = normalize((uMVMatrix * vec4(uLights[i].position.xyz,0)).xyz); \n"
-                    "       lightDir[i] = normalize(v*tangentMat);                     \n"
-                    "       halfVec[i] = normalize(lightDir[i]+eyeVec);                \n"
-                    "   }                                                              \n"
-                    "}																    \n"
-
-    ;
+   
 
 
     char fShaderNormalMapStr[] =
-                    "precision mediump float;                       \n"
+                    //"precision mediump float;                       \n"
+    				"precision mediump float;                       \n"
                     "struct material {								\n"
                     "	vec4	ambient;							\n"
                     "	vec4    diffuse;							\n"
                     "	float   shininess;							\n"
                     "};												\n"
                     "struct lightSource {							\n"
-                    "	mediump vec4	position;					\n"
-                    "	mediump vec4	ambient;					\n"
-                    "	mediump vec4	diffuse;					\n"
+                    "	mediump vec4	position;							\n"
+                    "	mediump vec4	ambient;							\n"
+                    "	mediump vec4	diffuse;							\n"
                     "};												\n"
                     "const int numOfLights = 4;						\n"
-                    "varying vec3 lightDir[numOfLights];			\n"
-					"varying vec3 halfVec[numOfLights];				\n"
-                    "varying vec2 vTexCoord;						\n"
-                    "uniform sampler2D sTexture;					\n"
-					"uniform sampler2D normalTexture;				\n"
-					"uniform sampler2D specularTexture;			    \n"
-                    "uniform lightSource uLights[numOfLights];    \n"
-                    "uniform material	uMtrl;						\n"
+                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];\n"
+                    "varying   vec2 vTexCoord;											\n"
+                    "uniform   sampler2D sTexture, normalTexture, specularTexture;			            \n"
+                    "uniform   lightSource uLights[numOfLights];    \n"
+                    "uniform   material	uMtrl;						\n"
                     ""
                     "vec4 calculateLighting(vec4 lightDiffuse, vec4 specularColor, vec3 normal, vec3 vlightDir, vec3 vHalfVec, vec3 tcolor) {							\n"
                     "	vec4 computedColor = vec4(0.0, 0.0, 0.0, 0.0);		\n"
                     "   float ndotl = max(dot(normal, vlightDir), 0.0);					\n"
                     //"   computedColor += (lightDiffuse.xyz * uMtrl.diffuse.xyz * tcolor * ndotl);	\n"
-                    "   computedColor += vec4((lightDiffuse.xyz * tcolor * ndotl), 0);	\n"
+                    "   computedColor.xyz += (lightDiffuse.xyz * tcolor * ndotl);	\n"
+                    //"   computedColor.xyz += (ndotl);	\n"
                     "   float specularIntensity = pow (max (dot (normalize(vHalfVec), normal), 0.0), uMtrl.shininess + 1.0);\n"
                     "   computedColor += (specularIntensity * specularColor);        \n"
                     //"   computedColor += (specularIntensity * vec4(1.0,1.0,1.0,1.0));        \n"
@@ -426,7 +427,6 @@ extern "C"
 
     ;
 	char vShaderStrSphere[] = 
-	
 		"struct lightSource {				\n"
 		"	vec4	position;				\n"
 		"	vec4	ambient;				\n"
@@ -621,6 +621,7 @@ extern "C"
         maxVUniforms = 2048; // fake the maxVUniform for non-GPU skinning
 		//userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
         userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
+        //userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderStr);
 #endif
 		
 		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
@@ -679,6 +680,7 @@ extern "C"
 
 
 		// setup render target
+		LOG("Generate FBO object");
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
    		std::string fboName = "renderFBO";
    		std::string fboTexName = "fboTex";
@@ -689,10 +691,14 @@ extern "C"
    		esContext->fboID  = texManager.createFBO(fboName.c_str());   
    		esContext->fboTexID = fboTex->getID();
 
+
+
    		glGenRenderbuffers(1, &esContext->fboDepthBuf);
    		glBindRenderbuffer(GL_RENDERBUFFER, esContext->fboDepthBuf);
    		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, esContext->width, esContext->height);
 
+   		LOG("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
+   		LOG("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
 
    		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
    		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, esContext->fboDepthBuf);

@@ -332,12 +332,13 @@ void SBInitialize()
 }
 
 void SBInitGraphics(ESContext *esContext) {
-	//LOG("Before shaderInit");
+	LOG("Before shaderInit");
 	shaderInit(esContext);
-	//LOG("After shaderInit");
+	LOG("After shaderInit");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->createIntAttribute("renderer.fboTexID",- 1, true,"",40,false,false,false,"texture id attached with the current fbo. For fast video recording.");
 	scene->setIntAttribute("renderer.fboTexID", esContext->fboTexID);
+	LOG("fboTexID = %d", esContext->fboTexID);
 }
 
 
@@ -355,9 +356,11 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	static bool initShader = false;
 	if (!initShader)
 	{
+		LOG("Shader not initialized, run SBInitGraphics.");
 		SBInitGraphics(esContext);
         initShader = true;
 	}
+
 
 	UserData *userData = (UserData*) esContext->userData;
 	ShapeData *shapeData = (ShapeData*) esContext->shapeData;
@@ -368,13 +371,14 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	texm.updateTexture();
 
 
-	bool useRenderTarget = true;
+	bool useRenderTarget = false;
 	if (useRenderTarget)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
 	// clear background
 	//glClearColor( 0.0f,0.0f,0.0f,1.0f );
 	//glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
+	SBSetupDrawing(width, height, esContext);
 	glClearColor(0.33f, 0.78f, 0.95f, 1.f);
 
 	glEnable(GL_DEPTH_TEST);
@@ -449,11 +453,11 @@ void SBDrawCharacters_ES20(ESContext *esContext) {
 		//DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if(meshInstance)
-		{
+		{	/*
 			if (!meshInstance->isStaticMesh())
 			{
 				//LOG("pawn %s is deformable mesh", pawn->getName().c_str());
-				meshInstance->blendShapeStaticMesh();
+				//meshInstance->blendShapeStaticMesh();
 				meshInstance->setVisibility(1);
 				//if (!meshInstance->isStaticMesh() && !meshUpdated)
 				meshInstance->update();
@@ -462,6 +466,7 @@ void SBDrawCharacters_ES20(ESContext *esContext) {
 			{
 				//LOG("pawn %s is static mesh", pawn->getName().c_str());
 			}
+			*/
 			//if(pawn->dMeshInstance_p->getDeformableMesh())
 			drawMeshStatic(meshInstance, esContext, false);
 			//else
@@ -740,7 +745,36 @@ void SBUpdate(float t)
     //sim->update();
     bool update_sim = scene->getSimulationManager()->updateTimer();
     if (update_sim)
+    {
     	scene->update();
+
+    	// update mesh position
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		//printf("draw pawns::numOfPawns: %d\n", pawns.size());
+		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+			 pawnIter != pawns.end();
+			 pawnIter++)
+		{
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+			//LOG("draw pawn %s", pawn->getName().c_str());
+			//DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+			DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+			if(meshInstance)
+			{
+				if (!meshInstance->isStaticMesh())
+				{
+					//LOG("pawn %s is deformable mesh", pawn->getName().c_str());
+					meshInstance->blendShapeStaticMesh();
+					//meshInstance->setVisibility(1);
+					//if (!meshInstance->isStaticMesh() && !meshUpdated)
+					meshInstance->update();
+				}
+			}
+		}
+    }
+
+
+    
 }
     
 void SBExecuteCmd(const char* command)

@@ -90,7 +90,7 @@ void AppListener::OnCharacterUpdate( const std::string & name)
     SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
     if (!pawn)
         return;
-
+    /*
     // remove any existing scene
     if (pawn->scene_p)
     {
@@ -116,6 +116,7 @@ void AppListener::OnCharacterUpdate( const std::string & name)
     {
         scene->getRootGroup()->add( pawn->scene_p );
     }
+    */
 }
 
 void AppListener::OnPawnCreate( const std::string & name )
