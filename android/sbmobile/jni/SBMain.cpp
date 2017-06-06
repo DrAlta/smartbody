@@ -114,6 +114,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEn
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height)
 {	
+	LOG("onSurfaceChanged, width = %d, height = %d", width, height);
 	esContext.width = width;
 	esContext.height = height;
 	SBSetupDrawing(width,height, &esContext);
@@ -132,7 +133,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setup(JNIEnv * env,
 	{
 		int hasJVM = env->GetJavaVM(&SBMobile::jvm);
 	}
-	esInitContext(&esContext);	
+	//esInitContext(&esContext);	
 	SBInitialize(); // initialize smartbody with media path
 	initSBMobilePythonModule(); // initialize Python APIs for SBMobile to enable video/audio playback through JNI
 	sbInit = true;
@@ -153,11 +154,21 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_init(JNIEnv * env, 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env, jobject obj)
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	//LOG("render, scene = %d, sbInit = %d", scene, sbInit);
 	if(!scene)
 		return;
 	if (!sbInit)
+	{
+		/*
+		LOG("No sbInit yet, draw test background curW = %d, curH = %d", curW, curH);
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.33f, 0.78f, 0.95f, 1.f);
+		glViewport( 0, 0, curW, curH);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		*/
 		return;
-	SrMat id;
+	}
+	SrMat id;	
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	SBDrawFrame_ES20(curW, curH, &esContext, id);
 }
