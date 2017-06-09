@@ -104,12 +104,12 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				SmartBody::util::log(" .dae file %s doesn't contain visual scene information.", convertedPath.c_str());
 			SBSkeleton* skeleton = new SBSkeleton();
 			skeleton->setName(basename + extension);
-			SBMotion* motion = new SBMotion();
-			motion->setName(basename + extension);
+			SBMotion* singleMotion = new SBMotion();
+			singleMotion->setName(basename + extension);
 			int order;
 			if (visualSceneNode)
 			{
-				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
+				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *singleMotion, 1.0, order, materialId2Name);
 
 				if (zaxis)
 				{				
@@ -138,11 +138,22 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			
 			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
 
+			SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 			std::vector<SBMotion*> motions;
+			
 			if (skmNode)
 			{
-
-				ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, motions, 1.0, order, false);
+				// NOTE: Some Collada files put each animation channel in a separate <animation> node. For this kind of special case, enable "parseSingleAnimation" to combine all nodes into one animation.
+				// Otherwise, the default ( and correct ) behavior should be separate each <animation> node into an individual SBMotion. 
+				if (scene->getBoolAttribute("parseSingleAnimation"))
+				{					
+					ParserCOLLADAFast::parseLibrarySingleAnimation(skmNode, *skeleton, *singleMotion, 1.0, order, false);
+					motions.push_back(singleMotion);
+				}
+				else
+				{
+					ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, motions, 1.0, order, false);
+				}				
 			}
 
 			if (skeleton->getNumJoints() == 0)
