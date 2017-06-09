@@ -670,13 +670,13 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 			
 			// process this node as a joint if it's a non-geometry node
 			bool treatAsJoint = false;
-			if (typeAttr == "NODE" && hasRootJoint)
-			{
-				treatAsJoint = true;
-				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
-				if (geometryNode)
-					treatAsJoint = false;
-			}
+ 			if (typeAttr == "NODE" && hasRootJoint)
+ 			{
+ 				treatAsJoint = true;
+ 				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
+ 				if (geometryNode)
+ 					treatAsJoint = false;
+ 			}
 			
 			if (treatAsJoint || typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
 			{
@@ -685,7 +685,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				int index = -1;
 				if (parent != NULL)	
 					index = parent->index();
-
+				//SmartBody::util::log("ParseJoint : id = %s, name = %s, type = %s, parent idx = %d", idAttr.c_str(), nameAttr.c_str(), typeAttr.c_str(), index);
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
 				if (skeleton.search_joint(nameAttr.c_str()) != NULL)
@@ -1000,6 +1000,280 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 	}
 }
 
+
+void ParserCOLLADAFast::parseLibrarySingleAnimation(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis)
+{
+	SkChannelArray& skChannels = skeleton.channels();
+	motion.init(skChannels);
+	SkChannelArray& motionChannels = motion.channels();
+	SkChannelArray channelsForAdjusting;
+
+	std::map<std::string, ColladaFloatArrayFast > floatArrayMap;
+	std::map<std::string, ColladaSamplerFast  > samplerMap;
+	std::vector<ColladChannelFast > channelSamplerNameMap;
+
+	std::map<std::string, std::vector<std::string> > jointRotationOrderMap;
+
+	std::set<int> quatIDSet;
+	std::vector<int> quatIDList;
+	for (unsigned int k = 0; k < motionChannels.size(); k++)
+	{
+		std::string chanName = motionChannels.name(k);
+		std::string type = "rotateX";
+		int dataID = getMotionChannelId(motionChannels, chanName, type);
+		if (dataID >= 0)
+			quatIDSet.insert(dataID);
+	}
+	std::copy(quatIDSet.begin(), quatIDSet.end(), std::back_inserter(quatIDList));
+
+	//const DOMNodeList* list = node->getChildNodes();
+	rapidxml::xml_node<>* curNode = node->first_node();
+	// load all array of floats with corresponding channel names and sample rates
+	while (curNode)
+		//for (unsigned int i = 0; i < list->getLength(); i++)
+	{
+		//rapidxml::xml_node<>* node1 = list->item(i);	
+		rapidxml::xml_node<>* node1 = curNode;
+		std::string node1Name = node1->name();
+		if (node1Name == "animation")
+		{
+			parseNodeAnimation(node1, floatArrayMap, scale, samplerMap, channelSamplerNameMap, skeleton);
+		}
+		curNode = curNode->next_sibling();
+	}
+
+	std::vector<ColladChannelFast>::iterator mi;
+	for (mi = channelSamplerNameMap.begin();
+		mi != channelSamplerNameMap.end();
+		mi++)
+	{
+		ColladChannelFast& colChannel = *mi;
+		SkJoint* joint = skeleton.search_joint(colChannel.targetJointName.c_str());
+		if (!joint) continue; // joint does not exist in the skeleton
+		if (samplerMap.find(colChannel.sourceName) == samplerMap.end()) continue; // sampler does not exist
+		ColladaSamplerFast& sampler = samplerMap[colChannel.sourceName];
+		if (floatArrayMap.find(sampler.inputName) == floatArrayMap.end() || floatArrayMap.find(sampler.outputName) == floatArrayMap.end())
+			continue; // no float array
+
+		ColladaFloatArrayFast& inFloatArray = floatArrayMap[sampler.inputName];
+		ColladaFloatArrayFast& outFloatArray = floatArrayMap[sampler.outputName];
+
+
+		// insert frames for the motion
+		if (motion.frames() == 0)
+		{
+			for (unsigned int frameCt = 0; frameCt < inFloatArray.floatArray.size(); frameCt++)
+			{
+				motion.insert_frame(frameCt, inFloatArray.floatArray[frameCt]);
+				for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
+					motion.posture(frameCt)[postureCt] = 0.0f;
+				// reset quaternion to zero rotation
+				for (unsigned int k = 0; k < quatIDList.size(); k++)
+				{
+					motion.posture(frameCt)[quatIDList[k]] = 1.f;
+				}
+
+			}
+		}
+		if (colChannel.targetType == "matrix")
+		{
+			int stride = 16;
+			SrMat tran;
+			std::string jName = colChannel.targetJointName;
+
+			channelsForAdjusting.add(jName.c_str(), SkChannel::Quat);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::XPos);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::YPos);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::ZPos);
+
+			// 			SrQuat rotateOffset;
+			// 			if (zaxis && jName == skeleton.root()->name())
+			// 			{
+			// 				// rotate by 90 degree				
+			// 				SrVec xaxis(1, 0, 0);
+			// 				SrQuat adjust(xaxis, 3.14159f / -2.0f);
+			// 				rotateOffset = adjust;	
+			// 			}
+			for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+			{
+				SrMat tran;
+				for (int m = 0; m < stride; m++)
+				{
+					int idx = frameCt*stride + m;
+					if (idx >= (int)outFloatArray.floatArray.size())
+						break;
+					tran[m] = outFloatArray.floatArray[idx];
+				}
+				tran.transpose();
+				SrVec offset;
+				offset.x = tran[12];
+				offset.y = tran[13];
+				offset.z = tran[14];
+				//if (joint)
+				//	offset -= joint->offset();
+				//offset = offset*joint->quat()->prerot();
+				SrQuat quat(tran);
+				// 				quat = rotateOffset*quat;
+				// 				offset = offset*rotateOffset;
+				//quat = joint->quat()->prerot().inverse()*quat;
+				int channelId = -1;
+				// put in translation
+				std::string strTranslate = "translate";
+				channelId = getMotionChannelId(motionChannels, jName, strTranslate);
+				if (channelId >= 0)
+				{
+					for (int k = 0; k < 3; k++)
+						motion.posture(frameCt)[channelId + k] = offset[k];
+				}
+				// put in rotation
+				std::string strRotation = "rotateX";
+				channelId = getMotionChannelId(motionChannels, jName, strRotation);
+				if (channelId >= 0)
+				{
+					for (int k = 0; k < 4; k++)
+						motion.posture(frameCt)[channelId + k] = quat.getData(k);
+				}
+			}
+		}
+		else
+		{
+			int channelId = getMotionChannelId(motionChannels, colChannel.targetJointName, colChannel.targetType);
+			if (channelId >= 0)
+			{
+				int stride = outFloatArray.stride;
+				for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+				{
+					for (int strideCt = 0; strideCt < stride; strideCt++)
+					{
+						int idx = frameCt*stride + strideCt;
+						if (idx >= (int)outFloatArray.floatArray.size()) continue;
+						motion.posture(frameCt)[channelId + strideCt] = outFloatArray.floatArray[idx];
+					}
+				}
+			}
+
+			std::string jointName = colChannel.targetJointName;
+			std::string channelType = colChannel.targetType;
+			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
+			{
+				if (channelsForAdjusting.search(jointName.c_str(), SkChannel::Quat) < 0)
+					channelsForAdjusting.add(jointName.c_str(), SkChannel::Quat);
+				if (jointRotationOrderMap.find(jointName) == jointRotationOrderMap.end())
+				{
+					std::vector<std::string> emptyString;
+					jointRotationOrderMap[jointName] = emptyString;
+				}
+				std::string rotationOrder = channelType.substr(channelType.size() - 1, 1);
+				jointRotationOrderMap[jointName].push_back(rotationOrder);
+			}
+			if (channelType == "translate")
+			{
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
+			}
+			if (channelType == "translateX")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
+			if (channelType == "translateY")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
+			if (channelType == "translateZ")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
+		}
+
+	}
+
+	// remap the euler angles to quaternion if necessary
+	std::vector<int> quatIndices;
+	int rootIdx = -1;
+	std::map<std::string, std::vector<std::string> >::iterator vi;
+	for (vi = jointRotationOrderMap.begin();
+		vi != jointRotationOrderMap.end();
+		vi++)
+	{
+		std::string jointName = (*vi).first;
+		//LOG("joint name = %s",jointName.c_str());
+		int channelID = motionChannels.search(jointName, SkChannel::Quat);
+		if (channelID != -1)
+		{
+			int quatIdx = motionChannels.float_position(channelID);
+			if (zaxis && jointName == skeleton.root()->jointName())
+				rootIdx = quatIdx;
+			quatIndices.push_back(quatIdx);
+		}
+	}
+
+	for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+	{
+		for (size_t i = 0; i < quatIndices.size(); i++)
+		{
+			int quatId = quatIndices[i];
+			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
+			float roty = motion.posture(frameCt)[quatId + 1] / scale;
+			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
+			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			rotx *= float(M_PI) / 180.0f;
+			roty *= float(M_PI) / 180.0f;
+			rotz *= float(M_PI) / 180.0f;
+			SrMat mat;
+			sr_euler_mat(order, mat, rotx, roty, rotz);
+			SrQuat quat = SrQuat(mat);
+			motion.posture(frameCt)[quatId + 0] = quat.w;
+			motion.posture(frameCt)[quatId + 1] = quat.x;
+			motion.posture(frameCt)[quatId + 2] = quat.y;
+			motion.posture(frameCt)[quatId + 3] = quat.z;
+		}
+
+		if (zaxis) // rotate the root joints depending on up axis
+		{
+			std::string rootName = skeleton.root()->jointName();
+			SrVec newPos;
+			SrQuat newQuatRot;
+			SrVec xaxis(1, 0, 0);
+			SrQuat adjust(xaxis, 3.14159f / -2.0f);
+			int channelID = motionChannels.search(rootName, SkChannel::Quat);
+			if (channelID != -1)
+			{
+				int quatId = motionChannels.float_position(channelID);
+				newQuatRot.w = motion.posture(frameCt)[quatId + 0];
+				newQuatRot.x = motion.posture(frameCt)[quatId + 1];
+				newQuatRot.y = motion.posture(frameCt)[quatId + 2];
+				newQuatRot.z = motion.posture(frameCt)[quatId + 3];
+				newQuatRot = adjust*newQuatRot;
+				motion.posture(frameCt)[quatId + 0] = newQuatRot.w;
+				motion.posture(frameCt)[quatId + 1] = newQuatRot.x;
+				motion.posture(frameCt)[quatId + 2] = newQuatRot.y;
+				motion.posture(frameCt)[quatId + 3] = newQuatRot.z;
+			}
+
+			for (int k = 0; k < 3; k++)
+			{
+				int chanType = SkChannel::XPos + k;
+				int xID = motionChannels.search(rootName, (SkChannel::Type)chanType);
+				if (xID)
+					newPos[k] = motion.posture(frameCt)[motionChannels.float_position(xID)];
+			}
+			newPos = newPos*adjust;
+			for (int k = 0; k < 3; k++)
+			{
+				int chanType = SkChannel::XPos + k;
+				int xID = motionChannels.search(rootName, (SkChannel::Type)chanType);
+				if (xID)
+					motion.posture(frameCt)[motionChannels.float_position(xID)] = newPos[k];
+			}
+		}
+	}
+
+
+
+	double duration = double(motion.duration());
+	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0 / 3.0, duration);
+	motion.compress();
+	// now there's adjust for the channels by default
+	animationPostProcessByChannels(skeleton, dynamic_cast<SmartBody::SBMotion*>(&motion), channelsForAdjusting);
+	//animationPostProcess(skeleton,motion);
+}
+
+
 void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSkeleton& skeleton, std::vector<SmartBody::SBMotion*>& motions, float scale, int& order, bool zaxis )
 {
 	
@@ -1295,6 +1569,7 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 
 	
 }
+
 
 void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {

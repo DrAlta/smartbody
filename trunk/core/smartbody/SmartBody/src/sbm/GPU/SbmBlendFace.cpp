@@ -530,7 +530,6 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 
 void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
 {
-
 	GLint prevBufferObject;
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &prevBufferObject);
 
