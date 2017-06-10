@@ -26,7 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <queue>
 
-#define ELITE_HACK 1
+#define ELITE_HACK 0
 
 namespace SmartBody {
 
