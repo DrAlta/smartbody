@@ -124,7 +124,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			// get the default gesture map if the emotional one isn't available
 			if (gestureMapName != "gestureMap")
 			{
-				gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(character->getStringAttribute("gestureMap"));		
+				gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(character->getStringAttribute("gestureMap"));
 			}
 			if (!gestureMap)
 			{
@@ -153,11 +153,18 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		}
 		int useIndex = -1;
 		if (request->actor->getBoolAttribute("gestureRequest.useLastRandomGesture"))
-			useIndex = request->actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
+		{
+			int nextIndex = request->actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
+			std::string pastGestureChoicesStr = request->actor->getStringAttribute("gestureRequest.curGestureRandom");
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(pastGestureChoicesStr, tokens, "|");
+			if (tokens.size() > nextIndex)
+				useIndex = atoi(tokens[nextIndex].c_str());
+			request->actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", nextIndex + 1);
+		}
 		int appliedIndex = 0;
 		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"), useIndex, appliedIndex);
-		if (useIndex > -1)
-			request->actor->setBoolAttribute("gestureRequest.useLastRandomGesture", useIndex + 1);
+			
 		std::string str = request->actor->getStringAttribute("gestureRequest.lastGestureRandom");
 		if (str != "")
 			str += "|";

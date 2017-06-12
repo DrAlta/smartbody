@@ -419,7 +419,6 @@ void BmlRequest::faceRequestProcess()
 
 void BmlRequest::gestureRequestProcess()
 {
-	bool useLastGestureChoices = actor->getBoolAttribute("gestureRequest.useLastRandomGesture");
 	std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
 
 	std::vector<int> lastChoices;
@@ -479,14 +478,13 @@ void BmlRequest::gestureRequestProcess()
 					if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 					{
 						int which = 0;
-						if (useLastGestureChoices)
+						if (actor->getBoolAttribute("gestureRequest.useLastRandomGesture"))
 						{
 							int lastChoiceIndex = actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
 							if (int(lastChoices.size()) > lastChoiceIndex)
 							{
 								which = lastChoices[lastChoiceIndex];
-								lastChoiceIndex++;
-								actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex);
+								actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex + 1);
 							}
 							else
 							{
@@ -1079,14 +1077,13 @@ void BmlRequest::gestureRequestProcess()
 			if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 			{
 				int which = 0;
-				if (useLastGestureChoices)
+				if (actor->getBoolAttribute("gestureRequest.useLastRandomGesture"))
 				{
 					int lastChoiceIndex = actor->getIntAttribute("gestureRequest.lastGestureRandomIndex");
 					if (int(lastChoices.size()) > lastChoiceIndex)
 					{
 						which = lastChoices[lastChoiceIndex];
-						lastChoiceIndex++;
-						actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex);
+						actor->setIntAttribute("gestureRequest.lastGestureRandomIndex", lastChoiceIndex + 1);
 						
 					}
 					else
