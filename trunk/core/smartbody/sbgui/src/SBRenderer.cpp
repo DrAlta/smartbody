@@ -1060,7 +1060,7 @@ void SBGBuffer::initBuffer(int w, int h)
 
 void SBGBuffer::resize(int w, int h)
 {
-	SmartBody::util::log("Resize SBGBuffer");
+	//SmartBody::util::log("Resize SBGBuffer");
 	createBufferTex(w, h, false);
 }
 
