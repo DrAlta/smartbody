@@ -371,7 +371,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	texm.updateTexture();
 
 
-	bool useRenderTarget = false;
+	bool useRenderTarget = true;
 	if (useRenderTarget)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
@@ -434,7 +434,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
 {
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glViewport( 0, 0, w, h);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawBackgroundTexID(esContext->fboTexID, esContext);
