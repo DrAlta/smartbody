@@ -54,7 +54,7 @@ public class SBMobileLib {
 	 public static native double  getDoubleAttribute(String attrName);
 	 public static native int getIntAttribute(String attrName);
 
-    static void playSound(String soundFile, boolean loopSound)
+    public static void playSound(String soundFile, boolean loopSound)
     {
         Log.e("SBM", "SBMobileLib: Playing sound " + soundFile);
         if (_mediaPlayer != null)
@@ -74,7 +74,7 @@ public class SBMobileLib {
         }
     }
 
-    static void stopSound()
+    public static void stopSound()
     {
         Log.e("SBM", "SBMobileLib: Stop playing sound ");
         if (_mediaPlayer != null)

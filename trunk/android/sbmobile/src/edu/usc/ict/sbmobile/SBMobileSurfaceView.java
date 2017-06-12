@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -86,11 +87,12 @@ public class SBMobileSurfaceView extends GLSurfaceView {
                 SBMobileLib.reloadTexture();
         		sbReloadTexture = false;
         	}
+            //Log.e("myapp", "onDrawFrame");
             SBMobileLib.render();
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-           // Log.d("SBM", "onSurfaceChanged");
+            //Log.e("myapp", "onSurfaceChanged");
             SBMobileLib.surfaceChanged(width, height);
         }
 

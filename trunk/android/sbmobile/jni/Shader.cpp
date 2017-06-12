@@ -898,6 +898,7 @@ extern "C"
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, backgroundTexID);
 		glUniform1i (backData->samplerLoc, 0);
+		//LOG("drawBackgroundTexID, after glBindTexture");
 		float z_max = -(1.f - 0.0001f);//gwiz::epsilon8());
 		SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
 		SrVec2 quadT[4] = { SrVec2(0.f, 1.f), SrVec2(0.f, 0.f), SrVec2(1.f, 0.f), SrVec2(1.f, 1.f) };
@@ -912,13 +913,14 @@ extern "C"
 		glVertexAttribPointer(texcoord_loc,2,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
 		//wes_matrix_mvp();
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
-			
+		//LOG("drawBackgroundTexID, before glDrawElements");
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
-		
+		//LOG("drawBackgroundTexID, after glDrawElements");
 		glDisableVertexAttribArray(pos_loc);
 		glDisableVertexAttribArray(texcoord_loc);
 		
 		glUseProgram(0);
+		//LOG("drawBackgroundTexID, after glUseProgram(0)");
 	}
 	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
 	{

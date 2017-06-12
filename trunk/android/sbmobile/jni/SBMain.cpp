@@ -181,7 +181,9 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv
 	if (!sbInit)
 		return;
 	SrMat id;
+	//LOG("Runninmg FBOTex Rendering");
 	SBDrawFBOTex_ES20(width, height, &esContext, id);
+	//LOG("Done with FBOTex Rendering");
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	//SBDrawFrame_ES20(curW, curH, &esContext, id);
 }
