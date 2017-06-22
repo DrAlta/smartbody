@@ -1289,7 +1289,11 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 	SmartBodyBinary::StaticMesh staticMesh = *mesh;
 
 	// 1 StaticMesh
-	this->setName(staticMesh.staticmeshname());
+	//this->setName(staticMesh.staticmeshname());
+	// set the mesh name based on the filename
+	boost::filesystem::path p(file);
+	this->setName(p.filename().string());
+
 	for (int numMeshModels = 0; numMeshModels < staticMesh.meshmodels_size(); ++numMeshModels)
 	{
 		const SmartBodyBinary::MeshModel& meshModel = staticMesh.meshmodels(numMeshModels);
@@ -1989,7 +1993,7 @@ SrVec DeformableMesh::computeCenterOfMass()
 	{
 		CoM += posBuf[i];
 	}
-	CoM /= posBuf.size();
+	CoM /= (float) posBuf.size();
 	return CoM;
 }
 
