@@ -55,13 +55,13 @@ public class SBMobileSurfaceView extends GLSurfaceView {
      public void onResume() {
         super.onResume();
         sbReloadTexture = true;
-        //Log.d("SBM","VHMobileSurfaceView::onResume");
+        Log.e("SBM","VHMobileSurfaceView::onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //Log.d("SBM", "VHMobileSurfaceView::onPause");
+        Log.e("SBM", "VHMobileSurfaceView::onPause");
 
     }
 

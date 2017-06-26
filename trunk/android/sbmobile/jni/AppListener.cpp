@@ -12,6 +12,7 @@
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 
 
 AppListener::AppListener()
@@ -26,7 +27,7 @@ void AppListener::OnCharacterCreate( const std::string & name, const std::string
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     SmartBody::SBPawn* pawn = scene->getPawn(name);
-	//LOG("On character create, name = '%s'", name.c_str());
+	//SmartBody::util::log("On character create, name = '%s'", name.c_str());
     if (!pawn)
         return;
 
@@ -34,7 +35,7 @@ void AppListener::OnCharacterCreate( const std::string & name, const std::string
     SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
     if (attr)
 	{
-		//LOG("pawn %s, register attribute 'mesh'", name.c_str());
+		//SmartBody::util::log("pawn %s, register attribute 'mesh'", name.c_str());
         attr->registerObserver(this);
 	}
     attr = pawn->getAttribute("deformableMesh");
@@ -121,7 +122,7 @@ void AppListener::OnCharacterUpdate( const std::string & name)
 
 void AppListener::OnPawnCreate( const std::string & name )
 {
-	LOG("On pawn create, name = '%s'", name.c_str());
+	SmartBody::util::log("On pawn create, name = '%s'", name.c_str());
     OnCharacterCreate(name, "");
 }
 
@@ -163,7 +164,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
                     pawn->dMeshInstance_p = new DeformableMeshInstance();
                 SrVec val = vec3Attribute->getValue();
                 pawn->dMeshInstance_p->setMeshScale(SrVec(val));
-				//LOG("Set mesh to size %f", val[0]);
+				//SmartBody::util::log("Set mesh to size %f", val[0]);
             }
         }
         else if (name == "deformableMesh" || name == "mesh")
@@ -174,7 +175,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 			{
 				const std::string& value = strAttribute->getValue();
 				// clean up any old meshes
-				//LOG("Set 'mesh' to %s", value.c_str());
+				//SmartBody::util::log("Set 'mesh' to %s", value.c_str());
 				if (value == "")
 					return;
 
@@ -200,14 +201,14 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
-						//LOG("useDeformableMesh : %d", value.c_str());
+						//SmartBody::util::log("useDeformableMesh : %d", value.c_str());
 						pawn->dMeshInstance_p = new DeformableMeshInstance();
 						//pawn->dMeshInstance_p = new DeformableMeshInstance();
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
 					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
 					{
-						//LOG("useStaticMesh1 : %d", value.c_str());
+						//SmartBody::util::log("useStaticMesh1 : %d", value.c_str());
 						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
@@ -215,7 +216,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					}
 					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
-						//LOG("useStaticMesh2 : %d", value.c_str());
+						//SmartBody::util::log("useStaticMesh2 : %d", value.c_str());
 						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
@@ -247,7 +248,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					if (mesh->blendShapeMap.size() == 0)
 #endif
 					{
-						//LOG("Building blenshapes");
+						//SmartBody::util::log("Building blenshapes");
 						// if there are no blendshapes, but there are blendShape.channelName attributes, 
 						// then add the morph targets
 						std::vector<SmartBody::StringAttribute*> shapeAttributes;
@@ -267,7 +268,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 						}
 
 						int numShapeAttributes = shapeAttributes.size();
-						//LOG("Num Shape Attributes = %d", numShapeAttributes);
+						//SmartBody::util::log("Num Shape Attributes = %d", numShapeAttributes);
 						if (numShapeAttributes > 0)
 						{
 							// make space for all the attributes
@@ -342,7 +343,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 									}
 								}
 							}
-							//LOG("Num blendshapes = %d", blendshapeIter->second.size());
+							//SmartBody::util::log("Num blendshapes = %d", blendshapeIter->second.size());
 						}
 					}
 					

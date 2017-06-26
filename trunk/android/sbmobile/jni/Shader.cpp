@@ -15,6 +15,7 @@
 #include "Shader.h"
 #include "sb/SBScene.h"
 #include "sb/SBAttribute.h"
+#include <sb/SBUtilities.h>
 #include "sbm/GPU/SbmTexture.h"
 #include "sr/sr_camera.h"
 #include "sr/sr_light.h"
@@ -508,14 +509,14 @@ extern "C"
 
 		if(!compiled)
 		{
-			LOG("shader error : %s", shaderSrc);
+			SmartBody::util::log("shader error : %s", shaderSrc);
 			GLint infoLen = 0;
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
 
 			if(infoLen > 0){ 
 				char* infoLog = (char*)malloc(sizeof(char) * infoLen);
 				glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-                LOG("Shader Build Log = %s", infoLog);
+                SmartBody::util::log("Shader Build Log = %s", infoLog);
 				free(infoLog);
 			}
 
@@ -524,7 +525,7 @@ extern "C"
 		}
 		else
 		{
-			LOG("shader is complied correctly");
+			SmartBody::util::log("shader is complied correctly");
 		}
 
 		return shader;
@@ -567,7 +568,7 @@ extern "C"
 		if(!linked)
 		{
 			GLint infoLen = 0;
-			LOG("program %d error", programObject);
+			SmartBody::util::log("program %d error", programObject);
 			glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &infoLen);
 
 			if(infoLen > 0)
@@ -575,7 +576,7 @@ extern "C"
 				char *infoLog = (char*)malloc(sizeof(char) * infoLen);
 
 				glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
-				LOG("Error linking program:\n%s\n", infoLog);
+				SmartBody::util::log("Error linking program:\n%s\n", infoLog);
 				free(infoLog);
 
 			}
@@ -585,7 +586,7 @@ extern "C"
 		}
 		else
 		{
-			LOG("program %d is linked correctly", programObject);
+			SmartBody::util::log("program %d is linked correctly", programObject);
 		}
 
 		//setp 7: free shader resources
@@ -612,7 +613,7 @@ extern "C"
 #define GPU_SKINNING 0
 #if GPU_SKINNING
         glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &maxVUniforms);
-		LOG("Web browser supports %d number of Vertex uniform vectors", maxVUniforms);
+		SmartBody::util::log("Web browser supports %d number of Vertex uniform vectors", maxVUniforms);
 		if(maxVUniforms >= MAX_VERTEX_UNIFORM_1024)
 			userData->programObject = esLoadProgram(vShaderStr, fShaderStr);
 		else
@@ -680,7 +681,7 @@ extern "C"
 
 
 		// setup render target
-		LOG("Generate FBO object");
+		SmartBody::util::log("Generate FBO object");
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
    		std::string fboName = "renderFBO";
    		std::string fboTexName = "fboTex";
@@ -697,8 +698,8 @@ extern "C"
    		glBindRenderbuffer(GL_RENDERBUFFER, esContext->fboDepthBuf);
    		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, esContext->width, esContext->height);
 
-   		LOG("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
-   		LOG("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
+   		SmartBody::util::log("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
+   		SmartBody::util::log("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
 
    		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
    		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, esContext->fboDepthBuf);
@@ -877,11 +878,11 @@ extern "C"
 	
 	void SHADER_API drawBackground(std::string backgroundName, ESContext *esContext)
 	{
-		//LOG("Shader drawBackground");
+		//SmartBody::util::log("Shader drawBackground");
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,backgroundName.c_str());
 		if (!tex)
 		{
-			//LOG("drawBackground : cannot find texture image .....");
+			//SmartBody::util::log("drawBackground : cannot find texture image .....");
 			return; // no background image
 		}
 
@@ -898,7 +899,7 @@ extern "C"
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, backgroundTexID);
 		glUniform1i (backData->samplerLoc, 0);
-		//LOG("drawBackgroundTexID, after glBindTexture");
+		//SmartBody::util::log("drawBackgroundTexID, after glBindTexture");
 		float z_max = -(1.f - 0.0001f);//gwiz::epsilon8());
 		SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
 		SrVec2 quadT[4] = { SrVec2(0.f, 1.f), SrVec2(0.f, 0.f), SrVec2(1.f, 0.f), SrVec2(1.f, 1.f) };
@@ -913,20 +914,20 @@ extern "C"
 		glVertexAttribPointer(texcoord_loc,2,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
 		//wes_matrix_mvp();
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
-		//LOG("drawBackgroundTexID, before glDrawElements");
+		//SmartBody::util::log("drawBackgroundTexID, before glDrawElements");
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
-		//LOG("drawBackgroundTexID, after glDrawElements");
+		//SmartBody::util::log("drawBackgroundTexID, after glDrawElements");
 		glDisableVertexAttribArray(pos_loc);
 		glDisableVertexAttribArray(texcoord_loc);
 		
 		glUseProgram(0);
-		//LOG("drawBackgroundTexID, after glUseProgram(0)");
+		//SmartBody::util::log("drawBackgroundTexID, after glUseProgram(0)");
 	}
 	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
 	{
 		UserData *userData = (UserData*)esContext->userData;
 		SmartBody::SBScene *scene = SmartBody::SBScene::getScene();
-		//LOG("Render Deformable Model");
+		//SmartBody::util::log("Render Deformable Model");
 		DeformableMesh *mesh = shape->getDeformableMesh();
 		std::vector<SrVec4>          QuaternionBuf;
 		std::vector<SrVec4>			 TranslationBuf;
@@ -945,7 +946,7 @@ extern "C"
 		}
 		glEnable( GL_MULTISAMPLE );
 		glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-		//LOG("meshScale = %f", shape->getMeshScale());
+		//SmartBody::util::log("meshScale = %f", shape->getMeshScale());
 		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
 		
 		if (shape->_deformPosBuf.size() > 0)
@@ -1043,11 +1044,11 @@ extern "C"
 						{
 							glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
 							//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
-							//LOG("Use Blended texture");
+							//SmartBody::util::log("Use Blended texture");
 						}
 						else 
 						{
-							//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+							//SmartBody::util::log("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 							glBindTexture(GL_TEXTURE_2D, tex->getID());
 						}
 
@@ -1080,7 +1081,7 @@ extern "C"
 		UserData *userData = (UserData*)esContext->userData;
 		glUseProgram ( userData->programObject );
 		SmartBody::SBScene *scene = SmartBody::SBScene::getScene();
-		//LOG("Render Deformable Model");
+		//SmartBody::util::log("Render Deformable Model");
 		DeformableMesh *mesh = shape->getDeformableMesh();
 		std::vector<SrVec4>          QuaternionBuf;
 		std::vector<SrVec4>			 TranslationBuf;
@@ -1104,7 +1105,7 @@ extern "C"
 		{
 			glUniform1i(userData->blendTextureLightLoc, 0);
 		}
-		//LOG("meshScale = %f", shape->getMeshScale());
+		//SmartBody::util::log("meshScale = %f", shape->getMeshScale());
 		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
 
 		if (shape->_deformPosBuf.size() > 0)
@@ -1176,10 +1177,10 @@ extern "C"
 				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
                 SbmTexture* normalMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMesh->normalMapName.c_str());
                 SbmTexture* specularMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
-				//LOG("Render StaticMesh texName = %s, tex = %d", subMesh->texName.c_str(), tex);
+				//SmartBody::util::log("Render StaticMesh texName = %s, tex = %d", subMesh->texName.c_str(), tex);
 				if (tex && !showSkinWeight)
 				{
-					//LOG("Render StaticMesh texID = %d", tex->getID());
+					//SmartBody::util::log("Render StaticMesh texID = %d", tex->getID());
 					GLint activeTexture = -1;
 					glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
 
@@ -1201,20 +1202,20 @@ extern "C"
 						{
 							glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
 							//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
-							//LOG("Use Blended texture");
+							//SmartBody::util::log("Use Blended texture");
 						}
 						else
 						{
-							//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+							//SmartBody::util::log("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 							glBindTexture(GL_TEXTURE_2D, tex->getID());
 						}
 					}
 					else 		//	If blended textures not used, use neutral appearance
 					{
 						glBindTexture(GL_TEXTURE_2D, tex->getID());
-						//LOG("Use original texture, texID = %d", tex->getID());
+						//SmartBody::util::log("Use original texture, texID = %d", tex->getID());
 					}
-                    //LOG("sTexture uniform loc = %d", userData->samplerLoc);
+                    //SmartBody::util::log("sTexture uniform loc = %d", userData->samplerLoc);
 					glUniform1i (userData->samplerLoc, 0);
 				}
                 if (normalMap)

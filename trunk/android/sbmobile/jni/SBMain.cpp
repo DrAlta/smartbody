@@ -17,6 +17,7 @@
 #include <jni.h>
 #include <vhcl.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <sbm/GPU/SbmTexture.h>
@@ -60,7 +61,7 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_openConnection(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_closeConnection(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
-	JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLog(JNIEnv * env, jobject obj);
+	JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLOG(JNIEnv * env, jobject obj);
     JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName);
 	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getBoolAttribute(JNIEnv * env, jobject obj, jstring attrName);
 	JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getDoubleAttribute(JNIEnv * env, jobject obj, jstring attrName);  
@@ -104,7 +105,7 @@ JNIEXPORT jint JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNI
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj)
 {
-	//LOG("Reload OpenGL Texture");
+	//SmartBody::util::log("Reload OpenGL Texture");
 	SBInitGraphics(&esContext);
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	texm.reloadTexture();
@@ -114,7 +115,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEn
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height)
 {	
-	LOG("onSurfaceChanged, width = %d, height = %d", width, height);
+	SmartBody::util::log("onSurfaceChanged, width = %d, height = %d", width, height);
 	esContext.width = width;
 	esContext.height = height;
 	SBSetupDrawing(width,height, &esContext);
@@ -147,20 +148,21 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_init(JNIEnv * env, 
 	scene->addAssetPath("script", "scripts");
 	SBInitScene("init.py");		
 	vhcl::Log::g_log.AddListener(&androidListener);		
-	LOG("Initializing Done");
+	//SmartBody::util::g_log.AddListener(&androidListener);		
+	SmartBody::util::log("Initializing Done");
 }
 
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env, jobject obj)
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	//LOG("render, scene = %d, sbInit = %d", scene, sbInit);
+	//SmartBody::util::log("render, scene = %d, sbInit = %d", scene, sbInit);
 	if(!scene)
 		return;
 	if (!sbInit)
 	{
 		/*
-		LOG("No sbInit yet, draw test background curW = %d, curH = %d", curW, curH);
+		SmartBody::util::log("No sbInit yet, draw test background curW = %d, curH = %d", curW, curH);
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.33f, 0.78f, 0.95f, 1.f);
 		glViewport( 0, 0, curW, curH);
@@ -181,9 +183,9 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv
 	if (!sbInit)
 		return;
 	SrMat id;
-	//LOG("Runninmg FBOTex Rendering");
+	//SmartBody::util::log("Runninmg FBOTex Rendering");
 	SBDrawFBOTex_ES20(width, height, &esContext, id);
-	//LOG("Done with FBOTex Rendering");
+	//SmartBody::util::log("Done with FBOTex Rendering");
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	//SBDrawFrame_ES20(curW, curH, &esContext, id);
 }
@@ -238,11 +240,11 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_executeSB(JNIEnv * 
 	if (!sbInit)
 		return;
 	const char* pyCmdStrConst = (env)->GetStringUTFChars( sbmCmd , NULL ) ;
-	LOG("python cmd = %s",pyCmdStrConst);
+	SmartBody::util::log("python cmd = %s",pyCmdStrConst);
 	SBExecutePythonCmd(pyCmdStrConst);
 }
 
-JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLog( JNIEnv * env, jobject obj )
+JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getLOG( JNIEnv * env, jobject obj )
 {	
 	if (!sbInit)
 		return env->NewStringUTF("");;
