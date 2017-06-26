@@ -279,6 +279,8 @@ class SBScene : public SBObject
 
 		SBAPI void rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendThreshold = 0.025f);
 
+		//bool  blendScalePos(SrVec &v, SrVec &rootPos, int rootIdx, int headIdx, float blendThreshold, float scaleRatio);
+
 #if 0 // should be creating navigation mesh directly in AssetManager
 		SBAPI bool createNavigationMesh(const std::string& meshfilename);
 #endif

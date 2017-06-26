@@ -63,7 +63,7 @@ void printLog(const std::string& message)
 		if (s[s.size() - 1] == '\n')
 			s.erase(s.length() - 1);
 	if (s.length() > 0)
-		SmartBody::util::logSimple(s.c_str());
+		SmartBody::util::log(s.c_str());
 }
 
 
