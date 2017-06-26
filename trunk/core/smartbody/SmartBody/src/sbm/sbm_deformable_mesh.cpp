@@ -542,6 +542,7 @@ void DeformableMesh::rebuildVertexBuffer( bool rebuild )
 
 bool DeformableMesh::buildSkinnedVertexBuffer()
 {	
+	SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBuffer()");
 	if (initSkinnedVertexBuffer) return true;
 
 	if (initStaticVertexBuffer && !isSkinnedMesh()) return true;
@@ -611,6 +612,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 					SkJoint* curJoint = skinWeight->infJoint[k];
 					if (boneJointIdxMap.find(jointName) == boneJointIdxMap.end()) // new joint
 					{
+						//SmartBody::util::log("BoneJointIdxMap, joint name = %s, idx = %d", jointName.c_str(), nTotalBones);
 						boneJointIdxMap[jointName] = nTotalBones++;		
 						boneJointList.push_back(curJoint);
 						boneJointNameList.push_back(jointName);
@@ -639,7 +641,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-		//SmartBody::util::log("meshIndexList %d, matList.size() = %d \n", i, matList.size());
+		SmartBody::util::log("meshIndexList %d, matList.size() = %d \n", i, matList.size());
 		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	

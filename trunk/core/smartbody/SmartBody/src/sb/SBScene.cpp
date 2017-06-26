@@ -125,6 +125,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_sn_group.h>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 // for minizip compression
 
 #if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
@@ -649,7 +650,8 @@ void SBScene::update()
 
 		return;
 	}
-
+	
+	//SmartBody::util::log("After remote mode");
 	// scripts
 	this->getProfiler()->mark("scripts", 1, "beforeUpdate()");
 	std::map<std::string, SmartBody::SBScript*>& scripts = getScripts();
@@ -661,7 +663,7 @@ void SBScene::update()
 			(*iter).second->beforeUpdate(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("scripts");
-
+	//SmartBody::util::log("After script");
 	// services
 	this->getProfiler()->mark("services", 1, "beforeUpdate()");
 	std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
@@ -673,6 +675,7 @@ void SBScene::update()
 			(*iter).second->beforeUpdate(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("services");
+	//SmartBody::util::log("After services");
 
 	this->getProfiler()->mark("allsequences", 1, "commands");
 	std::string seqName = "";
@@ -734,6 +737,7 @@ void SBScene::update()
 			//pawn->updateToColObject();
 			pawn->updateToSteeringSpaceObject();
 		}
+		//SmartBody::util::log("After pawn update");
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 
 		if( char_p )
@@ -766,6 +770,7 @@ void SBScene::update()
 		}  // end of char_p processing
 		
 		this->getProfiler()->mark(pawn->getName().c_str());
+		//SmartBody::util::log("After character mode");
 	} // end of loop
 	this->getProfiler()->mark("pawn");
 	
@@ -787,7 +792,7 @@ void SBScene::update()
 		listeners[i]->OnSimulationUpdate( );
 	}
 	this->getProfiler()->mark("listeners");
-
+	//SmartBody::util::log("After listener update");
 	this->getProfiler()->mark("scripts", 1, "update()");
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
@@ -797,7 +802,7 @@ void SBScene::update()
 			(*iter).second->update(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("scripts");
-
+	//SmartBody::util::log("After running scripts");
 	this->getProfiler()->mark("services", 1, "update()");
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
@@ -807,7 +812,7 @@ void SBScene::update()
 			(*iter).second->update(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("services");
-
+	//SmartBody::util::log("After service update");
 	// services
 	this->getProfiler()->mark("services", 1, "afterUpdate()");
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
@@ -832,7 +837,7 @@ void SBScene::update()
 	this->getProfiler()->mark("scripts");
 
 	this->getProfiler()->mark("SBScene::update()");
-
+	//SmartBody::util::log("After SBScene::update");
 }
 
 
@@ -4180,10 +4185,100 @@ void SBScene::updateCharacterNames()
 	}
 }
 
+bool blendScalePos(SrVec &v, SrVec &rootPos, int rootIdx, int headIdx, SrVec4i& boneIdx, SrVec4& boneWeight, float blendThreshold, float scaleRatio)
+{
+	if (v.y > rootPos.y + blendThreshold)
+		return false;
+
+	float rootHeadSkinWeightMax = 0.9f;
+	float rootHeadSkinWeightMin = 0.7f;
+	float rootSkinWeightMin = 0.1f;
+	float headSkinWeight = -1.f;
+	float rootSkinWeight = -1.f;
+	for (int k = 0; k < 4; k++)
+	{
+		if (boneIdx[k] == rootIdx)
+		{
+			rootSkinWeight = boneWeight[k];
+			//SmartBody::util::log("neck skin weight = %f", rootSkinWeight);
+		}
+		else if (boneIdx[k] == headIdx)
+		{
+			headSkinWeight = boneWeight[k];
+			//SmartBody::util::log("head skin weight = %f", headSkinWeight);
+		}
+	}
+	if (headSkinWeight > rootHeadSkinWeightMax) return false; // don't scale the part when head weight is larger than threshold
+	//if (v.y > rootPos.y && rootSkinWeight < rootSkinWeightMin) return false;
+	//float blendRatio = (v.y - rootPos.y + blendThreshold) / (blendThreshold*2.0);
+	float blendRatio = (v.y - rootPos.y) / (blendThreshold);
+	//float blendRatio = 0.f;
+	if (blendRatio < 0.f) blendRatio = 0.0;
+// 	if (headSkinWeight > rootHeadSkinWeightMin)
+// 	{		
+// 		blendRatio = (headSkinWeight - rootHeadSkinWeightMin) / (rootHeadSkinWeightMax - rootHeadSkinWeightMin);
+// 		SmartBody::util::log("head skin weight = %f, root skin weight = %f, blendRatio = %f", headSkinWeight, rootSkinWeight, blendRatio);
+// 	}
+	
+	float blendScaleRatio = (blendRatio)+(1.0 - blendRatio)*scaleRatio;
+	v = rootPos + (v - rootPos)*blendScaleRatio;
+	return true;
+}
+
+bool blendScalePos2(SrVec &v, SrVec &rootPos, SrVec &neckPos, int rootIdx, int neckIdx, SrVec4i& boneIdx, SrVec4& boneWeight, float blendThreshold, float scaleRatio)
+{
+	if (v.y > rootPos.y) // don't change anything
+		return false;
+
+	float rootHeadSkinWeightMax = 0.9f;
+	float rootHeadSkinWeightMin = 0.7f;
+	float rootSkinWeightMin = 0.1f;
+	float neckSkinWeight = -1.f;
+	float rootSkinWeight = -1.f;
+	for (int k = 0; k < 4; k++)
+	{
+		if (boneIdx[k] == rootIdx)
+		{
+			rootSkinWeight = boneWeight[k];
+			//SmartBody::util::log("neck skin weight = %f", rootSkinWeight);
+		}
+		else if (boneIdx[k] == neckIdx)
+		{
+			neckSkinWeight = boneWeight[k];
+			//SmartBody::util::log("head skin weight = %f", headSkinWeight);
+		}
+	}
+	if (rootSkinWeight > rootHeadSkinWeightMax) return false; // don't scale the part when head weight is larger than threshold
+	if (v.y > neckPos.y && neckSkinWeight < 0.1f) return false;
+
+	//float blendRatio = (v.y - rootPos.y + blendThreshold) / (blendThreshold*2.0);
+	float blendRatio = (rootPos.y - v.y) / (blendThreshold);
+	//float blendRatio = 0.f;
+	if (blendRatio > 1.f) blendRatio = 1.f;
+	//if (v.y < neckPos.y) blendRatio = 1.f;
+	//if (rootPos.y < neckPos.y) blendRatio = 0.f
+	// 	if (headSkinWeight > rootHeadSkinWeightMin)
+	// 	{		
+	// 		blendRatio = (headSkinWeight - rootHeadSkinWeightMin) / (rootHeadSkinWeightMax - rootHeadSkinWeightMin);
+	// 		SmartBody::util::log("head skin weight = %f, root skin weight = %f, blendRatio = %f", headSkinWeight, rootSkinWeight, blendRatio);
+	// 	}
+
+	float blendScaleRatio = (1.0 - blendRatio)+(blendRatio)*scaleRatio;
+	v = rootPos + (v - rootPos)*blendScaleRatio;
+	return true;
+}
+
+
+
+
 SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendRatio)
 {
+	SmartBody::util::log("Rescale mesh and skeleton");
 	SBAssetManager* assetManager = getAssetManager();
 	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+	
+	
+	
 	SmartBody::SBSkeleton* skel = assetManager->getSkeleton(skelName);
 	if (!mesh || !skel)
 	{
@@ -4197,40 +4292,73 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 		SmartBody::util::log("Warning, can't find joint '%s'.", rootJointName.c_str());
 		return;
 	}
+	SmartBody::util::log("before build skin vertex buffer");
+	mesh->buildSkinnedVertexBuffer();
+	SmartBody::util::log("after build skin vertex buffer");
 
+	SmartBody::util::log("before skeleton update global matrices");
 	skel->update_global_matrices();
 	SrVec rootPos = rootJoint->gmat().get_translation();
 	std::vector<std::string> belowJointNames;
+	std::string headJointName = "none";
 	belowJointNames.push_back(rootJointName);
+	int rootJointIdx = mesh->boneJointIdxMap[rootJointName];
+	int headJointIdx = -1;
+	int neckJointIdx = -1;
+	SmartBody::util::log("before find head joints");
 	for (unsigned int i = 0; i < skel->getNumJoints(); i++)
 	{
 		SmartBody::SBJoint* joint = skel->getJoint(i);
+#if 1
+		//if (joint->getParent() == rootJoint) // children of root joint
+		{
+			std::string jointName = joint->getName();
+			std::transform(jointName.begin(), jointName.end(), jointName.begin(), ::tolower);
+			if (jointName.find("head") != std::string::npos)
+			{
+				SmartBody::util::log("Head Joint = %s", joint->getMappedJointName().c_str());
+				headJointName = joint->getMappedJointName();
+				headJointIdx = mesh->boneJointIdxMap[headJointName];
+			}
+		}
+#endif
+
 		SrVec jpos = joint->gmat().get_translation();
 		if (jpos.y < rootPos.y) // lower than root position
 		{
 			belowJointNames.push_back(joint->getMappedJointName());
 		}
 	}
+	SrVec neckPos = rootJoint->getParent()->gmat().get_translation();
+	neckJointIdx = mesh->boneJointIdxMap[rootJoint->getParent()->getMappedJointName()];
+	SmartBody::util::log("Head Joint name = %s, idx = %d, Root Joint name = %s, idx = %d", headJointName.c_str(), headJointIdx, rootJointName.c_str(), rootJointIdx);
 	
-	float blendThreshold = skel->getBoundingBox().size().y*blendRatio;
+	float blendThreshold = skel->getBoundingBox().size().y*blendRatio;	
+	
+	//rootPos = rootPos + SrVec(0, blendThreshold, 0);
 
 	for (unsigned int i = 0; i < mesh->dMeshStatic_p.size(); i++)
 	{
 		SrModel& model = mesh->dMeshStatic_p[i]->shape();
 		SrModel& dynModel = mesh->dMeshDynamic_p[i]->shape();
-
+		SkinWeight* skinWeight = mesh->skinWeights[i];
+		skinWeight->buildSkinWeightBuf();		
 		//std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;
-
 		for (unsigned int k = 0; k < model.V.size(); k++)
 		{		
 			SrVec v = model.V[k];
-			if (v.y > rootPos.y + blendThreshold)
-				continue;
-			//float blendRatio = (v.y - rootPos.y + blendThreshold) / (blendThreshold*2.0);
-			float blendRatio = (v.y - rootPos.y ) / (blendThreshold);
-			if (blendRatio < 0.f ) blendRatio = 0.0;
-			float blendScaleRatio = (blendRatio) + (1.0 - blendRatio)*scaleRatio;
-			v = rootPos + (v - rootPos)*blendScaleRatio;
+			SrVec4i gboneIdx;
+			SrVec4i& lboneIdx = skinWeight->boneIDs[k];
+			for (int b = 0; b < 4; b++)
+			{
+				gboneIdx[b] = mesh->boneJointIdxMap[skinWeight->infJointName[lboneIdx[b]]];
+			}
+			//LOG("old bone idx = %d %d %d %d", lboneIdx[0], lboneIdx[1], lboneIdx[2], lboneIdx[3]);
+			//LOG("global bone idx = %d %d %d %d", gboneIdx[0], gboneIdx[1], gboneIdx[2], gboneIdx[3]);
+			bool willScale = blendScalePos(v, rootPos, rootJointIdx, headJointIdx, gboneIdx, skinWeight->boneWeights[k], blendThreshold, scaleRatio);
+			//bool willScale = blendScalePos2(v, rootPos, neckPos, rootJointIdx, neckJointIdx, gboneIdx, skinWeight->boneWeights[k], blendThreshold, scaleRatio);
+			if (!willScale) continue;
+
 			model.V[k] = v; // update the new position
 			dynModel.V[k] = v;
 			//model.VOrig[k] = v;
@@ -4245,6 +4373,7 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 				for (unsigned int k = 0; k < faceModel.V.size(); k++)
 				{
 					SrVec v = faceModel.V[k];
+#if 0
 					if (v.y > rootPos.y + blendThreshold)
 						continue;
 
@@ -4252,6 +4381,17 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 					if (blendRatio < 0.f) blendRatio = 0.0;
 					float blendScaleRatio = (blendRatio)+(1.0 - blendRatio)*scaleRatio;
 					v = rootPos + (v - rootPos)*blendScaleRatio;
+#else
+					SrVec4i gboneIdx;
+					SrVec4i& lboneIdx = skinWeight->boneIDs[k];
+					for (int b = 0; b < 4; b++)
+					{
+						gboneIdx[b] = mesh->boneJointIdxMap[skinWeight->infJointName[lboneIdx[b]]];
+					}
+					bool willScale = blendScalePos(v, rootPos, rootJointIdx, headJointIdx, gboneIdx, skinWeight->boneWeights[k], blendThreshold, scaleRatio);
+					//bool willScale = blendScalePos2(v, rootPos, neckPos, rootJointIdx, neckJointIdx, gboneIdx, skinWeight->boneWeights[k], blendThreshold, scaleRatio);
+					if (!willScale) continue;
+#endif
 
 					//v = rootPos + (v - rootPos)*scaleRatio;
 					//faceModel.V[k] = v; // update the new position					
