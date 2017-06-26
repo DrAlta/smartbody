@@ -20,6 +20,7 @@
 #include <sb/SBAttribute.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_deformable_mesh.h>
@@ -207,7 +208,7 @@ void setupLights()
 		}
 	}
 
-    //LOG("light size = %d\n",_lights.size());
+    //SmartBody::util::log("light size = %d\n",_lights.size());
 	
 	if (_lights.size() == 0 && numLightsInScene == 0)
 	{
@@ -310,7 +311,7 @@ void SBSetup(const char* mediapath, const char* setupScript)
 {
 	vhcl::Log::g_log.AddListener(&listener);
 	XMLPlatformUtils::Initialize();
-	LOG("media path%s", mediapath);
+	SmartBody::util::log("media path%s", mediapath);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string mpath = mediapath;
 	initPython(mpath + "pythonLib_27/Lib");
@@ -332,13 +333,13 @@ void SBInitialize()
 }
 
 void SBInitGraphics(ESContext *esContext) {
-	LOG("Before shaderInit");
+	SmartBody::util::log("Before shaderInit");
 	shaderInit(esContext);
-	LOG("After shaderInit");
+	SmartBody::util::log("After shaderInit");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->createIntAttribute("renderer.fboTexID",- 1, true,"",40,false,false,false,"texture id attached with the current fbo. For fast video recording.");
 	scene->setIntAttribute("renderer.fboTexID", esContext->fboTexID);
-	LOG("fboTexID = %d", esContext->fboTexID);
+	SmartBody::util::log("fboTexID = %d", esContext->fboTexID);
 }
 
 
@@ -352,11 +353,11 @@ void SBInitScene( const char* initScriptName )
 }
 
 void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView) {
-	//LOG("draw!");
+	//SmartBody::util::log("draw!");
 	static bool initShader = false;
 	if (!initShader)
 	{
-		LOG("Shader not initialized, run SBInitGraphics.");
+		SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
 		SBInitGraphics(esContext);
         initShader = true;
 	}
@@ -398,25 +399,26 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	glViewport( 0, 0, width, height);
 	SrMat matMVP = matModelView * matPerspective;
 	//use the shape program object
-	//LOG("Before use program");
+	//SmartBody::util::log("Before use program");
 	glUseProgram (shapeData->programObject );
-	//LOG("After use program");
+	//SmartBody::util::log("After use program");
 	glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
 	glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
-	//LOG("Before draw grid");
+	//SmartBody::util::log("Before draw grid");
 	//drawGrid(esContext);
-	//LOG("Before draw pawns");
+	//SmartBody::util::log("Before draw pawns");
 	SBDrawPawns(esContext);
 	// Use the program object
-	//LOG("Before userData useProgram");
+	//SmartBody::util::log("Before userData useProgram");
 	glUseProgram ( userData->programObject );
 	glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
 	glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
-	//LOG("Before SBDrawCharacters_ES20");
+	//SmartBody::util::log("Before SBDrawCharacters_ES20");
 	SBDrawCharacters_ES20(esContext);
 	//draw lights
-	//LOG("After SBDrawCharacters_ES20");
+	//SmartBody::util::log("After SBDrawCharacters_ES20");
 	drawLights(esContext);
+	//SmartBody::util::log("SBDrawFrame_ES20::drawRenderTarget");
 	if (useRenderTarget)
 	{
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -428,7 +430,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 		*/
 		SBDrawFBOTex_ES20(width, height, esContext, eyeView);
 	}
-	//LOG("After drawLights");
+	//SmartBody::util::log("After drawLights");
 }
 
 void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
@@ -449,24 +451,26 @@ void SBDrawCharacters_ES20(ESContext *esContext) {
 		 pawnIter++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		//LOG("draw pawn %s", pawn->getName().c_str());
+		//SmartBody::util::log("draw pawn %s", pawn->getName().c_str());
 		//DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if(meshInstance)
-		{	/*
+		{	
+			#if 0
 			if (!meshInstance->isStaticMesh())
 			{
-				//LOG("pawn %s is deformable mesh", pawn->getName().c_str());
-				//meshInstance->blendShapeStaticMesh();
-				meshInstance->setVisibility(1);
+				//SmartBody::util::log("pawn %s is deformable mesh", pawn->getName().c_str());
+				meshInstance->blendShapeStaticMesh();
+				//meshInstance->setVisibility(1);
 				//if (!meshInstance->isStaticMesh() && !meshUpdated)
 				meshInstance->update();
 			}
 			else
 			{
-				//LOG("pawn %s is static mesh", pawn->getName().c_str());
+				//SmartBody::util::log("pawn %s is static mesh", pawn->getName().c_str());
 			}
-			*/
+			#endif
+			
 			//if(pawn->dMeshInstance_p->getDeformableMesh())
 			drawMeshStatic(meshInstance, esContext, false);
 			//else
@@ -523,11 +527,11 @@ void SBDrawFrame(int width, int height, SrMat eyeViewMat)
 	}
 
 	
-	//LOG("Getting Scene");
+	//SmartBody::util::log("Getting Scene");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if(!scene)
 		return;
-	//LOG("Got Scene");
+	//SmartBody::util::log("Got Scene");
 
 #if 0
 	SmartBody::SBAttribute* attribute = scene->getAttribute("appStatus");
@@ -552,7 +556,7 @@ void SBDrawFrame(int width, int height, SrMat eyeViewMat)
 	glClearColor(0.4f,0.4f,0.4f,1);
 	myGLEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	//LOG("Preparing to DrawCharacter");
+	//SmartBody::util::log("Preparing to DrawCharacter");
     // setup view
     cam.setAspectRatio(float(width) / float(height));
 	SrMat mat;
@@ -567,7 +571,7 @@ void SBDrawFrame(int width, int height, SrMat eyeViewMat)
 	glLoadMatrixf ( (float*) mat);
 	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
 
-	//LOG("Set camera");
+	//SmartBody::util::log("Set camera");
 #if 1
     // draw lights
     setupLights();
@@ -600,7 +604,7 @@ void SBDrawFrame(int width, int height, SrMat eyeViewMat)
      */
     
     // draw characters
-    //LOG("Drawing Character");
+    //SmartBody::util::log("Drawing Character");
 	SBDrawBackground();
     SBDrawCharacters();
 #endif
@@ -614,11 +618,11 @@ void SBDrawBackground(ESContext* esContext)
 	SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"background_img");
 	if (!tex)
 	{
-		//LOG("cannot find texture image .....");
+		//SmartBody::util::log("cannot find texture image .....");
 		return; // no background image
 	}
 
-	//LOG("texture image id = %d", tex->getID());
+	//SmartBody::util::log("texture image id = %d", tex->getID());
 	glMatrixMode (GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity ();
@@ -634,7 +638,7 @@ void SBDrawBackground(ESContext* esContext)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-	//LOG("before bindAttrib");
+	//SmartBody::util::log("before bindAttrib");
 	float z_max = -(1.f - gwiz::epsilon10());
 	SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
 	SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
@@ -689,7 +693,7 @@ void SBDrawCharacters()
             jointPos[i * 3 + 0] = pos.x;
             jointPos[i * 3 + 1] = pos.y;
             jointPos[i * 3 + 2] = pos.z;
-			//LOG("Joint %d, Position = %f %f %f", i, pos.x,pos.y,pos.z);
+			//SmartBody::util::log("Joint %d, Position = %f %f %f", i, pos.x,pos.y,pos.z);
             indexMap[joint->index()] = i;
             boneIdx[i*2+0] = joint->index();
             if (joint->parent())
@@ -731,6 +735,7 @@ void SBDrawCharacters()
     
 void SBUpdate(float t)
 {
+	//SmartBody::util::log("SBUpdate, t = %f", t);
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
     if((!scene)  || (!sim))
@@ -739,7 +744,7 @@ void SBUpdate(float t)
 	{
 		int err = SmartBody::SBScene::getScene()->getVHMsgManager()->poll();
 		if( err == CMD_FAILURE )   {
-			LOG("ttu_poll ERROR\n" );
+			SmartBody::util::log("ttu_poll ERROR\n" );
 		}
 	}
     //sim->update();
@@ -749,6 +754,7 @@ void SBUpdate(float t)
     	scene->update();
 
     	// update mesh position
+    	#if 1
 		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 		//printf("draw pawns::numOfPawns: %d\n", pawns.size());
 		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -756,14 +762,14 @@ void SBUpdate(float t)
 			 pawnIter++)
 		{
 			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-			//LOG("draw pawn %s", pawn->getName().c_str());
+			//SmartBody::util::log("draw pawn %s", pawn->getName().c_str());
 			//DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 			DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 			if(meshInstance)
 			{
 				if (!meshInstance->isStaticMesh())
 				{
-					//LOG("pawn %s is deformable mesh", pawn->getName().c_str());
+					//SmartBody::util::log("pawn %s is deformable mesh", pawn->getName().c_str());
 					meshInstance->blendShapeStaticMesh();
 					//meshInstance->setVisibility(1);
 					//if (!meshInstance->isStaticMesh() && !meshUpdated)
@@ -771,6 +777,7 @@ void SBUpdate(float t)
 				}
 			}
 		}
+		#endif
     }
 
 
@@ -781,28 +788,28 @@ void SBExecuteCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
-    LOG("%s\n", command);
+    SmartBody::util::log("%s\n", command);
 }
     
 void SBExecutePythonCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->run(command);
-    LOG("%s\n", command);
+    SmartBody::util::log("%s\n", command);
 }
 
 
 void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	//if (!mcuInit) return;
-	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
+	//SmartBody::util::log("VHMSG Callback : op = %s ,args = %s\n",op,args);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	switch( scene->getCommandManager()->execute( op, (char *)args ) ) {
 	case CMD_NOT_FOUND:
-		LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+		SmartBody::util::log("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
 		break;
 	case CMD_FAILURE:
-		LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+		SmartBody::util::log("SBM ERR: command FAILED: '%s' + '%s'", op, args );
 		break;
 	}
 }
@@ -835,11 +842,11 @@ void SBInitVHMSGConnection()
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
 		scene->getVHMsgManager()->setEnable(true);
-		LOG("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
+		SmartBody::util::log("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
 	}
 	else
 	{
-		LOG("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
+		SmartBody::util::log("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
 	}
 }
     
