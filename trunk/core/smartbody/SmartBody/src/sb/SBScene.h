@@ -277,7 +277,7 @@ class SBScene : public SBObject
 		SBAPI void updatePawnNames();
 		SBAPI void updateCharacterNames();
 
-		SBAPI void rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendThreshold = 0.025f);
+		SBAPI void rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, const std::vector<std::string>& skipMeshNames, float scaleRatio, float blendThreshold = 0.025f);
 
 		//bool  blendScalePos(SrVec &v, SrVec &rootPos, int rootIdx, int headIdx, float blendThreshold, float scaleRatio);
 

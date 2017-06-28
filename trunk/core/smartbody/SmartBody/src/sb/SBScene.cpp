@@ -4271,7 +4271,7 @@ bool blendScalePos2(SrVec &v, SrVec &rootPos, SrVec &neckPos, int rootIdx, int n
 
 
 
-SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendRatio)
+SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, const std::vector<std::string>& skipMeshNames, float scaleRatio, float blendRatio)
 {
 	SmartBody::util::log("Rescale mesh and skeleton");
 	SBAssetManager* assetManager = getAssetManager();
@@ -4336,6 +4336,9 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 	float blendThreshold = skel->getBoundingBox().size().y*blendRatio;	
 	
 	//rootPos = rootPos + SrVec(0, blendThreshold, 0);
+	std::map<std::string, bool> skipMeshMap;
+	for (unsigned int i = 0; i < skipMeshNames.size(); i++)
+		skipMeshMap[skipMeshNames[i]] = true;
 
 	for (unsigned int i = 0; i < mesh->dMeshStatic_p.size(); i++)
 	{
@@ -4343,6 +4346,9 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 		SrModel& dynModel = mesh->dMeshDynamic_p[i]->shape();
 		SkinWeight* skinWeight = mesh->skinWeights[i];
 		skinWeight->buildSkinWeightBuf();		
+		std::string modelName = (const char*)model.name;
+		if (skipMeshMap.find(modelName) != skipMeshMap.end()) // skip the mesh
+			continue;
 		//std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;
 		for (unsigned int k = 0; k < model.V.size(); k++)
 		{		
@@ -4363,7 +4369,9 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 			dynModel.V[k] = v;
 			//model.VOrig[k] = v;
 		}		
-		std::string modelName = (const char*)model.name;
+		model.computeNormals();
+		dynModel.computeNormals();
+		//std::string modelName = (const char*)model.name;
 		if (mesh->blendShapeMap.find(modelName) != mesh->blendShapeMap.end()) // the shape is associated with blendshape
 		{
 			std::vector<SrSnModel*>& blendShapes = mesh->blendShapeMap[modelName];
