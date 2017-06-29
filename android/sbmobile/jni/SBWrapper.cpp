@@ -300,7 +300,14 @@ void setupLights()
 
 void SBSetupDrawing(int w, int h, ESContext *esContext)
 {   
-	glViewport(0, 0, w, h);
+	static bool firstSetupDrawing = true;
+	if (firstSetupDrawing)
+	{
+		//SmartBody::util::log("First setup drawing, glViewport = %d %d", w, h);
+		glViewport(0, 0, w, h);
+		firstSetupDrawing = false;
+	}
+	
 	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 	//myGLEnable(GL_CULL_FACE);
 	//glShadeModel(GL_SMOOTH);
@@ -355,9 +362,10 @@ void SBInitScene( const char* initScriptName )
 void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView) {
 	//SmartBody::util::log("draw!");
 	static bool initShader = false;
+	static bool firstRender = true;
 	if (!initShader)
 	{
-		SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
+		//SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
 		SBInitGraphics(esContext);
         initShader = true;
 	}
@@ -390,13 +398,20 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	
 	//cam.print();
 	// setup view
-	cam.setAspectRatio(float(width) / float(height));
+	if (firstRender)
+	{
+		float aspectRatio = float(width) / float(height);
+		cam.setAspectRatio(aspectRatio);
+		SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+		firstRender = false;
+	}
+	
 	SrMat matPerspective, matModelView;
 	cam.get_perspective_mat(matPerspective);
 	cam.get_view_mat(matModelView);
 	matModelView *= cam.getScale();
 	matModelView = matModelView*eyeView;
-	glViewport( 0, 0, width, height);
+	//glViewport( 0, 0, width, height);
 	SrMat matMVP = matModelView * matPerspective;
 	//use the shape program object
 	//SmartBody::util::log("Before use program");
@@ -437,7 +452,7 @@ void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
 {
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0, 0.0, 0.0, 1.0);
-	glViewport( 0, 0, w, h);
+	//glViewport( 0, 0, w, h);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawBackgroundTexID(esContext->fboTexID, esContext);
 }
