@@ -4352,7 +4352,7 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 		//std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;
 		for (unsigned int k = 0; k < model.V.size(); k++)
 		{		
-			SrVec v = model.V[k];
+			SrVec& v = model.V[k];
 			SrVec4i gboneIdx;
 			SrVec4i& lboneIdx = skinWeight->boneIDs[k];
 			for (int b = 0; b < 4; b++)
