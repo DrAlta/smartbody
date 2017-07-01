@@ -402,7 +402,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	{
 		float aspectRatio = float(width) / float(height);
 		cam.setAspectRatio(aspectRatio);
-		SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+		//SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
 		firstRender = false;
 	}
 	
