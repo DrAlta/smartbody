@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    flatDir {
+        dirs 'libs' //this way we can find the .aar file in libs folder
+    }
+}
+
+repositories {
+    jcenter()
+    mavenLocal() // Missed this
+}
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "edu.usc.ict.sbsimpleapp"
+        minSdkVersion 19
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("./keystore/myapp.keystore")
+            storePassword "myapp123"
+            keyAlias "myapp"
+            keyPassword "myapp123"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    //buildTypes {
+    //    release {
+    //        minifyEnabled false
+    //        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    //    }
+    //}
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile(name:'sbmobile-release', ext:'aar')
+    compile 'com.android.support:appcompat-v7:21.0.3'
+}
