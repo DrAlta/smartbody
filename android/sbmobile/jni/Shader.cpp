@@ -362,11 +362,11 @@ extern "C"
 		"  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
 		"  vec4 lightColor = vec4(1.0,1.0,1.0,1.0);							\n"
 		"  //if (blendTextureWithLight==1)									\n"
-		"  //lightColor = vComputedLightColor;										\n"
+		"  lightColor = vComputedLightColor;										\n"
 		"  if (texColor.a < 0.2) discard;                                   \n"
-		"  //gl_FragColor  = lightColor;//texColor * lightColor;							\n"
+		"  gl_FragColor  = texColor * lightColor;							\n"
 		"  //gl_FragColor  =  vec4(1.0,0,0,1.0);                   			\n"
-		"  gl_FragColor  =  texColor;                   			\n"
+		"  //gl_FragColor  =  texColor;                   			\n"
 		"}																	\n"
 
 		;
@@ -423,7 +423,7 @@ extern "C"
                     "  vComputedLightColor.a = 1.0;                                  \n"
                     //"  gl_FragColor  = texColor * vComputedLightColor;				 \n"
                     "  gl_FragColor  = vComputedLightColor;				 \n"
-                    "  //gl_FragColor  =  vec4(normal,1.0);                   			     \n"
+                    "  //gl_FragColor  =  vec4(texColor.a , texColor.a , texColor.a ,1.0);                   			     \n"
                     "}																	\n"
 
     ;
@@ -620,8 +620,8 @@ extern "C"
 			userData->programObject = esLoadProgram(vShaderLimitedStr, fShaderStr);
 #else
         maxVUniforms = 2048; // fake the maxVUniform for non-GPU skinning
-		//userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
-        userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
+		userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
+        //userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
         //userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderStr);
 #endif
 		
