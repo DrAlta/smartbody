@@ -301,7 +301,7 @@ void setupLights()
 void SBSetupDrawing(int w, int h, ESContext *esContext)
 {   
 	static bool firstSetupDrawing = true;
-	if (firstSetupDrawing)
+	//if (firstSetupDrawing)
 	{
 		//SmartBody::util::log("First setup drawing, glViewport = %d %d", w, h);
 		glViewport(0, 0, w, h);
@@ -398,7 +398,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	
 	//cam.print();
 	// setup view
-	if (firstRender)
+	//if (firstRender)
 	{
 		float aspectRatio = float(width) / float(height);
 		cam.setAspectRatio(aspectRatio);
