@@ -2,13 +2,12 @@ scene.run("BehaviorSetCommon.py")
 def setupBehaviorSet():
 	scene = getScene()	
 	print "Setting up behavior set for Reaching ..."
-	#scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
-	#scene.loadAssetsFromPath("behaviorsets/reaching/motions")
 	scene.addAssetPath("script", "behaviorsets/reaching/scripts")
 	
 	
 	assetManager = scene.getAssetManager()	
-	motionPath = "behaviorsets/reaching/motions/"
+	#motionPath = "behaviorsets/reaching/motions/"
+	motionPath = "behaviorsets/reaching/motionsBinary/"
 	skel = scene.getSkeleton("common.sk")
 	if skel == None:
 		scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
@@ -51,7 +50,6 @@ def setupBehaviorSet():
 	rightHandMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
 	rightHandMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
 	rightHandMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Release")
-	rightHandMotions.append("HandsAtSide_RArm_GestureYou")
 	
 	leftHandMotions = StringVec();
 	leftHandMotions.append(preFix+"ChrHarmony_Relax001_LArmReachRtHigh")
@@ -88,12 +86,12 @@ def setupBehaviorSet():
 	leftHandMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp")	
 	leftHandMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Reach")	
 	leftHandMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Release")	
-	leftHandMotions.append("HandsAtSide_LArm_GestureYou")	
 	
 	for i in range(0,len(rightHandMotions)):
 		motion = scene.getMotion(rightHandMotions[i])
 		if motion == None:
-			assetManager.loadAsset(motionPath+rightHandMotions[i]+'.skm')
+			#assetManager.loadAsset(motionPath+rightHandMotions[i]+'.skm')
+			assetManager.loadAsset(motionPath+rightHandMotions[i]+'.skmb')
 			motion = scene.getMotion(rightHandMotions[i])
 		#print 'motionName = ' + locoMotions[i]
 		if motion != None:
