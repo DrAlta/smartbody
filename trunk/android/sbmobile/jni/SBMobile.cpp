@@ -1,6 +1,13 @@
 #include "SBMobile.h"
+#include "SBWrapper.h"
 #include <vhcl.h>
 #include <sb/SBUtilities.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sr/sr_plane.h>
+#include <sr/sr_box.h>
+#include <sr/sr_camera.h>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
@@ -22,21 +29,47 @@
 #include "external/stb/stb_image_resize.h"
 
 
-
 #include <GLES3/gl3.h>
 
+struct SBMobileWrap :  SBMobile, boost::python::wrapper<SBMobile>
+{
+	virtual bool eventScreenTouch(int action, float x, float y);	
+	bool default_eventScreenTouch(int action, float x, float y)  { return SBMobile::eventScreenTouch(action, x, y); }		
+};
+
+void setSBMobile(SBMobile* inEngine) { SBMobile::setSBMobile(inEngine); }
+
+
+
+bool SBMobileWrap::eventScreenTouch( int action, float x, float y )
+{	
+	if (boost::python::override o = this->get_override("eventScreenTouch"))
+	{
+		try {
+			return o(action,x,y);
+		} catch (...) {
+			PyErr_Print();
+		}
+	}	
+	
+	return SBMobile::eventScreenTouch(action,x,y);		
+}
+
+
+void setEngine(SBMobile* inEngine) { SBMobile::setSBMobile(inEngine); }
 
 BOOST_PYTHON_MODULE(SBMobile)
 {	
-	boost::python::class_<SBMobile>("SBMobile")
-		//.staticmethod("setEngine", &VHEngineWrap::setEngine, "Set the VHEngine singleton")
-		// Video API
-		.def("playVideo", &SBMobile::playVideo, "Playback a video file from a specific video view.")
-		.def("stopVideo", &SBMobile::stopVideo, "Stop the video playback.")		
-		// Sound API
-		.def("playSound", &SBMobile::playSound, "Playback a sound file.")
+	boost::python::def("setEngine", setEngine, "Set Engine");
+	boost::python::class_<SBMobileWrap, boost::noncopyable>("SBMobile")	
+		.def("playVideo", &SBMobile::playVideo, "Playback a video file from a specific video view.") // Video API
+		.def("stopVideo", &SBMobile::stopVideo, "Stop the video playback.")			
+		.def("playSound", &SBMobile::playSound, "Playback a sound file.") // Sound API
 		.def("stopSound", &SBMobile::stopSound, "Stop the sound playback.")
+		.def("convertScreenSpaceTo3D", &SBMobile::convertScreenSpaceTo3D, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")				
+		.def("testCharacterIntersection", &SBMobile::testCharacterIntersection, boost::python::return_value_policy<boost::python::return_by_value>(), "Test intersection with a character.")						
 		.def("snapshotPNGResize", &SBMobile::snapshotPNGResize, "Save the current image to png file.")
+		.def("eventScreenTouch", &SBMobile::eventScreenTouch, &SBMobileWrap::default_eventScreenTouch, "Event called when the screen is touched.")
 		;	
 
 }
@@ -48,9 +81,11 @@ void initSBMobilePythonModule()
 
 
 
+
 JavaVM* SBMobile::jvm = NULL;
 JNIEnv* SBMobile::env = NULL;
 bool    SBMobile::jvmIsAttached = false;
+SBMobile* SBMobile::engine = NULL;
 
 SBMobile::SBMobile()
 {
@@ -63,6 +98,102 @@ SBMobile::~SBMobile()
 	
 }
 
+void SBMobile::resize( int w, int h )
+{
+	screenWidth = w;
+	screenHeight = h;	
+	
+}
+
+std::string SBMobile::testCharacterIntersection(float x, float y, std::string charName)
+{	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBCharacter* sbChar = scene->getCharacter(charName);
+	if (!sbChar) return "none";
+	SmartBody::SBSkeleton* skel = sbChar->getSkeleton();
+	SrVec rayPt = convertScreenSpaceTo3D(x,y,SrVec(0,0,0), SrVec(0,0,1));
+	SrBox bbox = skel->getBoundingBox();	
+	// check projection only in 2D
+	bbox.a.z = 0.0;
+	bbox.b.z = 0.0;	
+	rayPt.z = 0.0;	
+	SmartBody::util::log("rayPt = %s, bbox min = %s, max = %s", rayPt.toString().c_str(), bbox.a.toString().c_str(), bbox.b.toString().c_str());
+	if (!bbox.contains(rayPt)) return "none";
+
+	skel->update_global_matrices();
+	std::vector<SkJoint*>& joints = skel->get_joint_array();	
+	float dist = 1e30;
+	int closestIdx = -1;
+	std::string closestJointName = "none";
+	for (size_t j = 0; j < joints.size(); j++)
+	{
+		if (joints[j]->getJointType() != SkJoint::TypeJoint)
+			continue;
+		joints[j]->update_gmat();
+		const SrMat& gmat = joints[j]->gmat();
+		SrVec point(gmat.get(3, 0), gmat.get(3, 1), 0.0);
+		//initialBoundingBox.extend(point);
+		if ((point - rayPt).norm() < dist)
+		{
+			dist = (point - rayPt).norm();
+			closestIdx = j;
+		}
+	}
+	if (closestIdx >= 0 && closestIdx < joints.size())
+		closestJointName = joints[closestIdx]->getMappedJointName();
+	return closestJointName;
+}
+
+SrVec SBMobile::convertScreenSpaceTo3D(float x, float y, SrVec ground, SrVec upVector)
+{
+	SrVec p1;
+	SrVec p2;
+	float screenX, screenY;
+	screenX = (float)(x*2.f)/screenWidth - 1.f;
+	screenY = (float)(y*2.f)/screenHeight - 1.f;
+	screenY *= -1.0;
+
+	//LOG("convertScreenSpaceTo3D, screenX = %f, screenY = %f", x, y);
+	SmartBody::SBScene::getScene()->getActiveCamera()->get_ray(screenX, screenY, p1, p2);
+	//SmartBody::util::log("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x,y, p1[0], p1[1], p1[2],  p2[0], p2[1], p2[2]);
+	bool intersectGround = true;
+	SrVec dest, src;				
+	SrPlane plane(ground, upVector);
+	dest = plane.intersect(p1, p2);
+	return dest;
+}
+
+bool SBMobile::eventScreenTouch(int action, float x, float y)
+{
+	//LOG("touch screen event, action = %d, x = %f, y = %f", action, x, y);
+	static bool firstTime = true;
+	static float prevx = 0.f, prevy = 0.f;
+	
+	// normalize coordinate first
+	x = x/screenWidth;
+	y = y/screenHeight;
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
+	if (action == 0) // action down
+		firstTime = true;
+	//SrCamera* cam = scene->getCamera("defaultCamera");
+	//if (!cam) return false;
+	float deltaX, deltaY;
+	deltaX = x - prevx; 
+	deltaY = y - prevy;
+	if (firstTime)
+	{
+		deltaX = 0.f;
+		deltaY = 0.f;
+		firstTime = false;		
+	}
+	prevx = x; 
+	prevy = y;
+	
+	SBCameraOperation(deltaX,deltaY);
+
+	return true;
+}
 
 jstring SBMobile::stringToJString( const std::string& str )
 {

@@ -23,12 +23,10 @@
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
 
+#if 0
 #ifdef __cplusplus
-
 extern "C" {
-#endif
-
-   
+#endif  
 ///
 //  Macros
 //
@@ -63,44 +61,11 @@ typedef struct
 {
     GLfloat   m[4][4];
 } ESMatrix;
+#endif
 
-typedef struct _escontext
-{
-   /// Put your user data here...
-   void*       userData;
-   void*	   shapeData;
-   void*       backgroundData;
 
-   // fbo data
-   GLuint fboTexID;
-   GLuint fboID;
-   GLuint fboDepthBuf;
 
-   /// Window width
-   GLint       width;
-
-   /// Window height
-   GLint       height;
-
-   /// Window handle
-   EGLNativeWindowType  hWnd;
-
-   /// EGL display
-   EGLDisplay  eglDisplay;
-      
-   /// EGL context
-   EGLContext  eglContext;
-
-   /// EGL surface
-   EGLSurface  eglSurface;
-
-   /// Callbacks
-   void (ESCALLBACK *drawFunc) ( struct _escontext * );
-   void (ESCALLBACK *keyFunc) ( struct _escontext *, unsigned char, int, int );
-   void (ESCALLBACK *updateFunc) ( struct _escontext *, float deltaTime );
-} ESContext;
-
-extern ESContext esContext;
+//extern ESContext esContext;
 
 typedef struct
 {
@@ -189,6 +154,48 @@ typedef struct
 
 } ShapeData;
 
+
+typedef struct _escontext
+{
+	/// Put your user data here...
+	UserData*       userData;
+	ShapeData*	   shapeData;
+	BackgroundData*       backgroundData;
+
+	// fbo data
+	GLuint fboTexID;
+	GLuint fboID;
+	GLuint fboDepthBuf;
+
+	/// Window width
+	GLint       width;
+
+	/// Window height
+	GLint       height;
+
+#if 0
+	/// Window handle
+	EGLNativeWindowType  hWnd;
+
+	/// EGL display
+	EGLDisplay  eglDisplay;
+
+	/// EGL context
+	EGLContext  eglContext;
+
+	/// EGL surface
+	EGLSurface  eglSurface;
+
+	/// Callbacks
+	void (ESCALLBACK *drawFunc) (struct _escontext *);
+	void (ESCALLBACK *keyFunc) (struct _escontext *, unsigned char, int, int);
+	void (ESCALLBACK *updateFunc) (struct _escontext *, float deltaTime);
+#endif
+} ESContext;
+
+
+
+#if 0
 ///
 //  Public Functions
 //
@@ -198,7 +205,7 @@ typedef struct
 /// \brief Initialize ES framework context.  This must be called before calling any other functions.
 /// \param esContext Application context
 //
-void ESUTIL_API esInitContext ( ESContext *esContext );
+void ESUTIL_API esInitContext(ESContext *esContext);
 
 //
 /// \brief Create a window with the specified parameters
@@ -213,34 +220,34 @@ void ESUTIL_API esInitContext ( ESContext *esContext );
 ///         ES_WINDOW_STENCIL - specifies that a stencil buffer should be created
 ///         ES_WINDOW_MULTISAMPLE - specifies that a multi-sample buffer should be created
 /// \return GL_TRUE if window creation is succesful, GL_FALSE otherwise
-GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char *title, GLint width, GLint height, GLuint flags );
+GLboolean ESUTIL_API esCreateWindow(ESContext *esContext, const char *title, GLint width, GLint height, GLuint flags);
 
 //
 /// \brief Register a draw callback function to be used to render each frame
 /// \param esContext Application context
 /// \param drawFunc Draw callback function that will be used to render the scene
 //
-void ESUTIL_API esRegisterDrawFunc ( ESContext *esContext, void (ESCALLBACK *drawFunc) ( ESContext* ) );
+void ESUTIL_API esRegisterDrawFunc(ESContext *esContext, void (ESCALLBACK *drawFunc) (ESContext*));
 
 //
 /// \brief Register an update callback function to be used to update on each time step
 /// \param esContext Application context
 /// \param updateFunc Update callback function that will be used to render the scene
 //
-void ESUTIL_API esRegisterUpdateFunc ( ESContext *esContext, void (ESCALLBACK *updateFunc) ( ESContext*, float ) );
+void ESUTIL_API esRegisterUpdateFunc(ESContext *esContext, void (ESCALLBACK *updateFunc) (ESContext*, float));
 
 //
 /// \brief Register an keyboard input processing callback function
 /// \param esContext Application context
 /// \param keyFunc Key callback function for application processing of keyboard input
 //
-void ESUTIL_API esRegisterKeyFunc ( ESContext *esContext, 
-                                    void (ESCALLBACK *drawFunc) ( ESContext*, unsigned char, int, int ) );
+void ESUTIL_API esRegisterKeyFunc(ESContext *esContext,
+	void (ESCALLBACK *drawFunc) (ESContext*, unsigned char, int, int));
 //
 /// \brief Log a message to the debug output for the platform
 /// \param formatStr Format string for error log.  
 //
-void ESUTIL_API esLogMessage ( const char *formatStr, ... );
+void ESUTIL_API esLogMessage(const char *formatStr, ...);
 
 //
 /// \brief Loads a 24-bit TGA image from a file
@@ -249,11 +256,10 @@ void ESUTIL_API esLogMessage ( const char *formatStr, ... );
 /// \param height Height of loaded image in pixels
 ///  \return Pointer to loaded image.  NULL on failure. 
 //
-char* ESUTIL_API esLoadTGA ( char *fileName, int *width, int *height );
-
-
+char* ESUTIL_API esLoadTGA(char *fileName, int *width, int *height);
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 #endif // ESUTIL_H

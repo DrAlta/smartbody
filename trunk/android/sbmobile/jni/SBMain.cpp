@@ -58,6 +58,9 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
 
+	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
+	
+
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_openConnection(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_closeConnection(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
@@ -68,11 +71,30 @@ extern "C" {
 	JNIEXPORT jint JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNIEnv * env, jobject obj, jstring attrName); 
 };
 
+
+JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my)
+{
+	SBMobile* engine = SBMobile::getSBMobile();
+	if (!engine) 
+	{
+		//engine = new SBMobile();
+		//SBMobile::setSBMobile(engine);
+		return false;
+	}
+	else
+	{
+		engine->resize(curW, curH);
+		return engine->eventScreenTouch(action,mx,my);
+	}	
+}
+
+
+
 JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName)
 {
 	const char* attrNameStr = (env)->GetStringUTFChars( attrName , NULL ) ;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-    std::string strVal = scene->getStringAttribute(attrNameStr);
+	std::string strVal = scene->getStringAttribute(attrNameStr);
     return env->NewStringUTF(strVal.c_str());
 }
 

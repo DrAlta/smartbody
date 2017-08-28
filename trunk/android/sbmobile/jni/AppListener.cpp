@@ -14,9 +14,11 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBUtilities.h>
 
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 AppListener::AppListener()
 {
+		
 }
 
 AppListener::~AppListener()
@@ -29,10 +31,10 @@ void AppListener::OnCharacterCreate( const std::string & name, const std::string
     SmartBody::SBPawn* pawn = scene->getPawn(name);
 	//SmartBody::util::log("On character create, name = '%s'", name.c_str());
     if (!pawn)
-        return;
+		return;
 
     // add attribute observations
-    SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
+    SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");    
     if (attr)
 	{
 		//SmartBody::util::log("pawn %s, register attribute 'mesh'", name.c_str());
@@ -161,7 +163,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
             if (vec3Attribute)
             {
                 if (!pawn->dMeshInstance_p)
-                    pawn->dMeshInstance_p = new DeformableMeshInstance();
+                    pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
                 SrVec val = vec3Attribute->getValue();
                 pawn->dMeshInstance_p->setMeshScale(SrVec(val));
 				//SmartBody::util::log("Set mesh to size %f", val[0]);
@@ -195,21 +197,23 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					}
 					mesh = assetManager->getDeformableMesh(value);
 				}
-		
-				
+
+
 				if (mesh)
 				{
 					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
-						//SmartBody::util::log("useDeformableMesh : %d", value.c_str());
-						pawn->dMeshInstance_p = new DeformableMeshInstance();
+						SmartBody::util::log("useDeformableMesh : %d", value.c_str());
+						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						SbmDeformableMeshGPUInstance* gpuMeshInst = (SbmDeformableMeshGPUInstance*)pawn->dMeshInstance_p;
+						SmartBody::util::log("deformMesh Intance, VBODeformPos = %d", gpuMeshInst->getVBODeformPos());
 						//pawn->dMeshInstance_p = new DeformableMeshInstance();
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
 					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
 					{
 						//SmartBody::util::log("useStaticMesh1 : %d", value.c_str());
-						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 
@@ -217,7 +221,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
 						//SmartBody::util::log("useStaticMesh2 : %d", value.c_str());
-						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 					}
@@ -249,12 +253,12 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 #endif
 					{
 						//SmartBody::util::log("Building blenshapes");
-						// if there are no blendshapes, but there are blendShape.channelName attributes, 
+						// if there are no blendshapes, but there are blendShape.channelName attributes,
 						// then add the morph targets
 						std::vector<SmartBody::StringAttribute*> shapeAttributes;
 						std::map<std::string, SmartBody::SBAttribute*>& attributes = pawn->getAttributeList();
-						for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin(); 
-							 iter != attributes.end(); 
+						for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
+							 iter != attributes.end();
 							 iter++)
 						{
 							SmartBody::SBAttribute* attribute = (*iter).second;
@@ -285,7 +289,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 								const std::string& attrName = (*iter)->getName();
 								// get the shape name and value
 								std::string shapeName = attrName.substr(23);
-								
+
 								std::string shapeChannel = (*iter)->getValue();
 								if (shapeChannel == "Neutral")
 								{
@@ -306,7 +310,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 									model->ref();
 									hasNeutral = true;
 								}
-								
+
 							}
 
 							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
@@ -320,7 +324,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 									for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
 										 iter != shapeAttributes.end();
 										 iter++)
-									{									
+									{
 										const std::string& attrName = (*iter)->getName();
 										// get the shape name and value
 										std::string shapeName = attrName.substr(23);
@@ -346,12 +350,12 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 							//SmartBody::util::log("Num blendshapes = %d", blendshapeIter->second.size());
 						}
 					}
-					
+
 					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInstance->setDeformableMesh(mesh);
-					//meshInsance->setSkeleton(pawn->getSkeleton());	
+					//meshInsance->setSkeleton(pawn->getSkeleton());
 					meshInstance->setPawn(pawn);
-					
+
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
 					{
