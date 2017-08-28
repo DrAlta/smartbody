@@ -69,6 +69,7 @@ public:
 public:
 	virtual void update();
 	virtual bool buildVertexBufferGPU();	
+	bool rebuildVertexBufferGPU(bool rebuild);
 	void skinTransformGPU(DeformableMeshInstance* meshInstance);
 	static void initShaderProgram();	
 	VBOVec3f* getPosVBO() { return VBOPos; }
@@ -86,6 +87,7 @@ protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
 	bool initBuffer1();	
 	void updateTransformBuffer();	
+	void cleanBuffer();
 };
 
 class SbmDeformableMeshGPUInstance : public DeformableMeshInstance

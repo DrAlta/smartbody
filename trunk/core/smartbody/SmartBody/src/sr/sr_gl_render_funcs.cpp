@@ -578,7 +578,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				glLineWidth(1.5);
 				glEnable(GL_POLYGON_OFFSET_LINE);
-				glPolygonOffset(1.0, 1.0);
+				glPolygonOffset(-1.0, -1.0);
 				glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_INT, &mesh->triBuf[0]);	
 				glEnable(GL_LIGHTING);
 				glDisable(GL_POLYGON_OFFSET_LINE);

@@ -21,7 +21,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define USE_FESTIVAL_RELAY 0
-
+//#define USE_CEREVOICE 1
 #ifdef USE_CEREVOICE
 #define USE_CEREPROC_RELAY 1
 #else

@@ -37,7 +37,7 @@ enum
 };
 
 
-#if defined (ANDROID_BUILD) || defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN)
 template <class S>
 class VBOData
 {

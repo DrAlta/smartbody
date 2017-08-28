@@ -12,7 +12,7 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__)
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 using namespace Eigen;
@@ -35,7 +35,7 @@ void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix&
 	blas::gemm(mat1,mat2,mat3);	
 #endif
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__)
 	MatrixXd m1(mat1.size1(), mat1.size2()), m2(mat2.size1(),mat2.size2()), m3(mat3.size1(), mat3.size2());
 	for(unsigned int i = 0; i < mat1.size1(); ++i)
 		for(unsigned int j = 0; j < mat1.size2(); ++j)
@@ -62,7 +62,7 @@ void MeCtUBLAS::matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& 
 	blas::gemv('N',1.0,mat1,vin,0.0,vout);	
 #endif
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__)
 	MatrixXd m1(mat1.size1(), mat1.size2());
 	for(size_t i = 0; i < mat1.size1(); ++i)
 		for(size_t j = 0; j < mat1.size2(); ++j)
@@ -85,7 +85,7 @@ bool MeCtUBLAS::inverseMatrix( const dMatrix& mat, dMatrix& inv )
 #if !defined(__ANDROID__) &&  !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 	lapack::gesv(A,inv);
 #endif
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__)
 	MatrixXd m(mat.size1(), mat.size2()), mInv;
 	for(size_t i = 0; i < mat.size1(); ++i)
 		for(size_t j = 0; j < mat.size2(); ++j)
@@ -114,7 +114,7 @@ bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V 
 	dMatrix M(A);
 	lapack::gesvd(M,S,U,V);
 #endif
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__)
 	MatrixXd mA;
 	for(size_t i = 0; i < A.size1(); ++i)
 		for(size_t j = 0; j < A.size2(); ++j)

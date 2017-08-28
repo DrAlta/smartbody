@@ -1,8 +1,11 @@
 
 #include <cstring>
 #include <cstdio>
-#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__)
 #include "external/glew/glew.h"
+#endif
+#if defined(__ANDROID__)
+#include <GLES3/gl3.h>
 #endif
 #include "VBOData.h"
 
