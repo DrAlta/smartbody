@@ -2173,7 +2173,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 			int index = mchan_arr.float_position(k);
 			// get the mirrored index position
 			int otherIndex = index;
-			std::string jointNameOther = "";
+			std::string jointNameOther = jointName;
 			bool found = false;
 			for (size_t n = 0; n < from.size(); n++)
 			{
@@ -2235,7 +2235,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 					SrVec qaOther = q_origOther.axisAngle();
 					SkJoint* jointOther = skeleton->search_joint(jointNameOther.c_str());
 					SrQuat final_qOther = q_origOther;
-					if (found)
+					if (mirrorJoint)
 					{
 						SrQuat q_zeroOther = SrQuat(jointOther->gmatZero());
 						SrQuat q_lzeroOther = SrQuat(jointOther->gmatZero());

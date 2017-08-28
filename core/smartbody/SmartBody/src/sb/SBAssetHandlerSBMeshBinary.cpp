@@ -19,7 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerSBMeshBinary.h"
-
+#include "SBUtilities.h"
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -52,7 +52,8 @@ namespace SmartBody {
 		std::string fileName = boost::filesystem::basename(p);
 		std::string extension =  boost::filesystem::extension(p);
 
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
+#if !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
+		SmartBody::util::log("Creating GPU Deformable Mesh");
 		SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
 #else
 		DeformableMesh* mesh = new DeformableMesh();

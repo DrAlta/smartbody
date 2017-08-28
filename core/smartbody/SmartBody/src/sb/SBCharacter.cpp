@@ -764,11 +764,11 @@ void SBCharacter::notify(SBSubject* subject)
 						std::string shapeName = attrName.substr(startPos + 1);
 						if (getSkeleton()->getJointByName(channelName))
 						{
-							SmartBody::util::log("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
+							//SmartBody::util::log("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
 							continue;
 						}
 						shapeNames.push_back(channelName);
-						SmartBody::util::log("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
+						//SmartBody::util::log("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
 					}
 				}
 			}

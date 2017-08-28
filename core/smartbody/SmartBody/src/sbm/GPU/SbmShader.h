@@ -73,13 +73,15 @@ public:
 	SBAPI static SbmShaderManager& singleton() {}
 	SBAPI static void destroy_singleton() {}
 
-	SBAPI bool initOpenGL() {}
-	SBAPI bool initGLExtension() {}
+	SBAPI bool initOpenGL() { return true;  }
+	SBAPI bool initGLExtension() { return true;  }
 	SBAPI void setViewer(SrViewer* vw) {}
 	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true) {}
 	SBAPI SbmShaderProgram* getShader(const std::string& entryName) {}
 	SBAPI void buildShaders() {}
-	SBAPI static int getShaderSupport() {}
+	SBAPI static int getShaderSupport() {
+		return SUPPORT_OPENGL_2_0;
+	}
 };
 
 #else

@@ -22,6 +22,9 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
+#if defined(__ANDROID__)
+#include <GLES3/gl3.h>
+#endif
 #include "SbmShader.h"
 #include <sb/SBUtilities.h>
 #include <stdio.h>
@@ -115,39 +118,53 @@ void SbmShaderProgram::buildShader()
 	// build the shader after there is an opengl context
 	vsID = -1;
 	fsID = -1;
+	//printOglError("buildShader::start");
 	if (vsShaderStr.size() > 0)
 	{
-		SmartBody::util::log("Create Vertex Shader");
+		//SmartBody::util::log("Create Vertex Shader");
 		//SmartBody::util::log("Vertex Shader Text = %s", vsShaderStr.c_str());
 		vsID = glCreateShader(GL_VERTEX_SHADER);
+		//printOglError("buildShader::glCreateShader vs");
 		//SmartBody::util::log("vsID = %d", vsID);
 		loadShaderStr(vsID,vsShaderStr.c_str());
-		SmartBody::util::log("After Build Vertex Shader");
+		//printOglError("buildShader::loadVertexShader");
+		//SmartBody::util::log("After Build Vertex Shader");
 	}	
 	
 	if (fsShaderStr.size() > 0)
 	{
-		SmartBody::util::log("Create Fragment Shader");
+		//SmartBody::util::log("Create Fragment Shader");
 		//SmartBody::util::log("Fragment Shader Text = %s", fsShaderStr.c_str());
 		fsID = glCreateShader(GL_FRAGMENT_SHADER);
+		//printOglError("buildShader::glCreateShader fs");
 		loadShaderStr(fsID,fsShaderStr.c_str());
 		//SmartBody::util::log("fsID = %d", fsID);
-		SmartBody::util::log("After Build Fragment Shader");
+		//printOglError("buildShader::loadFragmentShader");
+		//SmartBody::util::log("After Build Fragment Shader");
 	}
 
 	printShaderInfoLog(vsID);
+	//printOglError("buildShader::printShaderInfoLog, vs");
 	printShaderInfoLog(fsID);
+	//printOglError("buildShader::printShaderInfoLog, fs");
     
 	programID = glCreateProgram();
-	//SmartBody::util::log("programID = %d", programID);
+	//printOglError("buildShader::glCreateProgram");
+	///SmartBody::util::log("programID = %d", programID);
 	if (vsID != -1)
-		glAttachShader(programID,vsID);
+	{
+		glAttachShader(programID, vsID);
+		//printOglError("buildShader::glCreateProgram");
+	}
 	if (fsID != -1)
-		glAttachShader(programID,fsID);
+	{
+		glAttachShader(programID, fsID);
+		//printOglError("buildShader::glCreateProgram");
+	}
 	glLinkProgram(programID);
+	//printOglError("buildShader::linkProgram");
 	printProgramInfoLog(programID);
-	isBuilt = true;
-	//printOglError("linkProgram");
+	isBuilt = true;	
 #endif
 }
 
@@ -166,8 +183,11 @@ void SbmShaderProgram::loadShader(GLuint sID,  const char* shaderFileName )
 void SbmShaderProgram::loadShaderStr( GLuint sID, const char* shaderStr )
 {		
 	glShaderSource(sID, 1, &shaderStr,NULL);	
+	//SmartBody::util::log("loadShaderStr, sdi = %d, shaderStr = %s", sID, shaderStr);
+	//printOglError("loadShaderStr::glShaderSource");
 	glCompileShader(sID);
-	SmartBody::util::log("Finish compile shader, sid = %d", sID);
+	//printOglError("loadShaderStr::glCompileShader");
+	//SmartBody::util::log("Finish compile shader, sid = %d", sID);
 }
 
 
@@ -243,6 +263,16 @@ void SbmShaderProgram::printOglError(const char* tag)
 	{
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 		SmartBody::util::log("glError %s: %s\n", tag,gluErrorString(glErr));
+#elif defined(__ANDROID__)
+		std::string error;
+		switch (glErr) {
+		case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
+		case GL_INVALID_ENUM:           error = "INVALID_ENUM";           break;
+		case GL_INVALID_VALUE:          error = "INVALID_VALUE";          break;
+		case GL_OUT_OF_MEMORY:          error = "OUT_OF_MEMORY";          break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+		}
+		SmartBody::util::log("glError %s: %s\n", tag, error.c_str());
 #endif
 		retCode = 1;
 		glErr = glGetError();
@@ -289,10 +319,14 @@ SbmShaderManager::~SbmShaderManager(void)
 
 bool SbmShaderManager::initOpenGL()
 {
+#if defined(__ANDROID__)
+	return true;
+#else
 	if (!viewer)
 		return false;
 	viewer->makeGLContext();
 	return true;
+#endif
 }
 
 bool SbmShaderManager::initGLExtension()
@@ -330,7 +364,6 @@ bool SbmShaderManager::initGLExtension()
 #elif defined(__ANDROID__)
 	shaderInit = true;
 	return true;
-	return false;
 #endif
 }
 
