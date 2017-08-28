@@ -40,11 +40,13 @@ public class SBMobileLib {
      public static native void openConnection();
      public static native void closeConnection();
 
+     public static native boolean handleInputEvent(int action, float x, float y);
+
      public static native void executeSB(String sbmCmd);
      public static native String getLog();
      public static native void step();
      public static native void render();
-    public static native void renderFBOTex(int width, int height);
+     public static native void renderFBOTex(int width, int height);
      public static native void renderCardboard(float eyeView[]);
      public static native void reloadTexture();
      public static native void surfaceChanged(int width, int height);
@@ -74,15 +76,15 @@ public class SBMobileLib {
         }
     }
 
-    public static void stopSound()
-    {
+    public static void stopSound() {
         Log.e("SBM", "SBMobileLib: Stop playing sound ");
-        if (_mediaPlayer != null)
-        {
+        if (_mediaPlayer != null) {
             if (_mediaPlayer.isPlaying())
                 _mediaPlayer.stop();
             _mediaPlayer.release();
             _mediaPlayer = null;
         }
     }
+
+
 }

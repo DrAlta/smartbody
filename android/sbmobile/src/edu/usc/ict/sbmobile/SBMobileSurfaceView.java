@@ -65,6 +65,11 @@ public class SBMobileSurfaceView extends GLSurfaceView {
 
     }
 
+    public boolean handleScreenTouchEvent(int action, float x, float y)
+    {
+        return true;
+    }
+
     private void init(boolean translucent, int depth, int stencil, Context context) {
 
         /* By default, GLSurfaceView() creates a RGB_565 opaque surface.
@@ -78,6 +83,13 @@ public class SBMobileSurfaceView extends GLSurfaceView {
         setEGLContextClientVersion(3);
         setRenderer(new Renderer());
         setPreserveEGLContextOnPause(true);
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                //return SBMobileLib.handleInputEvent(event.getAction(), event.getX(), event.getY());
+                return handleScreenTouchEvent(event.getAction(), event.getX(), event.getY());
+            }
+        });
     }   
 
     private static class Renderer implements GLSurfaceView.Renderer {

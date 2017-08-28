@@ -27,6 +27,8 @@
 #include <EGL/egl.h>
 #include "esUtil.h"
 
+
+#if 0
 #if !defined(__ANDROID__)
 #include  <X11/Xlib.h>
 #include  <X11/Xatom.h>
@@ -316,6 +318,7 @@ void ESUTIL_API esRegisterUpdateFunc ( ESContext *esContext, void (ESCALLBACK *u
 }
 
 
+
 ///
 //  esRegisterKeyFunc()
 //
@@ -395,4 +398,5 @@ char* ESUTIL_API esLoadTGA ( char *fileName, int *width, int *height )
     return buffer;
 }
 
+#endif
 

@@ -25,6 +25,7 @@
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sbm/GPU/SbmShader.h>
 #include <sbm/xercesc_utils.hpp>
 
 #include <sr/sr_camera.h>
@@ -40,6 +41,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+
 #include "AppListener.h"
 #include "Shader.h"
 
@@ -78,6 +81,7 @@ void setupLights()
 	#if USE_GL_FIXED_PIPELINE
     _lights.clear();
 	int numLightsInScene = 0;
+	
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		 iter != pawnNames.end();
@@ -301,7 +305,7 @@ void setupLights()
 void SBSetupDrawing(int w, int h, ESContext *esContext)
 {   
 	static bool firstSetupDrawing = true;
-	//if (firstSetupDrawing)
+	if (firstSetupDrawing)
 	{
 		//SmartBody::util::log("First setup drawing, glViewport = %d %d", w, h);
 		glViewport(0, 0, w, h);
@@ -379,8 +383,11 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	texm.updateTexture();
 
+	//SbmShaderManager& ssm = SbmShaderManager::singleton();
+	//ssm.buildShaders();
 
-	bool useRenderTarget = true;
+
+	bool useRenderTarget = false;
 	if (useRenderTarget)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
@@ -393,18 +400,22 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	SBUpdateCharacterGPUSkin();
+
 	// draw background
 	SBDrawBackground(esContext);
 	
 	//cam.print();
 	// setup view
-	//if (firstRender)
+	if (firstRender)
 	{
 		float aspectRatio = float(width) / float(height);
 		cam.setAspectRatio(aspectRatio);
 		//SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
 		firstRender = false;
 	}
+
+	
 	
 	SrMat matPerspective, matModelView;
 	cam.get_perspective_mat(matPerspective);
@@ -429,7 +440,8 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
 	glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
 	//SmartBody::util::log("Before SBDrawCharacters_ES20");
-	SBDrawCharacters_ES20(esContext);
+	//SBDrawCharacters_ES20(esContext);
+	SBDrawCharacterGPUSkin(esContext);
 	//draw lights
 	//SmartBody::util::log("After SBDrawCharacters_ES20");
 	drawLights(esContext);
@@ -455,6 +467,42 @@ void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
 	//glViewport( 0, 0, w, h);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawBackgroundTexID(esContext->fboTexID, esContext);
+}
+
+void SBUpdateCharacterGPUSkin()
+{
+	const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (unsigned int i = 0; i < pawnNames.size(); i++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+		if (meshInstance)
+		{
+			if (!meshInstance->isStaticMesh())
+			{
+				SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
+				GPUMeshUpdate(meshInstance);
+			}
+		}
+	}
+}
+
+void SBDrawCharacterGPUSkin(ESContext *esContext)
+{
+	const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (unsigned int i = 0; i < pawnNames.size(); i++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+		//SmartBody::util::log("draw pawn %s", pawn->getName().c_str());
+		//DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+		if (meshInstance)
+		{
+			drawMeshStaticVBO(meshInstance, esContext, false);
+		}
+	}
+
+	
 }
 
 void SBDrawCharacters_ES20(ESContext *esContext) {
@@ -788,7 +836,9 @@ void SBUpdate(float t)
 					meshInstance->blendShapeStaticMesh();
 					//meshInstance->setVisibility(1);
 					//if (!meshInstance->isStaticMesh() && !meshUpdated)
-					meshInstance->update();
+					//meshInstance->update();
+					//meshInstance->_skeleeton->update_global_matrices();
+					meshInstance->updateTransformBuffer();
 				}
 			}
 		}
