@@ -62,6 +62,18 @@ void SbmTextureManager::updateEnvMaps()
 		envDiffuseMapAttr->setValidValues(hdrTexNames);
 }
 
+SBAPI void SbmTextureManager::deleteTexture(int type, const char* textureName)
+{
+	StrTextureMap& texMap = findMap(type);
+	if (texMap.find(textureName) != texMap.end())
+	{
+		SbmTexture* tex = texMap[textureName];
+		texMap.erase(textureName);
+		delete tex;
+	}
+}
+
+
 
 void SbmTextureManager::releaseAllTextures()
 {
@@ -407,6 +419,7 @@ SbmTexture::SbmTexture( const char* texName )
 	dataType = GL_UNSIGNED_BYTE;
 	internal_format = GL_RGBA8;
 	texture_format = GL_RGBA;
+	texRotate = ROTATE_NONE;
 }
 
 SbmTexture::~SbmTexture(void)
@@ -640,6 +653,48 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
     //SmartBody::util::log("Texture name = %s, texture ID = %d",textureName.c_str(),texID);	
     //imdebug("rgb w=%d h=%d %p", width, height, buffer);
 #endif
+}
+
+SBAPI void SbmTexture::rotateTexture(RotateEnum rotate)
+{
+	if (rotate == ROTATE_NONE) return; // do nothing if there is no rotation
+
+	std::vector<unsigned char> imgCopy = imgBuffer;
+	int newWidth = width , newHeight = height;
+	if (rotate == ROTATE_90 || rotate == ROTATE_270)
+	{
+		std::swap(newWidth, newHeight);
+	}
+	int bytesPerChannel = 1; // assume unsigned byte
+	if (dataType == GL_FLOAT)
+		bytesPerChannel = 4; // set to float for g-buffer application
+	int pixelSize = bytesPerChannel*channels;
+	int ti, tj;
+	for (unsigned i=0; i<newHeight;i++)
+		for (unsigned j = 0; j < newWidth; j++)
+		{
+			if (rotate == ROTATE_270)
+			{
+				ti = newWidth - j - 1;
+				tj = i;
+			}
+			else if (rotate == ROTATE_180)
+			{
+				ti = newHeight - i - 1;
+				tj = j;
+			}
+			else if (rotate == ROTATE_90)
+			{
+				ti = j;
+				tj = newHeight - i - 1;
+			}
+			for (unsigned int k = 0; k < pixelSize; k++)
+			{
+				imgBuffer[(i*newWidth + j)*pixelSize + k] = imgCopy[(ti*width + tj)*pixelSize + k];
+			}
+		}	
+	width = newWidth;
+	height = newHeight;
 }
 
 unsigned char* SbmTexture::getBuffer()
