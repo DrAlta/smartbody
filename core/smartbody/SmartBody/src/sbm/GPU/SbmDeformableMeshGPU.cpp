@@ -602,6 +602,7 @@ SbmDeformableMeshGPU::SbmDeformableMeshGPU(void) : DeformableMesh()
 {
 	useGPU = false;	
 	VBOPos = NULL;
+	VBONormal = NULL;
 	VBOTangent = NULL;
 	VBOBiNormal = NULL;
 	VBOTexCoord = NULL;
@@ -610,7 +611,7 @@ SbmDeformableMeshGPU::SbmDeformableMeshGPU(void) : DeformableMesh()
 	VBOBoneID2 = NULL;
 	VBOWeight1 = NULL;
 	VBOWeight2 = NULL;
-	TBOTran = NULL;
+	TBOTran = NULL; 
 	initGPUVertexBuffer = false;
 }
 
@@ -1449,19 +1450,28 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 
 void SbmDeformableMeshGPU::cleanBuffer()
 {
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 1");
 	if (VBOPos) delete VBOPos;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 2");
 	if (VBOTangent) delete VBOTangent;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 3");
 	if (VBOBiNormal) delete VBOBiNormal;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 4");
 	if (VBONormal) delete VBONormal;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 5");
 	if (VBOTexCoord) delete VBOTexCoord;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 6");
 	if (VBOBoneID1) delete VBOBoneID1;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 7");
 	if (VBOWeight1) delete VBOWeight1;
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 8");
 
 	for (unsigned int i = 0; i < subMeshTris.size(); i++)
 	{
 		delete subMeshTris[i];
 	}
 	subMeshTris.clear();
+	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 9");
 }
 
 bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
@@ -1477,7 +1487,7 @@ bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
 
 bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 {
-	SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBufferGPU()");
+	//SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBufferGPU()");
 	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();
 	if (!hasGLContext) return false;
 	if (skinWeights.size() == 0 )
@@ -1485,17 +1495,17 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	if (initGPUVertexBuffer) return true;
 	bool hasSkinBuffer = DeformableMesh::buildSkinnedVertexBuffer();
 	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
-	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #0");
+	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #0");
 	VBOPos		= new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
 	VBOTangent	= new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
-	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #1");
+	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #1");
 	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
 	VBONormal	= new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
-	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #2");
+	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #2");
 	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
 	VBOBoneID1	= new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
 	VBOWeight1	= new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
-	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #3");
+	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #3");
 
 #if USE_SKIN_WEIGHT_SIZE_8
 	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
@@ -1517,14 +1527,14 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
 		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
-	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #4");
+	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #4");
 	initGPUVertexBuffer = true;
 	return true;
 }
 
 bool SbmDeformableMeshGPU::initBuffer()
 {
-	SmartBody::util::log("SbmDeformableMeshGPU::initBuffer");
+	//SmartBody::util::log("SbmDeformableMeshGPU::initBuffer");
 
 	return this->buildVertexBufferGPU();
 #if 0
@@ -1724,14 +1734,14 @@ bool SbmDeformableMeshGPUInstance::initBuffer()
 		//int colorSize = dynamicMesh.size()*3;
 		//TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 		
-		SmartBody::util::log("SbmDeformableMeshGPUInstance::initBuffer, _deformPosBuf size = %d, posBuf size = %d", _deformPosBuf.size(), gpuMesh->posBuf.size());
-		SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #0");
+		//SmartBody::util::log("SbmDeformableMeshGPUInstance::initBuffer, _deformPosBuf size = %d, posBuf size = %d", _deformPosBuf.size(), gpuMesh->posBuf.size());
+		//SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #0");
 		VBODeformPos = new VBOVec3f((char*)"DeformPos", VERTEX_POSITION, _deformPosBuf);
-		SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #1");
+		//SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #1");
 		VBODeformNormal = new VBOVec3f((char*)"DeformNormal", VERTEX_POSITION, _deformNormalBuf);
-		SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #2");
+		//SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #2");
 		VBODeformTangent = new VBOVec3f((char*)"DeformTangent", VERTEX_POSITION, _deformTangentBuf);
-		SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #3");
+		//SbmShaderProgram::printOglError("SbmDeformableMeshGPUInstance::initBuffer #3");
 		bufferReady = true;
 	}
 	return true;

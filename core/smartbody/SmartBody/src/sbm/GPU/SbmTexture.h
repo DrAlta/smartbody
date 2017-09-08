@@ -81,6 +81,7 @@ public:
 
 	// Creates a 1x1 white texture
 	SBAPI SbmTexture* createTexture(int type, const char* textureName);
+	SBAPI void deleteTexture(int type, const char* textureName);
 	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);	
 	SBAPI void createBlackTexture(const char* textureName, int width = 1, int height = 1);
 	SBAPI void createColorTexture(const char* textureName, SrColor initColor, int width = 1, int height = 1);
@@ -105,6 +106,8 @@ public:
 
 class SbmTexture : public SmartBody::SBAsset// simple place holder for OpenGL texture
 {
+public:
+	enum RotateEnum { ROTATE_NONE = 0, ROTATE_90, ROTATE_180, ROTATE_270 };
 protected:
 	std::string textureName;
 	std::string textureFileName;
@@ -119,6 +122,7 @@ protected:
 	GLint internal_format;
 	GLenum texture_format;		
 	GLenum dataType;
+	RotateEnum texRotate;
 public:
 	SBAPI SbmTexture(const char* texName);
 	SBAPI ~SbmTexture(void);
@@ -135,6 +139,7 @@ public:
 	SBAPI bool loadHDRImage(const char* fileName);
 
 	SBAPI void buildTexture(bool buildMipMap = false, bool recreateTexture = true);
+	SBAPI void rotateTexture(RotateEnum rotate);
 
 	SBAPI unsigned char* getBuffer();
 	SBAPI int getBufferSize();
