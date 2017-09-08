@@ -341,6 +341,8 @@ void SBInitialize()
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
     sim->setupTimer();
     scene->createBoolAttribute("enableAlphaBlend", true, true, "", 5, false, false, false, "enable alpha blending?");
+	scene->createStringAttribute("background_img", "none", true, "", 5, false, false, false, "enable alpha blending?");
+	//SBSetBackground("/sdcard/acdata/background.png", "background.png");
 }
 
 void SBInitGraphics(ESContext *esContext) {
@@ -353,6 +355,33 @@ void SBInitGraphics(ESContext *esContext) {
 	SmartBody::util::log("fboTexID = %d", esContext->fboTexID);
 }
 
+void SBSetBackground(const char* fileName, const char* textureName, int textureRotate)
+{
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
+	
+	std::string newTex = textureName;
+	std::string oldTex = scene->getStringAttribute("background_img");
+	//if (oldTex == newTex)
+	texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, oldTex.c_str());
+
+	if (newTex == "none") return; // delete texture directly
+
+	if (texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, textureName) == NULL) // need to load the texture
+	{		
+		texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, textureName, fileName);
+		/*
+		if (textureRotate == 90)
+		{
+			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, textureName);
+			tex->rotateTexture(SbmTexture::ROTATE_90);
+		}
+		*/
+	}	
+	scene->setStringAttribute("background_img", textureName);
+}
+
+
 
 void SBInitScene( const char* initScriptName )
 {
@@ -363,7 +392,73 @@ void SBInitScene( const char* initScriptName )
 	cameraReset = new SrCamera(cam);
 }
 
-void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView) {
+void SBDrawFrameAR(int width, int height, ESContext *esContext, SrMat modelViewMat, SrMat projMat)
+{
+	static bool initShader = false;
+	static bool firstRender = true;
+	if (!initShader)
+	{
+		//SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
+		SBInitGraphics(esContext);
+		initShader = true;
+	}
+
+
+	UserData *userData = (UserData*)esContext->userData;
+	ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	// setup textures
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+	texm.updateTexture();
+
+	// clear background	
+	SBSetupDrawing(width, height, esContext);
+
+	SBUpdateCharacterGPUSkin();
+	//cam.print();
+	// setup view
+	if (firstRender)
+	{
+		SrCamera& cam = *scene->getActiveCamera();
+		float aspectRatio = float(width) / float(height);
+		cam.setAspectRatio(aspectRatio);
+		//SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+		firstRender = false;
+	}
+
+
+
+	SrMat matModelView, matMVP;
+	matModelView = modelViewMat;
+	matMVP = matModelView * projMat;
+	//use the shape program object
+	//SmartBody::util::log("Before use program");
+	glUseProgram(shapeData->programObject);
+	//SmartBody::util::log("After use program");
+	glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
+	glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
+	//SmartBody::util::log("Before draw pawns");
+	SBDrawPawns(esContext);
+	// Use the program object
+	//SmartBody::util::log("Before userData useProgram");
+	glUseProgram(userData->programObject);
+	glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
+	glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
+	//SmartBody::util::log("Before SBDrawCharacters_ES20");
+	//SBDrawCharacters_ES20(esContext);
+	SBDrawCharacterGPUSkin(esContext);
+	//draw lights
+	//SmartBody::util::log("After SBDrawCharacters_ES20");
+	drawLights(esContext);
+
+	// draw background
+	SBDrawBackground(esContext);	
+}
+
+
+
+void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView, bool drawAR ) {
 	//SmartBody::util::log("draw!");
 	static bool initShader = false;
 	static bool firstRender = true;
@@ -387,7 +482,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//ssm.buildShaders();
 
 
-	bool useRenderTarget = false;
+	bool useRenderTarget = true;
 	if (useRenderTarget)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
@@ -395,15 +490,19 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//glClearColor( 0.0f,0.0f,0.0f,1.0f );
 	//glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
 	SBSetupDrawing(width, height, esContext);
-	glClearColor(0.33f, 0.78f, 0.95f, 1.f);
 
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	if (!drawAR)
+	{
+		glClearColor(0.33f, 0.78f, 0.95f, 1.f);
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	
 
 	SBUpdateCharacterGPUSkin();
 
-	// draw background
-	SBDrawBackground(esContext);
+	
 	
 	//cam.print();
 	// setup view
@@ -445,16 +544,14 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//draw lights
 	//SmartBody::util::log("After SBDrawCharacters_ES20");
 	drawLights(esContext);
+
+	// draw background
+	SBDrawBackground(esContext);
+
 	//SmartBody::util::log("SBDrawFrame_ES20::drawRenderTarget");
 	if (useRenderTarget)
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		/*
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		drawBackgroundTexID(esContext->fboTexID, esContext);		
-		*/
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);		
 		SBDrawFBOTex_ES20(width, height, esContext, eyeView);
 	}
 	//SmartBody::util::log("After drawLights");
@@ -466,7 +563,8 @@ void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	//glViewport( 0, 0, w, h);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	drawBackgroundTexID(esContext->fboTexID, esContext);
+	SrVec2 texScale = SrVec2(1,1), texOffset = SrVec2(0,0);
+	drawBackgroundTexID(esContext->fboTexID, texScale, texOffset, esContext);
 }
 
 void SBUpdateCharacterGPUSkin()
@@ -726,7 +824,10 @@ void SBDrawBackground(ESContext* esContext)
 	glPopMatrix();
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #else
-	drawBackground("background_img", esContext);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string backgroundTexName = scene->getStringAttribute("background_img");
+	drawBackground(backgroundTexName, esContext);
+	//drawBackground("background_img", esContext);
 #endif
 }
 

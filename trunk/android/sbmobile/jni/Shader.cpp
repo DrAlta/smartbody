@@ -331,7 +331,7 @@ extern "C"
 		 "layout(location = 2) in vec3 tangent; \n"
 		 "layout(location = 3) in vec4 BoneID1; \n"
 		 "layout(location = 4) in vec4 BoneWeight1; \n"
-		 "uniform mat4 Transform[120]; \n"
+		 "uniform mat4 Transform[63]; \n"
 		 "uniform float meshScale; \n"
 		 "out vec3 deformPos; \n"
 		 "out vec3 deformNormal; \n"
@@ -988,11 +988,31 @@ extern "C"
 			//SmartBody::util::log("drawBackground : cannot find texture image .....");
 			return; // no background image
 		}
+		
+		// figure out the texture coordinate scale and offset
+		float texW = tex->getWidth();
+		float texH = tex->getHeight();
+		float surfaceW = esContext->width;
+		float surfaceH = esContext->height;
+		SrVec2 texScale = SrVec2(1, 1), texOffset = SrVec2(0, 0);
+		float texAspect = texW / texH;
+		float surfaceAspect = surfaceW / surfaceH;
+		if (texAspect > surfaceAspect)
+		{
+			texScale.x = surfaceAspect / texAspect; // this must be < 1
+			texOffset.x = (1.0 - texScale.x)*0.5f;
+		}
+		else
+		{
+			texScale.y = texAspect/surfaceAspect; // this must be < 1
+			texOffset.y = (1.0 - texScale.y)*0.5f;
+		}
 
-		drawBackgroundTexID(tex->getID(), esContext);
+				
+		drawBackgroundTexID(tex->getID(),texScale, texOffset, esContext);
 	}
 
-	void SHADER_API drawBackgroundTexID(GLuint backgroundTexID, ESContext *esContext)
+	void SHADER_API drawBackgroundTexID(GLuint backgroundTexID, SrVec2& texScale, SrVec2& texOffset, ESContext *esContext)
 	{
 		BackgroundData *backData = (BackgroundData*)esContext->backgroundData;
 		glUseProgram ( backData->programObject );
@@ -1006,6 +1026,12 @@ extern "C"
 		float z_max = -(1.f - 0.0001f);//gwiz::epsilon8());
 		SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
 		SrVec2 quadT[4] = { SrVec2(0.f, 1.f), SrVec2(0.f, 0.f), SrVec2(1.f, 0.f), SrVec2(1.f, 1.f) };
+		for (int i = 0; i < 4; i++)
+		{
+			quadT[i].x = quadT[i].x*texScale.x + texOffset.x;
+			quadT[i].y = quadT[i].y*texScale.y + texOffset.y;
+		}
+
 		unsigned short indices[] = {0,1,2, 0,2,3};
 
 		GLuint pos_loc = backData->positionLoc;

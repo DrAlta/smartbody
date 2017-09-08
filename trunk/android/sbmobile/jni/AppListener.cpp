@@ -124,7 +124,7 @@ void AppListener::OnCharacterUpdate( const std::string & name)
 
 void AppListener::OnPawnCreate( const std::string & name )
 {
-	SmartBody::util::log("On pawn create, name = '%s'", name.c_str());
+	//SmartBody::util::log("On pawn create, name = '%s'", name.c_str());
     OnCharacterCreate(name, "");
 }
 

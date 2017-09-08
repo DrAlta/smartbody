@@ -46,6 +46,7 @@ public class SBMobileLib {
      public static native String getLog();
      public static native void step();
      public static native void render();
+     public static native void renderAR(float [] modelViewMat, float [] projMat);
      public static native void renderFBOTex(int width, int height);
      public static native void renderCardboard(float eyeView[]);
      public static native void reloadTexture();
@@ -55,6 +56,7 @@ public class SBMobileLib {
 	 public static native boolean  getBoolAttribute(String attrName);
 	 public static native double  getDoubleAttribute(String attrName);
 	 public static native int getIntAttribute(String attrName);
+     public static native void setBackground(String fileName, String textureName, int texRotate);
 
     public static void playSound(String soundFile, boolean loopSound)
     {
