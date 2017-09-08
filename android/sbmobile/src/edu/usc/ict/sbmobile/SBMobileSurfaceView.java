@@ -70,7 +70,7 @@ public class SBMobileSurfaceView extends GLSurfaceView {
         return true;
     }
 
-    private void init(boolean translucent, int depth, int stencil, Context context) {
+    protected void init(boolean translucent, int depth, int stencil, Context context) {
 
         /* By default, GLSurfaceView() creates a RGB_565 opaque surface.
          * If we want a translucent one, we should change the surface's

@@ -17,6 +17,7 @@
 #include <jni.h>
 #include <vhcl.h>
 #include <sb/SBScene.h>
+#include <sb/SBPawn.h>
 #include <sb/SBUtilities.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -51,9 +52,12 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_init(JNIEnv * env, jobject obj);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setup(JNIEnv * env, jobject obj, jstring mediaPath);
 	
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setBackground(JNIEnv * env, jobject obj, jstring fileName, jstring textureName, jint texRotate);
+
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_step(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env, jobject obj);	
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
@@ -88,6 +92,13 @@ JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEven
 	}	
 }
 
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setBackground(JNIEnv * env, jobject obj, jstring fileName, jstring textureName, jint texRotate)
+{
+	const char* fileNameStr = (env)->GetStringUTFChars(fileName, NULL);
+	const char* textureNameStr = (env)->GetStringUTFChars(textureName, NULL);
+	SBSetBackground(fileNameStr, textureNameStr, texRotate);
+}
 
 
 JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName)
@@ -194,7 +205,48 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env
 	}
 	SrMat id;	
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
-	SBDrawFrame_ES20(curW, curH, &esContext, id);
+	SBDrawFrame_ES20(curW, curH, &esContext, id, false);
+}
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj)
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (!scene)
+		return;
+	if (!sbInit)
+	{
+		/*
+		SmartBody::util::log("No sbInit yet, draw test background curW = %d, curH = %d", curW, curH);
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.33f, 0.78f, 0.95f, 1.f);
+		glViewport( 0, 0, curW, curH);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		*/
+		return;
+	}
+	SrMat id;
+
+	SrMat modelViewMat, projMat;
+	jfloat *bodyf = env->GetFloatArrayElements(modelview, 0);
+	for (int i = 0; i < 16; i++)
+		modelViewMat[i] = bodyf[i];
+
+	jfloat *projf = env->GetFloatArrayElements(proj, 0);
+	for (int i = 0; i < 16; i++)
+		projMat[i] = projf[i];
+
+	//SmartBody::util::log("render AR, scene = %d, sbInit = %d", scene, sbInit);
+	SBDrawFrameAR(curW, curH, &esContext, modelViewMat, projMat);
+
+	
+	SmartBody::SBPawn* gazeTarget = scene->getPawn("None");
+
+	SrMat invModelView = modelViewMat.inverse();
+	SrVec newGazePos = invModelView.get_translation();
+	gazeTarget->setPosition(newGazePos);
+	//SBDrawFrame_ES20(curW, curH, &esContext, id, true);
+	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
+	//SBDrawFrame_ES20(curW, curH, &esContext, id, true);
 }
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height)

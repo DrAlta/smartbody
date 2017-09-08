@@ -18,13 +18,15 @@ extern "C"
 
 	void SBInitVHMSGConnection();
 	void SBCloseVHMSGConnection();
+	void SBSetBackground(const char* fileName, const char* textureName, int textureRotate);
     void SBSetup(const char* path, const char* setupScript);
     void SBInitialize();
     void SBInitGraphics(ESContext* esContext);
 	void SBInitScene(const char* initScriptName);
     void SBSetupDrawing(int w, int h, ESContext* esContext);
 
-    void SBDrawFrame_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
+	void SBDrawFrameAR(int w, int h, ESContext *esContext, SrMat modelViewMat, SrMat perspectiveMat);
+    void SBDrawFrame_ES20(int w, int h, ESContext *esContext, SrMat eyeView, bool drawAR = false);
     void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
 	void SBUpdateCharacterGPUSkin();
 	void SBDrawCharacterGPUSkin(ESContext *esContext);

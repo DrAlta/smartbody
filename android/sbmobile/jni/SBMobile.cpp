@@ -117,7 +117,7 @@ std::string SBMobile::testCharacterIntersection(float x, float y, std::string ch
 	bbox.a.z = 0.0;
 	bbox.b.z = 0.0;	
 	rayPt.z = 0.0;	
-	SmartBody::util::log("rayPt = %s, bbox min = %s, max = %s", rayPt.toString().c_str(), bbox.a.toString().c_str(), bbox.b.toString().c_str());
+	//SmartBody::util::log("rayPt = %s, bbox min = %s, max = %s", rayPt.toString().c_str(), bbox.a.toString().c_str(), bbox.b.toString().c_str());
 	if (!bbox.contains(rayPt)) return "none";
 
 	skel->update_global_matrices();
