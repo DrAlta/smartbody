@@ -1,6 +1,6 @@
 LOCAL_SHORT_COMMANDS := true
 
-USE_CEREVOICE:=false
+USE_CEREVOICE:=true
 
 
 SB_LOCAL_PATH := $(call my-dir)
@@ -251,6 +251,7 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../boost \
 					$(SB_LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
 					$(SB_LOCAL_PATH)/../../include \
+					$(SB_LOCAL_PATH)/../../include/eigen \
 					$(SB_LOCAL_PATH)/$(CEREVOICE_LIB_DIR)/cerevoice_eng/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
@@ -479,6 +480,9 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sbm/GPU/SbmTexture.cpp \
 	$(SB_MY_DIR)/sbm/GPU/SbmShader.cpp \
 	$(SB_MY_DIR)/sbm/GPU/SbmBlendFace.cpp \
+	$(SB_MY_DIR)/sbm/GPU/VBOData.cpp \
+	$(SB_MY_DIR)/sbm/GPU/TBOData.cpp \
+	$(SB_MY_DIR)/sbm/GPU/SbmDeformableMeshGPU.cpp \
 	$(SB_MY_DIR)/sb/sbm_character.cpp \
 	$(SB_MY_DIR)/sb/sbm_pawn.cpp \
 	$(SB_MY_DIR)/sb/SBAttribute.cpp \
