@@ -346,13 +346,13 @@ void SBInitialize()
 }
 
 void SBInitGraphics(ESContext *esContext) {
-	SmartBody::util::log("Before shaderInit");
+	//SmartBody::util::log("Before shaderInit");
 	shaderInit(esContext);
-	SmartBody::util::log("After shaderInit");
+	//SmartBody::util::log("After shaderInit");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->createIntAttribute("renderer.fboTexID",- 1, true,"",40,false,false,false,"texture id attached with the current fbo. For fast video recording.");
 	scene->setIntAttribute("renderer.fboTexID", esContext->fboTexID);
-	SmartBody::util::log("fboTexID = %d", esContext->fboTexID);
+	//SmartBody::util::log("fboTexID = %d", esContext->fboTexID);
 }
 
 void SBSetBackground(const char* fileName, const char* textureName, int textureRotate)
@@ -908,7 +908,7 @@ void SBUpdate(float t)
 	{
 		int err = SmartBody::SBScene::getScene()->getVHMsgManager()->poll();
 		if( err == CMD_FAILURE )   {
-			SmartBody::util::log("ttu_poll ERROR\n" );
+			//SmartBody::util::log("ttu_poll ERROR\n" );
 		}
 	}
     //sim->update();
@@ -954,14 +954,14 @@ void SBExecuteCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
-    SmartBody::util::log("%s\n", command);
+    //SmartBody::util::log("%s\n", command);
 }
     
 void SBExecutePythonCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->run(command);
-    SmartBody::util::log("%s\n", command);
+    //SmartBody::util::log("%s\n", command);
 }
 
 
@@ -1008,11 +1008,11 @@ void SBInitVHMSGConnection()
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
 		scene->getVHMsgManager()->setEnable(true);
-		SmartBody::util::log("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
+		//SmartBody::util::log("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
 	}
 	else
 	{
-		SmartBody::util::log("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
+		//SmartBody::util::log("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
 	}
 }
     

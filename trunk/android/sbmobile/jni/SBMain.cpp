@@ -148,7 +148,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEn
 
 JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height)
 {	
-	SmartBody::util::log("onSurfaceChanged, width = %d, height = %d", width, height);
+	//SmartBody::util::log("onSurfaceChanged, width = %d, height = %d", width, height);
 	esContext.width = width;
 	esContext.height = height;
 	SBSetupDrawing(width,height, &esContext);
@@ -314,7 +314,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_executeSB(JNIEnv * 
 	if (!sbInit)
 		return;
 	const char* pyCmdStrConst = (env)->GetStringUTFChars( sbmCmd , NULL ) ;
-	SmartBody::util::log("python cmd = %s",pyCmdStrConst);
+	//SmartBody::util::log("python cmd = %s",pyCmdStrConst);
 	SBExecutePythonCmd(pyCmdStrConst);
 }
 
