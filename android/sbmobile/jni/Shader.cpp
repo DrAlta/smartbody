@@ -591,7 +591,7 @@ extern "C"
 		}
 		else
 		{
-			SmartBody::util::log("shader is complied correctly");
+			//SmartBody::util::log("shader is complied correctly");
 		}
 
 		return shader;
@@ -636,7 +636,7 @@ extern "C"
 		if(!linked)
 		{
 			GLint infoLen = 0;
-			SmartBody::util::log("program %d error", programObject);
+			//SmartBody::util::log("program %d error", programObject);
 			glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &infoLen);
 
 			if(infoLen > 0)
@@ -644,7 +644,7 @@ extern "C"
 				char *infoLog = (char*)malloc(sizeof(char) * infoLen);
 
 				glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
-				SmartBody::util::log("Error linking program:\n%s\n", infoLog);
+				//SmartBody::util::log("Error linking program:\n%s\n", infoLog);
 				free(infoLog);
 
 			}
@@ -654,7 +654,7 @@ extern "C"
 		}
 		else
 		{
-			SmartBody::util::log("program %d is linked correctly", programObject);
+			//SmartBody::util::log("program %d is linked correctly", programObject);
 		}
 
 		//setp 7: free shader resources
@@ -760,7 +760,7 @@ extern "C"
 
 
 		// setup render target
-		SmartBody::util::log("Generate FBO object");
+		//SmartBody::util::log("Generate FBO object");
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
    		std::string fboName = "renderFBO";
    		std::string fboTexName = "fboTex";
@@ -777,8 +777,8 @@ extern "C"
    		glBindRenderbuffer(GL_RENDERBUFFER, esContext->fboDepthBuf);
    		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, esContext->width, esContext->height);
 
-   		SmartBody::util::log("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
-   		SmartBody::util::log("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
+   		//SmartBody::util::log("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
+   		//SmartBody::util::log("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
 
    		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
    		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, esContext->fboDepthBuf);

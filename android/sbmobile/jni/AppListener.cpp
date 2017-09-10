@@ -203,10 +203,10 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
-						SmartBody::util::log("useDeformableMesh : %d", value.c_str());
+						//SmartBody::util::log("useDeformableMesh : %d", value.c_str());
 						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						SbmDeformableMeshGPUInstance* gpuMeshInst = (SbmDeformableMeshGPUInstance*)pawn->dMeshInstance_p;
-						SmartBody::util::log("deformMesh Intance, VBODeformPos = %d", gpuMeshInst->getVBODeformPos());
+						//SmartBody::util::log("deformMesh Intance, VBODeformPos = %d", gpuMeshInst->getVBODeformPos());
 						//pawn->dMeshInstance_p = new DeformableMeshInstance();
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}

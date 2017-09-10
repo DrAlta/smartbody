@@ -203,12 +203,12 @@ jstring SBMobile::stringToJString( const std::string& str )
 	jstring resultJString;
 	status = jvm->GetEnv((void **) &env, JNI_VERSION_1_4);
 	if(status < 0) {
-		SmartBody::util::log("callback_handler: failed to get JNI environment, "
-			"assuming native thread");
+		//SmartBody::util::log("callback_handler: failed to get JNI environment, "
+		//	"assuming native thread");
 		status = jvm->AttachCurrentThread(&env, NULL);
 		if(status < 0) {
-			SmartBody::util::log("callback_handler: failed to attach "
-				"current thread");
+			//SmartBody::util::log("callback_handler: failed to attach "
+			//	"current thread");
 			return resultJString;
 		}
 		isAttached = true;
@@ -232,12 +232,12 @@ bool SBMobile::beforeCallJavaMethod( const std::string& className, const std::st
 
 	status = jvm->GetEnv((void **) &env, JNI_VERSION_1_4);
 	if(status < 0) {
-		SmartBody::util::log("callback_handler: failed to get JNI environment, "
-			"assuming native thread");
+		//SmartBody::util::log("callback_handler: failed to get JNI environment, "
+		//	"assuming native thread");
 		status = jvm->AttachCurrentThread(&env, NULL);
 		if(status < 0) {
-			SmartBody::util::log("callback_handler: failed to attach "
-				"current thread");
+		//	SmartBody::util::log("callback_handler: failed to attach "
+		//		"current thread");
 			return false;
 		}
 		jvmIsAttached = true;
@@ -245,7 +245,7 @@ bool SBMobile::beforeCallJavaMethod( const std::string& className, const std::st
 
 	interfaceClass = env->FindClass(className.c_str());
 	if(!interfaceClass) {
-		SmartBody::util::log("callback_handler: failed to get class reference");
+		//SmartBody::util::log("callback_handler: failed to get class reference");
 		if(jvmIsAttached) jvm->DetachCurrentThread();
 		return false;
 	}
@@ -253,7 +253,7 @@ bool SBMobile::beforeCallJavaMethod( const std::string& className, const std::st
 	method = env->GetStaticMethodID(
 		interfaceClass, methodName.c_str(), methodDef.c_str());
 	if(!method) {
-		SmartBody::util::log("callback_handler: failed to get method ID");
+		//SmartBody::util::log("callback_handler: failed to get method ID");
 		if(jvmIsAttached) jvm->DetachCurrentThread();
 		return false;
 	}
@@ -370,7 +370,7 @@ void SBMobile::snapshotPNGResize(std::string imgFileName, int width, int height,
 	{
 		// resize image
 		resizeImg = (GLubyte *) malloc(outW * outH * sizeof(GLubyte) * channels);
-		SmartBody::util::log("Before stbi resizing");
+		//SmartBody::util::log("Before stbi resizing");
 		int resize_result = stbir_resize_uint8(image, width, height, 0,  resizeImg, outW, outH, 0, channels);
 
 		for(int j = 0; j*2 < outH; ++j )
@@ -387,9 +387,9 @@ void SBMobile::snapshotPNGResize(std::string imgFileName, int width, int height,
 	        }
 	    }
 
-		SmartBody::util::log("before stbi write png");
+		//SmartBody::util::log("before stbi write png");
 		int save_result = stbi_write_png(imgFileName.c_str(), outW, outH, channels, resizeImg, outW*channels);
-		SmartBody::util::log("after stbi write png");
+		//SmartBody::util::log("after stbi write png");
 		free(resizeImg);
 	}
 	else
