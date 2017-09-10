@@ -324,7 +324,7 @@ extern "C"
     ;
 
 	 char vShaderSkinStr[] =
-		 "//#version 430          \n"
+		 //"#version 430          \n"
 		 "#version 300 es         \n"
 		 "layout(location = 0) in vec3 position; \n"
 		 "layout(location = 1) in vec3 normal; \n"
