@@ -1755,18 +1755,20 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		}
 	}
 #endif
-
-	// Save Phonemes
-	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
+	if (result_visemes)
 	{
-		VisemeData* v = (*result_visemes)[ i ];
-		VisemeData* newV = new VisemeData(v->id(), v->time());
-		phonemes.push_back(newV);
-	}
+		// Save Phonemes
+		for (size_t i = 0; i < (*result_visemes).size(); i++)
+		{
+			VisemeData* v = (*result_visemes)[i];
+			VisemeData* newV = new VisemeData(v->id(), v->time());
+			phonemes.push_back(newV);
+		}
 
-	// Process Visemes
-	if (actor && actor->isDiphone()) // if use diphone, reconstruct the curves
-		processVisemes(result_visemes, request, actor->getDiphoneScale());			
+		// Process Visemes
+		if (actor && actor->isDiphone()) // if use diphone, reconstruct the curves
+			processVisemes(result_visemes, request, actor->getDiphoneScale());
+	}
 
 #if 0
 	bool shouldInsert = true;
