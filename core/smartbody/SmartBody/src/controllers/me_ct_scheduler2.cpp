@@ -610,10 +610,10 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		timingCt->setName( timing_name.c_str() );
 	}
 
-	SmartBody::util::log("[%s] Blend curve:", this->getName().c_str());
-	blendingCt->get_curve().print();
-	SmartBody::util::log("[%s] Timewarp curve:", this->getName().c_str());
-	timingCt->get_curve().print();
+	//SmartBody::util::log("[%s] Blend curve:", this->getName().c_str());
+	//blendingCt->get_curve().print();
+	//SmartBody::util::log("[%s] Timewarp curve:", this->getName().c_str());
+	//timingCt->get_curve().print();
 	return create_track( blendingCt, timingCt, ct );
 }
 
