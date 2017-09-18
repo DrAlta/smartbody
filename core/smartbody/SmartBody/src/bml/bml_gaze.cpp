@@ -385,7 +385,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	{
 		if (gaze_ct)
 		{
-			SmartBody::util::log("WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned.");
+			SmartBody::util::log("WARNING: BML::parse_bml_gaze(..): controller '%s' already exists, ignoring specified gaze joints.", handle.c_str());
 		}
 		else
 		{
