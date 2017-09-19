@@ -1537,6 +1537,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         string soundFile = splitArgs[ 0 ];
         string characterName = splitArgs[ 1 ];
 		
+		SmartBody::util::log("Sound to play = %s", soundFile.c_str());
         // check for double-quotes around sound file
         if ( soundFile.length() > 1 )
         {
@@ -1597,7 +1598,8 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 			{
 				//soundFile = string( full ) + string( "/" ) + soundFile;
 				p  /= soundFile;
-				soundFile = abs_p.string() + string("/") + soundFile;
+				if (boost::filesystem::exists(p))
+					soundFile = abs_p.string() + string("/") + soundFile;
 			}
         }
 

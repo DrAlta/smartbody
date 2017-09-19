@@ -186,6 +186,7 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 #if (BOOST_VERSION > 104400)
 	std::string basePath = abs_p.string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+	m_speechRequestInfo[m_requestIdCounter].audioFilename = std::string(ref + ".bml");
 	string bmlFilename = bmlPath.string().c_str();
 	string emoFilename = emoPath.string().c_str();
 #else
