@@ -1039,7 +1039,7 @@ SBMotion* SBMotion::removeChannels(std::string motionName, bool isTranslation, s
 	newMotion->setSyncPoint("relax", this->getTimeRelax());
 	newMotion->setSyncPoint("stop", this->getTimeStop());
 
-	delete data;
+	delete [] data;
 
 	return newMotion;
 }
@@ -3080,7 +3080,7 @@ bool SBMotion::removeMetaData( const std::string& tagName )
 double SBMotion::getMetaDataDouble( const std::string& tagName )
 {
 	std::string strValue = getMetaDataString(tagName);
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	return atof(strValue.c_str());
 #elif __native_client__
 	return atof(strValue.c_str());
@@ -3511,15 +3511,15 @@ int SBMotion::getKeyFrameFromTime( float t, int firstFrame, int lastFrame )
 	float weight;
 	getInterpolationFrames(t,f1,f2,weight);
 	return f1;
-
-	if (firstFrame+1>=lastFrame) // narrow down to the last frame
-		return firstFrame;	
-	unsigned int index = (firstFrame+lastFrame)/2;
-	if (_frames[index].keytime==t)
-		return index;
-	if (_frames[index].keytime < t)
-		return getKeyFrameFromTime(t, index, lastFrame);
-	return getKeyFrameFromTime(t, firstFrame, index);
+//
+//  if (firstFrame+1>=lastFrame) // narrow down to the last frame
+//    return firstFrame;  
+//  unsigned int index = (firstFrame+lastFrame)/2;
+//  if (_frames[index].keytime==t)
+//    return index;
+//  if (_frames[index].keytime < t)
+//    return getKeyFrameFromTime(t, index, lastFrame);
+//  return getKeyFrameFromTime(t, firstFrame, index);
 }
 
 void SBMotion::getAllChannelPos( const std::vector<std::string>& channeNames, float t, std::vector<SrVec>& outPosList )

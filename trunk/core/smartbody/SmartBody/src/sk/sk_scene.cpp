@@ -64,13 +64,13 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
 	 if (!j)
 		 return NULL;
    int i;
-   SrSnGroup* g = new SrSnGroup;
-   g->separator ( true );
    if (j->index() < 0)
    {
 	   SmartBody::util::log("Joint %s cannot be added to scene graph since joint index is %d", j->jointName().c_str(), j->index());
 	   return NULL;
    }
+   SrSnGroup* g = new SrSnGroup;
+   g->separator ( true );
    _jgroup [ j->index() ] = g;
 
    // insert children recursivelly
@@ -392,13 +392,12 @@ void SkScene::set_axis_length ( float l )
 
     const std::vector<SkJoint*>& joints = _skeleton->joints();
    
-   int i;
-   for ( i=0; i<_jgroup.size(); i++ )
-    { g = _jgroup[i];
+   if (_jgroup.size() > 0)
+    { g = _jgroup[0];
       axis = (SrSnLines*) ((SrSnGroup*)g->get(AxisPos))->get(1);
       axis->shape().init();
       axis->shape().push_axis ( SrVec::null, _axislen, 3, "xyz"/*let*/, false/*rule*/ );
-      break; // as the axis is shared, we can update only the first one
+      // as the axis is shared, we can update only the first one
     }
  }
 

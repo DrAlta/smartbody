@@ -691,7 +691,8 @@ void SBPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vecto
 		SbmJointObj* obj = mi->second;
 		// set the child rigid body for the joint
 		SBPhysicsJoint* oj = obj->getPhyJoint();
-		if (oj && jointObjMap.find(oj->getSBJoint()->getMappedJointName()) != jointObjMap.end())
+    if (!oj) continue;
+		if (jointObjMap.find(oj->getSBJoint()->getMappedJointName()) != jointObjMap.end())
 		{
 			oj->setChildObj(obj);	 
 		}

@@ -625,10 +625,10 @@ void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< Vis
          break;
       }
 
-      if ( strLine.length() < 0 )
-      {
-         continue;
-      }
+//      if ( strLine.length() < 0 )
+//      {
+//         continue;
+//      }
 
       // we're looking for a line in the following format:
       //   <phoneme index> <start time> <end time>

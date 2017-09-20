@@ -783,7 +783,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							std::string jointOrientationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "jointOrientX") jorientx = finalValue;
@@ -797,7 +797,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotateX") rotx = finalValue;
@@ -811,7 +811,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotationX") rotx = finalValue;

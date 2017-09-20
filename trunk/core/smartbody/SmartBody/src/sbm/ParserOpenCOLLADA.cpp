@@ -447,9 +447,9 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 		return NULL;
 	}
 
-	delete parser;
-	delete errHandler;
-	return NULL;
+//  delete parser;
+//  delete errHandler;
+//  return NULL;
 }
 
 
@@ -500,9 +500,9 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 		return NULL;
 	}
 
-	delete parser;
-	delete errHandler;
-	return NULL;
+//  delete parser;
+//  delete errHandler;
+//  return NULL;
 }
 
 void ParserOpenCOLLADA::nodeStr(const XMLCh* s, std::string& out)
@@ -961,7 +961,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							xml_utils::xml_translate(&jointOrientationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "jointOrientX") jorientx = finalValue;
@@ -976,7 +976,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotateX") rotx = finalValue;
@@ -991,7 +991,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
-							float finalValue;
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotationX") rotx = finalValue;
@@ -3215,12 +3215,12 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 
 	{
 		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", positionID.c_str(), positionID.c_str());
-		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", positionArrayID.c_str(), model.V.size() * 3);
+    fprintf(fp, "<float_array id=\"%s\" count=\"%lu\">", positionArrayID.c_str(), model.V.size() * 3);
 		for (unsigned int k = 0; k<model.V.size(); k++)
 			fprintf(fp, "%f %f %f ", model.V[k][0] * scale, model.V[k][1] * scale, model.V[k][2] * scale);
 		fprintf(fp, "</float_array>\n");
 		fprintf(fp, "<technique_common>\n");
-		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", positionArrayID.c_str(), model.V.size(), 3);
+    fprintf(fp, "<accessor source=\"#%s\" count=\"%lu\" stride=\"%d\">\n", positionArrayID.c_str(), model.V.size(), 3);
 		fprintf(fp, "<param name=\"X\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"Y\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"Z\" type=\"float\"/>\n");
@@ -3236,12 +3236,12 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 	if (hasNormal) // has vertex normals
 	{
 		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", normalID.c_str(), normalID.c_str());
-		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", normalArrayID.c_str(), model.N.size() * 3);
+    fprintf(fp, "<float_array id=\"%s\" count=\"%lu\">", normalArrayID.c_str(), model.N.size() * 3);
 		for (unsigned int k = 0; k<model.N.size(); k++)
 			fprintf(fp, "%f %f %f ", model.N[k][0], model.N[k][1], model.N[k][2]);
 		fprintf(fp, "</float_array>\n");
 		fprintf(fp, "<technique_common>\n");
-		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", normalArrayID.c_str(), model.N.size(), 3);
+    fprintf(fp, "<accessor source=\"#%s\" count=\"%lu\" stride=\"%d\">\n", normalArrayID.c_str(), model.N.size(), 3);
 		fprintf(fp, "<param name=\"X\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"Y\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"Z\" type=\"float\"/>\n");
@@ -3257,12 +3257,12 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 
 	{
 		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", colorID.c_str(), colorID.c_str());
-		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", colorArrayID.c_str(), model.Vc.size() * 3);
+    fprintf(fp, "<float_array id=\"%s\" count=\"%lu\">", colorArrayID.c_str(), model.Vc.size() * 3);
 		for (unsigned int k = 0; k<model.Vc.size(); k++)
 			fprintf(fp, "%f %f %f ", model.Vc[k][0], model.Vc[k][1], model.Vc[k][2]);
 		fprintf(fp, "</float_array>\n");
 		fprintf(fp, "<technique_common>\n");
-		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", colorArrayID.c_str(), model.Vc.size(), 3);
+    fprintf(fp, "<accessor source=\"#%s\" count=\"%lu\" stride=\"%d\">\n", colorArrayID.c_str(), model.Vc.size(), 3);
 		fprintf(fp, "<param name=\"R\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"G\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"B\" type=\"float\"/>\n");
@@ -3279,12 +3279,12 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 	if (hasTexCoord) // has vertex normals
 	{
 		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", texCoordID.c_str(), texCoordID.c_str());
-		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", texCoordArrayID.c_str(), model.T.size() * 2);
+    fprintf(fp, "<float_array id=\"%s\" count=\"%lu\">", texCoordArrayID.c_str(), model.T.size() * 2);
 		for (unsigned int k = 0; k<model.T.size(); k++)
 			fprintf(fp, "%f %f ", model.T[k][0], model.T[k][1]);
 		fprintf(fp, "</float_array>\n");
 		fprintf(fp, "<technique_common>\n");
-		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", texCoordArrayID.c_str(), model.T.size(), 2);
+    fprintf(fp, "<accessor source=\"#%s\" count=\"%lu\" stride=\"%d\">\n", texCoordArrayID.c_str(), model.T.size(), 2);
 		fprintf(fp, "<param name=\"U\" type=\"float\"/>\n");
 		fprintf(fp, "<param name=\"V\" type=\"float\"/>\n");
 		fprintf(fp, "</accessor>\n");
@@ -3309,7 +3309,7 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 		std::string matID = matName + "_SG";
 		std::vector<int>& mtlFaces = mi->second;
 		int offset = 0;
-		fprintf(fp, "<triangles material=\"%s\" count=\"%d\">\n", matID.c_str(), mtlFaces.size());
+    fprintf(fp, "<triangles material=\"%s\" count=\"%lu\">\n", matID.c_str(), mtlFaces.size());
 		fprintf(fp, "<input semantic=\"VERTEX\" source=\"#%s\" offset=\"%d\"/>\n", vertexID.c_str(), offset++);
 		if (hasNormal)
 		{
@@ -3498,13 +3498,13 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		std::string skinWeightID = skinID + "-weights";
 		std::string skinWeightArrayID = skinWeightID + "-array";
 		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinWeightID.c_str(),skinWeightID.c_str());
-		fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", skinWeightArrayID.c_str(), skinWeight->bindWeight.size());
+    fprintf(fp,"<float_array id=\"%s\" count=\"%lu\">", skinWeightArrayID.c_str(), skinWeight->bindWeight.size());
 		for (unsigned int k=0;k<skinWeight->bindWeight.size();k++)
 			fprintf(fp,"%f ",skinWeight->bindWeight[k]);
 		fprintf(fp,"</float_array>\n");
 
 		fprintf(fp,"<technique_common>\n");
-		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"1\">\n",skinWeightArrayID.c_str(),skinWeight->bindWeight.size());
+    fprintf(fp,"<accessor source=\"#%s\" count=\"%lu\" stride=\"1\">\n",skinWeightArrayID.c_str(),skinWeight->bindWeight.size());
 		fprintf(fp,"<param name=\"WEIGHT\" type=\"float\"/>\n");
 		fprintf(fp,"</accessor>\n");
 		fprintf(fp,"</technique_common>\n");
@@ -3516,7 +3516,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		fprintf(fp,"<input semantic=\"INV_BIND_MATRIX\" source=\"#%s\"/>\n",skinBindPoseID.c_str());
 		fprintf(fp,"</joints>\n");
 		// output vertex weights semantics
-		fprintf(fp,"<vertex_weights count=\"%d\">\n",skinWeight->numInfJoints.size());
+    fprintf(fp,"<vertex_weights count=\"%lu\">\n",skinWeight->numInfJoints.size());
 		fprintf(fp,"<input semantic=\"JOINT\" source=\"#%s\" offset=\"0\"/>\n", skinJointID.c_str());
 		fprintf(fp,"<input semantic=\"WEIGHT\" source=\"#%s\" offset=\"1\"/>\n", skinWeightID.c_str());
 		

@@ -358,12 +358,12 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	// whether use offset
 	if (_useOffset)
 	{
-		if (!sbMotion->getOffsetParent())
+		if (sbMotion && !sbMotion->getOffsetParent())
 			_motion = sbMotion->getOffset();
 	}
 	else
 	{
-		if (sbMotion->getOffsetParent())
+		if (sbMotion && sbMotion->getOffsetParent())
 			_motion = sbMotion->getOffsetParent();
 	}
 

@@ -290,6 +290,9 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 								data = parent_buffer[ ++parent_buffer_index ];
 								local_buffer[ ++local_buffer_index ] = data;
 								break;
+                
+              default:
+                break;
 						}
 					}
 				}

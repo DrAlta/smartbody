@@ -18,8 +18,9 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
+#include <sb/SBTypes.h>
 
-#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #endif
 #if defined(__ANDROID__)
@@ -644,7 +645,7 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 
 void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance)
 {
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
 	
 	TBOData* tranTBO = gpuMeshInstance->getTBOTransforBuffer();
@@ -1482,6 +1483,7 @@ bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
 		cleanBuffer();
 		return buildVertexBufferGPU();
 	}
+  return false;
 }
 
 
@@ -1682,7 +1684,7 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 		VBOVec3f* posVBO = gpuMesh->getPosVBO();		
 		glBindBuffer(GL_ARRAY_BUFFER, posVBO->VBO()->m_iVBO_ID);
 		//SmartBody::util::log("gpuBlendShape::after glBindBuffer");
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(SB_IPHONE) 
 		float* pData = (float*)glMapBufferRange(GL_ARRAY_BUFFER, 0, gpuMesh->posBuf.size()*sizeof(SrVec), GL_MAP_WRITE_BIT);
 		//SmartBody::util::log("gpuBlendShape::after glMapBufferRange");
 #else

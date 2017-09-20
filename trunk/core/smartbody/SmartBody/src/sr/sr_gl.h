@@ -46,8 +46,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #elif defined(SB_IPHONE)
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>

@@ -132,7 +132,7 @@ public:
 	/*! traverse hierarchy */
 	SkJoint* parent() const { return _parent; }
 	SkJoint* child ( int i ) const { return _children[i]; }
-	int num_children () const { return _children.size(); }
+	size_t num_children () const { return _children.size(); }
 
 	/* Recursively get all the child joint of current joint */
 	static void recursive_children(std::vector<SkJoint*>& joints, SkJoint* root);

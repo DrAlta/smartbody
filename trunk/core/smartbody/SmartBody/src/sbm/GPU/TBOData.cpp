@@ -1,5 +1,6 @@
+#include <sb/SBTypes.h>
 
-#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE) 
 #include "external/glew/glew.h"
 #endif
 #include "TBOData.h"
@@ -10,7 +11,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 //Zengrui: For Smartbody Javascript, we use another project for the rendering part
 //thus, ifdef out the implementation
-#if !defined(EMSCRIPTEN) && !defined(__ANDROID__)
+#if !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE) 
 TBOData::TBOData( char* name, ublas::vector<float>& Data )
 {
 	strcpy(m_Name,name);

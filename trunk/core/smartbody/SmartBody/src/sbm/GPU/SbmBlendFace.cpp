@@ -18,6 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
+#include <sb/SBTypes.h>
 
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
@@ -584,7 +585,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		//SmartBody::util::log("After bind framebuffer");
 			assert( glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE );
 			
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			glPushAttrib(GL_ENABLE_BIT);
 				glDisable(GL_DEPTH_TEST);
 				glDisable(GL_LIGHTING);
@@ -668,7 +669,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 				glMatrixMode (GL_MODELVIEW);
 				glPopMatrix();
 			glPopAttrib();
-#elif defined(__ANDROID__) // why there is a step here that void all the rendering ?
+#elif defined(__ANDROID__) || defined(SB_IPHONE) // why there is a step here that void all the rendering ?
 			GLint frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 			//gluOrtho2D(-1, 1, -1, 1);
 			glm::mat4 projMat = glm::ortho<float>(-1,1,-1,1);
@@ -835,7 +836,7 @@ std::string ZeroPadNumber(int num)
 	*/
 
 
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string>& texture_names, std::vector<std::string>& textureFileNames, GLuint program, int w, int h)
 {
 	int numTextures		= weights.size();
@@ -876,7 +877,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #2");
 
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 		glPushAttrib(GL_ENABLE_BIT);
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_LIGHTING);
@@ -937,7 +938,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 		glPopMatrix();                              
 		glMatrixMode (GL_MODELVIEW);
 		glPopAttrib();								// Pops ENABLE_BIT
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(SB_IPHONE)
 		glDisable(GL_DEPTH_TEST);
 		//glDisable(GL_LIGHTING);
 		glMatrixMode (GL_PROJECTION);
@@ -1020,7 +1021,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
 {
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 	bool showMasks		= false;
@@ -1265,7 +1266,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 
 void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
 {
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 	bool showMasks		= false;
@@ -1434,7 +1435,7 @@ void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<floa
 
 void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
 {
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 
@@ -1716,7 +1717,7 @@ void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::ve
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
 
 	assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -1836,7 +1837,7 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
 
 	assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);

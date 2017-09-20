@@ -1447,7 +1447,7 @@ void prune_schedule( SbmCharacter*   actor,
 									} 
 #endif
 									else if (dynamic_cast<MeCtConstraint*>(anim_source)) {
-										MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);										
+										//MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);
 										if (hasConstraint)
 										{
 											in_use = false;
@@ -1495,7 +1495,7 @@ void prune_schedule( SbmCharacter*   actor,
 										*/
 									}
 									else if (dynamic_cast<MeCtExampleBodyReach*>(anim_source)) {
-										MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
+										//MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
 										if (hasBodyReach)
 										{
 											//SmartBody::util::log("Prune Reach Controller!\n");
@@ -1575,11 +1575,12 @@ void prune_schedule( SbmCharacter*   actor,
 												//  TODO: Throttle warnings....
 												SmartBody::util::log("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type().c_str());
 											}
-											if( LOG_CONTROLLER_TREE_PRUNING )
+                      if( LOG_CONTROLLER_TREE_PRUNING ) {
 												if (in_use)
 													SmartBody::util::log("\t- Not Pruned (primary ct of type).");
 												else
 													SmartBody::util::log("\t- Pruned (occluded)!!");
+                      }
 								} else {
 									if( LOG_CONTROLLER_TREE_PRUNING )
 										SmartBody::util::log("\t- Not Pruned (future activity).");
@@ -2699,7 +2700,9 @@ bool SbmCharacter::checkExamples()
 	{
 		SmartBody::util::log("%s: Steering works under minimal config.", this->getName().c_str());
 		PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-		steersuiteAgent->steeringConfig = PPRAISteeringAgent::MINIMAL;
+    if (steersuiteAgent) {
+      steersuiteAgent->steeringConfig = PPRAISteeringAgent::MINIMAL;
+    }
 		return true;
 	}
 	SmartBody::util::log("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());

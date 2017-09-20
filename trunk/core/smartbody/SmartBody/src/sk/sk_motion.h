@@ -128,7 +128,7 @@ public :
 	SkChannelArray& channels () { return _channels; }
 
 	/*! Number of frames in the current motion */
-	int frames () const { return _frames.size(); }
+	size_t frames () const { return _frames.size(); }
 
 	/*! The size of the float array representing one posture. */
 	int posture_size () const { return _postsize; }

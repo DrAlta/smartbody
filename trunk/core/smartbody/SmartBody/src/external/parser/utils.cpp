@@ -34,7 +34,7 @@ error( const char *s )
 {
     cerr <<  "error: " << s << endl;
     abort();
-    exit( 1 );
+//    exit( 1 );
 }
 
 /* same as error(), but no abort() call. */
@@ -48,7 +48,7 @@ void
 ignoreComment(ifstream& inpt)
 {
   ECString nxt;
-  char a;
+  char a = 0;
   inpt.get(a);
   if(a == '/')
     {

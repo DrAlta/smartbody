@@ -159,16 +159,18 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		{
 			std::string errorInfo;
 			errorInfo = character->getName() + "'s animation state transition warning. ";
-			if (curStateData)
+      if (curStateData) {
 				if (curStateData->state)
 					errorInfo += "current state: " + curStateData->state->stateName;
-			else
-				errorInfo += "current state: null ";
-			if (nextStateData)
+        else
+          errorInfo += "current state: null ";
+      }
+      if (nextStateData) {
 				if (nextStateData->state)
 					errorInfo += "next state: " + nextStateData->state->stateName;
-			else 
-				errorInfo += "next state: null ";
+        else
+          errorInfo += "next state: null ";
+      }
 			SmartBody::util::log("%s", errorInfo.c_str());
 
 			if (curStateData == NULL && nextStateData != NULL)
@@ -1066,7 +1068,8 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 }
 
 void MeCtParamAnimation::updateJointTrajectory( PABlendData* blendData )
-{	
+{
+  if (!character) return;
 	std::vector<std::string> jointConsNames = character->getJointConstraintNames();
 	SmartBody::SBJoint* baseJoint = character->getSkeleton()->getJointByMappedName("base");
 	SrMat baseGmat;
@@ -1075,14 +1078,14 @@ void MeCtParamAnimation::updateJointTrajectory( PABlendData* blendData )
 	{		
 		baseGmat = baseJoint->gmat();//baseJoint->getParent()->gmat();		
 	}
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+//	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	SmartBody::SBAnimationBlend* animBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
 
 	SmartBody::SBRetarget* retarget = NULL;
 	if (animBlend)
 	{
-		SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();			
+		SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
 		retarget = retargetManager->getRetarget(animBlend->getBlendSkeleton(),character->getSkeleton()->getName());
 	}
 	

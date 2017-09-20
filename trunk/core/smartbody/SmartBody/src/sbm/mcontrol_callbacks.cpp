@@ -374,10 +374,10 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	if (operation == "state")
 	{
 		std::string blendName = args.read_token();
-		PABlend* newState = new PABlend(blendName);
 		std::string nextString = args.read_token();
 		if (nextString == "cycle")
 		{
+      PABlend* newState = new PABlend(blendName);
 			std::string cycle = args.read_token();
 			if (cycle == "true")
 				newState->cycle = true;
@@ -417,7 +417,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				}
 				newState->keys.push_back(keysForOneMotion);
 			}
-
+      delete newState;
 			//SmartBody::SBScene::getScene()->getBlendManager()->addBlend(newState);
 		}
 		else if (nextString == "parameter")
@@ -2307,7 +2307,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	int frameNum = -1;
 	if (strcmp(frameNumString, "") != 0)	frameNum = atoi(frameNumString);
 	int mode = -1;
-	int chanSize;
+	int chanSize = 0;
 	SkChannel chan;
 
 	if (strcmp(operation, "motion") == 0)	mode = 1;
@@ -2386,7 +2386,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				default:
 					chanTypeString = "Others";
 			}
-			int pos;
+			int pos = 0;
 			if (mode == 1)
 			{
 				pos = skelChanArray.search(chan.joint->jointName(), chan.type);
@@ -3211,7 +3211,7 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, SmartBody::SBC
 		}
 		else if( strcmp(type, "spline") == 0)
 		{
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			int args_count = args.calc_num_tokens();
 			if((args_count % 2) != 0)
 			{

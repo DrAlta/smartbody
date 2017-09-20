@@ -249,7 +249,7 @@ MeCtScheduler2::~MeCtScheduler2 () {
 }
 
 MeController* MeCtScheduler2::child( size_t n ) {
-	if( n >= 0 && n < _tracks.size() )
+	if( n < _tracks.size() )
 		return _tracks[ n ]->_root;
 	else
 		return NULL;

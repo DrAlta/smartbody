@@ -204,7 +204,7 @@ SBAPI void SmartBody::util::logSimple(const char * message)
 	g_log.vLogSimple(message);
 }
 
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) // && !defined(SB_IPHONE)
 
 
 // global instance of a logger

@@ -479,15 +479,24 @@ bool SrModel::load ( SrInput &in )
       else if ( s=="vertices_per_face" ) // read F: a b c
        { in >> i; F.resize(i);
          for ( i=0; i<F.size(); i++ )
-          { fscanf ( in.filept(), "%d %d %d", &F[i][0], &F[i][1], &F[i][2] ); // equiv to: in >> F[i];
-            //F[i].validate(); 
+          {
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
+            fscanf ( in.filept(), "%hud %hud %hud", &F[i][0], &F[i][1], &F[i][2] ); // equiv to: in >> F[i];
+#else
+            fscanf ( in.filept(), "%d %d %d", &F[i][0], &F[i][1], &F[i][2] ); // equiv to: in >> F[i];
+#endif
+            //F[i].validate();
           }
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="normals_per_face" ) // read Fn: a b c
        { in >> i; Fn.resize(i);
          for ( i=0; i<Fn.size(); i++ )
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
+           fscanf ( in.filept(), "%hud %hud %hud", &Fn[i][0], &Fn[i][1], &Fn[i][2] ); // equiv to: in >> Fn[i];
+#else
           fscanf ( in.filept(), "%d %d %d", &Fn[i][0], &Fn[i][1], &Fn[i][2] ); // equiv to: in >> Fn[i];
+#endif
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="textcoords_per_face" ) // read Ft: a b c

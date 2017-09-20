@@ -306,28 +306,18 @@ int  MeCtExampleBodyReach::determineReachType(SrVec& targetPos)
 	if (dot(crossDir,SrVec(0,1,0)) > 0 && isValidReachEngine(MeCtReachEngine::RIGHT_ARM)) // right hand
 	{
 #if USE_JUMP_MOTION
-		if (targetPos.y < character->getHeight()*1.1)
+    reachType = (targetPos.y < character->getHeight()*1.1) ? MeCtReachEngine::RIGHT_ARM : MeCtReachEngine::RIGHT_JUMP;
 #else
-		if (1)
+    reachType = MeCtReachEngine::RIGHT_ARM;
 #endif
-		{
-			reachType = MeCtReachEngine::RIGHT_ARM;
-		}
-		else
-			reachType = MeCtReachEngine::RIGHT_JUMP;
 	}	
 	else if (isValidReachEngine(MeCtReachEngine::LEFT_ARM))
 	{
 #if USE_JUMP_MOTION
-		if (targetPos.y < character->getHeight()*1.1)
+    reachType = (targetPos.y < character->getHeight()*1.1) ? MeCtReachEngine::LEFT_ARM : MeCtReachEngine::LEFT_JUMP;
 #else
-		if (1)
+		reachType = MeCtReachEngine::LEFT_ARM;
 #endif
-		{
-			reachType = MeCtReachEngine::LEFT_ARM;
-		}
-		else
-			reachType = MeCtReachEngine::LEFT_JUMP;
 	}
 	return reachType;
 }

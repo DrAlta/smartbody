@@ -118,7 +118,7 @@ downHeap(int pos)
   int rc = right_child(pos);
   int largec;
   int lcthere = 0;
-  Edge* lct;
+  Edge* lct = NULL;
   if(lc < unusedPos_)
     {
       assert(lc < HeapSize);
@@ -129,7 +129,7 @@ downHeap(int pos)
 	}
     }
   int rcthere = 0;
-  Edge* rct;
+  Edge* rct = NULL;
   if(rc < unusedPos_)
     {
       rct = array[rc];

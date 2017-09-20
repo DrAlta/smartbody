@@ -364,12 +364,12 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 	   {
 		   fprintf(stderr, "Error: Could not extract root element from XML DOM document\n");
 	   }
+     doc->release();
    }
    else
    {
 	   fprintf(stderr, "Error: XML DOM document is null!\n");
    }
-   doc->release();
 
    //actualText += "</speech>\n";
    if ( actualText != "" ) {

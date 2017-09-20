@@ -102,7 +102,7 @@ public :
 //	void compress () { _channels.compress(); }
 
 	/*! Returns the number of channels in the array */
-	int size () const { return _channelList.size(); }
+	size_t size () const { return _channelList.size(); }
 
 	bool doesChannelExist(std::string name, SkChannel::Type t);
 

@@ -1342,7 +1342,7 @@ void PATransitionManager::update()
 	if (!transition)
 		return;
 	std::vector<double> fromKey;
-	int id;
+	int id = 0;
 	
 
 	for (int i = 0; i < transition->getSourceBlend()->getNumMotions(); i++)

@@ -202,11 +202,14 @@ void SrQuat::set( float ex, float ey, float ez )
 // 	x = x0*cz - sz*y0;
 // 	y = sz*x0 + y0*cz;
 // 	z = sz*w0 + cz*z0;
-	gwiz::quat_t euQ = gwiz::quat_t(gwiz::euler_t(ex,ey,ez));
-	x = (float)euQ.x();
-	y = (float)euQ.y();
-	z = (float)euQ.z();
-	w = (float)euQ.w();
+
+// or
+  
+//  gwiz::quat_t euQ = gwiz::quat_t(gwiz::euler_t(ex,ey,ez));
+//  x = (float)euQ.x();
+//  y = (float)euQ.y();
+//  z = (float)euQ.z();
+//  w = (float)euQ.w();
 }
 
 void SrQuat::get ( SrVec& axis, float& radians ) const

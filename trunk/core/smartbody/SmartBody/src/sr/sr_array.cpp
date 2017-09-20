@@ -34,7 +34,7 @@ SrArrayBase::SrArrayBase ( sruint sizeofx, int s, int c )
             : _size(s), _capacity(c)
  { 
    if ( _capacity<_size ) _capacity=_size;
-   _data = _capacity>0? malloc(sizeofx*_capacity) : 0;
+   _data = _capacity>0? malloc(sizeofx*_capacity) : NULL;
  }
 
 SrArrayBase::SrArrayBase ( sruint sizeofx, const SrArrayBase& a ) 
@@ -62,10 +62,16 @@ void SrArrayBase::size ( unsigned sizeofx, int ns )
    _size = ns;
    if ( _size<0 ) _size=0;
 
-   if ( _size>_capacity )
-    { _capacity = _size;
-      _data = realloc ( _data, sizeofx*_capacity ); // if _data==0, realloc reacts as malloc.
-    }
+   if ( _size>_capacity ) {
+     _capacity = _size;
+     if (_capacity > 0) {
+       _data = realloc ( _data, sizeofx*_capacity ); // if _data==0, realloc reacts as malloc.
+     } else {
+       if (_data)
+         free(_data);
+       _data = NULL;
+     }
+   }
  }
 
 void SrArrayBase::capacity ( unsigned sizeofx, int nc )

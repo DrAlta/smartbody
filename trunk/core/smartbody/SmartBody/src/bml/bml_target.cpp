@@ -70,23 +70,25 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 				if( target ) {
 					// Target is a character, look at eyeball
 					bone_id = "eyeball_left";
-					if( DEBUG_BML_TARGET )
+#if DEBUG_BML_TARGET
 					{
 						std::stringstream strstr;
 						strstr << "DEBUG: BML::parse_target(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
 						SmartBody::util::log(strstr.str().c_str());
 					}
-				} else {
+#endif
+        } else {
 					// Target is a pawn, look at world offset
 					target =  SmartBody::SBScene::getScene()->getPawn( object_id );
 					if( target ) {
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
-						if( DEBUG_BML_TARGET )
+#if DEBUG_BML_TARGET
 						{
 							std::stringstream strstr;
 							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
 							SmartBody::util::log(strstr.str().c_str());
 						}
+#endif
 					} else {
 						// TODO: Query World State Protocol (requires event delay)
 						std::stringstream strstr;
@@ -99,8 +101,9 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 				// Found ':' object/bone delimiter
 				bone_id = object_id.substr( colon_index+1 );
 				object_id.erase( colon_index );
-				if( DEBUG_BML_TARGET )
+#if DEBUG_BML_TARGET
 					cout << "DEBUG: BML::parse_target(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
+#endif
 				target =  SmartBody::SBScene::getScene()->getPawn( object_id );
 				if( target==NULL ) {
 
@@ -109,12 +112,13 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					if( target )
 					{
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
-						if( DEBUG_BML_TARGET )
+#if DEBUG_BML_TARGET
 						{
 							std::stringstream strstr;
 							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
 							SmartBody::util::log(strstr.str().c_str());
 						}
+#endif
 					}
 					else
 					{

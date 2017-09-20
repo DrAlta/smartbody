@@ -270,7 +270,7 @@ is_effEnd(FullHist* tree, FullHist* child)
       if(ntrmNm == "''") return 1;
       return 0;
     }
-  error("should not get here");
+//  error("should not get here");
   return 0;
 }
 

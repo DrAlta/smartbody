@@ -6,15 +6,15 @@ Bst::
 tester(Val* oval)
 {
   return;
-  Bsts::const_iterator bi = oval->bsts().begin();
-  //cerr << "OBS " << oval->bsts().size() << endl;
-  int jj = 0;
-  for( ; bi != oval->bsts().end() ; bi++)
-    {
-      cerr << "JJ" << jj << endl;
-      jj++;
-    }
-  cerr << "AFT" << endl;
+//  Bsts::const_iterator bi = oval->bsts().begin();
+//  //cerr << "OBS " << oval->bsts().size() << endl;
+//  int jj = 0;
+//  for( ; bi != oval->bsts().end() ; bi++)
+//    {
+//      cerr << "JJ" << jj << endl;
+//      jj++;
+//    }
+//  cerr << "AFT" << endl;
 }
   
 bool

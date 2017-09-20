@@ -12,7 +12,7 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
-#if defined(EMSCRIPTEN) || defined(__ANDROID__)
+#if defined(EMSCRIPTEN) || defined(__ANDROID__) 
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 using namespace Eigen;

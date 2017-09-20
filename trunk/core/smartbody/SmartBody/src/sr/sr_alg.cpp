@@ -215,7 +215,7 @@ void sr_get_closest_on_ellipse ( float a, float b, float& x, float& y )
    int nb = sr_solve_quartic_polynomial ( c, s );
 
    double denom, s_theta, c_theta, dist;
-   double test_x [4], test_y [4];
+   double test_x [4] = {0,0,0,0}, test_y [4] = {0,0,0,0};
    double min_dist = aMAXFLOAT;
    int i, winner=0;
 

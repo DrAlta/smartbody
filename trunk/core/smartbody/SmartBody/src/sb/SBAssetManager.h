@@ -1,5 +1,5 @@
 #ifndef _SBASSETMANAGER_H_
-#define _SBASSETMANAGER_H
+#define _SBASSETMANAGER_H_
 
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>

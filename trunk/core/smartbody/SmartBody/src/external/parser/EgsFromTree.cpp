@@ -110,7 +110,7 @@ edgesFromTree(InputTree* tree)
 	}
       //cerr << "endeFE " << *edg << endl;
       return lhs;
-      rPendFactor();
+      //rPendFactor();
     }
   return NULL;
 }

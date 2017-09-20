@@ -1261,7 +1261,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			else if( cmd == "gazefade" ) {
 
 					std::string fade_cmd = args.read_token();
-					bool fade_in;
+					bool fade_in = false;
 					bool print_track = false;
 					if( fade_cmd == "in" ) {
 						fade_in = true;

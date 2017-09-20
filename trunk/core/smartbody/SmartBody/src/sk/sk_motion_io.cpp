@@ -304,45 +304,49 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				else
 					continue;
 			} else if( token=="strokeStart" ) {
-				if( DEPRECATE_BAD_METADATA_NAMES )
+#if DEPRECATE_BAD_METADATA_NAMES
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeStart\" has been deprecated in favor of \"stroke_start\" to match BML.";
 					SmartBody::util::log(strstr.str().c_str());
 				}
+#endif
 				if( parse_timing_metadata( in, token, _time_stroke_start ) )
 					metadata_flags |= STROKE_START;
 				else
 					continue;
 			} else if( token=="emphasis" ) {
-				if( DEPRECATE_BAD_METADATA_NAMES )
+#if DEPRECATE_BAD_METADATA_NAMES
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"emphasis\" has been deprecated in favor of \"stroke_emphasis\" to match BML." << endl;
 					SmartBody::util::log(strstr.str().c_str());
 				}
+#endif
 				if( parse_timing_metadata( in, token, _time_stroke_emphasis ) )
 					metadata_flags |= STROKE_EMPH;
 				else
 					continue;
 			} else if( token=="stroke" ) {
-				if( DEPRECATE_BAD_METADATA_NAMES )
+#if DEPRECATE_BAD_METADATA_NAMES
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"stroke\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
 					SmartBody::util::log(strstr.str().c_str());
 				}
+#endif
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
 					continue;
 			} else if( token=="strokeEnd" ) {
-				if( DEPRECATE_BAD_METADATA_NAMES )
+#if DEPRECATE_BAD_METADATA_NAMES
 				{
 					std::stringstream strstr;
 					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeEnd\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
 					SmartBody::util::log(strstr.str().c_str());
 				}
+#endif
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
@@ -533,7 +537,7 @@ bool SkMotion::save ( SrOutput& out )
 	if (sbMotion)
 		jointMap = sbMotion->getJointMap();
 
-	out << "channels " << _channels.size() << srnl;
+	out << "channels " << ((int)_channels.size()) << srnl;
 	for (int i = 0; i < _channels.size(); ++i)
 	{ 
 		const std::string& chanName = _channels.name(i);

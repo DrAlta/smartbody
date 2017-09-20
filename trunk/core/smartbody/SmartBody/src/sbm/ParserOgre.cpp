@@ -165,10 +165,10 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 		return false;
 	}
 
-	delete parser;
-	delete errHandler;
-	return true;
-
+//  delete parser;
+//  delete errHandler;
+//  return true;
+//
 }
 
 
@@ -310,9 +310,9 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 		return false;
 	}
 
-	delete parser;
-	delete errHandler;
-	return true;
+//  delete parser;
+//  delete errHandler;
+//  return true;
 }
 
 DOMNode* ParserOgre::getNode(const std::string& nodeName, DOMNode* node)
@@ -473,7 +473,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 					}
 					else if (transformNodeName == "rotation")
 					{
-						float angle;
+						float angle = 0;
 						DOMNamedNodeMap* rotationAttr = transformNode->getAttributes();
 						if (rotationAttr)
 						{					
@@ -779,7 +779,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 															}
 															else if (transformNodeName == "rotate")
 															{
-																float angle;
+																float angle = 0;
 																DOMNamedNodeMap* rotationAttr = transformNode->getAttributes();
 																if (rotationAttr)
 																{			
@@ -871,7 +871,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 											if (leftKey == -1)
 											{
 												// no left key, use right key value
-												for (size_t f = b - 1; f >= 0; f++)
+												for (int f = b - 1; f >= 0; f++)
 												{
 													vecTranslateX[f] = vecTranslateX[rightKey];
 													vecTranslateY[f] = vecTranslateY[rightKey];
@@ -1604,7 +1604,7 @@ bool ParserOgre::exportOgreXMLMesh( DeformableMesh* defMesh, std::string meshNam
 		fprintf(fp,"<submesh material=\"%s\">\n", matName.c_str());
 
 		// export vertices
-		fprintf(fp,"<geometry vertexcount=\"%d\">\n",model.V.size());
+    fprintf(fp,"<geometry vertexcount=\"%lu\">\n",model.V.size());
 		if (model.V.size() != model.N.size())
 			model.computeNormals();
 		fprintf(fp,"<vertexbuffer positions=\"true\" normals=\"true\">\n");
@@ -1643,7 +1643,7 @@ bool ParserOgre::exportOgreXMLMesh( DeformableMesh* defMesh, std::string meshNam
 				int widx = weight->weightIndex[counter];
 				int bidx = weight->jointNameIndex[counter];
 				//std::string& boneName = weight->infJointName[bidx];				
-				fprintf(fp,"<vertexboneassignment vertexindex=\"%d\" boneindex=\"%d\" weight=\"%f\" />\n",k,weight->bindWeight[widx],bidx);
+        fprintf(fp,"<vertexboneassignment vertexindex=\"%d\" boneindex=\"%f\" weight=\"%d\" />\n",k,weight->bindWeight[widx],bidx);
 				counter++;
 			}			
 		}

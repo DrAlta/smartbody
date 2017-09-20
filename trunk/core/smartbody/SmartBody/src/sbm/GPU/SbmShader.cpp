@@ -18,8 +18,9 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
+#include <sb/SBTypes.h>
 
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #endif
 #if defined(__ANDROID__)
@@ -263,7 +264,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 	{
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 		SmartBody::util::log("glError %s: %s\n", tag,gluErrorString(glErr));
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(SB_IPHONE)
 		std::string error;
 		switch (glErr) {
 		case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
@@ -289,7 +290,7 @@ SbmShaderManager::SbmShaderManager(void)
 {
 	viewer = NULL;
 	shaderInit = false;
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	shaderSupport = SUPPORT_OPENGL_2_0;
 #else
 	shaderSupport = NO_GPU_SUPPORT;
@@ -319,7 +320,7 @@ SbmShaderManager::~SbmShaderManager(void)
 
 bool SbmShaderManager::initOpenGL()
 {
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	return true;
 #else
 	if (!viewer)
@@ -337,7 +338,7 @@ bool SbmShaderManager::initGLExtension()
     if (shaderInit && shaderSupport == NO_GPU_SUPPORT)
         return false;
 
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 	if (!viewer)
 		return false;
         static int counter = 0;
@@ -361,7 +362,7 @@ bool SbmShaderManager::initGLExtension()
 	return checkShaderInit(counter);
 
     //return false;
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(SB_IPHONE)
 	shaderInit = true;
 	return true;
 #endif
@@ -369,7 +370,7 @@ bool SbmShaderManager::initGLExtension()
 
 bool SbmShaderManager::checkShaderInit(int &counter)
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	if (glewIsSupported("GL_VERSION_4_0"))
 	{
 		SmartBody::util::log("Ready for OpenGL 4.0.\n");

@@ -13,7 +13,7 @@ enum
 	VERTEX_ATTRIBUTE_3 = 3,
 	VERTEX_ATTRIBUTE_4 = 4,
 	VERTEX_ATTRIBUTE_5 = 5,
-#if !defined(__native_client__) && !defined(__ANDROID__) 	
+#if !defined(__native_client__) && !defined(__ANDROID__) && !defined(SB_IPHONE) 
 	VERTEX_POSITION = GL_VERTEX_ARRAY,
 	VERTEX_VBONORMAL = GL_NORMAL_ARRAY,
 	VERTEX_TEXCOORD = GL_TEXTURE_COORD_ARRAY,

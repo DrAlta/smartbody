@@ -371,7 +371,7 @@ void SkMotion::applyNew ( float t,
 #endif
 
 	//sr_out<<"t: "<<t<<" frames: "<<f<<srspc<<(f+1)<<"\n";
-	int num;
+	int num = 0;
 	int csize = _channels.size();
 
 	if ( buffer ) {
@@ -582,7 +582,7 @@ void SkMotion::apply ( float t,
 	int csize = _channels.size();
 
 	
-	float outValue[4], origValue[4], newValue[4]; // at most 4 
+  float outValue[4], origValue[4] = {0,0,0,0}, newValue[4]; // at most 4 
 	// Apply to float* buffer
 	float* v = NULL;
 	int sum = 0;		

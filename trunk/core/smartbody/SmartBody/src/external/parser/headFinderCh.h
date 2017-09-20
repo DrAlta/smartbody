@@ -22,7 +22,7 @@
  */
 
 #ifndef HEADFINDCH_H
-#define HEADFINDCN_H
+#define HEADFINDCH_H
 
 #include "ECString.h"
 #include "InputTree.h"

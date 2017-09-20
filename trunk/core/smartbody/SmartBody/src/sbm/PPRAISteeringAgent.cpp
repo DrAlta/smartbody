@@ -779,8 +779,8 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	}
 
 	// always update current steering information
-	float curSpeed;
-	float curTurningAngle;
+	float curSpeed = 0;
+	float curTurningAngle = 0;
 	float curScoot;
 
 	//SmartBody::util::log("dt = %f, curSteerPos = %f %f, dir = %f",dt, x,z, yaw);
@@ -790,8 +790,10 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		//locomotionEnd = true;
 		
 
-		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
-		curSpeed /= parameterScale;
+    if (curStateData) {
+      curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
+    }
+    curSpeed /= parameterScale;
 
 
 		//curSpeed = steerCurSpeed;
@@ -803,7 +805,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 
 		SrMat rotMat; rotMat.roty(curTurningAngle*dt);
 		nextSteerDir = curSteerDir*rotMat;
-		float radius = fabs(curSpeed/curTurningAngle);
+		//float radius = fabs(curSpeed/curTurningAngle);
 		nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
 		// predict next position
 		//SmartBody::util::log("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
@@ -886,19 +888,21 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		{
 			terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
 		}
-		float difference = y - terrainHeight;
-		float ang = - difference * tiltGain;
+		// float difference = y - terrainHeight;
+		// float ang = - difference * tiltGain;
 		//SmartBody::util::log("current y %f, terrain height %f, character height %f, difference %f, angle %f", y, terrainHeight, character->getHeight(), difference, ang);
 
 		std::vector<double> weights;
-		weights.resize(curStateData->state->getNumMotions());
+    if (curStateData && curStateData->state) {
+      weights.resize(curStateData->state->getNumMotions());
 		//if (terrainMode)
 		//	curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
 		//else		
-		curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
+      curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
 		//SmartBody::util::log("dt = %f, newSpeed = %f, newTurningAngle = %f, newScoot = %f",dt, newSpeed,nextTurningAngle,newScoot);
 		//curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, 0.f, 0.f, weights);
-		character->param_animation_ct->updateWeights(weights);	
+      character->param_animation_ct->updateWeights(weights);
+    }
 #endif
 		//steerCurSpeed = newSpeed;
 		//steerCurAngle = nextTurningAngle;
@@ -1688,8 +1692,10 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		}
 		//SmartBody::util::log("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
-		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);	
-		curSpeed /= parameterScale;
+    if (curStateData && curStateData->state) {
+      curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
+    }
+    curSpeed /= parameterScale;
 		if (smoothing)
 		{
 			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
@@ -1793,7 +1799,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			newSpeed = targetSpeed;
 		}
 
-		if (inControl)
+		if (inControl && curStateData && curStateData->state)
 		{
 			std::vector<double> weights;
 			weights.resize(curStateData->state->getNumMotions());

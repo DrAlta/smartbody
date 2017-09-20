@@ -78,7 +78,7 @@ init(ECString path)
       ifstream fts(ftstr.c_str());
       if(!fts) cerr << "could not find " << ftstr << endl;
       assert(fts);
-      FeatureTree* ft = new FeatureTree(fts); //puts it in root;
+      new FeatureTree(fts); //puts it in root;
       if(tmp == "ww") continue;
       Feature::readLam(which, tmp, path);
     }

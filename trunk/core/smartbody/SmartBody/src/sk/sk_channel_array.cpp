@@ -322,8 +322,8 @@ int SkChannelArray::linear_search (const std::string& name, SkChannel::Type type
 
 	for (int i = 0; i < chs; i++)
 	{ 
-		if ( _channelList[i].type == type && 
-			(_channelList[i].mappedName == name) || (_channelList[i].name == name))
+		if ( (_channelList[i].type == type &&
+			(_channelList[i].mappedName == name)) || (_channelList[i].name == name))
 		{ 
 			return i;
 		}
@@ -575,7 +575,7 @@ bool SkChannelArray::operator == ( const SkChannelArray& a )
 SrOutput& operator<< ( SrOutput& o, const SkChannelArray& ca )
 {
 	int i;
-	o << "channels " << ca.size() << srnl;
+	o << "channels " << (int)ca.size() << srnl;
 	for ( i=0; i<ca.size(); i++ )
 	{ 
 		o << ca.name(i).c_str() << srspc

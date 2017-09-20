@@ -397,7 +397,7 @@ std::vector<std::string> SBSkeleton::getUpperBodyJointNames()
 SBJoint* SBSkeleton::getJoint(int index)
 {
 	const std::vector<SkJoint*>& alljoints = joints();
-	if (size_t(index) >=0 && size_t(index) < alljoints.size())
+	if (index >=0 && size_t(index) < alljoints.size())
 	{
 		SBJoint* sbJoint = dynamic_cast<SBJoint*>(alljoints[index]);
 		return sbJoint;
@@ -515,7 +515,7 @@ void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk
 	TposeSk->invalidate_global_matrices();
 	TposeSk->update_global_matrices();
 	newSk->copy(TposeSk); // first copy
-	if(new_name || strlen(new_name)<1)
+	if(new_name) //  || strlen(new_name)<1)
 	{
 		newSk->setName(std::string(new_name));
 		SrString fname(TposeSk->skfilename().c_str());

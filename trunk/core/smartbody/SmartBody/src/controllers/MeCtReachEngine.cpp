@@ -264,8 +264,10 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet, st
 	for (int i=0;i<3;i++)
 	{
 		skeletonCopy->root()->pos()->value(i,0.f);
-		root->pos()->value(i,0.f);
-	}	
+    if (root) {
+      root->pos()->value(i,0.f);
+    }
+	}
 
 	SmartBody::SBJoint* rootJoint = affectedJoints[0];
 	BOOST_FOREACH(TagMotion tagMotion, inMotionSet)
@@ -529,7 +531,9 @@ DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorTy
 		interpolator = rbfinterpolator;
 		resampleData = NULL;
 	}
-	interpExampleData = interpolator->getInterpExamples();
+  if (interpolator) {
+    interpExampleData = interpolator->getInterpExamples();
+  }
 	return interpolator;
 }
 
