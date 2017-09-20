@@ -828,12 +828,16 @@ float VoxelizerWindow::getVoxelGeodesicDist( SrVec3i& voxID1, SrVec3i& voxID2 )
 	PolyVox::Vector3DInt32 v1 = PolyVox::Vector3DInt32(voxID1[0],voxID1[1],voxID1[2]);
 	PolyVox::Vector3DInt32 v2 = PolyVox::Vector3DInt32(voxID2[0],voxID2[1],voxID2[2]);
 	std::list<PolyVox::Vector3DInt32> geoPath;
+	/* fails on compilation 
 	PolyVox::AStarPathfinderParams< PolyVox::SimpleVolume<uint8_t> > params(voxels,v1,v2,&geoPath,0.f,10000,PolyVox::SixConnected,&aStarVoxelInsideValidator,0);	
 	PolyVox::AStarPathfinder< PolyVox::SimpleVolume<uint8_t> > pathFinder(params);
-	SmartBody::util::log("Before A* path finder");
+	//SmartBody::util::log("Before A* path finder");
 	pathFinder.execute();
-	SmartBody::util::log("After A* path finder");
+	//SmartBody::util::log("After A* path finder");
 	
 	return (float)params.result->size();	
+	*/
+
+	return 0;
 
 }
