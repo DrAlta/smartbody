@@ -466,7 +466,7 @@ SBAPI void DeformableMesh::updateVertexBuffer()
 		SrMat bindShapeMat;
 		SkinWeight* skinWeight = NULL;
 		
-		if ( pos >= 0 && skinWeights.size() > pos)
+		if (skinWeights.size() > pos)
 		{
 			skinWeight = skinWeights[pos];
 			bindShapeMat = skinWeight->bindShapeMat;
@@ -2890,107 +2890,107 @@ void DeformableMeshInstance::update()
 	updateFast();
 	return;
 
-	int maxJoint = -1;
-	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
-	if (skinWeights.size() != _boneJointList.size()) updateJointList();
-	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
-	int iVtx = 0;
-
-#ifdef RECOMPUTE_NORMAL
-	int iNormalVtx = 0;
-#endif
-
-	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
-	{
-		SkinWeight* skinWeight = skinWeights[skinCounter];
-		SkJointList& jointList = _boneJointList[skinCounter];
-		std::map<std::string, std::vector<std::string> >::iterator iter = _mesh->morphTargets.find(skinWeight->sourceMesh);
-		int pos;
-		int globalCounter = 0;
-		if (iter != _mesh->morphTargets.end() && iter->second.size() > 0)	pos = _mesh->getMesh(iter->second[0]);
-		else																pos = _mesh->getMesh(skinWeight->sourceMesh);
-		if (pos != -1)
-		{
-			//SmartBody::util::log("update skinning, skin counter = %d", skinCounter);
-			SrSnModel* dMeshStatic = _mesh->dMeshStatic_p[pos];
-			//SrSnModel* dMeshDynamic = dynamicMesh[pos];
-			int numVertices = dMeshStatic->shape().V.size();
-			for (int i = 0; i < numVertices; i++)
-			{
-				if (i >= (int) skinWeight->numInfJoints.size())
-					continue;
-				int numOfInfJoints = skinWeight->numInfJoints[i];
-				if (numOfInfJoints > maxJoint)
-					maxJoint = numOfInfJoints;
-				SrVec& skinLocalVec = dMeshStatic->shape().V[i];
-				SrVec finalVec;		
-
-				if (numOfInfJoints >= 5 )
-				{
-					int a = 0; // dummy for break point
-				}
-
-
-				for (int j = 0; j < numOfInfJoints; j++)
-				{
-					//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];	
-					int jointIndex = skinWeight->jointNameIndex[globalCounter];
-					SkJoint* curJoint = jointList[jointIndex];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
-					if (curJoint == NULL) continue;
-						
-					const SrMat& gMat = curJoint->gmat();
-					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
-					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
-					globalCounter ++;
-					SrVec transformVec = _meshScale[0]*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
-					SrVec finalTransformVec = (transformVec  * gMat);
-					finalVec = finalVec + (float(jointWeight) * finalTransformVec);							
-				}
-				
-				_deformPosBuf[iVtx] = finalVec;
-				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
-				{
-					std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
-					// copy related vtx components 
-					for (unsigned int k=0;k<idxMap.size();k++)
-					{
-						_deformPosBuf[idxMap[k]] = finalVec;
-					}
-				}					
-				iVtx++;
-#if RECOMPUTE_NORMAL
-				if (_recomputeNormal)
-					dMeshDynamic->shape().V[i] = finalVec;
-#endif
-			}
-#if RECOMPUTE_NORMAL
-			if (_recomputeNormal)
-			{
-				dMeshDynamic->shape().computeNormals();
-				for (int i = 0; i < numVertices; i++)
-				{
-					SrVec finalN = dMeshDynamic->shape().N[i];
-					_mesh->normalBuf[iNormalVtx] = finalN;
-					if (vtxNewVtxIdxMap.find(iNormalVtx) != vtxNewVtxIdxMap.end())
-					{
-						std::vector<int>& idxMap = vtxNewVtxIdxMap[iNormalVtx];
-						// copy related vtx components 
-						for (unsigned int k=0;k<idxMap.size();k++)
-						{
-							_mesh->normalBuf[idxMap[k]] = finalN;
-						}
-					}
-					iNormalVtx++;
-				}
-					
-			}
-#endif
-			//dMeshDynamic->changed(true);	
-		}
-		else
-			continue;
-	}
-	_recomputeNormal = false;
+//  int maxJoint = -1;
+//  std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
+//  if (skinWeights.size() != _boneJointList.size()) updateJointList();
+//  std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
+//  int iVtx = 0;
+//
+//#ifdef RECOMPUTE_NORMAL
+//  int iNormalVtx = 0;
+//#endif
+//
+//  for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
+//  {
+//    SkinWeight* skinWeight = skinWeights[skinCounter];
+//    SkJointList& jointList = _boneJointList[skinCounter];
+//    std::map<std::string, std::vector<std::string> >::iterator iter = _mesh->morphTargets.find(skinWeight->sourceMesh);
+//    int pos;
+//    int globalCounter = 0;
+//    if (iter != _mesh->morphTargets.end() && iter->second.size() > 0)  pos = _mesh->getMesh(iter->second[0]);
+//    else                                pos = _mesh->getMesh(skinWeight->sourceMesh);
+//    if (pos != -1)
+//    {
+//      //SmartBody::util::log("update skinning, skin counter = %d", skinCounter);
+//      SrSnModel* dMeshStatic = _mesh->dMeshStatic_p[pos];
+//      //SrSnModel* dMeshDynamic = dynamicMesh[pos];
+//      int numVertices = dMeshStatic->shape().V.size();
+//      for (int i = 0; i < numVertices; i++)
+//      {
+//        if (i >= (int) skinWeight->numInfJoints.size())
+//          continue;
+//        int numOfInfJoints = skinWeight->numInfJoints[i];
+//        if (numOfInfJoints > maxJoint)
+//          maxJoint = numOfInfJoints;
+//        SrVec& skinLocalVec = dMeshStatic->shape().V[i];
+//        SrVec finalVec;    
+//
+//        if (numOfInfJoints >= 5 )
+//        {
+//          int a = 0; // dummy for break point
+//        }
+//
+//
+//        for (int j = 0; j < numOfInfJoints; j++)
+//        {
+//          //std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];  
+//          int jointIndex = skinWeight->jointNameIndex[globalCounter];
+//          SkJoint* curJoint = jointList[jointIndex];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+//          if (curJoint == NULL) continue;
+//            
+//          const SrMat& gMat = curJoint->gmat();
+//          SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];  
+//          double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
+//          globalCounter ++;
+//          SrVec transformVec = _meshScale[0]*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
+//          SrVec finalTransformVec = (transformVec  * gMat);
+//          finalVec = finalVec + (float(jointWeight) * finalTransformVec);              
+//        }
+//        
+//        _deformPosBuf[iVtx] = finalVec;
+//        if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+//        {
+//          std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+//          // copy related vtx components 
+//          for (unsigned int k=0;k<idxMap.size();k++)
+//          {
+//            _deformPosBuf[idxMap[k]] = finalVec;
+//          }
+//        }          
+//        iVtx++;
+//#if RECOMPUTE_NORMAL
+//        if (_recomputeNormal)
+//          dMeshDynamic->shape().V[i] = finalVec;
+//#endif
+//      }
+//#if RECOMPUTE_NORMAL
+//      if (_recomputeNormal)
+//      {
+//        dMeshDynamic->shape().computeNormals();
+//        for (int i = 0; i < numVertices; i++)
+//        {
+//          SrVec finalN = dMeshDynamic->shape().N[i];
+//          _mesh->normalBuf[iNormalVtx] = finalN;
+//          if (vtxNewVtxIdxMap.find(iNormalVtx) != vtxNewVtxIdxMap.end())
+//          {
+//            std::vector<int>& idxMap = vtxNewVtxIdxMap[iNormalVtx];
+//            // copy related vtx components 
+//            for (unsigned int k=0;k<idxMap.size();k++)
+//            {
+//              _mesh->normalBuf[idxMap[k]] = finalN;
+//            }
+//          }
+//          iNormalVtx++;
+//        }
+//          
+//      }
+//#endif
+//      //dMeshDynamic->changed(true);  
+//    }
+//    else
+//      continue;
+//  }
+//  _recomputeNormal = false;
 }
 
 int DeformableMeshInstance::getVisibility()

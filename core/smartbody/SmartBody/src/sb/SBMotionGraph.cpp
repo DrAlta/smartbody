@@ -1671,8 +1671,8 @@ void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const
 				maxVal = mat(i,j);
 		}
 	
-	unsigned char* imgBuf = NULL;
-	imgBuf = new unsigned char[mat.size1()*mat.size2()*3]; // create a color img
+  const int imgBufSize = mat.size1()*mat.size2()*3;
+	unsigned char* imgBuf = new unsigned char[imgBufSize]; // create a color img
 	for (unsigned int i=0;i<mat.size1();i++)
 	{
 		for (unsigned int j=0;j<mat.size2();j++)
@@ -1688,12 +1688,14 @@ void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const
 	for (unsigned int i=0;i<transitions.size();i++)
 	{
 		std::pair<int,int> trans = transitions[i];
-		int x,y; 
-		x = trans.first;
-		y = trans.second;
-		imgBuf[x*mat.size2()*3 + y*3 ] = 0;
-		imgBuf[x*mat.size2()*3 + y*3 + 1] = 255;
-		imgBuf[x*mat.size2()*3 + y*3 + 2] = 0;
+		int x = trans.first;
+		int y = trans.second;
+    int index = x*mat.size2()*3 + y*3;
+    if (index >= 0 && index+2 < imgBufSize) {
+      imgBuf[index ] = 0;
+      imgBuf[index + 1] = 255;
+      imgBuf[index + 2] = 0;
+    }
 	}
 
 #if 0

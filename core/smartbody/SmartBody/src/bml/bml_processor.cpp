@@ -807,10 +807,10 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 					}
 
 					// TODO
-					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
-					SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
-					return BehaviorRequestPtr();  // a.k.a., NULL
+//          std::wstringstream wstrstr;
+//          wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
+//          SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
+//          return BehaviorRequestPtr();  // a.k.a., NULL
 				} else {
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior.";

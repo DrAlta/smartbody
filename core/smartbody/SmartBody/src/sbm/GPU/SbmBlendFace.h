@@ -32,7 +32,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sbm/sbm_deformable_mesh.h>
 #include "SbmShader.h"
 #include "VBOData.h"
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(SB_IPHONE)
 #include <sbm/sbm_deformable_mesh.h>
 #include "SbmShader.h"
 #endif
@@ -113,7 +113,7 @@ class SbmBlendTextures
 	private:
 		std::string		_shaderName;
 };
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(SB_IPHONE)
 class SbmBlendTextures
 {
 public:

@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
+#include <sb/SBTypes.h>
 
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
@@ -33,6 +34,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBScene.h>
 #include <sb/SBUtilities.h>
 //#include "external/imdebug/imdebug.h"
+#include <sr/sr_gl.h>
 
 /************************************************************************/
 /* Sbm Texture Manager                                                  */
@@ -561,8 +563,12 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GL_CLAMP GL_CLAMP_TO_EDGE
+#ifndef GL_RGB8
 #define GL_RGB8 GL_RGB
+#endif
+#ifndef GL_RGBA8
 #define GL_RGBA8 GL_RGBA
+#endif
 #endif
     
     //glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -669,7 +675,7 @@ SBAPI void SbmTexture::rotateTexture(RotateEnum rotate)
 	if (dataType == GL_FLOAT)
 		bytesPerChannel = 4; // set to float for g-buffer application
 	int pixelSize = bytesPerChannel*channels;
-	int ti, tj;
+	int ti = 0, tj = 0;
 	for (unsigned i=0; i<newHeight;i++)
 		for (unsigned j = 0; j < newWidth; j++)
 		{

@@ -64,6 +64,7 @@ const char *SrEvent::type_name () const
       case EventDrag : return "drag";
       case EventRelease : return "release";
       case EventKeyboard : return "keyboard";
+      case Move: return "move";
     }
    return "undefined?!";
  }

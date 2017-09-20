@@ -1,7 +1,10 @@
 
 #include <cstring>
 #include <cstdio>
-#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__)
+
+#include <sb/SBTypes.h>
+
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE) 
 #include "external/glew/glew.h"
 #endif
 #if defined(__ANDROID__)

@@ -41,7 +41,7 @@ Val*
 ClassRule::
 apply(FullHist* treeh)
 {
-  Val* trdTree;
+  Val* trdTree = NULL;
   //int wI = Feature::whichInt;
   //cerr << "AP " << *this << endl;
   //if(curVal) cerr << "APCV " << *curVal << endl;

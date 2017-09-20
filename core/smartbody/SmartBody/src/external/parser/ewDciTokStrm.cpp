@@ -162,14 +162,15 @@ read()             // tion, savedWrd_  may or may not be empty, and nextWrd_
     if( retWrd == "." ) { ellipFlag++; }                            // flags
     if( nextWrd_.length() && nextWrd_[0] == '('                      // before
 	&& ( retWrd == "!" || retWrd == "?"                        // return
-	     || retWrd == "." && ellipFlag != 3 ))                  //    .
+	     || (retWrd == "." && ellipFlag != 3) ))                  //    .
     { parenFlag = 1; }                                               //    .
                                                                      //    .
-    if( retWrd == "(" )                                             //    .
+  if( retWrd == "(" ) {                                            //    .
 	if( !parenFlag ) { parenFlag = -1; }                         //    .
 	else if( !( Cap(savedWrd_)                                   //    .
-		    || !savedWrd_.length() && Cap(nextWrd_) ))       //    .
+		    || (!savedWrd_.length() && Cap(nextWrd_)) ))       //    .
 	{ parenFlag = 0; }                                           //    .
+  }
                                                                      //    .
     if( retWrd == ")" || retWrd == "</s>" || retWrd == "</S>" ) { parenFlag = 0; }     //.....
 
@@ -244,7 +245,7 @@ splitAtPunc( ECString seq )      // savedWrd_ to hold everything that's left.
 	      &&
 	      ( nextWrd_ == "</s>" ||
 		nextWrd_ == "</S>"
-		|| nextWrd_.length() > 0 && nextWrd_[0] == '(' ) ) )
+		|| (nextWrd_.length() > 0 && nextWrd_[0] == '(' ) )  ))
     {
 	ECString sseq(seq, puncIndex+1, length - puncIndex -1 );
         int len3 = (int)sseq.length();
@@ -320,21 +321,22 @@ splitAtPunc( ECString seq )      // savedWrd_ to hold everything that's left.
 
 								// page FIVE
 	{
-	    if( parenFlag == -1 )                       // The outer context
-	    	if( has_one( ')', seq, puncIndex ) )    // had no finalPunc
-		{                                       //   ...
-		    int index = puncIndex;
-		    while( seq[index] != ')' && index < length )    //  ...
-		    {  index++;  }                                  // so add
-		    savedWrd_
-                     = seq.substr( puncIndex, 1+index-puncIndex ); // dot in-
-		    savedWrd_ += "." ;
-		    savedWrd_ += seq.substr(index+1,length-index-1);//side the
-		    return seq.substr(0,puncIndex);             // close-paren
-		} else {                                        // ...  unless
-		    savedWrd_ = seq.substr(puncIndex,length-puncIndex);// close-paren
-		    return seq.substr( 0,puncIndex );           // is missing!
-		}
+    if( parenFlag == -1 ) {                       // The outer context
+      if( has_one( ')', seq, puncIndex ) )    // had no finalPunc
+      {                                       //   ...
+          int index = puncIndex;
+          while( seq[index] != ')' && index < length )    //  ...
+          {  index++;  }                                  // so add
+          savedWrd_
+                       = seq.substr( puncIndex, 1+index-puncIndex ); // dot in-
+          savedWrd_ += "." ;
+          savedWrd_ += seq.substr(index+1,length-index-1);//side the
+          return seq.substr(0,puncIndex);             // close-paren
+      } else {                                        // ...  unless
+          savedWrd_ = seq.substr(puncIndex,length-puncIndex);// close-paren
+          return seq.substr( 0,puncIndex );           // is missing!
+      }
+    }
 
 	    if( puncIndex < length
 		&& ( parenFlag == 0 || parenFlag > 3 )
@@ -402,10 +404,10 @@ splitAtPunc( ECString seq )      // savedWrd_ to hold everything that's left.
 	    }                                           // end ...n't... cases
 
                                           // special trailing-apostrophe cases
-	    if( length > 4 &&
-		  ( seq.substr( 0,5 ) == "goin'" || seq.substr( 0,5 ) == "doin'" )
-	       || length > 6 &&
-		  ( seq.substr( 0,7 ) == "lookin'" || seq.substr( 0,7 ) == "fishin'" ) )
+	    if( (length > 4 &&
+		  ( seq.substr( 0,5 ) == "goin'" || seq.substr( 0,5 ) == "doin'" ))
+	       || (length > 6 &&
+		  ( seq.substr( 0,7 ) == "lookin'" || seq.substr( 0,7 ) == "fishin'" )) )
 	    {
 		savedWrd_ = seq.substr( puncIndex+1,length-puncIndex-1 );
 		return seq.substr( 0, puncIndex+1 );
@@ -472,7 +474,7 @@ splitAtPunc( ECString seq )      // savedWrd_ to hold everything that's left.
     {
 	savedWrd_ = seq.substr( 1,length-1 );
 	if( has_alnum( seq,0 )
-	    || seq == "\"." && nextWrd_ == "." )   //eg  he said, ". . . Yes!"
+	    || (seq == "\"." && nextWrd_ == ".") )   //eg  he said, ". . . Yes!"
 	{   return "``";  }
 	else { return "''"; }
     }

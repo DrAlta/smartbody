@@ -230,7 +230,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	}
 
 	// if we didn't specify a target and want to put down an object, infer the target position in front of character
-	if (!hasTarget && bodyReachCt->getHandActionState() == MeCtReachEngine::PUT_DOWN_OBJECT)
+	if (curCharacter && !hasTarget && bodyReachCt->getHandActionState() == MeCtReachEngine::PUT_DOWN_OBJECT)
 	{
 		float x,y,z,h,p,r;
 		curCharacter->get_world_offset(x,y,z,h,p,r);	

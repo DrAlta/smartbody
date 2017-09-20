@@ -78,7 +78,7 @@ bool SrPolygon::convex () const
 
    if ( size()<3 ) return false; // degenerated polygon with 1 or 2 edges
 
-   float o, ordering;
+   float o, ordering = 0;
 
    for ( i=0; i<size(); i++ )
     { i1 = (i+1)%size();
@@ -180,8 +180,8 @@ float SrPolygon::perimeter () const
 
 SrPnt2 SrPolygon::interpolate_along_edges ( float t ) const
  {
-   int i1, i2, ilast;
-   float len1, len2=0;
+   int i1, i2 = 0, ilast;
+   float len1 = 0, len2=0;
 
    SrVec2 v;
    if ( size()==0 ) return v;

@@ -268,7 +268,7 @@ bool MeCtBreathing::controller_evaluate ( double t, MeFrameData& frame )
 	if (!_motion)
 		return true;
 
-	float frameTime;
+	float frameTime = 0;
 	bool isFrameTimeSet = false;
 	while(!isFrameTimeSet)
 	{

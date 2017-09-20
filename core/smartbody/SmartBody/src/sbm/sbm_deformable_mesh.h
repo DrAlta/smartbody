@@ -42,8 +42,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 	#include <wingdi.h>
 	#include <GL/gl.h>
 #elif defined(SB_IPHONE)
-    #include <OpenGLES/ES1/gl.h>
-    #include <OpenGLES/ES1/glext.h>
+    #include <OpenGLES/ES3/gl.h>
+    #include <OpenGLES/ES3/glext.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
        #include <OpenGL/gl.h>
 //       #include <Carbon/Carbon.h>

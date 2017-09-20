@@ -636,7 +636,7 @@ bool SrFrustum::pointInFrustum(SrVec &point) {
 
 void SrFrustum::extractFrustum()
 {
-#if !defined(__ANDROID__) && !defined(EMSCRIPTEN)
+#if !defined(__ANDROID__) && !defined(EMSCRIPTEN) && !defined(SB_IPHONE)
    float   proj[16];
    float   modl[16];
    float   clip[16];

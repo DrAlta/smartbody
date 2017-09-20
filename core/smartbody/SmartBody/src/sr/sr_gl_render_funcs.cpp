@@ -282,7 +282,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         //SmartBody::util::log("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	//SmartBody::util::log("Shape visibility = %d", shape->getVisibility());
 // 	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
 // 	{

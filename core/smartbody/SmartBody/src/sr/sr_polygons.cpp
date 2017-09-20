@@ -140,7 +140,7 @@ int SrPolygons::pick_polygon ( const SrVec2& p ) const
 
 bool SrPolygons::pick_edge ( const SrVec2& p, float epsilon, int& pid, int& vid ) const
  { 
-   float mindist2, dist2;
+   float mindist2 = 0, dist2;
    int i, id;
 
    pid = vid = -1; 

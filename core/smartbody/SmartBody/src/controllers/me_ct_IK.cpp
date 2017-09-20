@@ -195,37 +195,37 @@ int MeCtIK::get_support_joint_num()
 SBM_INLINE int MeCtIK::check_constraint(SrQuat* quat, int index)
 {
 	return 0;
-	float angle = quat->angle();
-	int modified = 0;
-	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(index));
-	if(info->type == JOINT_TYPE_HINGE)
-	{
-		if(info->constraint.hinge.max > 0.0f && angle > info->constraint.hinge.max) 
-		{
-			angle = info->constraint.hinge.max;
-			modified = 1;
-		}
-		else if(info->constraint.hinge.min < 0.0f && angle < info->constraint.hinge.min) 
-		{
-			angle = info->constraint.hinge.min;
-			modified = 1;
-		}
-	}
-	else if(info->type == JOINT_TYPE_BALL && info->constraint.ball.max > 0.0f)
-	{
-		if(angle > info->constraint.ball.max) 
-		{
-			angle = info->constraint.ball.max;
-			modified = 1;
-		}
-		else if(angle < -info->constraint.ball.max) 
-		{
-			angle = -info->constraint.ball.max;
-			modified = 1;
-		}
-	}
-	if(modified) quat->set(quat->axis(), angle);
-	return modified;
+//  float angle = quat->angle();
+//  int modified = 0;
+//  MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(index));
+//  if(info->type == JOINT_TYPE_HINGE)
+//  {
+//    if(info->constraint.hinge.max > 0.0f && angle > info->constraint.hinge.max) 
+//    {
+//      angle = info->constraint.hinge.max;
+//      modified = 1;
+//    }
+//    else if(info->constraint.hinge.min < 0.0f && angle < info->constraint.hinge.min) 
+//    {
+//      angle = info->constraint.hinge.min;
+//      modified = 1;
+//    }
+//  }
+//  else if(info->type == JOINT_TYPE_BALL && info->constraint.ball.max > 0.0f)
+//  {
+//    if(angle > info->constraint.ball.max) 
+//    {
+//      angle = info->constraint.ball.max;
+//      modified = 1;
+//    }
+//    else if(angle < -info->constraint.ball.max) 
+//    {
+//      angle = -info->constraint.ball.max;
+//      modified = 1;
+//    }
+//  }
+//  if(modified) quat->set(quat->axis(), angle);
+//  return modified;
 }
 
 SBM_INLINE int MeCtIK::reach_destination()

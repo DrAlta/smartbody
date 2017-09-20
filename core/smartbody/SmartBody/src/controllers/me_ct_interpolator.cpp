@@ -275,7 +275,7 @@ void MeCtInterpolator::getTiming(double t, double& t1, double& t2)
 	}
 
 	bool err = true;
-	int section;
+	int section = 0;
 	for (int i = 0; i < numKeys; i++)
 	{
 		if (t < key[i])
@@ -336,7 +336,7 @@ void MeCtInterpolator::adjustStartTime(double origW, double newW)
 	double dur = key[key.size() - 1] - key[0];
 	if (t > dur) t -= dur; 
 	bool err = true;
-	int section;
+	int section = 0;
 	for (int i = 0; i < numKeys; i++)
 	{
 		if (t < key[i])

@@ -31,7 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 srArgBuffer::srArgBuffer( const char *arg )	{
 	if( arg == NULL )	{
 		arg_len = 0;
-		tok_buff = new char;
+		tok_buff = new char[ 1 ];
 		tok_buff[0] = '\0';  // Empty string
 	}
 	else	{

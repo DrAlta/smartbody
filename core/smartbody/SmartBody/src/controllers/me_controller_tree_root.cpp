@@ -402,7 +402,7 @@ public:
 	 *  Returns a pointer to a controller currently in the tree.
 	 */
     MeController* controller( unsigned int n ) 
-    { return (0<=n && n<_controllers.size())? _controllers[n]: NULL; }
+    { return (n<_controllers.size())? _controllers[n]: NULL; }
 
 	/**
 	 *  Evaluates all the controllers.

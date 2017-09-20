@@ -723,15 +723,17 @@ bool ParserASFAMC::parseAmc(SmartBody::SBMotion& motion, SmartBody::SBSkeleton* 
 			if (iter != jointInfoMap.end())
 				jointInfo = (*iter).second;
 
-			SrMat C;
-			sr_euler_mat(order, C, jointInfo->axis.x, jointInfo->axis.y, jointInfo->axis.z);
-		
-			SrMat mat = C.inverse() * M * C;
-			SrQuat quat = SrQuat(mat);
-			motion.posture(frameCt)[quatId + 0] = quat.w;
-			motion.posture(frameCt)[quatId + 1] = quat.x;
-			motion.posture(frameCt)[quatId + 2] = quat.y;
-			motion.posture(frameCt)[quatId + 3] = quat.z;
+      if (jointInfo) {
+        SrMat C;
+        sr_euler_mat(order, C, jointInfo->axis.x, jointInfo->axis.y, jointInfo->axis.z);
+      
+        SrMat mat = C.inverse() * M * C;
+        SrQuat quat = SrQuat(mat);
+        motion.posture(frameCt)[quatId + 0] = quat.w;
+        motion.posture(frameCt)[quatId + 1] = quat.x;
+        motion.posture(frameCt)[quatId + 2] = quat.y;
+        motion.posture(frameCt)[quatId + 3] = quat.z;
+      }
 		}
 
 	double duration = double(motion.duration());

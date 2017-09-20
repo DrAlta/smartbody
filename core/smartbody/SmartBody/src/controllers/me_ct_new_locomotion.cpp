@@ -558,7 +558,8 @@ void MeCtNewLocomotion::updateConstraints(float t)
 			RightFading.setFadeOut(fadeout);
 		}
 	}
-	else if(((t > rplant[2] && t < rplant[3] )|| t > rplant[0] && t < rplant[1])&& RightFading.fadeMode == Fading::FADING_MODE_OFF)
+	else if(((t > rplant[2] && t < rplant[3] )|| (t > rplant[0] && t < rplant[1]))
+          && RightFading.fadeMode == Fading::FADING_MODE_OFF)
 	{	
 		SmartBody::SBSkeleton *sk2 = character->getSkeleton();
 		sk2->update_global_matrices();

@@ -103,12 +103,12 @@ void SBBoneBusManager::setHost(const std::string& host)
 {
 #ifdef SB_NO_BONEBUS
 	SmartBody::util::log("Bonebus has been disabled and can not set the bonebus host.");
-	return;
-#endif
+#else
 	_host = host;
 	SmartBody::StringAttribute* hostAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("host"));
 	if (hostAttribute)
 		hostAttribute->setValueFast(host);
+#endif
 }
 
 const std::string& SBBoneBusManager::getHost()
@@ -123,7 +123,7 @@ void SBBoneBusManager::start()
 void SBBoneBusManager::beforeUpdate(double time)
 {
 #ifdef SB_NO_BONEBUS
-	return;
+
 #else
 	// process commands received over BoneBus protocol
 	std::vector<std::string> commands = _boneBus.GetCommand();
@@ -271,7 +271,8 @@ void SBBoneBusManager::notify(SBSubject* subject)
 {
 #ifdef SB_NO_BONEBUS
 	return;
-#endif
+
+#else
 
 	SBService::notify(subject);
 
@@ -293,6 +294,7 @@ void SBBoneBusManager::notify(SBSubject* subject)
 		setHost(getStringAttribute("host"));
 		return;
 	}
+#endif
 
 }
 

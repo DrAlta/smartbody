@@ -263,6 +263,7 @@ double srLinearCurve::get_key_param(int index)
 		curKey = curKey->next();
 		curKeyIndex++;
 	}
+  return 0.0;
 }
 
 double srLinearCurve::get_key_value(int index)
@@ -279,6 +280,7 @@ double srLinearCurve::get_key_value(int index)
 		curKey = curKey->next();
 		curKeyIndex++;
 	}
+  return 0.0;
 }
 
 double srLinearCurve::get_next_nonzero_value( double after )	{

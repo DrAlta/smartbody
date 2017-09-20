@@ -218,7 +218,7 @@ SrCfgNode* SrCfgTreeBase::search_nearest ( const srcfg* c, float* d )
  {
    if ( !_root ) return _root;
    
-   SrCfgNode* nearest;
+   SrCfgNode* nearest = NULL;
    float mindist = 1E+30f; // float range in visualc is: 3.4E +/- 38 
 
    _nearest ( _root, c, nearest, mindist );
@@ -272,35 +272,35 @@ SrCfgNode* SrCfgTreeBase::expand_node_safe ( SrCfgNode* source, const srcfg* dir
    float t = step/dist;
    if ( t>1.0f ) t = 1.0f;
 
-   if ( 0 ) // test "long" expansion
-   { float dt = t;
-   maxtries=5;
-     while ( t<=1 && maxtries-->0 )
-     { SR_TRACE1 ( "INS: trying to insert...");
-       _cman->interp ( csource, direction, t, cnew );
-       t += dt;
-      
-      if ( _cman->valid(cnew) )
-      if ( _cman->visible(source->cfg(),cnew,ctmp,prec) )
-       { SR_TRACE1 ( "INS: inserting 1 node.");
-         _delnode ( nnew );
-         _delnode ( ntmp );
-         nnew = add_node ( source, cnew, -1 ); // instead of -1, could use aprox distance dist*t...
-         source->_children.top().level = -1;   // mark as safe (can be any <0 number)
-         _cman->child_added ( source->cfg(), cnew ); // notify configuration manager
-         SR_TRACE1 ( "INS: Ok.");
-         source = nnew;
-         if ( t>1 ) return nnew; // end
-
-         nnew = _newnode();
-         cnew = nnew->cfg();
-         ntmp = _newnode();
-         ctmp = ntmp->cfg();
-        
-       }
-     }
-    }
-   else
+//   if ( 0 ) // test "long" expansion
+//   { float dt = t;
+//   maxtries=5;
+//     while ( t<=1 && maxtries-->0 )
+//     { SR_TRACE1 ( "INS: trying to insert...");
+//       _cman->interp ( csource, direction, t, cnew );
+//       t += dt;
+//      
+//      if ( _cman->valid(cnew) )
+//      if ( _cman->visible(source->cfg(),cnew,ctmp,prec) )
+//       { SR_TRACE1 ( "INS: inserting 1 node.");
+//         _delnode ( nnew );
+//         _delnode ( ntmp );
+//         nnew = add_node ( source, cnew, -1 ); // instead of -1, could use aprox distance dist*t...
+//         source->_children.top().level = -1;   // mark as safe (can be any <0 number)
+//         _cman->child_added ( source->cfg(), cnew ); // notify configuration manager
+//         SR_TRACE1 ( "INS: Ok.");
+//         source = nnew;
+//         if ( t>1 ) return nnew; // end
+//
+//         nnew = _newnode();
+//         cnew = nnew->cfg();
+//         ntmp = _newnode();
+//         ctmp = ntmp->cfg();
+//        
+//       }
+//     }
+//    }
+//   else
    while ( maxtries-->0 )
     { SR_TRACE1 ( "INS: trying to insert...");
 

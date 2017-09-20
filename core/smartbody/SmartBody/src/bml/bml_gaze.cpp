@@ -366,14 +366,13 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		key_data[i] = NULL;
 	bool has_key_data = Gaze::parse_children( elem, key_data );
 
-	if( DEBUG_GAZE_KEYS ) {
+#if DEBUG_GAZE_KEYS
 		for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key ) {
 			if( key_data[key] != NULL ) {
-				if( DEBUG_GAZE_KEYS ) cout << "BML::parse_bml_gaze(..): Gaze key "<<key<<": " << *( key_data[key] ) << endl;
+			  cout << "BML::parse_bml_gaze(..): Gaze key "<<key<<": " << *( key_data[key] ) << endl;
 			}
 		}
-	}
-
+#endif
 
 	/////////////////////////////////////////////////////////////
 	// Identify the low and high gaze key indices
@@ -443,12 +442,13 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					}
 				}
 			}
-			if( DEBUG_JOINT_RANGE ) 
+#if DEBUG_JOINT_RANGE
 			{
 				cout << "DEBUG: BML::parse_bml_gaze(..): "
 					<< "low_key_index = "<<low_key_index<<",\t"
 					<< "high_key_index = "<<high_key_index<<endl;
 			}
+#endif
 		}		
 	}
 	
@@ -622,7 +622,8 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 	}
 */
-	if( LOG_GAZE_PARAMS ) {
+#if LOG_GAZE_PARAMS
+  {
 		cout << "DEBUG: Gaze parameters:" << endl
 				<< "\tgaze_speed_head = " << gaze_speed_head << endl
 				<< "\tgaze_speed_eyeball = " << gaze_speed_eyeball << endl
@@ -632,7 +633,8 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl
 				<< "\tgaze_fade_in_ival = " << gaze_fade_in_ival << endl
 				<< "\tgaze_time_hint = " << gaze_time_hint << endl;
-	}	
+	}
+#endif
 	bool usesHandle = true;
 	if (!gaze_ct) {
 		usesHandle = false;

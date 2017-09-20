@@ -142,7 +142,7 @@ void SrSaGlRender::get_top_matrix ( SrMat& mat )
 
 int SrSaGlRender::matrix_stack_size ()
 {
-   int value;
+   int value = 0;
 #if USE_GL_FIXED_PIPELINE
    glGetIntegerv ( GL_MODELVIEW_STACK_DEPTH, &value );
 #endif
@@ -193,11 +193,11 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    // 2. Render only if needed
    if ( !s->visible() ) return true;
 
-  
-   bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
+#if USE_GL_FIXED_PIPELINE // no display list for OpenGL ES Rendering
    //SmartBody::util::log("check isSrModel");
    // 3. Check if lists are up to date
-#if USE_GL_FIXED_PIPELINE // no display list for OpenGL ES Rendering
+   bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
+
    if ( !s->haschanged() && !isSrModel)
    { //SR_TRACE2 ( "Calling list..." );	  
       glCallList ( ogl->list ); 

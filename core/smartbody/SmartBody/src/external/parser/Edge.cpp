@@ -188,7 +188,7 @@ Edge::
 headItem()
 {
   GotIter gotiter(this);
-  Item* ans;
+  Item* ans = NULL;
   Item* next;
   while(gotiter.next(next))  //the head will be the the last thing in gotiter;
     ans = next;

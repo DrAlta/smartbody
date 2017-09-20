@@ -100,14 +100,14 @@ downHeap(int pos)
   int rc = right_child(pos);
   int largec;
   int lcthere = 0;
-  Val* lct;
+  Val* lct = NULL;
   if(lc < unusedPos_)
     {
       lct = array[lc];
       if(lct) lcthere = 1;
     }
   int rcthere = 0;
-  Val* rct;
+  Val* rct = NULL;
   if(rc < unusedPos_)
     {
       rct = array[rc];

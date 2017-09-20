@@ -121,7 +121,7 @@ void MeCtUnary::init( MeController* child ) {
 	}
 
 	if( _child ) {
-		if( _copy_child_channels )
+		if( _copy_child_channels && child )
 			controller_channels() = child->controller_channels();
 
 		_sub_context->add_controller( child );

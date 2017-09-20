@@ -85,7 +85,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 
 	rawMesh = new SrModel(inMesh); // copy orignal mesh data
 	
-	rcContext* m_ctx = new rcContext();
+  rcContext m_ctx;
 
 	// hardcoded default parameters for now
 	m_cellSize = 0.1f;
@@ -114,13 +114,14 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 #if 1// defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
  	//const int* tris = &inMesh.F.get(0)[0];
         // need to convert to integer array
-        int* tris = new int[inMesh.F.size()*3];
+  std::vector<int> tris_storage(inMesh.F.size()*3);
 	for (size_t i=0;i<inMesh.F.size();i++)
 	{
-              tris[i*3+0] = inMesh.F[i][0];
-              tris[i*3+1] = inMesh.F[i][1];
-              tris[i*3+2] = inMesh.F[i][2];
-        }
+    tris_storage[i*3+0] = inMesh.F[i][0];
+    tris_storage[i*3+1] = inMesh.F[i][1];
+    tris_storage[i*3+2] = inMesh.F[i][2];
+  }
+  const int* tris = tris_storage.data();
 #else
 	const int* tris = &inMesh.F[0][0];
 #endif
@@ -166,7 +167,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 		SmartBody::util::log("buildNavigation: Out of memory 'solid'.");
 		return false;
 	}
-	if (!rcCreateHeightfield(m_ctx, *m_solid, m_cfg.width, m_cfg.height, m_cfg.bmin, m_cfg.bmax, m_cfg.cs, m_cfg.ch))
+	if (!rcCreateHeightfield(&m_ctx, *m_solid, m_cfg.width, m_cfg.height, m_cfg.bmin, m_cfg.bmax, m_cfg.cs, m_cfg.ch))
 	{
 		SmartBody::util::log("buildNavigation: Could not create solid heightfield.");
 		return false;
@@ -178,7 +179,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_triareas = new unsigned char[ntris];
 	if (!m_triareas)
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", ntris);
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", ntris);
 		return false;
 	}
 
@@ -186,8 +187,8 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	// If your input data is multiple meshes, you can transform them here, calculate
 	// the are type for each of the meshes and rasterize them.
 	memset(m_triareas, 0, ntris*sizeof(unsigned char));
-	rcMarkWalkableTriangles(m_ctx, m_cfg.walkableSlopeAngle, verts, nverts, tris, ntris, m_triareas);
-	rcRasterizeTriangles(m_ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb);
+	rcMarkWalkableTriangles(&m_ctx, m_cfg.walkableSlopeAngle, verts, nverts, tris, ntris, m_triareas);
+	rcRasterizeTriangles(&m_ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb);
 	
 	if (!m_keepInterResults)
 	{
@@ -202,9 +203,9 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	// Once all geoemtry is rasterized, we do initial pass of filtering to
 	// remove unwanted overhangs caused by the conservative rasterization
 	// as well as filter spans where the character cannot possibly stand.
-	rcFilterLowHangingWalkableObstacles(m_ctx, m_cfg.walkableClimb, *m_solid);
-	rcFilterLedgeSpans(m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid);
-	rcFilterWalkableLowHeightSpans(m_ctx, m_cfg.walkableHeight, *m_solid);
+	rcFilterLowHangingWalkableObstacles(&m_ctx, m_cfg.walkableClimb, *m_solid);
+	rcFilterLedgeSpans(&m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid);
+	rcFilterWalkableLowHeightSpans(&m_ctx, m_cfg.walkableHeight, *m_solid);
 
 
 	//
@@ -217,12 +218,12 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_chf = rcAllocCompactHeightfield();
 	if (!m_chf)
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
 		return false;
 	}
-	if (!rcBuildCompactHeightfield(m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid, *m_chf))
+	if (!rcBuildCompactHeightfield(&m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid, *m_chf))
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
 		return false;
 	}
 
@@ -233,40 +234,40 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	}
 
 	// Erode the walkable area by agent radius.
-	if (!rcErodeWalkableArea(m_ctx, m_cfg.walkableRadius, *m_chf))
+	if (!rcErodeWalkableArea(&m_ctx, m_cfg.walkableRadius, *m_chf))
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not erode.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return false;
 	}
 
 	// (Optional) Mark areas.
 	//const ConvexVolume* vols = m_geom->getConvexVolumes();
 	//for (int i  = 0; i < m_geom->getConvexVolumeCount(); ++i)
-	//	rcMarkConvexPolyArea(m_ctx, vols[i].verts, vols[i].nverts, vols[i].hmin, vols[i].hmax, (unsigned char)vols[i].area, *m_chf);
+	//	rcMarkConvexPolyArea(&m_ctx, vols[i].verts, vols[i].nverts, vols[i].hmin, vols[i].hmax, (unsigned char)vols[i].area, *m_chf);
 
 	if (m_monotonePartitioning)
 	{
 		// Partition the walkable surface into simple regions without holes.
 		// Monotone partitioning does not need distancefield.
-		if (!rcBuildRegionsMonotone(m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
+		if (!rcBuildRegionsMonotone(&m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
+			m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
 			return false;
 		}
 	}
 	else
 	{
 		// Prepare for region partitioning, by calculating distance field along the walkable surface.
-		if (!rcBuildDistanceField(m_ctx, *m_chf))
+		if (!rcBuildDistanceField(&m_ctx, *m_chf))
 		{
-			m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build distance field.");
+			m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build distance field.");
 			return false;
 		}
 
 		// Partition the walkable surface into simple regions without holes.
-		if (!rcBuildRegions(m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
+		if (!rcBuildRegions(&m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
+			m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
 			return false;
 		}
 	}
@@ -279,12 +280,12 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_cset = rcAllocContourSet();
 	if (!m_cset)
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
 		return false;
 	}
-	if (!rcBuildContours(m_ctx, *m_chf, m_cfg.maxSimplificationError, m_cfg.maxEdgeLen, *m_cset))
+	if (!rcBuildContours(&m_ctx, *m_chf, m_cfg.maxSimplificationError, m_cfg.maxEdgeLen, *m_cset))
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not create contours.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not create contours.");
 		return false;
 	}
 
@@ -296,12 +297,12 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_pmesh = rcAllocPolyMesh();
 	if (!m_pmesh)
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
 		return false;
 	}
-	if (!rcBuildPolyMesh(m_ctx, *m_cset, m_cfg.maxVertsPerPoly, *m_pmesh))
+	if (!rcBuildPolyMesh(&m_ctx, *m_cset, m_cfg.maxVertsPerPoly, *m_pmesh))
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not triangulate contours.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not triangulate contours.");
 		return false;
 	}
 
@@ -312,13 +313,13 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_dmesh = rcAllocPolyMeshDetail();
 	if (!m_dmesh)
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmdtl'.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmdtl'.");
 		return false;
 	}
 
-	if (!rcBuildPolyMeshDetail(m_ctx, *m_pmesh, *m_chf, m_cfg.detailSampleDist, m_cfg.detailSampleMaxError, *m_dmesh))
+	if (!rcBuildPolyMeshDetail(&m_ctx, *m_pmesh, *m_chf, m_cfg.detailSampleDist, m_cfg.detailSampleMaxError, *m_dmesh))
 	{
-		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build detail mesh.");
+		m_ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build detail mesh.");
 		return false;
 	}
 
@@ -423,14 +424,14 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 
 		if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
 		{
-			m_ctx->log(RC_LOG_ERROR, "Could not build Detour navmesh.");
+			m_ctx.log(RC_LOG_ERROR, "Could not build Detour navmesh.");
 			return false;
 		}
 		m_navMesh = dtAllocNavMesh();
 		if (!m_navMesh)
 		{
 			dtFree(navData);
-			m_ctx->log(RC_LOG_ERROR, "Could not create Detour navmesh");
+			m_ctx.log(RC_LOG_ERROR, "Could not create Detour navmesh");
 			return false;
 		}
 
@@ -440,14 +441,14 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 		if (dtStatusFailed(status))
 		{
 			dtFree(navData);
-			m_ctx->log(RC_LOG_ERROR, "Could not init Detour navmesh");
+			m_ctx.log(RC_LOG_ERROR, "Could not init Detour navmesh");
 			return false;
 		}
 		m_navQuery = dtAllocNavMeshQuery();
 		status = m_navQuery->init(m_navMesh, 2048);
 		if (dtStatusFailed(status))
 		{
-			m_ctx->log(RC_LOG_ERROR, "Could not init Detour navmesh query");
+			m_ctx.log(RC_LOG_ERROR, "Could not init Detour navmesh query");
 			return false;
 		}		
 	}	

@@ -19,7 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #ifndef _SBASSETHANDLERSOGRE_H_
-#define _SBASSETHANDLEROGRE_H_
+#define _SBASSETHANDLERSOGRE_H_
 
 #include <sb/SBTypes.h>
 #include <vector>

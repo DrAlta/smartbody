@@ -635,6 +635,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	if (sbMotion == NULL)
 	{
 		SmartBody::util::log("Recorded motion %s is already existing!", recordname.c_str());
+    delete fileOutput;
 		return;
 	}
 
@@ -647,11 +648,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	fileOutput->close();
 
 	//record_clear();
-	if( fileOutput )	{
-		delete fileOutput;
-		fileOutput = NULL;
-	}
-	
+  delete fileOutput;	
 }
 
 void MeController::cont_record( double time, MeFrameData& frame )	{

@@ -90,11 +90,12 @@ bool MeCtMotionBlend::controller_evaluate( double t, MeFrameData& frame )
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
 	
-	if (currentBlendEngine)
-	{		
+	if (!currentBlendEngine)
+	{
+    return true;
+  }
 		//SmartBody::util::log("update reach");
-		currentBlendEngine->updateBlend((float)t,dt,inputMotionFrame);		
-	}
+  currentBlendEngine->updateBlend((float)t,dt,inputMotionFrame);
 	
 	//printf("blend weight = %f\n",blendWeight);
 	BodyMotionFrame outMotionFrame;

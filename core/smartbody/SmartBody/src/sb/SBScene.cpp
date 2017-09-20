@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
 Copyright (C) 2017 University of Southern California
 
 This file is part of Smartbody.
@@ -26,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <direct.h>
 #endif
 
+#include <sb/SBTypes.h>
 
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
@@ -2357,7 +2358,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		return;
 	}
 	
-	zipFile zf;	
+	zipFile zf = NULL;	
 	if (writeToZip)
 	{
 		zf = zipOpen((outDir+"/"+outZipArchiveName).c_str(),0);		
@@ -4038,7 +4039,7 @@ SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double dur
 	if (SHOW_DEPRECATION_MESSAGES)
 		SmartBody::util::log("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	
-	SBMotion* sbMotion = new SBMotion();
+	//SBMotion* sbMotion = new SBMotion();
 	return this->getAssetManager()->addMotionDefinition(motionName, duration, numFrames);
 }
 
@@ -4728,7 +4729,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>& testPawns)
 {
 	std::vector<std::string> visiblePawns;
-#if !defined(__ANDROID__) && !defined(EMSCRIPTEN)
+#if !defined(__ANDROID__) && !defined(EMSCRIPTEN) && !defined(SB_IPHONE) 
 	float m[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	SrMat modelViewMat = SrMat(m);

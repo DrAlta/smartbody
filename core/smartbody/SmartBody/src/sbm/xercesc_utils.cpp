@@ -465,7 +465,8 @@ void xml_utils::xmlToString( const DOMNode* node, string& converted ){ //recursi
 			break;
 		}
 
-		//default:	// ignore other node types
+		default:	// ignore other node types
+      break;
 	}
 }
 
@@ -476,14 +477,18 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 			return xmlParser->getDocument();
 		// xml in a file?
 		if( str[0]=='<' ) {
-			if (USELOG) SmartBody::util::log("Parsing inline XML.");
+#if USELOG
+			SmartBody::util::log("Parsing inline XML.");
+#endif
 			int numErrors = xml_utils::parseCString( str, xmlParser );
 			if (numErrors > 0)
 			{
 				SmartBody::util::log("Found %d errors when parsing %s.", numErrors, str);
 			}
 		} else {
-			if (USELOG) SmartBody::util::log("Parsing XML from file \"%s\"", str);
+#if USELOG
+			SmartBody::util::log("Parsing XML from file \"%s\"", str);
+#endif
 			std::ifstream ifs(str);
 			std::string content( (std::istreambuf_iterator<char>(ifs) ),
 								 (std::istreambuf_iterator<char>()    ) );

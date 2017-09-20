@@ -230,7 +230,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	{	
 		bool visemeMode = request->actor->get_viseme_curve_mode();
 		audioSpeechImplBackup->setVisemeMode(visemeMode);
-		audioSpeechImpl->setMotionMode(request->actor->getBoolAttribute("useCustomizedLipSyncIfPresent"));
+		audioSpeechImplBackup->setMotionMode(request->actor->getBoolAttribute("useCustomizedLipSyncIfPresent"));
 	}
 
 	// Found speech implementation.  Making request.

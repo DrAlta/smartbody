@@ -5,7 +5,7 @@
 #include "gfx/vec4.h"
 
 using namespace gfx;
-#if !defined(ESMCRIPTEN) && !defined(__ANDROID__)
+#if !defined(ESMCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 class TBOData
 {
 public:

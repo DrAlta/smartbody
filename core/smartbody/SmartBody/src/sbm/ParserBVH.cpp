@@ -502,15 +502,15 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 								// add the values to the old joint
 								if (oldJoint != NULL)
 								{
-									if (0)//oldJoint->isIgnoreChannels())
-									{
-										// shift the frame values down by three
-										for (int i = 0; i < 3; i++)
-										{
-											frames[i] = frames[i + 3];
-										}
-										index -= 3;
-									}
+//                  if (0)//oldJoint->isIgnoreChannels())
+//                  {
+//                    // shift the frame values down by three
+//                    for (int i = 0; i < 3; i++)
+//                    {
+//                      frames[i] = frames[i + 3];
+//                    }
+//                    index -= 3;
+//                  }
 									// TODO: Add data to SkMotion
 									ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
 									ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo, frames, posture, curFrame * frameTime, scale);
@@ -607,7 +607,7 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
 				std::cout << "WARNING!" << std::endl;
 			//if (!joint->parent()) // root joint ?
-			if (true)
+      if (/* DISABLES CODE */ (true))
 			{ 
 				float finalValue = float(data[c]) ;
 				if (channelInfo->channels[c] == BVHXPOSITION)

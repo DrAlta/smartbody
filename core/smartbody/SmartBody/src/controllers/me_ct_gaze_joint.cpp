@@ -206,13 +206,12 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			local_rot = (parent_zero_rot)*(-parent_rot)*(world_rot)*(-world_zero_rot);//LM.quat( gwiz::COMP_M_TR );
 			//gwiz::vector_t newAxis = world_zero_rot*local_rot.axis();
 			//local_rot = quat_t(local_rot.degrees(),newAxis);
-			}	   
-
-		}
+    }
 		else	{
 			const char *name = joint_p->jointName().c_str();
 			SmartBody::util::log( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
+  }
 #endif
 }
 

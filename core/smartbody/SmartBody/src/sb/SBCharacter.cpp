@@ -335,6 +335,8 @@ int SBCharacter::getNumControllers()
 
 void SBCharacter::addController(int index, SBController* controller)
 {
+  if (!controller) return;
+  
 	int numControllers = this->getNumControllers();
 	for (int c = 0; c < numControllers; c++)
 	{
@@ -1388,12 +1390,12 @@ SBAPI const SBM_CharacterFrameDataMarshalFriendly & SBCharacter::GetFrameDataMar
       float posx = j->pos()->value( 0 );
       float posy = j->pos()->value( 1 );
       float posz = j->pos()->value( 2 );
-      if ( false )
-      {
-         posx += j->offset().x;
-         posy += j->offset().y;
-         posz += j->offset().z;
-      }
+//      if ( false )
+//      {
+//         posx += j->offset().x;
+//         posy += j->offset().y;
+//         posz += j->offset().z;
+//      }
 
       std::string jointName;
       if (j->extName() != "")

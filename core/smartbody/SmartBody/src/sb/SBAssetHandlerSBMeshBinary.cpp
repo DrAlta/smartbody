@@ -73,7 +73,9 @@ namespace SmartBody {
 				assets.push_back(mesh);
 			else
 				delete mesh;
-		}
+    } else {
+      delete mesh;
+    }
 		return assets;
 	}
 

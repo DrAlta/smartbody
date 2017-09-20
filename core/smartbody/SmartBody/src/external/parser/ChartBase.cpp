@@ -167,92 +167,92 @@ set_Alphas()
   double         tempAlpha[400]; //400 has no particular meaning, just large enough.
   
   if( !snode || snode->prob() == 0.0 )
-    {
-      warn( "estimating the counts on a zero-probability sentence" );
-      return;
-    }
+  {
+    warn( "estimating the counts on a zero-probability sentence" );
+    return;
+  }
   double sAlpha = 1.0/snode->prob();
   snode->poutside() = sAlpha;
   
   /* for each position in the 2D chart, starting at top*/
   /* look at every bucket of length j */
   for (int j = wrd_count_-1 ; j >= 0 ; j--)
+  {
+    for (int i = 0 ; i <= wrd_count_ - j ; i++)
     {
-      for (int i = 0 ; i <= wrd_count_ - j ; i++)
-	{
-	  Items il = regs[j][i];
-	  list<Item*>::iterator ili = il.begin();
-	  Item* itm;
-	  for(; ili != il.end(); ili++ )
-	    {
-	      itm = *ili;
-	      if(itm != snode) itm->poutside() = 0; //init outside probs to 0;
-	    }
-	  
-	  bool valuesChanging = true;
-	  /* do alpha calulcations until values settle down */
-	  ili = il.begin();
-	  while(valuesChanging)
-	    {
-	      valuesChanging = false;
-	      int            tempPos = 0;  //position in tempAlpha;
-	      ili = il.begin();
-	      for(; ili != il.end(); ili++ )
-		{
-		  itm = *ili;
-		  if(itm == snode) continue;
-		  double itmalpha = 0;
-
-		  NeedmeIter nmi(itm);
-		  Edge* e;
-		  while( nmi.next(e) )
-		    {
-		      const Item* lhsItem = e->finishedParent();
-		      if(lhsItem) itmalpha += lhsItem->poutside()
-			                        * e->prob();
-		    }
-		  assert(tempPos < 400);
-		  double val = itmalpha/itm->prob();
-		  tempAlpha[tempPos++] = val;
-		} 
-	      /* at this point the new alpha values are stored in tempAlpha */
-	      int temppos = 0;
-	      ili = il.begin();
-	      for(; ili != il.end(); ili++ )
-		{
-		  itm = *ili;
-		  if(itm == snode) continue;
-		  /* the start symbol for the entire sentence has poutside =1*/
-		  if(i == 0 && j ==wrd_count_-1 &&
-		     itm->term()->isRoot())
-		    itm->poutside() = sAlpha;
-		  else
-		    {
-		      double oOutside = itm->poutside();
-		      double nOutside = tempAlpha[temppos];
-		      if(nOutside == 0)
-			{
-			  if(oOutside != 0) error("Alpha went down");
-			}
-		      else if(oOutside/nOutside < .95)
-			{
-			  itm->poutside() = nOutside;
-			  valuesChanging = true;
-			  //cerr << "alpha*beta " << *itm << " = "
-			  //<< (itm->poutside() * itm->prob()) << endl;
-			}
-		    }
-		  temppos++;
-		}
-	      if(temppos != tempPos)
-		{
-		  cerr << "temppos = " << temppos << " and tempPos = "
-		    << tempPos << " ";
-		  error("Funnly situation in setAlphas");
-		}
-	    }
-	}
+      Items il = regs[j][i];
+      list<Item*>::iterator ili = il.begin();
+      Item* itm;
+      for(; ili != il.end(); ili++ )
+      {
+        itm = *ili;
+        if(itm != snode) itm->poutside() = 0; //init outside probs to 0;
+      }
+      
+      bool valuesChanging = true;
+      /* do alpha calulcations until values settle down */
+      ili = il.begin();
+      while(valuesChanging)
+      {
+        valuesChanging = false;
+        int            tempPos = 0;  //position in tempAlpha;
+        ili = il.begin();
+        for(; ili != il.end(); ili++ )
+        {
+          itm = *ili;
+          if(itm == snode) continue;
+          double itmalpha = 0;
+          
+          NeedmeIter nmi(itm);
+          Edge* e;
+          while( nmi.next(e) )
+          {
+            const Item* lhsItem = e->finishedParent();
+            if(lhsItem) itmalpha += lhsItem->poutside()
+              * e->prob();
+          }
+          assert(tempPos < 400);
+          double val = itmalpha/itm->prob();
+          tempAlpha[tempPos++] = val;
+        }
+        /* at this point the new alpha values are stored in tempAlpha */
+        int temppos = 0;
+        ili = il.begin();
+        for(; ili != il.end(); ili++ )
+        {
+          itm = *ili;
+          if(itm == snode) continue;
+          /* the start symbol for the entire sentence has poutside =1*/
+          if(i == 0 && j ==wrd_count_-1 &&
+             itm->term()->isRoot())
+            itm->poutside() = sAlpha;
+          else
+          {
+            double oOutside = itm->poutside();
+            double nOutside = tempAlpha[temppos];
+            if(nOutside == 0)
+            {
+              if(oOutside != 0) error("Alpha went down");
+            }
+            else if(oOutside/nOutside < .95)
+            {
+              itm->poutside() = nOutside;
+              valuesChanging = true;
+              //cerr << "alpha*beta " << *itm << " = "
+              //<< (itm->poutside() * itm->prob()) << endl;
+            }
+          }
+          temppos++;
+        }
+        if(temppos != tempPos)
+        {
+          cerr << "temppos = " << temppos << " and tempPos = "
+          << tempPos << " ";
+          error("Funnly situation in setAlphas");
+        }
+      }
     }
+  }
 }
 
 void

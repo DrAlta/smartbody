@@ -91,7 +91,7 @@ init(ECString & prefix)
     }
   
   ECString          termName;
-  int ind, n;
+  int ind = 0, n;
   n = 0;
   bool seenNTs = false;
   while (stream >> termName)

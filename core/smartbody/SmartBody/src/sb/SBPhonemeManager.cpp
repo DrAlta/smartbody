@@ -548,13 +548,10 @@ void SBPhonemeManager::removePhonemesRealtime(const std::string& character, int 
 		int num = 0;
 		while (num < amount)
 		{
-			for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
-				 phonemeIter != (*iter).second.end();
-				 phonemeIter++)
-			{
-				(*iter).second.erase(phonemeIter);
-				break;
-			}
+      std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
+      if (phonemeIter != (*iter).second.end()) {
+        (*iter).second.erase(phonemeIter);
+      }
 			num++;
 		}
 	}

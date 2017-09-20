@@ -30,7 +30,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sbm/ODEPhysicsSim.h>
 #include <vhcl.h>
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 #define USE_PHYSICS_CHARACTER 0
 #elif __native_client__
 #define USE_PHYSICS_CHARACTER 0

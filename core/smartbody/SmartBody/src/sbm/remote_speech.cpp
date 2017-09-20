@@ -142,7 +142,9 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string 
 #endif
 	string date= tmpdatebuf;
 	string time= timebuf;
-	if( LOG_RHETORIC_SPEECH ) SmartBody::util::log(tmpdatebuf, "\n");
+#if LOG_RHETORIC_SPEECH
+	SmartBody::util::log(tmpdatebuf, "\n");
+#endif
 	//
 
 	//the following is the RemoteSpeechCmd, the soundfile produced is explained in the following comment
@@ -159,7 +161,6 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 *****************************************/
 	forPlaysound= "data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff" ; //this is for the unreal playsound command (this is what's sent to unreal through VHMsg)
 	string soundFile= "../../data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
-	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
 	SmartBody::SBCharacter* agent = SmartBody::SBScene::getScene()->getCharacter(agentName);
 	
@@ -171,7 +172,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	}
 	string command= "speak " + string(agentName) +" "+ myStream.str() + " " + voiceCode + " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
 	//IF REMOTE SPEECH PROCESS SENDS BACK A "SPEECH" tag in the UTTERANCE THIS FILENAME WILL BE CHANGED!!! Go to Recieving Function to see where the Sounfile name might be reset
-	soundLookUp.insert(myStream.str().c_str(),soundFilePtr); //the sound name has to be stored in a globally accessable table in order to be found later  
+	soundLookUp.insert(myStream.str().c_str(),new string(soundFile)); //the sound name has to be stored in a globally accessable table in order to be found later
 	string* agentNamePtr= new string (agentName);
 	charLookUp.insert(myStream.str().c_str(),agentNamePtr);
 	
@@ -564,14 +565,15 @@ char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 	string soundFile= *lookup_result;
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
-	char* justName= new char[soundFile.length()-22];
+//	char* justName= new char[soundFile.length()-22];
 	
 	return retSoundFile;
 }
 
 int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* manager ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
-	if( LOG_RHETORIC_SPEECH ) SmartBody::util::log("\n \n *************in recieving_func***************** \n \n" );
-
+#if LOG_RHETORIC_SPEECH
+  SmartBody::util::log("\n \n *************in recieving_func***************** \n \n" );
+#endif
 	//SmartBody::util::log("remoteSpeechReply Func");
 	char* character_name = args.read_token(); //character speaking
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_name );
@@ -601,7 +603,10 @@ int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* man
 
 int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, SmartBody::SBCommandManager* manager ) 
 { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
-	if( LOG_RHETORIC_SPEECH ) SmartBody::util::log("\n \n *************in remote_speech::recieving_func***************** \n \n");
+#if LOG_RHETORIC_SPEECH
+  SmartBody::util::log("\n \n *************in remote_speech::recieving_func***************** \n \n");
+#endif
+  
 	std::string resultStr = result;
 	if( !remote_speech::commandLookUp.key_in_use( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
 		// TODO: Log / print error
@@ -712,15 +717,18 @@ void remote_speech::requestComplete( RequestId requestId ){
 }
 
 int remoteSpeechReady_func(srArgBuffer& args, SmartBody::SBCommandManager* manager){
-	if( LOG_RHETORIC_SPEECH ) cout<<"***************in remoteSpeechReady_func**********"<<endl;
-
+#if LOG_RHETORIC_SPEECH
+  cout<<"***************in remoteSpeechReady_func**********"<<endl;
+#endif
 	remote_speech x;
 	char* agentId = args.read_token();
 	int reqId = args.read_int();
 	char* status = args.read_token();
 
 	if( strcmp( status, "SUCCESS" )==0 ) {
-		if( LOG_RHETORIC_SPEECH ) cout<<"  Speech "<<agentId<<" #"<<reqId<<" SUCCESS!" <<endl;
+#if LOG_RHETORIC_SPEECH
+    cout<<"  Speech "<<agentId<<" #"<<reqId<<" SUCCESS!" <<endl;
+#endif
 		/*char* character= args.read_token(); //character speaking
 		char* msgID= args.read_token(); //the determined message ID sent out by requestSpeechAudio
 		char* Okay= args.read_token(); // not used*/
@@ -730,14 +738,14 @@ int remoteSpeechReady_func(srArgBuffer& args, SmartBody::SBCommandManager* manag
 		for(unsigned int funTimes=0; funTimes<p->size(); funTimes++){
 			VisemeData* vd = p->at(funTimes);
 
-			if( LOG_RHETORIC_SPEECH ) {
-				cout<<"Viseme: "<<vd->id()<<endl;
-				cout<<"  weight "<<vd->weight()<<endl;
-				cout<<"  time "<<vd->time()<<endl;
-			}
-		}
+#if LOG_RHETORIC_SPEECH
+      cout<<"Viseme: "<<vd->id()<<endl;
+      cout<<"  weight "<<vd->weight()<<endl;
+      cout<<"  time "<<vd->time()<<endl;
+#endif
+    }
 
-		if( LOG_RHETORIC_SPEECH )  {
+#if LOG_RHETORIC_SPEECH
 			//DELETE THIS- THIS IS JUST TO TEST THE STOP AND START AUDIO COMMAND!!!
 			char* what= x.getSpeechPlayCommand(reqId);
 			SmartBody::util::log("Play speech command:");
@@ -751,8 +759,7 @@ int remoteSpeechReady_func(srArgBuffer& args, SmartBody::SBCommandManager* manag
 
 			//Delete This- THis is just to test the get mark time fcn!!
 //			cout<<endl<<"Mark Time: "<<x.getMarkTime(reqId, L"mark")<<endl;
-
-		}
+#endif
 	} else {
 		// Speech failed
 		SmartBody::util::log("ERROR: Speech %s %d failed: %s", agentId, reqId, args.read_remainder_raw());
@@ -764,7 +771,9 @@ int remoteSpeechReady_func(srArgBuffer& args, SmartBody::SBCommandManager* manag
 
 int remote_speech_test( srArgBuffer& args, SmartBody::SBCommandManager* manager) { //Tester function for remote Speech 
 	try{
-		if( LOG_RHETORIC_SPEECH ) SmartBody::util::log("\n \n *************In remote_speech_test***************** \n \n");
+#if LOG_RHETORIC_SPEECH
+    SmartBody::util::log("\n \n *************In remote_speech_test***************** \n \n");
+#endif
 //		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
 		char *x = (char*)"WTF?";
 		

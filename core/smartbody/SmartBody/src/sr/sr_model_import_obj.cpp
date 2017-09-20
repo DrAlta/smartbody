@@ -172,7 +172,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 			SrString map_Kd, dotstr, ext;
 			in.getline(map_Kd);
 			// in.getline may retrieve the EOF marker, eliminate it
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			if (map_Kd[map_Kd.len() - 1] == EOF)
 #endif
 				map_Kd.substring(0, map_Kd.len() - 2);
@@ -189,7 +189,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 			SrString mapBump, dotstr, ext;
 			in.getline(mapBump);
 			// in.getline may retrieve the EOF marker, eliminate it
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			if (mapBump[mapBump.len() - 1] == EOF)
 #endif
 				mapBump.substring(0, mapBump.len() - 2);
@@ -205,7 +205,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 			SrString mapKs, dotstr, ext;	 		  
 			in.getline(mapKs);
 			// in.getline may retrieve the EOF marker, eliminate it
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			if (mapKs[mapKs.len() - 1] == EOF)
 #endif
 				mapKs.substring(0, mapKs.len() - 2);
@@ -220,7 +220,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 			SrString mapNs, dotstr, ext;
 			in.getline(mapNs);
 			// in.getline may retrieve the EOF marker, eliminate it
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			if (mapNs[mapNs.len() - 1] == EOF)
 #endif
 				mapNs.substring(0, mapNs.len() - 2);

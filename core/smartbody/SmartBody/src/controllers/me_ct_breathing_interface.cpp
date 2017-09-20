@@ -219,7 +219,7 @@ float KeyframeBreathCycle::value(double realTime, double cycleTime)
 	_is_inspiring = cycleTime < _max_time;
 
 	int start_keyframe = 0;
-	int end_keyframe;
+	int end_keyframe = 0;
 	if(cycleTime > keyframes[_last_start_keyframe]->time)
 		start_keyframe = _last_start_keyframe;
 	for(unsigned int i=start_keyframe; i<keyframes.size(); i++)
@@ -253,7 +253,7 @@ SplineBreathCycle::~SplineBreathCycle()
 }
 void SplineBreathCycle::update()
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	MeSpline1D::Knot* knot = _spline->knot_first();
 	float max = -1;
 	do
@@ -270,7 +270,7 @@ void SplineBreathCycle::update()
 }
 float SplineBreathCycle::duration()
 {
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	return 1.f;
 #else
 	return float(_spline->knot_last()->get_x()-_spline->knot_first()->get_x());
@@ -278,7 +278,7 @@ float SplineBreathCycle::duration()
 }
 float SplineBreathCycle::value(double realTime, double cycleTime)
 {
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	return 1.f;
 #else
 	_is_inspiring = cycleTime < _max_time;

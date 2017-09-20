@@ -908,7 +908,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 }
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 //#if 0
 extern "C" {
 	extern void initpyexpat(void);
@@ -996,7 +996,7 @@ void initPython(std::string pythonLibPath)
 	//SmartBody::util::log("After LD_LIBRARY_PATH");
 	Py_NoSiteFlag = 1;
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	Py_SetProgramName((char*)pythonHome.c_str());
     Py_SetPythonHome((char*)pythonHome.c_str());
 #else
@@ -1006,7 +1006,7 @@ void initPython(std::string pythonLibPath)
 #endif
 #endif	
 	//SmartBody::util::log("After SetProgramName");
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 //#if 0
 	appendPythonModule("pyexpat", initpyexpat);
 	appendPythonModule("_functools", init_functools);
@@ -1131,7 +1131,7 @@ void setupPython()
 #ifndef SB_NO_PYTHON
 	try {
 #ifdef PYLOG
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 		const char* pyfilename = "/sdcard/sbmmedia/pylog.txt";
 #else
 		const char* pyfilename = "C:\\SbmAndroid\\android\\pylog.txt";
