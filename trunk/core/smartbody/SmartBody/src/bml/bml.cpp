@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <string>
 #include <boost/algorithm/string/predicate.hpp>
 
 
