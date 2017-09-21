@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
+#include <memory>
 
 // from: http://oopweb.com/CPP/Documents/CPPHOWTO/Volume/C++Programming-HOWTO-7.html
 void SmartBody::util::tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
