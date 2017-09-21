@@ -149,7 +149,7 @@ void glDrawBox ( const SrVec& a, const SrVec& b )
 void glColor ( const SrColor& c )
  {
 #if USE_GL_FIXED_PIPELINE
-   glColor4ubv ( (const GLubyte*)&c );
+   glColor4ubv ( c.data() );
 #endif
  }
 

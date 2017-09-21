@@ -67,7 +67,10 @@ class SBAPI SrMat
 
     /*! Copy operator. */
     void operator= ( const SrMat& m ) { set(m.e); }
-
+ 
+    const float* data() const { return e; }
+    float* data() { return e; }
+   
     /*! float pointer type cast operator */
     operator float*() { return &e[0]; }
 

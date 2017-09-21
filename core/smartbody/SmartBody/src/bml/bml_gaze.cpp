@@ -346,7 +346,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	const XMLCh* attrTargetPos = elem->getAttribute( BMLDefs::ATTR_TARGET_POS );
 	SrVec targetPos = SrVec();
-	xml_parse_float((float*)&targetPos,3,BMLDefs::ATTR_TARGET_POS,elem,false);
+	xml_parse_float(targetPos.data(),3,BMLDefs::ATTR_TARGET_POS,elem,false);
 	bool validTargetPos = (attrTargetPos && XMLString::stringLen( attrTargetPos ));
 
 	const SkJoint* target_joint = NULL;

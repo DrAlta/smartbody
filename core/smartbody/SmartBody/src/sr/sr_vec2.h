@@ -127,10 +127,13 @@ class SBAPI SrVec2
     bool nextzero ( float ds ) const { return norm2()<=ds*ds? true:false; }
 
     /*! Allows member access like a vector */
-    float& operator[] ( int i ) { return *((&x)+i); }
+    float& operator[] ( int i ) { return *(data()+i); }
+
+    const float* data() const { return &x; }
+    float* data() { return &x; }
 
     /*! Convertion to a float pointer. */
-    operator float* () const { return (float*)&x; }
+    operator const float* () const { return data(); }
 
     /*! Assignment operator from another SrVec2. Implemented inline. */
     void operator = ( const SrVec2& v ) { set(v); }

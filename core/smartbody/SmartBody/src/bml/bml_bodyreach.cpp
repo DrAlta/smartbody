@@ -130,7 +130,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	const XMLCh* attrTargetPos = elem->getAttribute( BMLDefs::ATTR_TARGET_POS );
 	SrVec targetPos = SrVec();
-	xml_parse_float((float*)&targetPos,3,BMLDefs::ATTR_TARGET_POS,elem,REQUIRED_ATTR);
+	xml_parse_float(targetPos.data(),3,BMLDefs::ATTR_TARGET_POS,elem,REQUIRED_ATTR);
 
 	const XMLCh* attrReachDuration = elem->getAttribute( BMLDefs::ATTR_REACH_DURATION );
 	float reachDuration = xml_parse_float(BMLDefs::ATTR_REACH_DURATION,elem,-1.f,REQUIRED_ATTR);//-1.f;	

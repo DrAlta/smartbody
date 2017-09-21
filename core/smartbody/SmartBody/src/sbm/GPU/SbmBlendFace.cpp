@@ -244,7 +244,7 @@ void SbmBlendFace::initShaderProgram_Dan()
 
 	glLinkProgram(_programID);
 	GLint isLinked = 0;
-	glGetProgramiv(_programID, GL_LINK_STATUS, (int *)&isLinked);
+	glGetProgramiv(_programID, GL_LINK_STATUS, &isLinked);
 	if(isLinked == GL_FALSE) {
 		SmartBody::util::log("ERROR inglLinkProgram(_programID);;");
 		SbmShaderProgram::printProgramInfoLog(_programID);
@@ -742,9 +742,9 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
 			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
 			glEnableVertexAttribArray(pos_loc);
-			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,quad[0].data());
 			glEnableVertexAttribArray(texcoord_loc);
-			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,quadT[0].data());
 			//wes_matrix_mvp();
 			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
 			//SmartBody::util::log("Before draw elements");
@@ -983,9 +983,9 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 		GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
 		GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
 		glEnableVertexAttribArray(pos_loc);
-		glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+		glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,quad[0].data());
 		glEnableVertexAttribArray(texcoord_loc);
-		glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+		glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,quadT[0].data());
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
