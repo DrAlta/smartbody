@@ -1540,13 +1540,13 @@ SBMotion* SBMotion::mirror2(std::string name, std::string skeletonName, std::vec
 			sbmotion = NULL;
 			return NULL;
 		}
-	}
 
-	// create a trail indicating that this motion was mirrored
-	sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
-	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
+    // create a trail indicating that this motion was mirrored
+    sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
+    sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
 
-	sbmotion->setTransformDepth(getTransformDepth() + 1); // increment the depth counter 
+    sbmotion->setTransformDepth(getTransformDepth() + 1); // increment the depth counter
+  }
 	return sbmotion;
 }
 
@@ -1587,13 +1587,13 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 			sbmotion = NULL;
 			return NULL;
 		}
-	}
 
-	// create a trail indicating that this motion was mirrored
-	sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
-	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");	
+    // create a trail indicating that this motion was mirrored
+    sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
+    sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
 
-	sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
+    sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter
+  }
 	return sbmotion;
 }
 
@@ -1662,9 +1662,9 @@ SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 		sbmotion->setName(motionName.c_str());
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 		sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
+    sbmotion->createStringAttribute("smoothMotion", this->getName(), false, "smoothing", 110, false, false, false, "Which motion has this motion been smoothed from");
+    sbmotion->createDoubleAttribute("smoothInterval", timeInterval, false, "smoothing", 120, false, false, false, "how long is the smooth time interval");
 	}
-	sbmotion->createStringAttribute("smoothMotion", this->getName(), false, "smoothing", 110, false, false, false, "Which motion has this motion been smoothed from");
-	sbmotion->createDoubleAttribute("smoothInterval", timeInterval, false, "smoothing", 120, false, false, false, "how long is the smooth time interval");	
 
 	return sbmotion;
 }
@@ -3507,7 +3507,7 @@ void SBMotion::setChannelMatFrame(const std::string& channelName, int frame, SrM
 // find the closest key frame with key time < t
 int SBMotion::getKeyFrameFromTime( float t, int firstFrame, int lastFrame )
 {
-	int f1,f2;
+	int f1 = 0, f2 = 0;
 	float weight;
 	getInterpolationFrames(t,f1,f2,weight);
 	return f1;
@@ -3770,6 +3770,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	if (!skel) 
 	{
 		SmartBody::util::log("Error : skeleton '%s' does not exist.", skelName.c_str());
+    return;
 	}
 	
 	FILE* fp = fopen(fileName.c_str(),"wt");

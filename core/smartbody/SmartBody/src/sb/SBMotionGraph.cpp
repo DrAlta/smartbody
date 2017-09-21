@@ -1663,49 +1663,49 @@ SBAPI std::vector<std::string> SBMotionGraph::getMotionNodeNames()
 // temp function for debugging
 void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const dMatrix& mat, const std::vector<std::pair<int,int> >& transitions )
 {
-	double maxVal = -1.f;
-	for (unsigned int i=0;i<mat.size1();i++)
-		for (unsigned int j=0;j<mat.size2();j++)
-		{
-			if (maxVal < mat(i,j))
-				maxVal = mat(i,j);
-		}
-	
-  const int imgBufSize = mat.size1()*mat.size2()*3;
-	unsigned char* imgBuf = new unsigned char[imgBufSize]; // create a color img
-	for (unsigned int i=0;i<mat.size1();i++)
-	{
-		for (unsigned int j=0;j<mat.size2();j++)
-		{
-			float imgVal = (float)(mat(i,j)/maxVal);
-			unsigned char imgByte = (int)(imgVal*255);
-			imgBuf[i*mat.size2()*3 + j*3 ] = imgByte;
-			imgBuf[i*mat.size2()*3 + j*3 + 1] = imgByte;
-			imgBuf[i*mat.size2()*3 + j*3 + 2] = imgByte;
-		}
-	}
-
-	for (unsigned int i=0;i<transitions.size();i++)
-	{
-		std::pair<int,int> trans = transitions[i];
-		int x = trans.first;
-		int y = trans.second;
-    int index = x*mat.size2()*3 + y*3;
-    if (index >= 0 && index+2 < imgBufSize) {
-      imgBuf[index ] = 0;
-      imgBuf[index + 1] = 255;
-      imgBuf[index + 2] = 0;
-    }
-	}
-
-#if 0
-	SOIL_save_image(
-		outfilename.c_str(),
-		SOIL_SAVE_TYPE_BMP,
-		mat.size1(),mat.size2(), 3,
-		imgBuf
-		);
-#endif
+//  double maxVal = -1.f;
+//  for (unsigned int i=0;i<mat.size1();i++)
+//    for (unsigned int j=0;j<mat.size2();j++)
+//    {
+//      if (maxVal < mat(i,j))
+//        maxVal = mat(i,j);
+//    }
+//  
+//  const int imgBufSize = mat.size1()*mat.size2()*3;
+//  unsigned char* imgBuf = new unsigned char[imgBufSize]; // create a color img
+//  for (unsigned int i=0;i<mat.size1();i++)
+//  {
+//    for (unsigned int j=0;j<mat.size2();j++)
+//    {
+//      float imgVal = (float)(mat(i,j)/maxVal);
+//      unsigned char imgByte = (int)(imgVal*255);
+//      imgBuf[i*mat.size2()*3 + j*3 ] = imgByte;
+//      imgBuf[i*mat.size2()*3 + j*3 + 1] = imgByte;
+//      imgBuf[i*mat.size2()*3 + j*3 + 2] = imgByte;
+//    }
+//  }
+//
+//  for (unsigned int i=0;i<transitions.size();i++)
+//  {
+//    std::pair<int,int> trans = transitions[i];
+//    int x = trans.first;
+//    int y = trans.second;
+//    int index = x*mat.size2()*3 + y*3;
+//    if (index >= 0 && index+2 < imgBufSize) {
+//      imgBuf[index ] = 0;
+//      imgBuf[index + 1] = 255;
+//      imgBuf[index + 2] = 0;
+//    }
+//  }
+//
+//#if 0
+//  SOIL_save_image(
+//    outfilename.c_str(),
+//    SOIL_SAVE_TYPE_BMP,
+//    mat.size1(),mat.size2(), 3,
+//    imgBuf
+//    );
+//#endif
 }
 
 int SBMotionGraph::findClosestElement( const std::vector<int>& intList, int val )

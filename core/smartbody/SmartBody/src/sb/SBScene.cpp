@@ -4562,6 +4562,7 @@ void SBScene::updateConeOfSight()
 	SkJoint * leftEye			= character->getSkeleton()->search_joint("eyeball_left");
 	if(!leftEye) {
 		SmartBody::util::log("Can't find 'eyeball_left' joint.\n");
+    return;
 	}
 	const SrMat& gmat_leftEye	= leftEye->gmat();
 	SrVec leftEye_location		= SrVec(gmat_leftEye.get(3, 0), gmat_leftEye.get(3, 1), gmat_leftEye.get(3, 2));
@@ -4570,6 +4571,7 @@ void SBScene::updateConeOfSight()
 	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
 	if(!rightEye) {
 		SmartBody::util::log("Can't find 'eyeball_right' joint.\n");
+    return;
 	}
 	const SrMat& gmat_rightEye	= rightEye->gmat();
 	SrVec rightEye_location		= SrVec(gmat_rightEye.get(3, 0), gmat_rightEye.get(3, 1), gmat_rightEye.get(3, 2));

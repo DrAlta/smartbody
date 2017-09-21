@@ -229,8 +229,9 @@ DataInterpolator* MeCtBlendEngine::createInterpolator(std::string interpolatorTy
 		resampleData = NULL;
 		simplexList = &baryInterpolator->simplexList;
 	}
-	//RBFInterpolator* interpolator = new RBFInterpolator();	 	
-	interpExampleData = interpolator->getInterpExamples();
+	//RBFInterpolator* interpolator = new RBFInterpolator();
+  if (interpolator)
+    interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
 }
 

@@ -571,19 +571,20 @@ void MeController::saveMotionRecord( const std::string &recordname )
 		if( skeleton_p == NULL )	{
 			SmartBody::util::log("MeController::record_write NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
-		}
+    } else {
 
-		*_record_output << "HIERARCHY\n";
-		print_bvh_hierarchy( skeleton_p->root(), 0 );
-		*_record_output << "MOTION\n";
-		*_record_output 
-			<< (const char *)"Frames: " 
-			<< (int)_frames->size() 
-			<< srnl;	
+      *_record_output << "HIERARCHY\n";
+      print_bvh_hierarchy( skeleton_p->root(), 0 );
+      *_record_output << "MOTION\n";
+      *_record_output
+        << (const char *)"Frames: "
+        << (int)_frames->size()
+        << srnl;
 
-		*_record_output << "Frame Time: " << _record_dt << srnl;	
-		//		load_bvh_joint_hmap();
-		SmartBody::util::log("MeController::write_record BVH: %s", filename.c_str() );
+      *_record_output << "Frame Time: " << _record_dt << srnl;
+      //    load_bvh_joint_hmap();
+      SmartBody::util::log("MeController::write_record BVH: %s", filename.c_str() );
+    }
 	}
 	else if( _record_mode == RECORD_MOTION )
 	{
@@ -642,12 +643,14 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	sbMotion->setName(recordname);
 	sbMotion->load(recordInput);
 	sbMotion->filename(filename.c_str());
-		
-	// save motion to file as well
-	*fileOutput << stringOutput;
-	fileOutput->close();
+  
+  if (fileOutput) {
+    // save motion to file as well
+    *fileOutput << stringOutput;
+    fileOutput->close();
+  }
 
-	//record_clear();
+  //record_clear();
   delete fileOutput;	
 }
 
