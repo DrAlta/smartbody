@@ -502,7 +502,7 @@ bool DeformableMesh::buildBlendShapes()
 	for (unsigned int i=0;i<neutralMesh.V.size(); i++)
 	{
 		SrVec inPt = neutralMesh.V[i];
-		meshKDTree->knnSearch((float*)&inPt, numKNN, knnPtIdxs.data(), knnPtDists.data());
+		meshKDTree->knnSearch(inPt.data(), numKNN, knnPtIdxs.data(), knnPtDists.data());
 		for (unsigned int k=0;k<numKNN;k++)
 		{
 			if (knnPtDists[k] < 1e-30) // almost identical vertex

@@ -160,10 +160,14 @@ class SBAPI SrVec
     bool nextzero ( float ds ) const { return norm2()<=ds*ds? true:false; }
 
     /*! Allows member access like a vector. */
-    float& operator[] ( int i ) { return *((&x)+i); }
+    float& operator[] ( int i ) { return *(this->data()+i); }
+
+    /*! get the content as float array */
+    const float* data() const { return &x; }
+    float* data() { return &x; }
 
     /*! Convertion to a float pointer. */
-    operator float* () const { return (float*)&x; }
+    operator const float* () const { return this->data(); }
 
     /*! Copy operator from another SrVec. Implemented inline. */
     void operator = ( const SrVec& v ) { set(v); }
@@ -332,12 +336,16 @@ class SBAPI SrVec
 		 f[0] = ia; f[1] = ib; f[2] = ic;
 		 return t;
 	 }
+   unsigned short* unsignedShortData() { return data; }
+   const unsigned short* unsignedShortData() const { return data; }
 #else
 	 int data[3];
 	 int& operator[] ( int i ) { return data[i]; }
 	 int operator[] ( int i ) const { return data[i]; }
 	 friend SrOutput& operator<< ( SrOutput& o, const SrVec3i& f ) { return o<<f.data[0]<<srspc<<f.data[1]<<srspc<<f.data[2]; }
 	 friend SrInput& operator>> ( SrInput& i, SrVec3i& f ) { return i>>f[0]>>f[1]>>f[2]; }
+   unsigned short* unsignedShortData() { assert(sizeof(int) == sizeof(unsigned short)); return ((unsigned short*)data; }
+   const unsigned short* unsignedShortData() const { assert(sizeof(int) == sizeof(unsigned short)); return (unsigned short*)data; }
 #endif
 	 void operator = ( const SrVec4i& v )
 	 {
@@ -353,16 +361,19 @@ class SBAPI SrVec
 
  class SrVec4
  {
+   float _data[4];
  public:
-	 float data[4];
 	 SrVec4() {}
-	 SrVec4(float a, float b, float c, float d) { data[0] = a; data[1] = b; data[2] = c; data[3] = d; }
-	 float& operator[] ( int i ) { return data[i]; }
+	 SrVec4(float a, float b, float c, float d) { _data[0] = a; _data[1] = b; _data[2] = c; _data[3] = d; }
+	 float& operator[] ( int i ) { return _data[i]; }
 	 void operator = ( const SrVec4& v )
 	 {
 		 for (int i=0;i<4;i++)
-			 data[i] = v.data[i];
+			 _data[i] = v._data[i];
 	 }
+   
+   const float* data() const { return _data; }
+   float* data() { return _data; }
  };
 //============================== end of file ===============================
 

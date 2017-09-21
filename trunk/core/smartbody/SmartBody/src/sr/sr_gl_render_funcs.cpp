@@ -328,13 +328,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 						SrMat finalMat = mat * woMat ;
 
-						rotation = glm::make_mat4((float*)&finalMat);
+						rotation = glm::make_mat4(finalMat.data());
 					}
 				}
 				else
 				{
 					const SrMat& woMat = skel->root()->gmat();
-					rotation = glm::make_mat4((float*)&woMat);
+					rotation = glm::make_mat4(woMat.data());
 				}
 
 				SrVec meshScale = shape->getMeshScale();
@@ -414,27 +414,27 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			if (shape->_deformPosBuf.size() > 0)
 			{
 				glEnableClientState(GL_VERTEX_ARRAY);
-				glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
+				glVertexPointer(3, GL_FLOAT, 0, shape->_deformPosBuf[0].data());
 			}
 			if (mesh->normalBuf.size() > 0)
 			{
 				glEnableClientState(GL_NORMAL_ARRAY);
-				glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
+				glNormalPointer(GL_FLOAT, 0, mesh->normalBuf[0].data());
 			}
 
 			if (showSkinWeight)
 			{
 				//glDepthMask(GL_FALSE);
 				glEnableClientState(GL_COLOR_ARRAY);
-				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
-				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+				glColorPointer(3,GL_FLOAT, 0,  mesh->skinColorBuf[0].data());
+				//glColorPointer(3,GL_FLOAT, 0,  mesh->meshColorBuf[0].data());
 				myGLDisable(GL_LIGHTING);
 			}
 // 			else if (mesh->hasVertexColor)
 // 			{
 // 				glEnableClientState(GL_COLOR_ARRAY);
-// 				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
-// 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+// 				glColorPointer(3,GL_FLOAT, 0, mesh->meshColorBuf[0].data());
+// 				//glColorPointer(3,GL_FLOAT, 0, mesh->meshColorBuf[0].data());
 // 				myGLDisable(GL_LIGHTING);
 // 
 // #if defined(__ANDROID__)
@@ -451,7 +451,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			if (mesh->texCoordBuf.size() > 0)
 			{
 				glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
+				glTexCoordPointer(2, GL_FLOAT, 0, mesh->texCoordBuf[0].data());
 			}
 #if 0
 			glEnable(GL_POLYGON_OFFSET_FILL);
@@ -674,17 +674,17 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
       
-      glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&T[0]);          
+      glTexCoordPointer(2, GL_FLOAT, 0, T[0].data());
    }
    if (N.size() != 0) // has normal array
    {
       glEnableClientState(GL_NORMAL_ARRAY);
-      glNormalPointer(GL_FLOAT, 0, (GLfloat*)&N[0]);
+      glNormalPointer(GL_FLOAT, 0, N[0].data());
    }
    glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&V[0]);  
+   glVertexPointer(3, GL_FLOAT, 0, V[0].data());  
 
-   glDrawElements(GL_TRIANGLES, F.size()*3, GL_UNSIGNED_SHORT, &F[0]);
+   glDrawElements(GL_TRIANGLES, F.size()*3, GL_UNSIGNED_SHORT, F[0].unsignedShortData());
    
    glDisableClientState(GL_VERTEX_ARRAY);
    glDisableClientState(GL_NORMAL_ARRAY);

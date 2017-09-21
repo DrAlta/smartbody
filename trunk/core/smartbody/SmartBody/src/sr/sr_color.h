@@ -78,6 +78,9 @@ class SBAPI SrColor
     /*! Constructor from a 4 dimension float pointer. */
     SrColor ( const float v[4] ) { set(v); }
 
+    srbyte* data() { return &r;}
+    const srbyte* data() const { return &r;}
+
     /*! Sets the components of the color, the alpha value has a default parameter of 255. */
     void set ( srbyte x, srbyte y, srbyte z, srbyte w=255 );
 

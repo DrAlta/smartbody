@@ -367,8 +367,8 @@ float MotionAnalysis::getTerrainYOffset( LegCycleState& state, float flightTime 
 	SrVec startPt = state.curStep, endPt = state.nextStep;
 	SrVec startN, endN;
 	SrVec up = SrVec(0,1,0);
-	startPt.y = heightField->get_elevation(startPt.x, startPt.z, (float*)&startN);
-	endPt.y = heightField->get_elevation(endPt.x, endPt.z, (float*)&endN);
+	startPt.y = heightField->get_elevation(startPt.x, startPt.z, startN.data());
+	endPt.y = heightField->get_elevation(endPt.x, endPt.z, endN.data());
 
 	SrVec midPt = (startPt+endPt)*0.5f;
 	SrVec a = startPt - midPt;
