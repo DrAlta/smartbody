@@ -104,42 +104,22 @@ std::string SmartBody::util::vFormat(const char * fmt, va_list argPtr)
 	const int32_t bufSize = 512;
 	char stackBuffer[bufSize];
 
-	int32_t attemptedSize = bufSize - 1;
-
-	int32_t numChars = vsnprintf(stackBuffer, attemptedSize, fmt, argPtr);
-	if (numChars >= 0)
+	int32_t numChars = vsnprintf(stackBuffer, bufSize, fmt, argPtr);
+	if (numChars < bufSize)
 	{
-		// if we had exactly the number of characters, then the null doesn't automatically get appended
-		stackBuffer[attemptedSize] = '\0';
-
 		// Got it on the first try.
 		return std::string(stackBuffer);
 	}
 
+  // Now use the heap.
 	// Define a given max size for the longest a string can be
+  // if the string is longer than this, well, tough luck...
 	const int32_t maxSize = 32768;
-
-	// Now use the heap.
-	char * heapBuffer = NULL;
-
-	while ((numChars == -1) && (attemptedSize < maxSize))
-	{
-		// Try a bigger size
-		attemptedSize *= 2;
-		delete[] heapBuffer;
-		heapBuffer = new char[attemptedSize + 1];
-		numChars = vsnprintf(heapBuffer, attemptedSize, fmt, argPtr);
-		heapBuffer[attemptedSize] = '\0';  // make sure there's a null at the end, doesn't always get appended
-	}
-
-	std::string result = std::string(heapBuffer);
-
-	delete[] heapBuffer;
-	heapBuffer = NULL;
-
-	return result;
+  std::unique_ptr<char[]> buffer(new char[maxSize]);
+  // should be using vasprintf(), but it's a GNU extension.
+  return vsnprintf(buffer.get(), maxSize, fmt, argPtr) > 0
+  ? std::string(buffer.get()) : "";
 }
-
 
 std::wstring SmartBody::util::vFormat(const wchar_t * fmt, va_list argPtr)
 {
@@ -192,11 +172,10 @@ std::wstring SmartBody::util::vFormat(const wchar_t * fmt, va_list argPtr)
 
 SBAPI void SmartBody::util::log(const char * message, ...)
 {
-	va_list argList;
-	va_start(argList, message);
-	g_log.vLog(message, argList);
-	va_end(argList);
-		
+  va_list argList;
+  va_start(argList, message);
+  g_log.vLog(message, argList);
+  va_end(argList);
 }
 
 SBAPI void SmartBody::util::logSimple(const char * message)
@@ -204,7 +183,7 @@ SBAPI void SmartBody::util::logSimple(const char * message)
 	g_log.vLogSimple(message);
 }
 
-#if !defined(__ANDROID__) // && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) //&& !defined(SB_IPHONE)
 
 
 // global instance of a logger
