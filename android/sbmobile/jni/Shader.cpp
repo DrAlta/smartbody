@@ -12,6 +12,10 @@
 	Thus, total uniform vector needed is:
 	QT(vec4 * 120 * 2) + light(vec4 * 3) + MVP(vec4 * 4) + MV(vec4 * 4) + meshScale(vec4 * 1) = 252 vec4
 */
+#include <string>
+#include <vector>
+#include <stdlib.h>
+#include <vhcl_log.h>
 #include "Shader.h"
 #include "sb/SBScene.h"
 #include "sb/SBAttribute.h"
@@ -21,12 +25,8 @@
 #include "sr/sr_light.h"
 #include "sr/sr_euler.h"
 #include "sr/sr_quat.h"
-#include <string>
-#include <vector>
-#include <stdlib.h>
 #include "boost/lexical_cast.hpp"
 #include "esUtil.h"
-#include <vhcl_log.h>
 
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <sbm/GPU/VBOData.h>
@@ -40,8 +40,8 @@
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
 #elif defined(IPHONE_BUILD)
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
+#import <OpenGLES/ES3/gl.h>
+#import <OpenGLES/ES3/glext.h>
 #elif defined(EMSCRIPTEN)
 #include <EGL/egl.h>
 #include <GLES/gl.h>
@@ -49,7 +49,7 @@
 #endif
 
 #define MAX_VERTEX_UNIFORM_1024 1024
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 #include<emscripten.h>
 #endif
 
@@ -560,7 +560,7 @@ extern "C"
 		//step 1: create the Shader object
 		shader = glCreateShader(type);
 
-		if(shader == NULL)
+		if(shader == 0)
 			return 0;
 		//step 2: load the Shader source
 		glShaderSource(shader, 1, &shaderSrc, NULL);
@@ -605,21 +605,21 @@ extern "C"
 		GLint  linked;
 		//step 1: load vertex shader
 		vertexShader		= esLoadShader(GL_VERTEX_SHADER, vertShaderSrc);
-		if(vertexShader == NULL)
+		if(vertexShader == 0)
 		{
 			glDeleteShader(vertexShader);
 			return 0;
 		}
 		//step 2: load fragment shader
 		fragmentShader		= esLoadShader(GL_FRAGMENT_SHADER, fragShaderSrc);
-		if(fragmentShader ==  NULL)
+		if(fragmentShader == 0)
 		{
 			glDeleteShader(fragmentShader);
 			return 0;
 		}
 		//setp 3: create program object
 		programObject = glCreateProgram();
-		if(programObject == NULL)
+		if(programObject == 0)
 			return 0;
 
 		//step 4: attach vertexShader and fragmentShader to the program
@@ -1038,9 +1038,9 @@ extern "C"
 		GLuint texcoord_loc = backData->texCoordLoc;
 		GLuint mvp_loc = backData->mvpLoc;
 		glEnableVertexAttribArray(pos_loc);
-		glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+		glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,quad[0].data());
 		glEnableVertexAttribArray(texcoord_loc);
-		glVertexAttribPointer(texcoord_loc,2,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+		glVertexAttribPointer(texcoord_loc,2,GL_FLOAT,0,0,quadT[0].data());
 		//wes_matrix_mvp();
 		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
 		//SmartBody::util::log("drawBackgroundTexID, before glDrawElements");
@@ -1192,7 +1192,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->positionLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
-			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&shape->_deformPosBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, shape->_deformPosBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
 		}
@@ -1201,7 +1201,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->normalLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->normalBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(GLfloat) * 3, mesh->normalBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1210,7 +1210,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->texCoordLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(GLfloat) * 2, (GLfloat*)&mesh->texCoordBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(GLfloat) * 2, mesh->texCoordBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 		//load transform
@@ -1225,8 +1225,9 @@ extern "C"
 				TranslationBuf.push_back(SrVec4(tempT.getData(0), tempT.getData(1), tempT.getData(2), 0.0));
 			}
 			//submit QT to the Vertex shader
-			glUniform4fv(userData->QuaternionLoc, QuaternionBuf.size(), (GLfloat*)&QuaternionBuf[0]);
-			glUniform4fv(userData->TranslationLoc, TranslationBuf.size(), (GLfloat*)&TranslationBuf[0]);
+      // todo: this smells.
+			glUniform4fv(userData->QuaternionLoc, QuaternionBuf.size(), QuaternionBuf[0].data());
+			glUniform4fv(userData->TranslationLoc, TranslationBuf.size(), TranslationBuf[0].data());
 				
 			QuaternionBuf.clear();
 			TranslationBuf.clear();
@@ -1237,14 +1238,14 @@ extern "C"
 		if(mesh->boneWeightBuf[0].size() > 0){
 			glEnableVertexAttribArray(userData->boneWeightLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->boneWeightObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->boneWeightBuf[0].size() * sizeof(GLfloat) * 4, (GLfloat*)&mesh->boneWeightBuf[0][0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->boneWeightBuf[0].size() * sizeof(GLfloat) * 4, mesh->boneWeightBuf[0][0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->boneWeightLoc,4,GL_FLOAT,0,0,0);
 		}
 		//load boneId
 		if(mesh->boneIDBuf_f[0].size() > 0){
 			glEnableVertexAttribArray(userData->boneIDLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->boneIdObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->boneIDBuf_f[0].size() * sizeof(GLfloat) * 4, (GLfloat*)&mesh->boneIDBuf_f[0][0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->boneIDBuf_f[0].size() * sizeof(GLfloat) * 4, mesh->boneIDBuf_f[0][0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->boneIDLoc,4,GL_FLOAT,0,0,0);
 		}
 
@@ -1302,8 +1303,8 @@ extern "C"
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, (GLushort *)&subMesh->triBuf[0], GL_DYNAMIC_DRAW);
-			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, subMesh->triBuf[0].unsignedShortData(), GL_DYNAMIC_DRAW);
+			glDrawElements(GL_TRIANGLES, (GLsizei)(subMesh->triBuf.size() * 3), GL_UNSIGNED_SHORT, 0);
 		}
 		if(scene->getBoolAttribute("enableAlphaBlend")){
 			glDisable(GL_BLEND);
@@ -1359,7 +1360,7 @@ extern "C"
 			glEnableVertexAttribArray(userData->positionLoc);
 			gpuMeshInstance->getVBODeformPos()->VBO()->BindBuffer();
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
-			//glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&shape->_deformPosBuf[0], GL_DYNAMIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, shape->_deformPosBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
 		}
@@ -1369,7 +1370,7 @@ extern "C"
 			glEnableVertexAttribArray(userData->normalLoc);
 			gpuMeshInstance->getVBODeformNormal()->VBO()->BindBuffer();
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
-			//glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&mesh->normalBuf[0], GL_DYNAMIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size() * sizeof(GLfloat) * 3, mesh->normalBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1379,7 +1380,7 @@ extern "C"
 			glEnableVertexAttribArray(userData->tangentLoc);
 			gpuMeshInstance->getVBODeformTangent()->VBO()->BindBuffer();
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshTangentObject);
-			//glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&mesh->tangentBuf[0], GL_DYNAMIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size() * sizeof(GLfloat) * 3, mesh->tangentBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->tangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1389,7 +1390,7 @@ extern "C"
 			glEnableVertexAttribArray(userData->texCoordLoc);
 			gpuMesh->getTexCoordVBO()->VBO()->BindBuffer();
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
-			//glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size() * sizeof(GLfloat) * 2, (GLfloat*)&mesh->texCoordBuf[0], GL_DYNAMIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size() * sizeof(GLfloat) * 2, mesh->texCoordBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1493,7 +1494,7 @@ extern "C"
 			}
 
 			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
-			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, (GLushort *)&subMesh->triBuf[0], GL_DYNAMIC_DRAW);
+			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, subMesh->triBuf[0].unsignedShortData(), GL_DYNAMIC_DRAW);
 			subMeshVBO->VBO()->BindBuffer();
 			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
 			subMeshVBO->VBO()->UnbindBuffer();
@@ -1545,7 +1546,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->positionLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
-			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&shape->_deformPosBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(float) * 3, shape->_deformPosBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
 		}
@@ -1554,7 +1555,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->normalLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->normalBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(float) * 3, mesh->normalBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1563,7 +1564,7 @@ extern "C"
         {
             glEnableVertexAttribArray(userData->tangentLoc);
             glBindBuffer(GL_ARRAY_BUFFER, userData->meshTangentObject);
-            glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->tangentBuf[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size () * sizeof(float) * 3, mesh->tangentBuf[0].data(), GL_DYNAMIC_DRAW);
             glVertexAttribPointer(userData->tangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
         }
 
@@ -1572,7 +1573,7 @@ extern "C"
 		{
 			glEnableVertexAttribArray(userData->texCoordLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
-			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(GLfloat) * 2, (GLfloat*)&mesh->texCoordBuf[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(float) * 2, mesh->texCoordBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
@@ -1674,8 +1675,8 @@ extern "C"
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, (GLushort *)&subMesh->triBuf[0], GL_DYNAMIC_DRAW);
-			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(unsigned short) * 3, subMesh->triBuf[0].unsignedShortData(), GL_DYNAMIC_DRAW);
+			glDrawElements(GL_TRIANGLES, (GLsizei)(subMesh->triBuf.size() * 3), GL_UNSIGNED_SHORT, 0);
 		}
 		if(scene->getBoolAttribute("enableAlphaBlend")){
 			glDisable(GL_BLEND);
@@ -1744,12 +1745,12 @@ extern "C"
 			//bind position buffer
 			glEnableVertexAttribArray(shapeData->positionLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, shapeData->posObject);
-			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), vertices, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//bind normal buffer
 			glEnableVertexAttribArray(shapeData->normalLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, shapeData->normalObject);
-			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), (GLfloat*)&normals[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), normals, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(shapeData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//pass uniform color
 			glUniform4f(shapeData->colorLoc, 1.0, 0.0, 0.0, 1.0);
@@ -1787,19 +1788,19 @@ extern "C"
 		//vertex position buffer
 		glEnableVertexAttribArray(shapeData->positionLoc);
 		glBindBuffer(GL_ARRAY_BUFFER, shapeData->posObject);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glEnableVertexAttribArray(shapeData->normalLoc);
 		glBindBuffer(GL_ARRAY_BUFFER, shapeData->normalObject);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(normals), (GLfloat*)&normals[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(shapeData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glUniform4f(shapeData->colorLoc, 1.0, 0.0, 0.0, 1.0);
 		glUniform1i(shapeData->lightEnabledLoc, 1);
 		//index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeData->indexObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), (GLuint*)&indices[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1843,7 +1844,7 @@ extern "C"
 		{
 			vertices[0] = x; vertices[1] = gridHeight; vertices[2] = -adjustGridSize;
 			vertices[3] = x; vertices[4] = gridHeight; vertices[5] = adjustGridSize;
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glDrawArrays(GL_LINES, 0, 2);
 		}
@@ -1852,7 +1853,7 @@ extern "C"
 
 			vertices[0] = -adjustGridSize; vertices[1] = gridHeight; vertices[2] = x;
 			vertices[3] = adjustGridSize; vertices[4] = gridHeight; vertices[5] = x;
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glDrawArrays(GL_LINES, 0, 2);
 		}
@@ -1872,11 +1873,10 @@ extern "C"
 		{
 			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter((*charIter));
 			
-			int numJoints;
 			SmartBody::SBSkeleton* sk = character->getSkeleton();
 			sk->update_global_matrices();
 			std::map<int,int> indexMap;
-			numJoints = sk->joints().size();
+			size_t numJoints = sk->joints().size();
 
 			GLfloat *jointPos = new GLfloat[3 * numJoints];
 			GLushort *boneIdx = new GLushort[2 * numJoints];
@@ -1910,15 +1910,15 @@ extern "C"
 
 			//draw joints
 			glBindBuffer(GL_ARRAY_BUFFER, shapeData->jointPosObject);
-			glBufferData(GL_ARRAY_BUFFER, numJoints * sizeof(GLfloat) * 3, (GLfloat*)&jointPos[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, numJoints * sizeof(GLfloat) * 3, jointPos, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glDrawArrays(GL_POINTS, 0, numJoints);
+			glDrawArrays(GL_POINTS, 0, (GLsizei)numJoints);
 
 			glUniform4f(shapeData->colorLoc, 1.0, 1.0, 1.0, 1.0);
 			//draw bones
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeData->boneIdxObject);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, numJoints * 2 * sizeof(GL_UNSIGNED_SHORT), (GLushort*)&boneIdx[0], GL_DYNAMIC_DRAW);
-			glDrawElements(GL_LINES, numJoints * 2, GL_UNSIGNED_SHORT, 0); 
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, numJoints * 2 * sizeof(GLushort), boneIdx, GL_DYNAMIC_DRAW);
+			glDrawElements(GL_LINES, (GLsizei)(numJoints * 2), GL_UNSIGNED_SHORT, 0); 
 			
 			delete [] jointPos;
 			delete [] boneIdx;

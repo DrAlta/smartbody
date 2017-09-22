@@ -23,13 +23,20 @@
 #include <string.h>
 #include <stdarg.h>
 #include <sys/time.h>
+#include <sb/SBTypes.h>
+#if defined(__ANDROID__)
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
+#else
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
 #include "esUtil.h"
 
+ESContext esContext;
 
 #if 0
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 #include  <X11/Xlib.h>
 #include  <X11/Xatom.h>
 #include  <X11/Xutil.h>
@@ -261,6 +268,7 @@ void ESUTIL_API esInitContext ( ESContext *esContext )
 //
 GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char* title, GLint width, GLint height, GLuint flags )
 {
+#if !defined(SB_IPHONE)
    EGLint attribList[] =
    {
        EGL_RED_SIZE,       5,
@@ -295,7 +303,7 @@ GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char* title, G
    {
       return GL_FALSE;
    }
-   
+#endif
 
    return GL_TRUE;
 }

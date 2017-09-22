@@ -52,9 +52,9 @@
 #include <GLES3/gl3.h>
 //#include "wes.h"
 //#include "wes_gl.h"
-#elif defined(IPHONE_BUILD)
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
+#elif defined(SB_IPHONE)
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
 #endif
 
 using namespace boost::filesystem;
@@ -76,6 +76,87 @@ static vhcl::Log::StdoutListener listener;
 std::vector<SrLight> _lights;
 #endif
 
+#if defined(SB_IPHONE)
+  static int curH, curW;
+  
+  struct SceneListener : public SmartBody::SBSceneListener {
+    void (*handler)(const char*);
+    void OnLogMessage( const std::string & message ) override {
+      handler(message.c_str());
+    }
+  };
+  
+  static SceneListener sceneListener;
+
+  void SBIOSInitialize(const char* path, void (*listener)(const char*))
+  {
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+    if (listener) {
+      sceneListener.handler = listener;
+      scene->addSceneListener(&sceneListener);
+    }
+    
+    SmartBody::util::log("Start running SBIOSInitialize");
+    std::string path1 = path;
+    path1 += "/";
+    SBSetup(path1.c_str(), "setup.py");
+    SBInitialize();
+
+    scene->addAssetPath("script", "scripts");
+    SBInitScene("init.py");
+    SmartBody::util::log("After running SBIOSInitialize");
+  }
+  
+  void SBIOSSetupDrawing(int width, int height)
+  {
+    esContext.width = width;
+    esContext.height = height;
+    SBSetupDrawing(width,height, &esContext);
+    curW = width;
+    curH = height;
+  }
+  
+  void SBIOSDrawFrame()
+  {
+    SrMat id;
+    //SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
+    SBDrawFrame_ES20(curW, curH, &esContext, id);
+  }
+  
+  void SBIOSReloadTexture()
+  {
+    SBInitGraphics(&esContext);
+    SbmTextureManager& texm = SbmTextureManager::singleton();
+    texm.reloadTexture();
+  }
+  
+#endif
+  
+  const char* SBGetStringAttribute(const char* inAttributeName)
+  {
+    return SmartBody::SBScene::getScene()->getStringAttribute(inAttributeName)
+    .c_str();
+  }
+  
+  int SBGetBoolAttribute(const char* inAttributeName)
+  {
+    return SmartBody::SBScene::getScene()->getBoolAttribute(inAttributeName)
+    ? 1 : 0;
+  }
+  
+  double SBGetDoubleAttribute(const char* inAttributeName)
+  {
+    return SmartBody::SBScene::getScene()->getDoubleAttribute(inAttributeName);
+  }
+  
+  int SBGetIntAttribute(const char* inAttributeName)
+  {
+    return SmartBody::SBScene::getScene()->getIntAttribute(inAttributeName);
+  }
+  
+  
+  
 void setupLights()
 {
 	#if USE_GL_FIXED_PIPELINE
@@ -322,10 +403,12 @@ void SBSetup(const char* mediapath, const char* setupScript)
 {
 	vhcl::Log::g_log.AddListener(&listener);
 	XMLPlatformUtils::Initialize();
-	SmartBody::util::log("media path%s", mediapath);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string mpath = mediapath;
-	initPython(mpath + "pythonLib_27/Lib");
+    std::string pythonPath = mpath + "pythonLib_27/Lib";
+    SmartBody::util::log("python path: %s", pythonPath.c_str());
+    initPython(pythonPath);
+    SmartBody::util::log("media path: %s", mediapath);
 	scene->setMediaPath(mediapath);
 	scene->addAssetPath("script", ".");
 	scene->runScript(setupScript);
@@ -755,9 +838,9 @@ void SBDrawFrame(int width, int height, SrMat eyeViewMat)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&quad[0]);
+     glVertexPointer(3, GL_FLOAT, 0, quad[0].data());
 	glColorPointer(4, GL_FLOAT, 0, quadColor);
-	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&quadN[0]);
+     glNormalPointer(GL_FLOAT, 0, quadN[0].data());
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -806,9 +889,11 @@ void SBDrawBackground(ESContext* esContext)
 	unsigned short indices[] = {0,1,2, 0,2,3};
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(4, GL_FLOAT, 0, (GLfloat*)&quad[0]);  
+    // todo: this smells. it relies on the memory model that represents SrVec4
+    // as a block.
+    glVertexPointer(4, GL_FLOAT, 0, quad[0].data());
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-	glTexCoordPointer(4, GL_FLOAT, 0, (GLfloat*)&quadT[0]); 
+    glTexCoordPointer(4, GL_FLOAT, 0, quadT[0].data());
 
 	glDrawElements_wes(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 
@@ -874,7 +959,7 @@ void SBDrawCharacters()
         //glLineWidth(1.0f);
         glColor4f(1, 1, 1, 1);
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
+      glVertexPointer(3, GL_FLOAT, 0, jointPos);
         glDrawArrays(GL_POINTS, 0, numJoints);
         glDrawElements(GL_LINES,numJoints*2,GL_UNSIGNED_SHORT, boneIdx);
         glDisableClientState(GL_VERTEX_ARRAY);

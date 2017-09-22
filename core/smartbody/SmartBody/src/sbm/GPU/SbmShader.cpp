@@ -37,7 +37,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-#if !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#if !defined(EMSCRIPTEN)
 /************************************************************************/
 /* Shader program class                                                 */
 /************************************************************************/
@@ -262,7 +262,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 #if 1
 	while (glErr != GL_NO_ERROR)
 	{
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 		SmartBody::util::log("glError %s: %s\n", tag,gluErrorString(glErr));
 #elif defined(__ANDROID__) || defined(SB_IPHONE)
 		std::string error;

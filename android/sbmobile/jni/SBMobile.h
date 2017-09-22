@@ -1,11 +1,12 @@
 #ifndef __SB_MOBILE__
 #define __SB_MOBILE__
+#if defined(__ANDROID__)
+#include <jni.h>
+#endif
 #include <vector>
 #include <string>
 #include <sr/sr_vec.h>
 #include <sb/SBTypes.h>
-#include <jni.h>
-
 void initSBMobilePythonModule();
 
 class SBMobile
@@ -34,21 +35,24 @@ public:
 
 	void snapshotPNGResize(std::string imgFileName, int width, int height, int outW = -1, int outH = -1);
 	
+#if defined(__ANDROID__)
 	void callJNIMethod(std::string className, std::string methodName, std::string methodDef, std::vector<std::string> parameters);		
 	bool beforeCallJavaMethod( const std::string& className, const std::string& methodName, const std::string& methodDef, jclass& interfaceClass, jmethodID& method);	
-
-	static SBMobile* getSBMobile() { return engine; }
-	static void setSBMobile(SBMobile* inEngine) { engine = inEngine; }
 
 	static JavaVM* jvm;
 	static JNIEnv* env;
 	static bool jvmIsAttached;
+#endif
 	static SBMobile* engine;
-	
+
+  static SBMobile* getSBMobile() { return engine; }
+  static void setSBMobile(SBMobile* inEngine) { engine = inEngine; }
+  
 protected:
 	int screenWidth, screenHeight;
+#if defined(__ANDROID__)
 	jstring stringToJString(const std::string& str);
-	
+#endif
 };
 
 
