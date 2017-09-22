@@ -20,8 +20,14 @@
 ///
 //  Includes
 //
+#include <sb/SBTypes.h>
+#if defined(__ANDROID__)
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
+#else 
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
 
 #if 0
 #ifdef __cplusplus
@@ -62,11 +68,7 @@ typedef struct
     GLfloat   m[4][4];
 } ESMatrix;
 #endif
-
-
-
-//extern ESContext esContext;
-
+  
 typedef struct
 {
    // Handle to a program object
@@ -193,6 +195,7 @@ typedef struct _escontext
 #endif
 } ESContext;
 
+extern ESContext esContext;
 
 
 #if 0

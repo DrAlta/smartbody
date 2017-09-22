@@ -29,7 +29,13 @@
 #include "external/stb/stb_image_resize.h"
 
 
+
+#if defined(__ANDROID__)
 #include <GLES3/gl3.h>
+#elseif defined(SB_IPHONE)
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
 
 struct SBMobileWrap :  SBMobile, boost::python::wrapper<SBMobile>
 {
@@ -79,13 +85,12 @@ void initSBMobilePythonModule()
 	initSBMobile();
 }
 
-
-
-
+#if !defined(SB_IPHONE)
 JavaVM* SBMobile::jvm = NULL;
 JNIEnv* SBMobile::env = NULL;
 bool    SBMobile::jvmIsAttached = false;
 SBMobile* SBMobile::engine = NULL;
+#endif
 
 SBMobile::SBMobile()
 {
@@ -195,6 +200,7 @@ bool SBMobile::eventScreenTouch(int action, float x, float y)
 	return true;
 }
 
+#if !defined(SB_IPHONE)
 jstring SBMobile::stringToJString( const std::string& str )
 {
 	int status;
@@ -355,6 +361,8 @@ void SBMobile::stopSound()
 		if(jvmIsAttached) jvm->DetachCurrentThread();
 	}
 }
+
+#endif
 
 void SBMobile::snapshotPNGResize(std::string imgFileName, int width, int height, int outW, int outH)
 {

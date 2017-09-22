@@ -32,8 +32,6 @@
 #include "SBMobile.h"
 #include "esUtil.h"
 
-ESContext esContext;
-
 #if 1
 vhcl::Log::AndroidListener androidListener;
 unsigned long prevTime = 0;

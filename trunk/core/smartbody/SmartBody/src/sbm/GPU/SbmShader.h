@@ -26,7 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_gl.h>
 #include <sr/sr_viewer.h>
 
-#if defined(SB_IPHONE) || defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN)
 
 class SbmShaderProgram
 {
