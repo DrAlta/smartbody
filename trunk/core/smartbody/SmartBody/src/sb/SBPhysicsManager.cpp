@@ -18,6 +18,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
+#include <vhcl.h>
+
 #include "SBPhysicsManager.h"
 #ifndef __native_client__
 #include <sb/SBPythonClass.h>
@@ -28,7 +30,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBPhysicsSim.h>
 #include <sb/SBUtilities.h>
 #include <sbm/ODEPhysicsSim.h>
-#include <vhcl.h>
 
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 #define USE_PHYSICS_CHARACTER 0
