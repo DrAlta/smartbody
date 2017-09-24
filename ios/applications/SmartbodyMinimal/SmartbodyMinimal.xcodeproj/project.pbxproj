@@ -7,57 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		620204A41F6DCB29004BBA67 /* libsmartbody-lib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204A31F6DCB29004BBA67 /* libsmartbody-lib.a */; };
-		620204C41F6DCF8F004BBA67 /* libsbmobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204C31F6DCF8F004BBA67 /* libsbmobile.a */; };
-		620204C61F6DCFA6004BBA67 /* libxerces-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204C51F6DCFA6004BBA67 /* libxerces-c.a */; };
-		620204C81F6DCFAC004BBA67 /* libvhcl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204C71F6DCFAC004BBA67 /* libvhcl.a */; };
-		620204CA1F6DCFAF004BBA67 /* libvhmsg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204C91F6DCFAF004BBA67 /* libvhmsg.a */; };
-		620204CC1F6DCFB4004BBA67 /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204CB1F6DCFB4004BBA67 /* libactivemq-cpp.a */; };
-		620204CE1F6DCFB7004BBA67 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204CD1F6DCFB7004BBA67 /* libapr-1.a */; };
-		620204D01F6DCFBA004BBA67 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204CF1F6DCFBA004BBA67 /* libalut.a */; };
-		620204D41F6DCFBF004BBA67 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204D11F6DCFBF004BBA67 /* libboost_filesystem.a */; };
-		620204D51F6DCFBF004BBA67 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204D21F6DCFBF004BBA67 /* libboost_python.a */; };
-		620204D61F6DCFBF004BBA67 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204D31F6DCFBF004BBA67 /* libboost_system.a */; };
-		620204D81F6DCFC1004BBA67 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204D71F6DCFC1004BBA67 /* libexpat.a */; };
-		620204DE1F6DCFCF004BBA67 /* libSteerLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204D91F6DCFCE004BBA67 /* libSteerLib.a */; };
-		620204DF1F6DCFCF004BBA67 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204DA1F6DCFCE004BBA67 /* libsndfile.a */; };
-		620204E01F6DCFCF004BBA67 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204DB1F6DCFCE004BBA67 /* libprotobuf.a */; };
-		620204E11F6DCFCF004BBA67 /* libpprAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204DC1F6DCFCE004BBA67 /* libpprAI.a */; };
-		620204E41F6DCFFF004BBA67 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204E31F6DCFFF004BBA67 /* libc++.tbd */; };
-		620204FA1F6DD5BF004BBA67 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204F91F6DD5BF004BBA67 /* libz.tbd */; };
-		6202FAB71F6C72FA004BBA67 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6202FAB61F6C72FA004BBA67 /* Accelerate.framework */; };
+		629B5E2D1F7853E7000B66E3 /* Smartbody.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E2C1F7853E6000B66E3 /* Smartbody.framework */; };
 		62D867801F65AA54000EB24D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D8677F1F65AA54000EB24D /* AppDelegate.swift */; };
 		62D867821F65AA54000EB24D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D867811F65AA54000EB24D /* ViewController.swift */; };
 		62D867851F65AA54000EB24D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 62D867831F65AA54000EB24D /* Main.storyboard */; };
 		62D867871F65AA54000EB24D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62D867861F65AA54000EB24D /* Assets.xcassets */; };
 		62D8678A1F65AA54000EB24D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 62D867881F65AA54000EB24D /* LaunchScreen.storyboard */; };
-		62D879901F65ABA7000EB24D /* SBMobile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D867911F65AAA2000EB24D /* SBMobile.swift */; };
-		62D879931F65ABD7000EB24D /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62D879921F65ABC8000EB24D /* OpenAL.framework */; };
 		62EDC1B41F65AFC80016B069 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 62EDC1B31F65AFC40016B069 /* assets */; };
-		62F2B7771F722F60001915B5 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62F2B7761F722F60001915B5 /* Python.framework */; };
-		62F2B77B1F733E67001915B5 /* libboost_numpy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62F2B77A1F733E66001915B5 /* libboost_numpy.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		620204A31F6DCB29004BBA67 /* libsmartbody-lib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsmartbody-lib.a"; path = "../../../../Documents/Projects/smartbody/smartbody-lib/build/Release-iphoneos/libsmartbody-lib.a"; sourceTree = "<group>"; };
-		620204C31F6DCF8F004BBA67 /* libsbmobile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsbmobile.a; path = "../../../../Documents/Projects/smartbody/smartbody-lib/build/Release-iphoneos/libsbmobile.a"; sourceTree = "<group>"; };
-		620204C51F6DCFA6004BBA67 /* libxerces-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libxerces-c.a"; path = "../../../../Documents/Projects/smartbody/build/lib/libxerces-c.a"; sourceTree = "<group>"; };
-		620204C71F6DCFAC004BBA67 /* libvhcl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhcl.a; path = ../../../../Documents/Projects/smartbody/build/lib/libvhcl.a; sourceTree = "<group>"; };
-		620204C91F6DCFAF004BBA67 /* libvhmsg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhmsg.a; path = ../../../../Documents/Projects/smartbody/build/lib/libvhmsg.a; sourceTree = "<group>"; };
-		620204CB1F6DCFB4004BBA67 /* libactivemq-cpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libactivemq-cpp.a"; path = "../../../../Documents/Projects/smartbody/build/lib/libactivemq-cpp.a"; sourceTree = "<group>"; };
-		620204CD1F6DCFB7004BBA67 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../../../../Documents/Projects/smartbody/build/lib/libapr-1.a"; sourceTree = "<group>"; };
-		620204CF1F6DCFBA004BBA67 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = ../../../../Documents/Projects/smartbody/build/lib/libalut.a; sourceTree = "<group>"; };
-		620204D11F6DCFBF004BBA67 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../../../Documents/Projects/smartbody/build/lib/libboost_filesystem.a; sourceTree = "<group>"; };
-		620204D21F6DCFBF004BBA67 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_python.a; path = ../../../../Documents/Projects/smartbody/build/lib/libboost_python.a; sourceTree = "<group>"; };
-		620204D31F6DCFBF004BBA67 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../Documents/Projects/smartbody/build/lib/libboost_system.a; sourceTree = "<group>"; };
-		620204D71F6DCFC1004BBA67 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = ../../../../Documents/Projects/smartbody/build/lib/libexpat.a; sourceTree = "<group>"; };
-		620204D91F6DCFCE004BBA67 /* libSteerLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSteerLib.a; path = ../../../../Documents/Projects/smartbody/build/lib/libSteerLib.a; sourceTree = "<group>"; };
-		620204DA1F6DCFCE004BBA67 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../../../Documents/Projects/smartbody/build/lib/libsndfile.a; sourceTree = "<group>"; };
-		620204DB1F6DCFCE004BBA67 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../../../Documents/Projects/smartbody/build/lib/libprotobuf.a; sourceTree = "<group>"; };
-		620204DC1F6DCFCE004BBA67 /* libpprAI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpprAI.a; path = ../../../../Documents/Projects/smartbody/build/lib/libpprAI.a; sourceTree = "<group>"; };
-		620204E31F6DCFFF004BBA67 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		620204F91F6DD5BF004BBA67 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		6202FAB61F6C72FA004BBA67 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		629B5E2C1F7853E6000B66E3 /* Smartbody.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Smartbody.framework; path = "../../build/XCode/Release-iphoneos/Smartbody.framework"; sourceTree = "<group>"; };
 		62D8677C1F65AA54000EB24D /* SmartbodyMinimal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartbodyMinimal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62D8677F1F65AA54000EB24D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		62D867811F65AA54000EB24D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -65,13 +25,7 @@
 		62D867861F65AA54000EB24D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		62D867891F65AA54000EB24D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		62D8678B1F65AA54000EB24D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		62D867911F65AAA2000EB24D /* SBMobile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBMobile.swift; sourceTree = "<group>"; };
-		62D879921F65ABC8000EB24D /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		62D879B41F65AC5D000EB24D /* SmartbodyMinimal-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SmartbodyMinimal-Bridging-Header.h"; sourceTree = "<group>"; };
 		62EDC1B31F65AFC40016B069 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
-		62F2B7761F722F60001915B5 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../BitTorrentSync/General/avatarchat/ChatAvatarsiOS/libs/Python.framework; sourceTree = "<group>"; };
-		62F2B7781F722FB4001915B5 /* OpenSSL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenSSL.framework; path = ../../../../BitTorrentSync/General/avatarchat/ChatAvatarsiOS/libs/OpenSSL.framework; sourceTree = "<group>"; };
-		62F2B77A1F733E66001915B5 /* libboost_numpy.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_numpy.a; path = ../../../../BitTorrentSync/General/avatarchat/ChatAvatarsiOS/libs/iPhoneSimulator/libboost_numpy.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,28 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				620204FA1F6DD5BF004BBA67 /* libz.tbd in Frameworks */,
-				620204E41F6DCFFF004BBA67 /* libc++.tbd in Frameworks */,
-				62D879931F65ABD7000EB24D /* OpenAL.framework in Frameworks */,
-				62F2B7771F722F60001915B5 /* Python.framework in Frameworks */,
-				6202FAB71F6C72FA004BBA67 /* Accelerate.framework in Frameworks */,
-				620204A41F6DCB29004BBA67 /* libsmartbody-lib.a in Frameworks */,
-				620204C41F6DCF8F004BBA67 /* libsbmobile.a in Frameworks */,
-				620204C61F6DCFA6004BBA67 /* libxerces-c.a in Frameworks */,
-				620204C81F6DCFAC004BBA67 /* libvhcl.a in Frameworks */,
-				620204CA1F6DCFAF004BBA67 /* libvhmsg.a in Frameworks */,
-				620204CC1F6DCFB4004BBA67 /* libactivemq-cpp.a in Frameworks */,
-				620204CE1F6DCFB7004BBA67 /* libapr-1.a in Frameworks */,
-				620204D81F6DCFC1004BBA67 /* libexpat.a in Frameworks */,
-				620204D01F6DCFBA004BBA67 /* libalut.a in Frameworks */,
-				620204D41F6DCFBF004BBA67 /* libboost_filesystem.a in Frameworks */,
-				620204D51F6DCFBF004BBA67 /* libboost_python.a in Frameworks */,
-				620204DE1F6DCFCF004BBA67 /* libSteerLib.a in Frameworks */,
-				620204DF1F6DCFCF004BBA67 /* libsndfile.a in Frameworks */,
-				620204E01F6DCFCF004BBA67 /* libprotobuf.a in Frameworks */,
-				620204E11F6DCFCF004BBA67 /* libpprAI.a in Frameworks */,
-				620204D61F6DCFBF004BBA67 /* libboost_system.a in Frameworks */,
-				62F2B77B1F733E67001915B5 /* libboost_numpy.a in Frameworks */,
+				629B5E2D1F7853E7000B66E3 /* Smartbody.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,12 +63,10 @@
 			children = (
 				62D8677F1F65AA54000EB24D /* AppDelegate.swift */,
 				62D867811F65AA54000EB24D /* ViewController.swift */,
-				62D867911F65AAA2000EB24D /* SBMobile.swift */,
 				62D867831F65AA54000EB24D /* Main.storyboard */,
 				62D867861F65AA54000EB24D /* Assets.xcassets */,
 				62D867881F65AA54000EB24D /* LaunchScreen.storyboard */,
 				62D8678B1F65AA54000EB24D /* Info.plist */,
-				62D879B41F65AC5D000EB24D /* SmartbodyMinimal-Bridging-Header.h */,
 			);
 			path = SmartbodyMinimal;
 			sourceTree = "<group>";
@@ -143,29 +74,7 @@
 		62D879911F65ABC7000EB24D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				62F2B77A1F733E66001915B5 /* libboost_numpy.a */,
-				62F2B7781F722FB4001915B5 /* OpenSSL.framework */,
-				62F2B7761F722F60001915B5 /* Python.framework */,
-				620204F91F6DD5BF004BBA67 /* libz.tbd */,
-				620204E31F6DCFFF004BBA67 /* libc++.tbd */,
-				620204DC1F6DCFCE004BBA67 /* libpprAI.a */,
-				620204DB1F6DCFCE004BBA67 /* libprotobuf.a */,
-				620204DA1F6DCFCE004BBA67 /* libsndfile.a */,
-				620204D91F6DCFCE004BBA67 /* libSteerLib.a */,
-				620204D71F6DCFC1004BBA67 /* libexpat.a */,
-				620204D11F6DCFBF004BBA67 /* libboost_filesystem.a */,
-				620204D21F6DCFBF004BBA67 /* libboost_python.a */,
-				620204D31F6DCFBF004BBA67 /* libboost_system.a */,
-				620204CF1F6DCFBA004BBA67 /* libalut.a */,
-				620204CD1F6DCFB7004BBA67 /* libapr-1.a */,
-				620204CB1F6DCFB4004BBA67 /* libactivemq-cpp.a */,
-				620204C91F6DCFAF004BBA67 /* libvhmsg.a */,
-				620204C71F6DCFAC004BBA67 /* libvhcl.a */,
-				620204C51F6DCFA6004BBA67 /* libxerces-c.a */,
-				620204C31F6DCF8F004BBA67 /* libsbmobile.a */,
-				620204A31F6DCB29004BBA67 /* libsmartbody-lib.a */,
-				6202FAB61F6C72FA004BBA67 /* Accelerate.framework */,
-				62D879921F65ABC8000EB24D /* OpenAL.framework */,
+				629B5E2C1F7853E6000B66E3 /* Smartbody.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -242,7 +151,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				62D879901F65ABA7000EB24D /* SBMobile.swift in Sources */,
 				62D867821F65AA54000EB24D /* ViewController.swift in Sources */,
 				62D867801F65AA54000EB24D /* AppDelegate.swift in Sources */,
 			);
@@ -384,18 +292,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4RX84Q9D57;
 				ENABLE_BITCODE = NO;
 				ENABLE_TESTABILITY = NO;
-				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../../libs\"";
+				FRAMEWORK_SEARCH_PATHS = "../../build/XCode/Release-$(PLATFORM_NAME)";
 				INFOPLIST_FILE = SmartbodyMinimal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../libs/$(PLATFORM_NAME)\"";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.smartbody;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "SmartbodyMinimal/SmartbodyMinimal-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
@@ -408,16 +314,14 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4RX84Q9D57;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../../libs\"";
+				FRAMEWORK_SEARCH_PATHS = "../../build/XCode/Release-$(PLATFORM_NAME)";
 				INFOPLIST_FILE = SmartbodyMinimal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../libs/$(PLATFORM_NAME)\"";
 				PRODUCT_BUNDLE_IDENTIFIER = org.smartbody;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "SmartbodyMinimal/SmartbodyMinimal-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;

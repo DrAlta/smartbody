@@ -46,7 +46,7 @@ __attribute__((objc_subclassing_restricted))
 - (void)update:(NSTimeInterval)time;
 - (void)executeWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));
 - (void)executePythonWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(pythonCommand:));
-- (void)cameraOperationWithDx:(float)dx dy:(float)dy mode:(NSInteger)mode;
+- (void)cameraOperationWithDx:(float)dx dy:(float)dy mode:(NSInteger)mode NS_SWIFT_NAME(cameraOperation(dx:dy:mode:));
 - (NSInteger)intForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (NSString * _Nonnull)stringForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (BOOL)boolForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
