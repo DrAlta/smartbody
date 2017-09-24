@@ -411,9 +411,6 @@
 		6202049A1F6DA9AD004BBA67 /* sr_vec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6202025C1F6DA9AC004BBA67 /* sr_vec.cpp */; };
 		6202049B1F6DA9AD004BBA67 /* sr_vec2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6202025E1F6DA9AC004BBA67 /* sr_vec2.cpp */; };
 		6202049C1F6DA9AD004BBA67 /* sr_viewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 620202601F6DA9AC004BBA67 /* sr_viewer.cpp */; };
-		620204A01F6DC974004BBA67 /* sbmesh.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6202049D1F6DC973004BBA67 /* sbmesh.pb.cc */; };
-		620204A11F6DC974004BBA67 /* sbutilities.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6202049E1F6DC974004BBA67 /* sbutilities.pb.cc */; };
-		620204A21F6DC974004BBA67 /* sbmotion.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6202049F1F6DC974004BBA67 /* sbmotion.pb.cc */; };
 		620204F31F6DD599004BBA67 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 620204E71F6DD598004BBA67 /* Shader.cpp */; };
 		620204F41F6DD599004BBA67 /* AppListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 620204EA1F6DD598004BBA67 /* AppListener.cpp */; };
 		620204F51F6DD599004BBA67 /* esUtil.c in Sources */ = {isa = PBXBuildFile; fileRef = 620204EB1F6DD598004BBA67 /* esUtil.c */; };
@@ -423,7 +420,9 @@
 		620205301F6DE506004BBA67 /* minigzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 620205151F6DE506004BBA67 /* minigzip.c */; };
 		620205331F6DE506004BBA67 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 620205191F6DE506004BBA67 /* unzip.c */; };
 		620205341F6DE506004BBA67 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 6202051C1F6DE506004BBA67 /* zip.c */; };
-		62F2B77E1F733EB4001915B5 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62F2B77D1F733EB4001915B5 /* Python.framework */; };
+		625246261F772C46007398F4 /* sbmesh.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246201F772C46007398F4 /* sbmesh.pb.cc */; };
+		625246271F772C46007398F4 /* sbmotion.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246221F772C46007398F4 /* sbmotion.pb.cc */; };
+		625246281F772C46007398F4 /* sbutilities.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246241F772C46007398F4 /* sbutilities.pb.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -472,12 +471,6 @@
 		620200051F6DA9AC004BBA67 /* rply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rply.c; sourceTree = "<group>"; };
 		620200061F6DA9AC004BBA67 /* rply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rply.h; sourceTree = "<group>"; };
 		620200071F6DA9AC004BBA67 /* rplyfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rplyfile.h; sourceTree = "<group>"; };
-		620200521F6DA9AC004BBA67 /* sbmesh.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbmesh.pb.h; sourceTree = "<group>"; };
-		620200531F6DA9AC004BBA67 /* sbmesh.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sbmesh.proto; sourceTree = "<group>"; };
-		620200561F6DA9AC004BBA67 /* sbmotion.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbmotion.pb.h; sourceTree = "<group>"; };
-		620200571F6DA9AC004BBA67 /* sbmotion.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sbmotion.proto; sourceTree = "<group>"; };
-		6202005A1F6DA9AC004BBA67 /* sbutilities.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbutilities.pb.h; sourceTree = "<group>"; };
-		6202005B1F6DA9AC004BBA67 /* sbutilities.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sbutilities.proto; sourceTree = "<group>"; };
 		6202005D1F6DA9AC004BBA67 /* DefaultAttributeTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultAttributeTable.cpp; sourceTree = "<group>"; };
 		6202005E1F6DA9AC004BBA67 /* DefaultAttributeTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAttributeTable.h; sourceTree = "<group>"; };
 		6202005F1F6DA9AC004BBA67 /* MiniBrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MiniBrain.cpp; sourceTree = "<group>"; };
@@ -968,9 +961,6 @@
 		6202025F1F6DA9AC004BBA67 /* sr_vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_vec2.h; sourceTree = "<group>"; };
 		620202601F6DA9AC004BBA67 /* sr_viewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_viewer.cpp; sourceTree = "<group>"; };
 		620202611F6DA9AC004BBA67 /* sr_viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_viewer.h; sourceTree = "<group>"; };
-		6202049D1F6DC973004BBA67 /* sbmesh.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbmesh.pb.cc; sourceTree = "<group>"; };
-		6202049E1F6DC974004BBA67 /* sbutilities.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbutilities.pb.cc; sourceTree = "<group>"; };
-		6202049F1F6DC974004BBA67 /* sbmotion.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbmotion.pb.cc; sourceTree = "<group>"; };
 		620204A91F6DCD4F004BBA67 /* libsbmobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsbmobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		620204E51F6DD598004BBA67 /* AppListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppListener.h; sourceTree = "<group>"; };
 		620204E61F6DD598004BBA67 /* SBMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBMain.cpp; sourceTree = "<group>"; };
@@ -1374,6 +1364,12 @@
 		6202FFFD1F6DA9AC004BBA67 /* RecastContour.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecastContour.cpp; sourceTree = "<group>"; };
 		6202FFFE1F6DA9AC004BBA67 /* RecastFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecastFilter.cpp; sourceTree = "<group>"; };
 		6202FFFF1F6DA9AC004BBA67 /* RecastLayers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecastLayers.cpp; sourceTree = "<group>"; };
+		625246201F772C46007398F4 /* sbmesh.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbmesh.pb.cc; sourceTree = "<group>"; };
+		625246211F772C46007398F4 /* sbmesh.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbmesh.pb.h; sourceTree = "<group>"; };
+		625246221F772C46007398F4 /* sbmotion.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbmotion.pb.cc; sourceTree = "<group>"; };
+		625246231F772C46007398F4 /* sbmotion.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbmotion.pb.h; sourceTree = "<group>"; };
+		625246241F772C46007398F4 /* sbutilities.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbutilities.pb.cc; sourceTree = "<group>"; };
+		625246251F772C46007398F4 /* sbutilities.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbutilities.pb.h; sourceTree = "<group>"; };
 		62F2B77D1F733EB4001915B5 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../BitTorrentSync/General/avatarchat/ChatAvatarsiOS/libs/Python.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1389,7 +1385,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				62F2B77E1F733EB4001915B5 /* Python.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1404,22 +1399,6 @@
 				620200071F6DA9AC004BBA67 /* rplyfile.h */,
 			);
 			path = rply;
-			sourceTree = "<group>";
-		};
-		6202004F1F6DA9AC004BBA67 /* protocols */ = {
-			isa = PBXGroup;
-			children = (
-				6202049D1F6DC973004BBA67 /* sbmesh.pb.cc */,
-				6202049F1F6DC974004BBA67 /* sbmotion.pb.cc */,
-				6202049E1F6DC974004BBA67 /* sbutilities.pb.cc */,
-				620200521F6DA9AC004BBA67 /* sbmesh.pb.h */,
-				620200531F6DA9AC004BBA67 /* sbmesh.proto */,
-				620200561F6DA9AC004BBA67 /* sbmotion.pb.h */,
-				620200571F6DA9AC004BBA67 /* sbmotion.proto */,
-				6202005A1F6DA9AC004BBA67 /* sbutilities.pb.h */,
-				6202005B1F6DA9AC004BBA67 /* sbutilities.proto */,
-			);
-			path = protocols;
 			sourceTree = "<group>";
 		};
 		6202005C1F6DA9AC004BBA67 /* sb */ = {
@@ -2065,6 +2044,7 @@
 		6202FAC81F6DA958004BBA67 /* smartbody-lib */ = {
 			isa = PBXGroup;
 			children = (
+				6252461F1F772C46007398F4 /* protocols */,
 				6202FAD31F6DA9AA004BBA67 /* src */,
 			);
 			name = "smartbody-lib";
@@ -2077,7 +2057,6 @@
 				6202FAD41F6DA9AA004BBA67 /* bml */,
 				6202FB2D1F6DA9AA004BBA67 /* controllers */,
 				6202FBEA1F6DA9AB004BBA67 /* external */,
-				6202004F1F6DA9AC004BBA67 /* protocols */,
 				6202005C1F6DA9AC004BBA67 /* sb */,
 				6202012A1F6DA9AC004BBA67 /* sbm */,
 				620201B81F6DA9AC004BBA67 /* sk */,
@@ -2498,6 +2477,19 @@
 			path = recast;
 			sourceTree = "<group>";
 		};
+		6252461F1F772C46007398F4 /* protocols */ = {
+			isa = PBXGroup;
+			children = (
+				625246201F772C46007398F4 /* sbmesh.pb.cc */,
+				625246211F772C46007398F4 /* sbmesh.pb.h */,
+				625246221F772C46007398F4 /* sbmotion.pb.cc */,
+				625246231F772C46007398F4 /* sbmotion.pb.h */,
+				625246241F772C46007398F4 /* sbutilities.pb.cc */,
+				625246251F772C46007398F4 /* sbutilities.pb.h */,
+			);
+			path = protocols;
+			sourceTree = SOURCE_ROOT;
+		};
 		62F2B77C1F733EB3001915B5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -2650,7 +2642,6 @@
 				6202042E1F6DA9AD004BBA67 /* ParserCOLLADAFast.cpp in Sources */,
 				620204901F6DA9AD004BBA67 /* sr_sn_matrix.cpp in Sources */,
 				620202DE1F6DA9AD004BBA67 /* me_ct_tether.cpp in Sources */,
-				620204A01F6DC974004BBA67 /* sbmesh.pb.cc in Sources */,
 				620204011F6DA9AD004BBA67 /* SBPythonSystem.cpp in Sources */,
 				6202044B1F6DA9AD004BBA67 /* sk_joint.cpp in Sources */,
 				620204061F6DA9AD004BBA67 /* SBRetargetManager.cpp in Sources */,
@@ -2744,6 +2735,7 @@
 				6202044C1F6DA9AD004BBA67 /* sk_joint_euler.cpp in Sources */,
 				6202035C1F6DA9AD004BBA67 /* FBinaryArray.cpp in Sources */,
 				620203E41F6DA9AD004BBA67 /* SBJointMap.cpp in Sources */,
+				625246281F772C46007398F4 /* sbutilities.pb.cc in Sources */,
 				620203721F6DA9AD004BBA67 /* perlin.cpp in Sources */,
 				620202971F6DA9AC004BBA67 /* me_ct_channel_writer.cpp in Sources */,
 				620204481F6DA9AD004BBA67 /* xercesc_utils.cpp in Sources */,
@@ -2939,7 +2931,6 @@
 				620203AB1F6DA9AD004BBA67 /* nvbg.cpp in Sources */,
 				620202671F6DA9AC004BBA67 /* bml.cpp in Sources */,
 				6202040F1F6DA9AD004BBA67 /* SBSteerAgent.cpp in Sources */,
-				620204A11F6DC974004BBA67 /* sbutilities.pb.cc in Sources */,
 				620202691F6DA9AC004BBA67 /* bml_bodyreach.cpp in Sources */,
 				620202A21F6DA9AC004BBA67 /* me_ct_gaze.cpp in Sources */,
 				6202041D1F6DA9AD004BBA67 /* VBOData.cpp in Sources */,
@@ -2968,6 +2959,7 @@
 				6202045B1F6DA9AD004BBA67 /* sk_blend_planner.cpp in Sources */,
 				6202048F1F6DA9AD004BBA67 /* sr_sn_group.cpp in Sources */,
 				6202042A1F6DA9AD004BBA67 /* ParserASFAMC.cpp in Sources */,
+				625246271F772C46007398F4 /* sbmotion.pb.cc in Sources */,
 				620202C91F6DA9AD004BBA67 /* me_ct_motion_player.cpp in Sources */,
 				620202871F6DA9AC004BBA67 /* BMLObject.cpp in Sources */,
 				620203B11F6DA9AD004BBA67 /* SBAsset.cpp in Sources */,
@@ -3001,7 +2993,6 @@
 				620203FF1F6DA9AD004BBA67 /* SBPythonSimulation.cpp in Sources */,
 				620204721F6DA9AD004BBA67 /* sr_hash_table.cpp in Sources */,
 				620203BC1F6DA9AD004BBA67 /* SBAssetHandlerSk.cpp in Sources */,
-				620204A21F6DC974004BBA67 /* sbmotion.pb.cc in Sources */,
 				620204671F6DA9AD004BBA67 /* sr_array.cpp in Sources */,
 				620204111F6DA9AD004BBA67 /* SBSubject.cpp in Sources */,
 				620203781F6DA9AD004BBA67 /* DetourCommon.cpp in Sources */,
@@ -3010,6 +3001,7 @@
 				620204411F6DA9AD004BBA67 /* sr_spline_curve.cpp in Sources */,
 				620202791F6DA9AC004BBA67 /* bml_states.cpp in Sources */,
 				620202A71F6DA9AC004BBA67 /* me_ct_generic_hand.cpp in Sources */,
+				625246261F772C46007398F4 /* sbmesh.pb.cc in Sources */,
 				620203C81F6DA9AD004BBA67 /* SBCollisionManager.cpp in Sources */,
 				6202028A1F6DA9AC004BBA67 /* BMLSpeechObject.cpp in Sources */,
 				620202951F6DA9AC004BBA67 /* me_ct_breathing_interface.cpp in Sources */,
@@ -3051,12 +3043,10 @@
 		620204B01F6DCD4F004BBA67 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				DEPLOYMENT_LOCATION = YES;
+				INSTALL_PATH = /lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -3064,11 +3054,10 @@
 		620204B11F6DCD4F004BBA67 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				DEPLOYMENT_LOCATION = YES;
+				INSTALL_PATH = /lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -3105,9 +3094,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DSTROOT = "../build/output/$(PLATFORM_NAME)";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/lib";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -3117,7 +3107,6 @@
 					SB_NO_BONEBUS,
 					SB_NO_ODE_PHYSICS,
 					SB_NO_VHMSG,
-					"PY_FORMAT_LONG_LONG=\"ll\"",
 					SB_NO_VHMSG,
 					"DEBUG=1",
 				);
@@ -3133,7 +3122,7 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
-					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/lib/Python.framework/Headers",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
 					"$(SB_SRC_ROOT)/SmartBody/src",
 					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
 					"$(SB_SRC_ROOT)/steersuite-1.3/external",
@@ -3142,12 +3131,12 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;
 				SDKROOT = iphoneos;
-				VALID_ARCHS = arm64;
+				SYMROOT = "$(SRCROOT)/../build/XCode";
+				VALID_ARCHS = "x86_64 arm64";
 				WARNING_CFLAGS = "-Wno-deprecated-register";
 			};
 			name = Debug;
@@ -3184,9 +3173,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DSTROOT = "../build/output/$(PLATFORM_NAME)";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/lib";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -3194,7 +3184,6 @@
 					SB_NO_BONEBUS,
 					SB_NO_ODE_PHYSICS,
 					SB_NO_VHMSG,
-					"PY_FORMAT_LONG_LONG=\"ll\"",
 					SB_NO_VHMSG,
 					NDEBUG,
 				);
@@ -3210,7 +3199,7 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
-					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/lib/Python.framework/Headers",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
 					"$(SB_SRC_ROOT)/SmartBody/src",
 					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
 					"$(SB_SRC_ROOT)/steersuite-1.3/external",
@@ -3219,13 +3208,13 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;
 				SDKROOT = iphoneos;
+				SYMROOT = "$(SRCROOT)/../build/XCode";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = arm64;
+				VALID_ARCHS = "x86_64 arm64";
 				WARNING_CFLAGS = "-Wno-deprecated-register";
 			};
 			name = Release;
@@ -3234,9 +3223,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEPLOYMENT_LOCATION = YES;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-register",
@@ -3249,9 +3239,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEPLOYMENT_LOCATION = YES;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-register",
