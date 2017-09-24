@@ -423,6 +423,35 @@
 		625246261F772C46007398F4 /* sbmesh.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246201F772C46007398F4 /* sbmesh.pb.cc */; };
 		625246271F772C46007398F4 /* sbmotion.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246221F772C46007398F4 /* sbmotion.pb.cc */; };
 		625246281F772C46007398F4 /* sbutilities.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246241F772C46007398F4 /* sbutilities.pb.cc */; };
+		625246321F775B95007398F4 /* Smartbody.h in Headers */ = {isa = PBXBuildFile; fileRef = 625246301F775B95007398F4 /* Smartbody.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		625246391F775D2A007398F4 /* SBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 625246381F775D2A007398F4 /* SBViewController.swift */; };
+		6252463A1F7761AE007398F4 /* libsbmobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204A91F6DCD4F004BBA67 /* libsbmobile.a */; };
+		6252463B1F7761AE007398F4 /* libsmartbody-lib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6202FAC61F6DA958004BBA67 /* libsmartbody-lib.a */; };
+		6252463D1F77628A007398F4 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252463C1F77628A007398F4 /* Accelerate.framework */; };
+		6252463F1F776291007398F4 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252463E1F776291007398F4 /* OpenGLES.framework */; };
+		625246411F776298007398F4 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246401F776298007398F4 /* libc++.tbd */; };
+		625246531F7762CB007398F4 /* libSteerLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246421F7762CA007398F4 /* libSteerLib.a */; };
+		625246541F7762CB007398F4 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246431F7762CA007398F4 /* libprotobuf.a */; };
+		625246551F7762CB007398F4 /* libvhcl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246441F7762CA007398F4 /* libvhcl.a */; };
+		625246561F7762CB007398F4 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246451F7762CA007398F4 /* libalut.a */; };
+		625246571F7762CB007398F4 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246461F7762CA007398F4 /* libboost_filesystem.a */; };
+		625246581F7762CB007398F4 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246471F7762CA007398F4 /* libpython2.7.a */; };
+		625246591F7762CB007398F4 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246481F7762CA007398F4 /* libboost_system.a */; };
+		6252465A1F7762CB007398F4 /* libxerces-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246491F7762CA007398F4 /* libxerces-c.a */; };
+		6252465B1F7762CB007398F4 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464A1F7762CA007398F4 /* libexpat.a */; };
+		6252465C1F7762CB007398F4 /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464B1F7762CA007398F4 /* libactivemq-cpp.a */; };
+		6252465D1F7762CB007398F4 /* libvhmsg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464C1F7762CB007398F4 /* libvhmsg.a */; };
+		6252465E1F7762CB007398F4 /* libboost_numpy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464D1F7762CB007398F4 /* libboost_numpy.a */; };
+		6252465F1F7762CB007398F4 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464E1F7762CB007398F4 /* libboost_python.a */; };
+		625246601F7762CB007398F4 /* libpprAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464F1F7762CB007398F4 /* libpprAI.a */; };
+		625246611F7762CB007398F4 /* libaprutil-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246501F7762CB007398F4 /* libaprutil-1.a */; };
+		625246621F7762CB007398F4 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246511F7762CB007398F4 /* libapr-1.a */; };
+		625246631F7762CB007398F4 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246521F7762CB007398F4 /* libsndfile.a */; };
+		625246651F77633C007398F4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246641F77633C007398F4 /* OpenAL.framework */; };
+		629B5E1E1F781BEC000B66E3 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E1D1F781BEC000B66E3 /* GLKit.framework */; };
+		629B5E261F783064000B66E3 /* SBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 629B5E241F783064000B66E3 /* SBContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		629B5E271F783064000B66E3 /* SBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 629B5E251F783064000B66E3 /* SBContext.mm */; };
+		629B5E291F784CED000B66E3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E281F784CED000B66E3 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1370,7 +1399,35 @@
 		625246231F772C46007398F4 /* sbmotion.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbmotion.pb.h; sourceTree = "<group>"; };
 		625246241F772C46007398F4 /* sbutilities.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbutilities.pb.cc; sourceTree = "<group>"; };
 		625246251F772C46007398F4 /* sbutilities.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbutilities.pb.h; sourceTree = "<group>"; };
-		62F2B77D1F733EB4001915B5 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../BitTorrentSync/General/avatarchat/ChatAvatarsiOS/libs/Python.framework; sourceTree = "<group>"; };
+		6252462E1F775B95007398F4 /* Smartbody.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Smartbody.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		625246301F775B95007398F4 /* Smartbody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Smartbody.h; sourceTree = "<group>"; };
+		625246311F775B95007398F4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		625246381F775D2A007398F4 /* SBViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBViewController.swift; sourceTree = "<group>"; };
+		6252463C1F77628A007398F4 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		6252463E1F776291007398F4 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		625246401F776298007398F4 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		625246421F7762CA007398F4 /* libSteerLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSteerLib.a; path = ../build/output/iphoneos/lib/libSteerLib.a; sourceTree = "<group>"; };
+		625246431F7762CA007398F4 /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../build/output/iphoneos/lib/libprotobuf.a; sourceTree = "<group>"; };
+		625246441F7762CA007398F4 /* libvhcl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhcl.a; path = ../build/output/iphoneos/lib/libvhcl.a; sourceTree = "<group>"; };
+		625246451F7762CA007398F4 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = ../build/output/iphoneos/lib/libalut.a; sourceTree = "<group>"; };
+		625246461F7762CA007398F4 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../build/output/iphoneos/lib/libboost_filesystem.a; sourceTree = "<group>"; };
+		625246471F7762CA007398F4 /* libpython2.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython2.7.a; path = ../build/output/iphoneos/lib/libpython2.7.a; sourceTree = "<group>"; };
+		625246481F7762CA007398F4 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../build/output/iphoneos/lib/libboost_system.a; sourceTree = "<group>"; };
+		625246491F7762CA007398F4 /* libxerces-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libxerces-c.a"; path = "../build/output/iphoneos/lib/libxerces-c.a"; sourceTree = "<group>"; };
+		6252464A1F7762CA007398F4 /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = ../build/output/iphoneos/lib/libexpat.a; sourceTree = "<group>"; };
+		6252464B1F7762CA007398F4 /* libactivemq-cpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libactivemq-cpp.a"; path = "../build/output/iphoneos/lib/libactivemq-cpp.a"; sourceTree = "<group>"; };
+		6252464C1F7762CB007398F4 /* libvhmsg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhmsg.a; path = ../build/output/iphoneos/lib/libvhmsg.a; sourceTree = "<group>"; };
+		6252464D1F7762CB007398F4 /* libboost_numpy.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_numpy.a; path = ../build/output/iphoneos/lib/libboost_numpy.a; sourceTree = "<group>"; };
+		6252464E1F7762CB007398F4 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_python.a; path = ../build/output/iphoneos/lib/libboost_python.a; sourceTree = "<group>"; };
+		6252464F1F7762CB007398F4 /* libpprAI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpprAI.a; path = ../build/output/iphoneos/lib/libpprAI.a; sourceTree = "<group>"; };
+		625246501F7762CB007398F4 /* libaprutil-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaprutil-1.a"; path = "../build/output/iphoneos/lib/libaprutil-1.a"; sourceTree = "<group>"; };
+		625246511F7762CB007398F4 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../build/output/iphoneos/lib/libapr-1.a"; sourceTree = "<group>"; };
+		625246521F7762CB007398F4 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../build/output/iphoneos/lib/libsndfile.a; sourceTree = "<group>"; };
+		625246641F77633C007398F4 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		629B5E1D1F781BEC000B66E3 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		629B5E241F783064000B66E3 /* SBContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SBContext.h; sourceTree = "<group>"; };
+		629B5E251F783064000B66E3 /* SBContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SBContext.mm; sourceTree = "<group>"; };
+		629B5E281F784CED000B66E3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1385,6 +1442,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6252462A1F775B95007398F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				629B5E291F784CED000B66E3 /* AVFoundation.framework in Frameworks */,
+				629B5E1E1F781BEC000B66E3 /* GLKit.framework in Frameworks */,
+				625246651F77633C007398F4 /* OpenAL.framework in Frameworks */,
+				625246531F7762CB007398F4 /* libSteerLib.a in Frameworks */,
+				625246541F7762CB007398F4 /* libprotobuf.a in Frameworks */,
+				625246551F7762CB007398F4 /* libvhcl.a in Frameworks */,
+				625246561F7762CB007398F4 /* libalut.a in Frameworks */,
+				625246571F7762CB007398F4 /* libboost_filesystem.a in Frameworks */,
+				625246581F7762CB007398F4 /* libpython2.7.a in Frameworks */,
+				625246591F7762CB007398F4 /* libboost_system.a in Frameworks */,
+				6252465A1F7762CB007398F4 /* libxerces-c.a in Frameworks */,
+				6252465B1F7762CB007398F4 /* libexpat.a in Frameworks */,
+				6252465C1F7762CB007398F4 /* libactivemq-cpp.a in Frameworks */,
+				6252465D1F7762CB007398F4 /* libvhmsg.a in Frameworks */,
+				6252465E1F7762CB007398F4 /* libboost_numpy.a in Frameworks */,
+				6252465F1F7762CB007398F4 /* libboost_python.a in Frameworks */,
+				625246601F7762CB007398F4 /* libpprAI.a in Frameworks */,
+				625246611F7762CB007398F4 /* libaprutil-1.a in Frameworks */,
+				625246621F7762CB007398F4 /* libapr-1.a in Frameworks */,
+				625246631F7762CB007398F4 /* libsndfile.a in Frameworks */,
+				625246411F776298007398F4 /* libc++.tbd in Frameworks */,
+				6252463F1F776291007398F4 /* OpenGLES.framework in Frameworks */,
+				6252463D1F77628A007398F4 /* Accelerate.framework in Frameworks */,
+				6252463A1F7761AE007398F4 /* libsbmobile.a in Frameworks */,
+				6252463B1F7761AE007398F4 /* libsmartbody-lib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2027,6 +2116,7 @@
 			children = (
 				6202FAC81F6DA958004BBA67 /* smartbody-lib */,
 				620204AA1F6DCD4F004BBA67 /* sbmobile */,
+				6252462F1F775B95007398F4 /* Smartbody */,
 				6202FAC71F6DA958004BBA67 /* Products */,
 				62F2B77C1F733EB3001915B5 /* Frameworks */,
 			);
@@ -2037,6 +2127,7 @@
 			children = (
 				6202FAC61F6DA958004BBA67 /* libsmartbody-lib.a */,
 				620204A91F6DCD4F004BBA67 /* libsbmobile.a */,
+				6252462E1F775B95007398F4 /* Smartbody.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2490,15 +2581,61 @@
 			path = protocols;
 			sourceTree = SOURCE_ROOT;
 		};
+		6252462F1F775B95007398F4 /* Smartbody */ = {
+			isa = PBXGroup;
+			children = (
+				625246301F775B95007398F4 /* Smartbody.h */,
+				625246311F775B95007398F4 /* Info.plist */,
+				625246381F775D2A007398F4 /* SBViewController.swift */,
+				629B5E241F783064000B66E3 /* SBContext.h */,
+				629B5E251F783064000B66E3 /* SBContext.mm */,
+			);
+			path = Smartbody;
+			sourceTree = "<group>";
+		};
 		62F2B77C1F733EB3001915B5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				62F2B77D1F733EB4001915B5 /* Python.framework */,
+				629B5E281F784CED000B66E3 /* AVFoundation.framework */,
+				629B5E1D1F781BEC000B66E3 /* GLKit.framework */,
+				625246641F77633C007398F4 /* OpenAL.framework */,
+				6252464B1F7762CA007398F4 /* libactivemq-cpp.a */,
+				625246451F7762CA007398F4 /* libalut.a */,
+				625246511F7762CB007398F4 /* libapr-1.a */,
+				625246501F7762CB007398F4 /* libaprutil-1.a */,
+				625246461F7762CA007398F4 /* libboost_filesystem.a */,
+				6252464D1F7762CB007398F4 /* libboost_numpy.a */,
+				6252464E1F7762CB007398F4 /* libboost_python.a */,
+				625246481F7762CA007398F4 /* libboost_system.a */,
+				6252464A1F7762CA007398F4 /* libexpat.a */,
+				6252464F1F7762CB007398F4 /* libpprAI.a */,
+				625246431F7762CA007398F4 /* libprotobuf.a */,
+				625246471F7762CA007398F4 /* libpython2.7.a */,
+				625246521F7762CB007398F4 /* libsndfile.a */,
+				625246421F7762CA007398F4 /* libSteerLib.a */,
+				625246441F7762CA007398F4 /* libvhcl.a */,
+				6252464C1F7762CB007398F4 /* libvhmsg.a */,
+				625246491F7762CA007398F4 /* libxerces-c.a */,
+				625246401F776298007398F4 /* libc++.tbd */,
+				6252463E1F776291007398F4 /* OpenGLES.framework */,
+				6252463C1F77628A007398F4 /* Accelerate.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		6252462B1F775B95007398F4 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				625246321F775B95007398F4 /* Smartbody.h in Headers */,
+				629B5E261F783064000B66E3 /* SBContext.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		620204A81F6DCD4F004BBA67 /* sbmobile */ = {
@@ -2537,14 +2674,33 @@
 			productReference = 6202FAC61F6DA958004BBA67 /* libsmartbody-lib.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		6252462D1F775B95007398F4 /* Smartbody */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 625246331F775B95007398F4 /* Build configuration list for PBXNativeTarget "Smartbody" */;
+			buildPhases = (
+				625246291F775B95007398F4 /* Sources */,
+				6252462A1F775B95007398F4 /* Frameworks */,
+				6252462B1F775B95007398F4 /* Headers */,
+				6252462C1F775B95007398F4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Smartbody;
+			productName = Smartbody;
+			productReference = 6252462E1F775B95007398F4 /* Smartbody.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		6202FABE1F6DA958004BBA67 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = SB;
 				LastUpgradeCheck = 0900;
-				ORGANIZATIONNAME = "Embody Digital";
+				ORGANIZATIONNAME = "Smartbody Project";
 				TargetAttributes = {
 					620204A81F6DCD4F004BBA67 = {
 						CreatedOnToolsVersion = 9.0;
@@ -2552,6 +2708,11 @@
 					};
 					6202FAC51F6DA958004BBA67 = {
 						CreatedOnToolsVersion = 9.0;
+						ProvisioningStyle = Automatic;
+					};
+					6252462D1F775B95007398F4 = {
+						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					62D494EE1F7210A0002B893F = {
@@ -2575,9 +2736,20 @@
 				6202FAC51F6DA958004BBA67 /* smartbody-lib */,
 				620204A81F6DCD4F004BBA67 /* sbmobile */,
 				62D494EE1F7210A0002B893F /* all */,
+				6252462D1F775B95007398F4 /* Smartbody */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6252462C1F775B95007398F4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		62D494EA1F7205B6002B893F /* ShellScript */ = {
@@ -3024,6 +3196,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		625246291F775B95007398F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				629B5E271F783064000B66E3 /* SBContext.mm in Sources */,
+				625246391F775D2A007398F4 /* SBViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3251,6 +3432,88 @@
 			};
 			name = Release;
 		};
+		625246341F775B95007398F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Smartbody/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "../build/output/$(PLATFORM_NAME)/lib";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.smartbody.Smartbody;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		625246351F775B95007398F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Smartbody/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "../build/output/$(PLATFORM_NAME)/lib";
+				PRODUCT_BUNDLE_IDENTIFIER = org.smartbody.Smartbody;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		62D494F01F7210A1002B893F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3295,6 +3558,15 @@
 			buildConfigurations = (
 				6202FAD01F6DA958004BBA67 /* Debug */,
 				6202FAD11F6DA958004BBA67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		625246331F775B95007398F4 /* Build configuration list for PBXNativeTarget "Smartbody" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				625246341F775B95007398F4 /* Debug */,
+				625246351F775B95007398F4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
