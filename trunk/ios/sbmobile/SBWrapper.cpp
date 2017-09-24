@@ -54,6 +54,7 @@
 #include <OpenGLES/ES3/glext.h>
 #endif
 
+#include "SBMobile.h"
 using namespace boost::filesystem;
 using namespace SmartBody;
 /*
@@ -74,88 +75,6 @@ extern "C"
 #if USE_GL_FIXED_PIPELINE
   std::vector<SrLight> _lights;
 #endif
-  
-#if defined(SB_IPHONE)
-  ESContext esContext;
-  int curH, curW;
-  
-  struct SceneListener : public SmartBody::SBSceneListener {
-    void (*handler)(const char*);
-    void OnLogMessage( const std::string & message ) override {
-      handler(message.c_str());
-    }
-  };
-  
-  static SceneListener sceneListener;
-
-  void SBIOSInitialize(const char* path, void (*listener)(const char*))
-  {
-    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-
-    if (listener) {
-      sceneListener.handler = listener;
-      scene->addSceneListener(&sceneListener);
-    }
-    
-    SmartBody::util::log("Start running SBIOSInitialize");
-    std::string path1 = path;
-    path1 += "/";
-    SBSetup(path1.c_str(), "setup.py");
-    SBInitialize();
-
-    scene->addAssetPath("script", "scripts");
-    SBInitScene("init.py");
-    SmartBody::util::log("After running SBIOSInitialize");
-  }
-  
-  void SBIOSSetupDrawing(int width, int height)
-  {
-    esContext.width = width;
-    esContext.height = height;
-    SBSetupDrawing(width,height, &esContext);
-    curW = width;
-    curH = height;
-  }
-  
-  void SBIOSDrawFrame()
-  {
-    SrMat id;
-    //SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
-    SBDrawFrame_ES20(curW, curH, &esContext, id);
-  }
-  
-  void SBIOSReloadTexture()
-  {
-    SBInitGraphics(&esContext);
-    SbmTextureManager& texm = SbmTextureManager::singleton();
-    texm.reloadTexture();
-  }
-  
-#endif
-  
-  const char* SBGetStringAttribute(const char* inAttributeName)
-  {
-    return SmartBody::SBScene::getScene()->getStringAttribute(inAttributeName)
-    .c_str();
-  }
-  
-  int SBGetBoolAttribute(const char* inAttributeName)
-  {
-    return SmartBody::SBScene::getScene()->getBoolAttribute(inAttributeName)
-    ? 1 : 0;
-  }
-  
-  double SBGetDoubleAttribute(const char* inAttributeName)
-  {
-    return SmartBody::SBScene::getScene()->getDoubleAttribute(inAttributeName);
-  }
-  
-  int SBGetIntAttribute(const char* inAttributeName)
-  {
-    return SmartBody::SBScene::getScene()->getIntAttribute(inAttributeName);
-  }
-  
-  
   
   void setupLights()
   {

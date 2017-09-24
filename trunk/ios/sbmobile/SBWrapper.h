@@ -37,18 +37,6 @@ extern "C"
   void SBDrawCharacters();
 #endif
   
-#if defined(SB_IPHONE)
-  void SBIOSInitialize(const char* path, void (*listener)(const char*));
-  void SBIOSSetupDrawing(int w, int h);
-  void SBIOSDrawFrame();
-  void SBIOSReloadTexture();
-#endif
-  
-  const char* SBGetStringAttribute(const char* inAttributeName);
-  int SBGetBoolAttribute(const char* inAttributeName);
-  double SBGetDoubleAttribute(const char* inAttributeName);
-  int SBGetIntAttribute(const char* inAttributeName);
-
   void setupLights();
   void SBUpdate(float t);
   void SBExecuteCmd(const char* command);
