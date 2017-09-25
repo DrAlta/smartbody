@@ -256,10 +256,23 @@ bool QueryResourcesCB(void* caller, NetRequest* req)
 	case NetRequest::Get_EventHandler_Names:
 		break;
 
-	case NetRequest::Get_Scene_Scale:
-		float scale = SmartBody::util::toFloat(req->ArgsAsString());
-		sbScene->setScale(scale);
+	case NetRequest::Get_Scene_Scale: 
+		sbScene->setScale(SmartBody::util::toFloat(req->ArgsAsString()));
 		break;
-	}
+  case NetRequest::Get_Viseme_Names:
+    break;
+  case NetRequest::Get_AU_Side:
+    break;
+  case NetRequest::Get_Channel_Names:
+    break;
+  case NetRequest::Get_Controller_Names:
+    break;
+  case NetRequest::Get_Character_Height:
+    break;
+  case NetRequest::Send_Python_Command:
+    break;
+  case NetRequest::Get_Face_Definition:
+    break;
+  }
 	return true;
 }

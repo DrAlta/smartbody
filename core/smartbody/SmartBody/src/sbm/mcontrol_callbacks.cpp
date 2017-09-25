@@ -26,7 +26,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #endif
 
-#include "mcontrol_callbacks.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -113,6 +112,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef __FLASHPLAYER__
 #include "AS3/AS3.h"
 #endif
+
+#include "mcontrol_callbacks.h"
 
 using namespace std;
 

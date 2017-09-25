@@ -455,6 +455,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		629B5E2E1F787B74000B66E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6202FABE1F6DA958004BBA67 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6202FAC51F6DA958004BBA67;
+			remoteInfo = "smartbody-lib";
+		};
+		629B5E301F787B74000B66E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6202FABE1F6DA958004BBA67 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 620204A81F6DCD4F004BBA67;
+			remoteInfo = sbmobile;
+		};
 		62D494F21F7210A7002B893F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6202FABE1F6DA958004BBA67 /* Project object */;
@@ -2686,6 +2700,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				629B5E2F1F787B74000B66E3 /* PBXTargetDependency */,
+				629B5E311F787B74000B66E3 /* PBXTargetDependency */,
 			);
 			name = Smartbody;
 			productName = Smartbody;
@@ -3208,6 +3224,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		629B5E2F1F787B74000B66E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6202FAC51F6DA958004BBA67 /* smartbody-lib */;
+			targetProxy = 629B5E2E1F787B74000B66E3 /* PBXContainerItemProxy */;
+		};
+		629B5E311F787B74000B66E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620204A81F6DCD4F004BBA67 /* sbmobile */;
+			targetProxy = 629B5E301F787B74000B66E3 /* PBXContainerItemProxy */;
+		};
 		62D494F31F7210A7002B893F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6202FAC51F6DA958004BBA67 /* smartbody-lib */;
@@ -3226,9 +3252,7 @@
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = /lib;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3237,9 +3261,7 @@
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = /lib;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -3275,7 +3297,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEPLOYMENT_POSTPROCESSING = YES;
+				DEPLOYMENT_POSTPROCESSING = NO;
 				DSTROOT = "../build/output/$(PLATFORM_NAME)";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -3316,7 +3338,9 @@
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SYMROOT = "$(SRCROOT)/../build/XCode";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "x86_64 arm64";
 				WARNING_CFLAGS = "-Wno-deprecated-register";
 			};
@@ -3393,7 +3417,9 @@
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SYMROOT = "$(SRCROOT)/../build/XCode";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "x86_64 arm64";
 				WARNING_CFLAGS = "-Wno-deprecated-register";
@@ -3403,12 +3429,9 @@
 		6202FAD01F6DA958004BBA67 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = /lib;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-register",
 					"-Wno-redeclared-class-member",
@@ -3419,12 +3442,9 @@
 		6202FAD11F6DA958004BBA67 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = /lib;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-register",
 					"-Wno-redeclared-class-member",
@@ -3435,7 +3455,7 @@
 		625246341F775B95007398F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -3450,11 +3470,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -3470,7 +3486,6 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3479,7 +3494,7 @@
 		625246351F775B95007398F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -3494,7 +3509,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -3508,7 +3523,6 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3517,8 +3531,6 @@
 		62D494F01F7210A1002B893F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4RX84Q9D57;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3526,8 +3538,6 @@
 		62D494F11F7210A1002B893F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4RX84Q9D57;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
