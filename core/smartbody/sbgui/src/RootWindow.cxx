@@ -307,7 +307,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	{
 		if (renderer != "custom" && renderer != "CUSTOM")
 		{
-			LOG("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
+			SmartBody::util::log("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
 		}
 		if (!useEditor)
 		{
@@ -758,7 +758,7 @@ void BaseWindow::LoadPackageCB( Fl_Widget* widget, void* data )
 	std::string initScriptName = dirName+"/initScene.py";
 	if (!fs::exists(fs::path(initScriptName)))
 	{
-		LOG("Package directory doesn't have 'initScene.py'. Abort loading.");
+		SmartBody::util::log("Package directory doesn't have 'initScene.py'. Abort loading.");
 		return;
 	}
 	
@@ -789,7 +789,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string fullfilename = std::string(file);
 
 	std::string path = fullfilename.substr(0, fullfilename.size() - filenameSize);
-	LOG("Path = %s, script = %s", path.c_str(), filebasename.c_str());
+	SmartBody::util::log("Path = %s, script = %s", path.c_str(), filebasename.c_str());
 	SmartBody::SBScene::getScene()->addAssetPath("script", path);
 	SmartBody::SBScene::getScene()->runScript(filebasename);
 }
@@ -1022,7 +1022,7 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 	int ret = system(speechRelayCommand.c_str());
 	if (ret == -1)
 	{
-		LOG("Speech relay command failed: %s", speechRelayCommand.c_str());
+		SmartBody::util::log("Speech relay command failed: %s", speechRelayCommand.c_str());
 	}
 }
 
@@ -1162,11 +1162,11 @@ void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 
 		if (manager->getNumBehaviorSets() == 0)
 		{
-			LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+			SmartBody::util::log("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
 		}
 		else
 		{
-			LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+			SmartBody::util::log("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
 		}
 	}
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
@@ -1380,17 +1380,17 @@ void BaseWindow::CameraCharacterShightCB(Fl_Widget* widget, void* data)
 		else
 			CameraFrameCB(widget, data);
 		SmartBody::SBScene::getScene()->removeConeOfSight();
-		LOG("Camera sight: OFF");
+		SmartBody::util::log("Camera sight: OFF");
 	} else {
 		SbmCharacter* character = rootWindow->getSelectedCharacter();
 		if(character) {
 			if(SmartBody::SBScene::getScene()->setCameraConeOfSight(character->getName())) {
 				// Renders eye beams
 				rootWindow->curViewer->getData()->eyeBeamMode = FltkViewer::ModeEyeBeams;
-				LOG("Camera sight: ON"); 
+				SmartBody::util::log("Camera sight: ON");
 			}
 		} else {
-			LOG("No character selected. Can't enable coneOfSight. "); 
+			SmartBody::util::log("No character selected. Can't enable coneOfSight. ");
 		}
 	}
 }
@@ -2039,7 +2039,7 @@ void BaseWindow::CreatePawnFromModelCB(Fl_Widget* w, void* data)
 		return;
 
 	const std::string& currentSelection = SBSelectionManager::getSelectionManager()->getCurrentSelection();
-	LOG(currentSelection.c_str());
+	SmartBody::util::log(currentSelection.c_str());
 	// get the first model
 	std::vector<std::string> meshes = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMeshNames();
 	if (meshes.size() > 0)

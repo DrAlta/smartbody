@@ -176,7 +176,7 @@ void glLight ( int id, const SrLight& l, bool bind_pos )
               id==6? GL_LIGHT6 : GL_LIGHT7;
 
    glLightf  ( n, GL_SPOT_EXPONENT, l.spot_exponent );
-   glLightfv ( n, GL_SPOT_DIRECTION, (float*)l.spot_direction );
+   glLightfv ( n, GL_SPOT_DIRECTION, l.spot_direction.data() );
    glLightf  ( n, GL_SPOT_CUTOFF, l.spot_cutoff );
    glLightf  ( n, GL_CONSTANT_ATTENUATION, l.constant_attenuation );
    glLightf  ( n, GL_LINEAR_ATTENUATION, l.linear_attenuation );

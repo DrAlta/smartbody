@@ -77,7 +77,9 @@ const bool LOG_CONTROLLER_SCHEDULE			= false;
 const bool LOG_REQUEST_REALIZE_TIME_SPAN	= false;
 
 
-
+#ifdef max
+#undef max
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //  Helper Functions
@@ -1333,7 +1335,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 	// Find earliest BehaviorRequest start time schedule before speech
 	{
-		time_sec min_time = numeric_limits<time_sec>::max();
+		time_sec min_time = std::numeric_limits<time_sec>::max();
 		for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 			BehaviorRequestPtr behavior = *i;
 			if (behavior->ignore == true)
