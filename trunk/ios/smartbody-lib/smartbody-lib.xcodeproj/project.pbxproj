@@ -3324,6 +3324,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
 					"$(SB_SRC_ROOT)/SmartBody/src",
@@ -3403,6 +3404,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
 					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
 					"$(SB_SRC_ROOT)/SmartBody/src",
