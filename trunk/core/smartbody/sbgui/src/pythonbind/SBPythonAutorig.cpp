@@ -246,12 +246,12 @@ std::vector<std::string> checkVisibility(const std::string& character)
 	std::vector<std::string> visible	= scene->checkVisibility(character);
 	
 	if(DEBUG_CHECK_VISIBILITY) {
-		LOG ("Visible pawns from %s: ", character.c_str());
+		SmartBody::util::log ("Visible pawns from %s: ", character.c_str());
 		for( std::vector<std::string>::const_iterator i = visible.begin(); 
 			 i != visible.end(); 
 			 i++)
 		{
-			LOG ("%s, ", (*i).c_str());
+			SmartBody::util::log("%s, ", (*i).c_str());
 		}
 	}
 
@@ -273,9 +273,9 @@ std::vector<std::string> checkVisibility_current_view()
 	std::vector<std::string> visible	= scene->checkVisibility_current_view();
 
 	if(DEBUG_CHECK_VISIBILITY) {
-		LOG ("Visible pawns: ");
+		SmartBody::util::log("Visible pawns: ");
 		for( std::vector<std::string>::const_iterator i = visible.begin(); i != visible.end(); ++i)  {
-			LOG ("%s, ", i);
+			SmartBody::util::log("%s, ", i);
 		}
 	}
 

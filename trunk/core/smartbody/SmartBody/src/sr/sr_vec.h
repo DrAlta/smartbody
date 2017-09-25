@@ -30,6 +30,7 @@
 # include <sr/sr_input.h> 
 # include <sr/sr_output.h> 
 #include <string>
+#include <cassert>
 
 class SrVec;
 class SrVec2;
@@ -344,7 +345,7 @@ class SBAPI SrVec
 	 int operator[] ( int i ) const { return data[i]; }
 	 friend SrOutput& operator<< ( SrOutput& o, const SrVec3i& f ) { return o<<f.data[0]<<srspc<<f.data[1]<<srspc<<f.data[2]; }
 	 friend SrInput& operator>> ( SrInput& i, SrVec3i& f ) { return i>>f[0]>>f[1]>>f[2]; }
-   unsigned short* unsignedShortData() { assert(sizeof(int) == sizeof(unsigned short)); return ((unsigned short*)data; }
+   unsigned short* unsignedShortData() { assert(sizeof(int) == sizeof(unsigned short)); return (unsigned short*)data; }
    const unsigned short* unsignedShortData() const { assert(sizeof(int) == sizeof(unsigned short)); return (unsigned short*)data; }
 #endif
 	 void operator = ( const SrVec4i& v )
