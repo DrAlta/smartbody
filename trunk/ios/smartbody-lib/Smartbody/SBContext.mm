@@ -34,7 +34,6 @@ struct SceneListener : public SmartBody::SBSceneListener {
   ESContext esContext;
 	int curH, curW;
 }
-@property (nonatomic, strong) AVAudioPlayer* audioPlayer;
 - (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
 - (void)stopSound;
 @end

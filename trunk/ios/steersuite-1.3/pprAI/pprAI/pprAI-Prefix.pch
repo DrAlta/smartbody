@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'pprAI' target in the 'pprAI' project
-//
-
-#ifdef __OBJC__
-    #import <Foundation/Foundation.h>
-#endif

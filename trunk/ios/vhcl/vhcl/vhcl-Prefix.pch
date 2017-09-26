@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'vhcl' target in the 'vhcl' project
-//
-
-#ifdef __OBJC__
-    #import <Foundation/Foundation.h>
-#endif

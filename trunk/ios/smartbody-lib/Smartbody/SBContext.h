@@ -33,11 +33,14 @@
 - (void)log:(NSString * _Nonnull)message;
 @end
 
+@class AVAudioPlayer;
+
 // make it final
 __attribute__((objc_subclassing_restricted))
 @interface SBContext : NSObject
 /// Note that we keep a strong reference to the delegate here
 @property (nonatomic, strong) id<SBContextDelegate> _Nullable delegate;
+@property (nonatomic, strong) AVAudioPlayer * _Nullable audioPlayer;
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL;
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL delegate:(id<SBContextDelegate> _Nullable)delegate OBJC_DESIGNATED_INITIALIZER;
 - (void)setupDrawingWithSize:(CGSize)size NS_SWIFT_NAME(setupDrawing(size:)); 

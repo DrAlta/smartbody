@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'bonebus' target in the 'bonebus' project
-//
-
-#ifdef __OBJC__
-    #import <Foundation/Foundation.h>
-#endif

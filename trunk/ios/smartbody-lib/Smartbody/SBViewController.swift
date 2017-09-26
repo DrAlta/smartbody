@@ -64,6 +64,9 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
   {
     if pause {
       _time += timeSinceLastResume
+      context?.audioPlayer?.pause()
+    } else {
+      context?.audioPlayer?.play()
     }
   }
   
