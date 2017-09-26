@@ -380,17 +380,17 @@ using python : 2.7  : "${sb_prefix}" ;
 
 using darwin : ${SB_IPHONE_SDK_VERSION}~iphone
 : ${CXX} ${sb_archs_list_flags} -mios-version-min=${SB_MIN_IOS_VERSION} ${CXXFLAGS}
-: <striper> <root>$SB_XCODE_ROOT/Platforms/iPhoneOS.platform/Developer
+: <striper> <root>${SB_XCODE_ROOT}/Platforms/iPhoneOS.platform/Developer
 : <architecture>arm <target-os>iphone
 ;
 using darwin : ${SB_IPHONE_SDK_VERSION}~iphonesim
 : ${CXX} ${sb_archs_list_flags} -mios-version-min=${SB_MIN_IOS_VERSION} ${CXXFLAGS}
-: <striper> <root>$SB_XCODE_ROOT/Platforms/iPhoneSimulator.platform/Developer
+: <striper> <root>${SB_XCODE_ROOT}/Platforms/iPhoneSimulator.platform/Developer
 : <architecture>x86 <target-os>iphone
 ;
 using darwin : ${SB_OSX_SDK_VERSION}
 : ${CXX} ${sb_archs_list_flags} -mmacosx-version-min=${SB_MIN_OSX_VERSION} ${CXXFLAGS}
-: <striper> <root>$SB_XCODE_ROOT/Platforms/MacOSX.platform/Developer
+: <striper> <root>${SB_XCODE_ROOT}/Platforms/MacOSX.platform/Developer
 : <architecture>x86 <target-os>darwin
 ;
 EOF
