@@ -29,8 +29,12 @@
 # endif
 #endif
 
+@class SBContext;
+
 @protocol SBContextDelegate <NSObject>
-- (void)log:(NSString * _Nonnull)message;
+- (void)context:(SBContext * _Nonnull)context log:(NSString * _Nonnull)message NS_SWIFT_NAME(context(_:log:));
+- (void)context:(SBContext * _Nonnull)context didStartPlayingAudioAtURL:(NSURL * _Nonnull)url NS_SWIFT_NAME(context(_:didStartPlayingAudioAtURL:));
+- (void)context:(SBContext * _Nonnull)context didFinishPlayingAudioAtURL:(NSURL * _Nonnull)url successfully:(BOOL)flag NS_SWIFT_NAME(context(_:didFinishPlayingAudioAtURL:successfully:));
 @end
 
 @class AVAudioPlayer;

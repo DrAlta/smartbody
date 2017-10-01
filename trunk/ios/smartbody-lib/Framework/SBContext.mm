@@ -29,7 +29,7 @@ struct SceneListener : public SmartBody::SBSceneListener {
   SBContext * _context;
 };
 
-@interface SBContext () {
+@interface SBContext () <AVAudioPlayerDelegate> {
   SceneListener _sceneListener;
   ESContext esContext;
 	int curH, curW;
@@ -43,7 +43,8 @@ static SBContext *sharedInstance = nil;
 void SceneListener::OnLogMessage( const std::string & message ) {
   id<SBContextDelegate> del = sharedInstance.delegate;
   if (del) {
-    [del log:[NSString stringWithUTF8String: message.c_str()]];
+    [del context:sharedInstance
+             log:[NSString stringWithUTF8String: message.c_str()]];
   }
 }
 
@@ -148,16 +149,25 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 - (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop
 {
   [self stopSound];
-  self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path] error:nil];
+  NSURL* url = [NSURL fileURLWithPath:path];
+  self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
   if (!self.audioPlayer) return;
+  self.audioPlayer.delegate = self;
   self.audioPlayer.numberOfLoops = loop ? -1 : 0;
   [self.audioPlayer play];
+  [self.delegate context:self didStartPlayingAudioAtURL:url];
 }
 
 - (void)stopSound
 {
   [self.audioPlayer stop];
-  self.audioPlayer = nil;
+}
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+  NSURL* url = player.url;
+  if (!url) return;
+  [self.delegate context:self didFinishPlayingAudioAtURL:url successfully:flag];
 }
 
 @end

@@ -8,14 +8,28 @@
 
 import UIKit
 import GLKit
-
+import AVFoundation
+ 
 open class SBViewController: GLKViewController, GLKViewControllerDelegate {
   private var _reloadTexture = true
   private var _time: TimeInterval = 0
   private var _lastSize = CGSize()
+  private var _audioWasPlaying = false
   
   open var context: SBContext?
   
+  open func makeOpenGLContext() -> EAGLContext? {
+    return EAGLContext.init(api: .openGLES3)
+  }
+  
+  open func setupOpenGL() {
+    
+  }
+
+  open func teardownOpenGL() {
+    
+  }
+
   open override func viewDidLoad() {
     super.viewDidLoad()
     self.delegate = self
@@ -30,12 +44,20 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
     glview.drawableColorFormat = .RGBA8888
     glview.drawableDepthFormat = .format16
     
-    guard let context = EAGLContext.init(api: .openGLES3) else {
+    guard let context = makeOpenGLContext() else {
       fatalError("failed to initialize OpenGL context")
     }
-    EAGLContext.setCurrent(context)
-    
+
     glview.context = context
+    EAGLContext.setCurrent(context)
+    setupOpenGL()
+  }
+  
+  deinit {
+    if let context = (self.view as? GLKView)?.context {
+      EAGLContext.setCurrent(context)
+      teardownOpenGL()
+    }
   }
   
   open override func didReceiveMemoryWarning() {
@@ -64,9 +86,13 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
   {
     if pause {
       _time += timeSinceLastResume
+      _audioWasPlaying = context?.audioPlayer?.isPlaying ?? false
       context?.audioPlayer?.pause()
     } else {
-      context?.audioPlayer?.play()
+      if _audioWasPlaying {
+        context?.audioPlayer?.play()
+        _audioWasPlaying = false
+      }
     }
   }
   
