@@ -423,8 +423,6 @@
 		625246261F772C46007398F4 /* sbmesh.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246201F772C46007398F4 /* sbmesh.pb.cc */; };
 		625246271F772C46007398F4 /* sbmotion.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246221F772C46007398F4 /* sbmotion.pb.cc */; };
 		625246281F772C46007398F4 /* sbutilities.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 625246241F772C46007398F4 /* sbutilities.pb.cc */; };
-		625246321F775B95007398F4 /* Smartbody.h in Headers */ = {isa = PBXBuildFile; fileRef = 625246301F775B95007398F4 /* Smartbody.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		625246391F775D2A007398F4 /* SBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 625246381F775D2A007398F4 /* SBViewController.swift */; };
 		6252463A1F7761AE007398F4 /* libsbmobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 620204A91F6DCD4F004BBA67 /* libsbmobile.a */; };
 		6252463B1F7761AE007398F4 /* libsmartbody-lib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6202FAC61F6DA958004BBA67 /* libsmartbody-lib.a */; };
 		6252463D1F77628A007398F4 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252463C1F77628A007398F4 /* Accelerate.framework */; };
@@ -449,9 +447,11 @@
 		625246631F7762CB007398F4 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246521F7762CB007398F4 /* libsndfile.a */; };
 		625246651F77633C007398F4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246641F77633C007398F4 /* OpenAL.framework */; };
 		629B5E1E1F781BEC000B66E3 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E1D1F781BEC000B66E3 /* GLKit.framework */; };
-		629B5E261F783064000B66E3 /* SBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 629B5E241F783064000B66E3 /* SBContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		629B5E271F783064000B66E3 /* SBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 629B5E251F783064000B66E3 /* SBContext.mm */; };
 		629B5E291F784CED000B66E3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E281F784CED000B66E3 /* AVFoundation.framework */; };
+		62D546F71F7B2CE3001B14E9 /* SBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D546F11F7B2CB6001B14E9 /* SBContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		62D546F81F7B2CE3001B14E9 /* Smartbody.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D546F41F7B2CB6001B14E9 /* Smartbody.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		62D546F91F7B2CEA001B14E9 /* SBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 62D546F21F7B2CB6001B14E9 /* SBContext.mm */; };
+		62D546FA1F7B2CEE001B14E9 /* SBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D546F31F7B2CB6001B14E9 /* SBViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1414,9 +1414,6 @@
 		625246241F772C46007398F4 /* sbutilities.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbutilities.pb.cc; sourceTree = "<group>"; };
 		625246251F772C46007398F4 /* sbutilities.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbutilities.pb.h; sourceTree = "<group>"; };
 		6252462E1F775B95007398F4 /* Smartbody.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Smartbody.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		625246301F775B95007398F4 /* Smartbody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Smartbody.h; sourceTree = "<group>"; };
-		625246311F775B95007398F4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		625246381F775D2A007398F4 /* SBViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBViewController.swift; sourceTree = "<group>"; };
 		6252463C1F77628A007398F4 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		6252463E1F776291007398F4 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		625246401F776298007398F4 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -1439,9 +1436,12 @@
 		625246521F7762CB007398F4 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../build/output/iphoneos/lib/libsndfile.a; sourceTree = "<group>"; };
 		625246641F77633C007398F4 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		629B5E1D1F781BEC000B66E3 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		629B5E241F783064000B66E3 /* SBContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SBContext.h; sourceTree = "<group>"; };
-		629B5E251F783064000B66E3 /* SBContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SBContext.mm; sourceTree = "<group>"; };
 		629B5E281F784CED000B66E3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		62D546F01F7B2CB6001B14E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		62D546F11F7B2CB6001B14E9 /* SBContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBContext.h; sourceTree = "<group>"; };
+		62D546F21F7B2CB6001B14E9 /* SBContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBContext.mm; sourceTree = "<group>"; };
+		62D546F31F7B2CB6001B14E9 /* SBViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBViewController.swift; sourceTree = "<group>"; };
+		62D546F41F7B2CB6001B14E9 /* Smartbody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Smartbody.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2130,7 +2130,7 @@
 			children = (
 				6202FAC81F6DA958004BBA67 /* smartbody-lib */,
 				620204AA1F6DCD4F004BBA67 /* sbmobile */,
-				6252462F1F775B95007398F4 /* Smartbody */,
+				62D546EF1F7B2CB6001B14E9 /* Framework */,
 				6202FAC71F6DA958004BBA67 /* Products */,
 				62F2B77C1F733EB3001915B5 /* Frameworks */,
 			);
@@ -2595,16 +2595,16 @@
 			path = protocols;
 			sourceTree = SOURCE_ROOT;
 		};
-		6252462F1F775B95007398F4 /* Smartbody */ = {
+		62D546EF1F7B2CB6001B14E9 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
-				625246301F775B95007398F4 /* Smartbody.h */,
-				625246311F775B95007398F4 /* Info.plist */,
-				625246381F775D2A007398F4 /* SBViewController.swift */,
-				629B5E241F783064000B66E3 /* SBContext.h */,
-				629B5E251F783064000B66E3 /* SBContext.mm */,
+				62D546F01F7B2CB6001B14E9 /* Info.plist */,
+				62D546F11F7B2CB6001B14E9 /* SBContext.h */,
+				62D546F21F7B2CB6001B14E9 /* SBContext.mm */,
+				62D546F31F7B2CB6001B14E9 /* SBViewController.swift */,
+				62D546F41F7B2CB6001B14E9 /* Smartbody.h */,
 			);
-			path = Smartbody;
+			path = Framework;
 			sourceTree = "<group>";
 		};
 		62F2B77C1F733EB3001915B5 /* Frameworks */ = {
@@ -2644,8 +2644,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				625246321F775B95007398F4 /* Smartbody.h in Headers */,
-				629B5E261F783064000B66E3 /* SBContext.h in Headers */,
+				62D546F81F7B2CE3001B14E9 /* Smartbody.h in Headers */,
+				62D546F71F7B2CE3001B14E9 /* SBContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3216,8 +3216,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				629B5E271F783064000B66E3 /* SBContext.mm in Sources */,
-				625246391F775D2A007398F4 /* SBViewController.swift in Sources */,
+				62D546F91F7B2CEA001B14E9 /* SBContext.mm in Sources */,
+				62D546FA1F7B2CEE001B14E9 /* SBViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3251,6 +3251,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
 				INSTALL_PATH = /lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -3260,6 +3271,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
 				INSTALL_PATH = /lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -3432,6 +3454,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
 				INSTALL_PATH = /lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
@@ -3445,6 +3478,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
 				INSTALL_PATH = /lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
@@ -3477,7 +3521,17 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Smartbody/Info.plist;
+				HEADER_SEARCH_PATHS = (
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
+				INFOPLIST_FILE = Framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "../build/output/$(PLATFORM_NAME)/lib";
@@ -3488,6 +3542,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
+				USE_HEADERMAP = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3516,7 +3571,17 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Smartbody/Info.plist;
+				HEADER_SEARCH_PATHS = (
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include",
+					"$(SB_BUILD_ROOT)/$(PLATFORM_NAME)/include/python2.7",
+					"$(SB_SRC_ROOT)/SmartBody/src",
+					"$(SB_SRC_ROOT)/steersuite-1.3/steerlib/include",
+					"$(SB_SRC_ROOT)/steersuite-1.3/external",
+					"$(SB_SRC_ROOT)/steersuite-1.3/pprAI/include",
+					"$(SB_SRC_ROOT)/ode/include",
+					"$(SRCROOT)/../sbmobile",
+				);
+				INFOPLIST_FILE = Framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "../build/output/$(PLATFORM_NAME)/lib";
@@ -3525,6 +3590,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
+				USE_HEADERMAP = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};

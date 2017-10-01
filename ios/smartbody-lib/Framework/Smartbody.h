@@ -2,7 +2,7 @@
 //  Smartbody.h
 //  Smartbody
 //
-//  Created by Anton Leuski on 9/23/17.
+//  Created by Anton Leuski on 9/26/17.
 //  Copyright © 2017 Smartbody Project. All rights reserved.
 //
 
@@ -17,4 +17,3 @@ FOUNDATION_EXPORT const unsigned char SmartbodyVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <Smartbody/PublicHeader.h>
 
 #import <Smartbody/SBContext.h>
-
