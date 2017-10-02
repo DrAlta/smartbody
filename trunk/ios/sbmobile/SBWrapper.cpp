@@ -458,6 +458,72 @@ extern "C"
     //SmartBody::util::log("After drawLights");
   }
   
+  void SBDrawFrameAR(int width, int height, ESContext *esContext, SrMat modelViewMat, SrMat projMat)
+{
+	static bool initShader = false;
+	static bool firstRender = true;
+	if (!initShader)
+	{
+		//SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
+		SBInitGraphics(esContext);
+		initShader = true;
+	}
+
+
+	UserData *userData = (UserData*)esContext->userData;
+	ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	// setup textures
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+	texm.updateTexture();
+
+	// clear background	
+	SBSetupDrawing(width, height, esContext);
+
+	SBUpdateCharacterGPUSkin();
+	//cam.print();
+	// setup view
+	if (firstRender)
+	{
+		SrCamera& cam = *scene->getActiveCamera();
+		float aspectRatio = float(width) / float(height);
+		cam.setAspectRatio(aspectRatio);
+		//SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+		firstRender = false;
+	}
+
+
+
+	SrMat matModelView, matMVP;
+	matModelView = modelViewMat;
+	matMVP = matModelView * projMat;
+	//use the shape program object
+	//SmartBody::util::log("Before use program");
+	glUseProgram(shapeData->programObject);
+	//SmartBody::util::log("After use program");
+	glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
+	glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
+	//SmartBody::util::log("Before draw pawns");
+	SBDrawPawns(esContext);
+	// Use the program object
+	//SmartBody::util::log("Before userData useProgram");
+	glUseProgram(userData->programObject);
+	glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
+	glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
+	//SmartBody::util::log("Before SBDrawCharacters_ES20");
+	SBDrawCharacters_ES20(esContext);
+	//SBDrawCharacterGPUSkin(esContext);
+	//draw lights
+	//SmartBody::util::log("After SBDrawCharacters_ES20");
+	drawLights(esContext);
+
+	// draw background
+	SBDrawBackground(esContext);	
+}
+
+
+  
   void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
   {
     glEnable(GL_DEPTH_TEST);
