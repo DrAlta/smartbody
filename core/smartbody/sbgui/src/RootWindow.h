@@ -43,10 +43,6 @@ class SbmCharacter;
 #endif
 #define NO_OGRE_VIEWER_CMD 0
 
-#if USE_OGRE_VIEWER > 0
-#include "FLTKOgreViewer.h"
-#endif
-
 class CharacterCreatorWindow;
 class ResolutionWindow;
 
@@ -75,12 +71,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		SbmCharacter* getSelectedCharacter();
       void ResetScene();
 
-#if USE_OGRE_VIEWER > 0
-		FLTKOgreWindow* ogreViewer;
 		FltkViewer* customViewer;
-#else
-		FltkViewer* customViewer;
-#endif
 		FltkViewer* curViewer;
 
 		int _layoutMode;

@@ -122,7 +122,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc140-mt-gd-1_59.lib;boost_system-vc140-mt-gd-1_59.lib;boost_regex-vc140-mt-gd-1_59.lib;boost_python-vc140-mt-gd-1_59.lib;OpenAL32.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;python27.lib;OgreMain_d.lib;OgreRTShaderSystem_d.lib;OIS_d.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;Pinocchio_d.lib;PolyVoxCore_d.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc140-mt-gd-1_59.lib;boost_system-vc140-mt-gd-1_59.lib;boost_regex-vc140-mt-gd-1_59.lib;boost_python-vc140-mt-gd-1_59.lib;OpenAL32.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;python27.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;Pinocchio_d.lib;PolyVoxCore_d.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\SmartBody\src\external\glew;..\..\smartbody\lib;..\..\SmartBody\src\external\protobuf\lib\Debug;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\external\Pinocchio\lib;..\external\cegui-0.8.7\lib;..\external\PolyVox\build\lib;..\external\fltk-1.3.4-1\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\OgreSDK\lib\debug;..\..\..\..\lib\boost\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\ode\lib;..\..\clapack\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\..\core\smartbody\Python27\libs;..\..\..\..\lib\festival\festival\src\lib;..\..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -400,7 +400,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbgui\bin
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc140-mt-1_59.lib;boost_system-vc140-mt-1_59.lib;boost_regex-vc140-mt-1_59.lib;boost_python-vc140-mt-1_59.lib;dbghelp.lib;opengl32.lib;glu32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;OgreMain.lib;OgreRTShaderSystem.lib;OIS.lib;CEGUIBase-0.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;Pinocchio.lib;PolyVoxCore.lib;steerlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc140-mt-1_59.lib;boost_system-vc140-mt-1_59.lib;boost_regex-vc140-mt-1_59.lib;boost_python-vc140-mt-1_59.lib;dbghelp.lib;opengl32.lib;glu32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;CEGUIBase-0.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;Pinocchio.lib;PolyVoxCore.lib;steerlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\SmartBody\src\external\glew;..\..\smartbody\lib;..\..\SmartBody\src\external\protobuf\lib\Release;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\external\cegui-0.8.7\lib;..\external\polyvox\build\lib;..\external\Pinocchio\lib;..\external\fltk-1.3.4-1\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\lib\festival\speech_tools\lib;..\..\..\..\lib\festival\festival\src\lib;..\..\..\..\lib\cerevoice\cerevoice\lib;..\..\..\..\lib\cerevoice\cerevoice_eng\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\sbm-ui\channelbufferviewer\lib;..\..\clapack\lib;..\..\ode\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\..\core\smartbody\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -668,12 +668,9 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp" />
     <ClCompile Include="..\src\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp" />
-    <ClCompile Include="..\src\EmbeddedOgre.cpp" />
-    <ClCompile Include="..\src\ExampleFrameListener.cpp" />
     <ClCompile Include="..\src\ExportWindow.cpp" />
     <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp" />
     <ClCompile Include="..\src\FLTKListener.cpp" />
-    <ClCompile Include="..\src\FLTKOgreViewer.cpp" />
     <ClCompile Include="..\src\fltk_viewer.cpp" />
     <ClCompile Include="..\src\flu\FluSimpleString.cpp" />
     <ClCompile Include="..\src\flu\Flu_Button.cpp" />
@@ -686,7 +683,6 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
     <ClCompile Include="..\src\motioneditor\MotionEditorWindow.cpp" />
     <ClCompile Include="..\src\ObjectManipulationHandle.cpp" />
-    <ClCompile Include="..\src\OgreFrameListener.cpp" />
     <ClCompile Include="..\src\panimationviewer\ErrorVisualization.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp" />
@@ -733,7 +729,6 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClCompile Include="..\src\ppm.cpp" />
     <ClCompile Include="..\src\SBGUIManager.cpp" />
     <ClCompile Include="..\src\sbm_main.cpp" />
-    <ClCompile Include="..\src\SBOgreListener.cpp" />
     <ClCompile Include="..\src\SBRenderer.cpp" />
     <ClCompile Include="..\src\SBSelectionManager.cpp" />
     <ClCompile Include="..\src\SBWindowListener.cpp" />
@@ -752,12 +747,9 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h" />
     <ClInclude Include="..\src\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\CharacterCreatorWindow.h" />
-    <ClInclude Include="..\src\EmbeddedOgre.h" />
-    <ClInclude Include="..\src\ExampleFrameListener.h" />
     <ClInclude Include="..\src\ExportWindow.h" />
     <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h" />
     <ClInclude Include="..\src\FLTKListener.h" />
-    <ClInclude Include="..\src\FLTKOgreViewer.h" />
     <ClInclude Include="..\src\fltk_viewer.h" />
     <ClInclude Include="..\src\flu\FluSimpleString.h" />
     <ClInclude Include="..\src\flu\Flu_Button.h" />
@@ -772,7 +764,6 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />
     <ClInclude Include="..\src\motioneditor\MotionEditorWindow.h" />
     <ClInclude Include="..\src\ObjectManipulationHandle.h" />
-    <ClInclude Include="..\src\OgreFrameListener.h" />
     <ClInclude Include="..\src\panimationviewer\ErrorVisualization.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h" />
@@ -817,7 +808,6 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClInclude Include="..\src\glfont2.h" />
     <ClInclude Include="..\src\pic.h" />
     <ClInclude Include="..\src\SBGUIManager.h" />
-    <ClInclude Include="..\src\SBOgreListener.h" />
     <ClInclude Include="..\src\SBRenderer.h" />
     <ClInclude Include="..\src\SBSelectionManager.h" />
     <ClInclude Include="..\src\SBWindowListener.h" />

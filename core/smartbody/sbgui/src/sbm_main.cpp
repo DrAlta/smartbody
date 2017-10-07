@@ -69,10 +69,6 @@
 #include <vhmsg.h>
 #endif
 
-#if USE_OGRE_VIEWER > 0
-#include "FLTKOgreViewer.h"
-#endif
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
