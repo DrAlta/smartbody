@@ -250,21 +250,6 @@
     <ClCompile Include="..\src\flu\Flu_Button.cpp">
       <Filter>flu</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EmbeddedOgre.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SBOgreListener.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\FLTKOgreViewer.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\ExampleFrameListener.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\OgreFrameListener.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\autorig\SBAutoRigManager.cpp">
       <Filter>autorig</Filter>
     </ClCompile>
@@ -493,21 +478,6 @@
     </ClInclude>
     <ClInclude Include="..\src\flu\FluSimpleString.h">
       <Filter>flu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EmbeddedOgre.h">
-      <Filter>viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SBOgreListener.h">
-      <Filter>viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\FLTKOgreViewer.h">
-      <Filter>viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ExampleFrameListener.h">
-      <Filter>viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\OgreFrameListener.h">
-      <Filter>viewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h">
       <Filter>autorig</Filter>
