@@ -65,7 +65,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   return self;
 }
 
-- (NSNumber* _Nullable)intValue {
+- (NSNumber* _Nullable)numberWithInt {
 #ifndef SB_NO_PYTHON
   try {
     return [NSNumber numberWithInteger:boost::python::extract<int>(self->object)];
@@ -76,7 +76,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   return nil;
 }
 
-- (NSNumber* _Nullable)boolValue {
+- (NSNumber* _Nullable)numberWithBool {
 #ifndef SB_NO_PYTHON
   try {
     return [NSNumber numberWithBool:boost::python::extract<bool>(self->object)];
@@ -87,7 +87,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   return nil;
 }
 
-- (NSNumber* _Nullable)floatValue {
+- (NSNumber* _Nullable)numberWithFloat {
 #ifndef SB_NO_PYTHON
   try {
     return [NSNumber numberWithFloat:boost::python::extract<float>(self->object)];
@@ -209,12 +209,12 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   SBExecuteCmd([command UTF8String]);
 }
 
-- (void)executePythonWithCommand:(NSString * _Nonnull)command
+- (void)executePythonCommand:(NSString * _Nonnull)command
 {
   SBExecutePythonCmd([command UTF8String]);
 }
 
-- (SBPythonObject* _Nullable)returnValueFromPythonCommand:(NSString * _Nonnull)command
+- (SBPythonObject* _Nullable)evaluatePythonCommand:(NSString * _Nonnull)command
 {
 #ifndef SB_NO_PYTHON
   try
