@@ -9,11 +9,15 @@
 import UIKit
 import GLKit
 import AVFoundation
- 
+
+extension GLKView {
+  open var drawableSize: CGSize {
+    return CGSize(width: drawableWidth, height: drawableHeight)
+  }
+}
+
 open class SBViewController: GLKViewController, GLKViewControllerDelegate {
-  private var _reloadTexture = true
   private var _time: TimeInterval = 0
-  private var _lastSize = CGSize()
   private var _audioWasPlaying = false
   
   open var context: SBContext?
@@ -23,7 +27,7 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
   }
   
   open func setupOpenGL() {
-    
+    context?.reloadTexture()
   }
 
   open func teardownOpenGL() {
@@ -40,42 +44,36 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
       fatalError("view must be a subclass of GLKView")
     }
     
-    glview.delegate = self;
-    glview.drawableColorFormat = .RGBA8888
-    glview.drawableDepthFormat = .format16
-    
     guard let context = makeOpenGLContext() else {
       fatalError("failed to initialize OpenGL context")
     }
-
+    
+    glview.delegate = self;
+    glview.drawableColorFormat = .RGBA8888
+    glview.drawableDepthFormat = .format16
     glview.context = context
-    EAGLContext.setCurrent(context)
+    glview.bindDrawable()
+
     setupOpenGL()
   }
   
   deinit {
-    if let context = (self.view as? GLKView)?.context {
-      EAGLContext.setCurrent(context)
+    if let glview = self.view as? GLKView {
+      glview.bindDrawable()
       teardownOpenGL()
     }
   }
   
+  open override func glkView(_ view: GLKView, drawIn rect: CGRect) {
+    glEnable(GLenum(GL_DEPTH_TEST))
+    glClearColor(1.0, 0.0, 0.0, 1.0)
+    glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+    context?.drawFrame(size: view.drawableSize)
+  }
+
   open override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
-  }
-  
-  open override func glkView(_ view: GLKView, drawIn rect: CGRect) {
-    let size = CGSize(width: view.drawableWidth, height: view.drawableHeight)
-    if _lastSize != size {
-      _lastSize = size
-      context?.setupDrawing(size: size)
-    }
-    if _reloadTexture {
-      context?.reloadTexture()
-      _reloadTexture = false
-    }
-    context?.drawFrame()
   }
   
   open override func viewDidLayoutSubviews() {
