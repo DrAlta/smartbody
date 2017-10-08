@@ -44,11 +44,7 @@
 #include "Shader.h"
 
 #if defined(ANDROID_BUILD)
-//#include <EGL/egl.h>
-//#include <GLES/gl.h>
 #include <GLES3/gl3.h>
-//#include "wes.h"
-//#include "wes_gl.h"
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES3/gl.h>
 #include <OpenGLES/ES3/glext.h>
@@ -347,6 +343,10 @@ extern "C"
   }
   
   void SBInitGraphics(ESContext *esContext) {
+    static bool initShader = false;
+    if (initShader) { return; }
+    initShader = true;
+    
     SmartBody::util::log("Before shaderInit");
     shaderInit(esContext);
     SmartBody::util::log("After shaderInit");
@@ -368,66 +368,34 @@ extern "C"
     
   }
   
-  void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView) {
-    //SmartBody::util::log("draw!");
-    static bool initShader = false;
-    static bool firstRender = true;
-    if (!initShader)
-    {
-      //SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
-      SBInitGraphics(esContext);
-      initShader = true;
-    }
-    
+  static void _SBDrawFrame_ES20(int width, int height, ESContext *esContext,
+                                const SrMat& matModelView,
+                                const SrMat& matPerspective)
+  {
+    SBInitGraphics(esContext);
     
     UserData *userData = (UserData*) esContext->userData;
     ShapeData *shapeData = (ShapeData*) esContext->shapeData;
-    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     
     // setup textures
     SbmTextureManager& texm = SbmTextureManager::singleton();
     texm.updateTexture();
     
-    
-    bool useRenderTarget = false;
-    if (useRenderTarget)
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
-    SrCamera& cam = *scene->getActiveCamera();
-    // clear background
-    //glClearColor( 0.0f,0.0f,0.0f,1.0f );
-    //glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
+//    bool useRenderTarget = false;
+//    if (useRenderTarget)
+//      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
+
     SBSetupDrawing(width, height, esContext);
-    glClearColor(0.33f, 0.78f, 0.95f, 1.f);
-    
-    glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
-    // draw background
-    SBDrawBackground(esContext);
-    
-    //cam.print();
-    // setup view
-    //if (firstRender)
-    {
-      float aspectRatio = float(width) / float(height);
-      cam.setAspectRatio(aspectRatio);
-      //SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
-      firstRender = false;
-    }
-    
-    SrMat matPerspective, matModelView;
-    cam.get_perspective_mat(matPerspective);
-    cam.get_view_mat(matModelView);
-    matModelView *= cam.getScale();
-    matModelView = matModelView*eyeView;
+    // ??? SBUpdateCharacterGPUSkin();
+
     //glViewport( 0, 0, width, height);
     SrMat matMVP = matModelView * matPerspective;
     //use the shape program object
     //SmartBody::util::log("Before use program");
     glUseProgram (shapeData->programObject );
     //SmartBody::util::log("After use program");
-    glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
-    glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
+    glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, matModelView.data());
+    glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, matMVP.data());
     //SmartBody::util::log("Before draw grid");
     //drawGrid(esContext);
     //SmartBody::util::log("Before draw pawns");
@@ -435,8 +403,8 @@ extern "C"
     // Use the program object
     //SmartBody::util::log("Before userData useProgram");
     glUseProgram ( userData->programObject );
-    glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
-    glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
+    glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, matModelView.data());
+    glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, matMVP.data());
     //SmartBody::util::log("Before SBDrawCharacters_ES20");
     SBDrawCharacters_ES20(esContext);
     //drawSkeleton(esContext);
@@ -444,85 +412,44 @@ extern "C"
     //SmartBody::util::log("After SBDrawCharacters_ES20");
     drawLights(esContext);
     //SmartBody::util::log("SBDrawFrame_ES20::drawRenderTarget");
-    if (useRenderTarget)
-    {
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-      /*
-       glEnable(GL_DEPTH_TEST);
-       glClearColor(0.0, 0.0, 0.0, 1.0);
-       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       drawBackgroundTexID(esContext->fboTexID, esContext);
-       */
-      SBDrawFBOTex_ES20(width, height, esContext, eyeView);
-    }
+//    if (useRenderTarget)
+//    {
+//      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+//      /*
+//       glEnable(GL_DEPTH_TEST);
+//       glClearColor(0.0, 0.0, 0.0, 1.0);
+//       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//       drawBackgroundTexID(esContext->fboTexID, esContext);
+//       */
+//      SBDrawFBOTex_ES20(width, height, esContext, eyeView);
+//    }
     //SmartBody::util::log("After drawLights");
   }
   
-  void SBDrawFrameAR(int width, int height, ESContext *esContext, SrMat modelViewMat, SrMat projMat)
-{
-	static bool initShader = false;
-	static bool firstRender = true;
-	if (!initShader)
-	{
-		//SmartBody::util::log("Shader not initialized, run SBInitGraphics.");
-		SBInitGraphics(esContext);
-		initShader = true;
-	}
+  void SBDrawFrame_ES20(int width, int height,
+                        ESContext *esContext, SrMat eyeView)
+  {
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    SrCamera& cam = *scene->getActiveCamera();
+    
+    float aspectRatio = float(width) / float(height);
+    cam.setAspectRatio(aspectRatio);
+    //SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
 
+    SrMat matPerspective, matModelView;
+    cam.get_perspective_mat(matPerspective);
+    cam.get_view_mat(matModelView);
+    matModelView *= cam.getScale();
+    matModelView = matModelView*eyeView;
 
-	UserData *userData = (UserData*)esContext->userData;
-	ShapeData *shapeData = (ShapeData*)esContext->shapeData;
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-
-	// setup textures
-	SbmTextureManager& texm = SbmTextureManager::singleton();
-	texm.updateTexture();
-
-	// clear background	
-	SBSetupDrawing(width, height, esContext);
-
-	SBUpdateCharacterGPUSkin();
-	//cam.print();
-	// setup view
-	if (firstRender)
-	{
-		SrCamera& cam = *scene->getActiveCamera();
-		float aspectRatio = float(width) / float(height);
-		cam.setAspectRatio(aspectRatio);
-		//SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
-		firstRender = false;
-	}
-
-
-
-	SrMat matModelView, matMVP;
-	matModelView = modelViewMat;
-	matMVP = matModelView * projMat;
-	//use the shape program object
-	//SmartBody::util::log("Before use program");
-	glUseProgram(shapeData->programObject);
-	//SmartBody::util::log("After use program");
-	glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
-	glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
-	//SmartBody::util::log("Before draw pawns");
-	SBDrawPawns(esContext);
-	// Use the program object
-	//SmartBody::util::log("Before userData useProgram");
-	glUseProgram(userData->programObject);
-	glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
-	glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
-	//SmartBody::util::log("Before SBDrawCharacters_ES20");
-	SBDrawCharacters_ES20(esContext);
-	//SBDrawCharacterGPUSkin(esContext);
-	//draw lights
-	//SmartBody::util::log("After SBDrawCharacters_ES20");
-	drawLights(esContext);
-
-	// draw background
-	SBDrawBackground(esContext);	
-}
-
-
+    _SBDrawFrame_ES20(width, height, esContext, matModelView, matPerspective);
+  }
+  
+  void SBDrawFrameAR(int width, int height, ESContext *esContext,
+                     const SrMat& modelViewMat, const SrMat& projMat)
+  {
+    _SBDrawFrame_ES20(width, height, esContext, modelViewMat, projMat);
+  }
   
   void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
   {
