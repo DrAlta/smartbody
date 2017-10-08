@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-
+#import <simd/matrix_types.h>
 #if !defined(SWIFT_WARN_UNUSED_RESULT)
 # if __has_attribute(warn_unused_result)
 #  define SWIFT_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
@@ -48,7 +48,11 @@ __attribute__((objc_subclassing_restricted))
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL;
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL delegate:(id<SBContextDelegate> _Nullable)delegate OBJC_DESIGNATED_INITIALIZER;
 - (void)setupDrawingWithSize:(CGSize)size NS_SWIFT_NAME(setupDrawing(size:)); 
-- (void)drawFrame;
+- (void)drawFrame:(CGSize)size NS_SWIFT_NAME(drawFrame(size:));
+- (void)drawFrame:(CGSize)size
+  modelViewMatrix:(matrix_float4x4)modelViewMatrix
+ projectionMatrix:(matrix_float4x4)projectionMatrix
+     gazeAtCamera:(BOOL)gazeAtCamera NS_SWIFT_NAME(drawFrame(size:modelViewMatrix:projectionMatrix:gazeAtCamera:));
 - (void)reloadTexture;
 - (void)update:(NSTimeInterval)time;
 - (void)executeWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));

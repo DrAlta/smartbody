@@ -14,6 +14,7 @@
 #pragma clang diagnostic ignored "-Wcomma"
 
 #include <sb/SBScene.h>
+#include <sb/SBPawn.h>
 #include <sb/SBSceneListener.h>
 #include <sbm/GPU/SbmTexture.h>
 
@@ -32,7 +33,8 @@ struct SceneListener : public SmartBody::SBSceneListener {
 @interface SBContext () <AVAudioPlayerDelegate> {
   SceneListener _sceneListener;
   ESContext esContext;
-	int curH, curW;
+  CGSize lastSize;
+  BOOL reloadTexture;
 }
 - (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
 - (void)stopSound;
@@ -61,6 +63,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   static dispatch_once_t onceToken;
   if (self = [super init]) {
     dispatch_once(&onceToken, ^{
+      self->reloadTexture = true;
       self.delegate = delegate;
       
       SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -85,22 +88,50 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 
 - (void)setupDrawingWithSize:(CGSize)size
 {
+  if (CGSizeEqualToSize(lastSize, size)) { return; }
+  lastSize = size;
   esContext.width = size.width;
   esContext.height = size.height;
   SBSetupDrawing(size.width,size.height, &esContext);
-  curW = size.width;
-  curH = size.height;
 }
 
-- (void)drawFrame
+- (void)drawFrame:(CGSize)size
 {
+  [self setupDrawingWithSize:size];
   SrMat identity;
   //SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
-  SBDrawFrame_ES20(curW, curH, &esContext, identity);
+  SBDrawFrame_ES20((int)size.width, (int)size.height,
+                   &esContext, identity);
+}
+
+- (void)drawFrame:(CGSize)size
+  modelViewMatrix:(matrix_float4x4)modelViewMatrix
+ projectionMatrix:(matrix_float4x4)projectionMatrix
+     gazeAtCamera:(BOOL)gazeAtCamera
+{
+  [self setupDrawingWithSize:size];
+  // Warning: we are relying on the storage models to be the same.
+  SrMat modelView((const float*)&modelViewMatrix);
+  SrMat projection((const float*)&projectionMatrix);
+  
+  SBDrawFrameAR((int)size.width, (int)size.height,
+                &esContext, modelView, projection);
+  
+  if (!gazeAtCamera) { return; }
+  
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  if (!scene) { return; }
+  SmartBody::SBPawn* gazeTarget = scene->getPawn("None");
+  
+  SrMat invModelView = modelView.inverse();
+  SrVec newGazePos = invModelView.get_translation();
+  gazeTarget->setPosition(newGazePos);
 }
 
 - (void)reloadTexture
 {
+  if (!self->reloadTexture) { return; }
+  self->reloadTexture = false;
   SBInitGraphics(&esContext);
   SbmTextureManager& texm = SbmTextureManager::singleton();
   texm.reloadTexture();
