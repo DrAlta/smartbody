@@ -548,11 +548,11 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 #if !defined(__native_client__)
     //SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
     GLuint iType = GL_TEXTURE_2D;
-#if !defined(EMSCRIPTEN)    //OpenGL ES 2.0 no EMUN for GL_TEXTURE_2D
+#if !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE)   //OpenGL ES 2.0 no EMUN for GL_TEXTURE_2D
     myGLEnable(GL_TEXTURE_2D);
 #endif
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-#if !defined(EMSCRIPTEN)
+#if !defined(EMSCRIPTEN) && !defined(__ANDROID__) && !defined(SB_IPHONE)
     myGLEnable(iType);	
 #endif
 
