@@ -44,6 +44,12 @@ extern "C"
   void SBExecuteCmd(const char* command);
   void SBExecutePythonCmd(const char* command);
   void SBCameraOperation(float dx, float dy, int cameraMode);
+  
+  bool SBPythonCommandVoid(const char * command);
+  bool SBPythonCommandBool(const char * command);
+  int SBPythonCommandInt(const char * command);
+  float SBPythonCommandFloat(const char * command);
+  void SBPythonCommandString(const char * command, char * output, int maxLen);
 #if __cplusplus
 }
 #endif

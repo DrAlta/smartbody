@@ -936,6 +936,94 @@ void SBCloseVHMSGConnection()
   vhmsg::ttu_close();
 }
 
+bool SBPythonCommandVoid( const char * command)
+{
+#ifndef SB_NO_PYTHON
+   return SmartBody::SBScene::getScene()->run(command);
+#else
+   return false;
+#endif
+}
+
+bool SBPythonCommandBool( const char * command )
+{
+#ifndef SB_NO_PYTHON
+   try
+   {
+      boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command, mainDict);
+      bool result = boost::python::extract<bool>(mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return false;
+   }
+#else
+   return false;
+#endif
+}
+
+int SBPythonCommandInt( const char * command )
+{
+#ifndef SB_NO_PYTHON
+   try
+   {
+      boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command, mainDict);
+      int result = boost::python::extract<int>(mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return 0;
+   }
+#else
+   return 0;
+#endif
+}
+
+float SBPythonCommandFloat( const char * command )
+{
+#ifndef SB_NO_PYTHON
+   try
+   {
+      boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command, mainDict);
+      float result = boost::python::extract<float>(mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return 0;
+   }
+#else
+   return 0;
+#endif
+}
+
+void SBPythonCommandString( const char * command, char * output, int maxLen)
+{
+#ifndef SB_NO_PYTHON
+   try
+   {
+      boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command, mainDict);
+      std::string result = boost::python::extract<std::string>(mainDict["ret"]);
+      strncpy(output, result.c_str(), maxLen);
+   }
+   catch (...)
+   {
+      PyErr_Print();
+   }
+#else
+   return;
+#endif
+}
+
 
 #endif
 
