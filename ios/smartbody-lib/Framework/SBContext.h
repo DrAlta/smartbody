@@ -40,9 +40,9 @@
 @class AVAudioPlayer;
 
 @interface SBPythonObject : NSObject
-@property (nonatomic, strong, readonly) NSNumber* _Nullable intValue;
-@property (nonatomic, strong, readonly) NSNumber* _Nullable boolValue;
-@property (nonatomic, strong, readonly) NSNumber* _Nullable floatValue;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable numberWithInt;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable numberWithBool;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable numberWithFloat;
 @property (nonatomic, strong, readonly) NSString* _Nullable stringValue;
 @end
 
@@ -62,8 +62,8 @@ __attribute__((objc_subclassing_restricted))
      gazeAtCamera:(BOOL)gazeAtCamera NS_SWIFT_NAME(drawFrame(size:modelViewMatrix:projectionMatrix:gazeAtCamera:));
 - (void)reloadTexture;
 - (void)update:(NSTimeInterval)time;
-- (void)executePythonWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(run(script:));
-- (SBPythonObject* _Nullable)returnValueFromPythonCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));
+- (void)executePythonCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(run(script:));
+- (SBPythonObject* _Nullable)evaluatePythonCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));
 - (void)cameraOperationWithDx:(float)dx dy:(float)dy mode:(NSInteger)mode NS_SWIFT_NAME(cameraOperation(dx:dy:mode:));
 - (NSInteger)intForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (NSString * _Nonnull)stringForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;

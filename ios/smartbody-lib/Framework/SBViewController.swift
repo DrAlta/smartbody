@@ -16,6 +16,12 @@ extension GLKView {
   }
 }
 
+extension SBPythonObject {
+  public var intValue: Int? { return self.numberWithInt?.intValue }
+  public var boolValue: Bool? { return self.numberWithBool?.boolValue }
+  public var floatValue: Float? { return self.numberWithFloat?.floatValue }
+}
+
 open class SBViewController: GLKViewController, GLKViewControllerDelegate {
   private var _time: TimeInterval = 0
   private var _audioWasPlaying = false
@@ -50,7 +56,7 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
     
     glview.delegate = self;
     glview.drawableColorFormat = .RGBA8888
-    glview.drawableDepthFormat = .format16
+    glview.drawableDepthFormat = .format24
     glview.context = context
     glview.bindDrawable()
 
