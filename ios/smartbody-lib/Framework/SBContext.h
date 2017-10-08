@@ -40,10 +40,10 @@
 @class AVAudioPlayer;
 
 @interface SBPythonObject : NSObject
-- (NSNumber* _Nullable)intValue;
-- (NSNumber* _Nullable)boolValue;
-- (NSNumber* _Nullable)floatValue;
-- (NSString* _Nullable)stringValue;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable intValue;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable boolValue;
+@property (nonatomic, strong, readonly) NSNumber* _Nullable floatValue;
+@property (nonatomic, strong, readonly) NSString* _Nullable stringValue;
 @end
 
 // make it final
