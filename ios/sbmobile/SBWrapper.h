@@ -28,6 +28,8 @@ extern "C"
   
   void SBDrawFrame_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
   void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
+  void SBDrawFrameAR(int width, int height, ESContext *esContext,
+                     const SrMat& modelViewMat, const SrMat& projMat);
   void SBDrawCharacters_ES20(ESContext *esContext);
   void SBDrawBackground(ESContext* esContext);
   void SBDrawPawns(ESContext *esContext);
