@@ -39,6 +39,13 @@
 
 @class AVAudioPlayer;
 
+@interface SBPythonObject : NSObject
+- (NSNumber* _Nullable)intValue;
+- (NSNumber* _Nullable)boolValue;
+- (NSNumber* _Nullable)floatValue;
+- (NSString* _Nullable)stringValue;
+@end
+
 // make it final
 __attribute__((objc_subclassing_restricted))
 @interface SBContext : NSObject
@@ -55,8 +62,8 @@ __attribute__((objc_subclassing_restricted))
      gazeAtCamera:(BOOL)gazeAtCamera NS_SWIFT_NAME(drawFrame(size:modelViewMatrix:projectionMatrix:gazeAtCamera:));
 - (void)reloadTexture;
 - (void)update:(NSTimeInterval)time;
-- (void)executeWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));
-- (void)executePythonWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(pythonCommand:));
+- (void)executePythonWithCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(run(script:));
+- (SBPythonObject* _Nullable)returnValueFromPythonCommand:(NSString * _Nonnull)command NS_SWIFT_NAME(execute(command:));
 - (void)cameraOperationWithDx:(float)dx dy:(float)dy mode:(NSInteger)mode NS_SWIFT_NAME(cameraOperation(dx:dy:mode:));
 - (NSInteger)intForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (NSString * _Nonnull)stringForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;

@@ -50,6 +50,68 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   }
 }
 
+@interface SBPythonObject () {
+  boost::python::object object;
+}
+
+@end
+
+@implementation SBPythonObject
+- (nonnull instancetype)initWith:(const boost::python::object&)object
+{
+  if (self = [super init]) {
+    self->object = object;
+  }
+  return self;
+}
+
+- (NSNumber* _Nullable)intValue {
+#ifndef SB_NO_PYTHON
+  try {
+    return [NSNumber numberWithInteger:boost::python::extract<int>(self->object)];
+  } catch (...) {
+    PyErr_Print();
+  }
+#endif
+  return nil;
+}
+
+- (NSNumber* _Nullable)boolValue {
+#ifndef SB_NO_PYTHON
+  try {
+    return [NSNumber numberWithBool:boost::python::extract<bool>(self->object)];
+  } catch (...) {
+    PyErr_Print();
+  }
+#endif
+  return nil;
+}
+
+- (NSNumber* _Nullable)floatValue {
+#ifndef SB_NO_PYTHON
+  try {
+    return [NSNumber numberWithFloat:boost::python::extract<float>(self->object)];
+  } catch (...) {
+    PyErr_Print();
+  }
+#endif
+  return nil;
+}
+
+- (NSString* _Nullable)stringValue {
+#ifndef SB_NO_PYTHON
+  try {
+    std::string result = boost::python::extract<std::string>(self->object);
+    return [NSString stringWithUTF8String:result.c_str()];
+  } catch (...) {
+    PyErr_Print();
+  }
+#endif
+  return nil;
+}
+
+@end
+
 @implementation SBContext
 
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL
@@ -150,6 +212,22 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 - (void)executePythonWithCommand:(NSString * _Nonnull)command
 {
   SBExecutePythonCmd([command UTF8String]);
+}
+
+- (SBPythonObject* _Nullable)returnValueFromPythonCommand:(NSString * _Nonnull)command
+{
+#ifndef SB_NO_PYTHON
+  try
+  {
+    boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+    return [[SBPythonObject alloc] initWith:boost::python::eval([command UTF8String], mainDict)];
+  }
+  catch (...)
+  {
+    PyErr_Print();
+  }
+#endif
+  return nil;
 }
 
 - (void)cameraOperationWithDx:(float)dx dy:(float)dy mode:(NSInteger)mode
