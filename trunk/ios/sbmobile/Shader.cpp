@@ -1111,7 +1111,7 @@ extern "C"
 		//SmartBody::util::log("meshScale = %f", shape->getMeshScale());
 		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
 
-		if (shape->_deformPosBuf.size() > 0)
+		if (shape->_deformPosBuf.size() > 0 && userData->positionLoc >= 0)
 		{
 			glEnableVertexAttribArray(userData->positionLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
@@ -1120,7 +1120,7 @@ extern "C"
 			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
 		}
 
-		if (mesh->normalBuf.size () > 0)
+		if (mesh->normalBuf.size () > 0 && userData->normalLoc >= 0)
 		{
 			glEnableVertexAttribArray(userData->normalLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
@@ -1129,7 +1129,7 @@ extern "C"
 		}
 
 
-        if (mesh->tangentBuf.size () > 0)
+        if (mesh->tangentBuf.size () > 0 && userData->tangentLoc >= 0)
         {
             glEnableVertexAttribArray(userData->tangentLoc);
             glBindBuffer(GL_ARRAY_BUFFER, userData->meshTangentObject);
@@ -1138,7 +1138,7 @@ extern "C"
         }
 
 		//load the texture coordinates
-		if (mesh->texCoordBuf.size() > 0)
+		if (mesh->texCoordBuf.size() > 0 && userData->texCoordLoc >= 0)
 		{
 			glEnableVertexAttribArray(userData->texCoordLoc);
 			glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
