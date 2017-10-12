@@ -419,13 +419,12 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 								std::string tokenBlock = childNodeOfSkin->value();
 								float bindShapeMat[16];
 
-								boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
+								std::vector<std::string> tokens;
+								SmartBody::util::tokenize(tokenBlock, tokens, " \r\n");
 								int i = 0;
-								for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-									it != tokens.end();
-									++it)
+								for (size_t i = 0; i < tokens.size(); i++)
 								{
-									bindShapeMat[i] = (float)atof((*it).c_str());
+									bindShapeMat[i] = (float)atof(tokens[i].c_str());
 									i++;
 									if (i >= 16)
 										break;
@@ -456,20 +455,19 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 
 									std::string tokenBlock = realContentNode->value();
 
-									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
+									std::vector<std::string> tokens;
+									SmartBody::util::tokenize(tokenBlock, tokens, " \r\n");
 									int matCounter = 0;
 									float bindPosMat[16];
 									SrMat newMat;									
-									for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-										it != tokens.end();
-										++it)
+									for (size_t i = 0; i < tokens.size(); i++)
 									{
 										//if ( sourceId == bindJointName && realNodeName == "Name_array") // joint name
 										if ( isBindJointName && (realNodeName == "Name_array" || realNodeName == "IDREF_array") ) // joint name
 										{
-											std::string jointName = (*it);
+											std::string jointName = tokens[i];
 											// check if the joint name start with the pre-fix and remove the prefix
-											if ((*it).compare(0, jointPrefix.size(), jointPrefix) == 0)
+											if (tokens[i].compare(0, jointPrefix.size(), jointPrefix) == 0)
 											{
 												jointName.erase(0, jointPrefix.size());
 											}
@@ -479,11 +477,11 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 										}
 										//if ( sourceId == bindWeightName && realNodeName == "float_array") // joint weights
 										if ( isBindWeights && realNodeName == "float_array") // joint weights
-											skinWeight->bindWeight.push_back((float)atof((*it).c_str()));
+											skinWeight->bindWeight.push_back((float)atof(tokens[i].c_str()));
 										//if ( sourceId == bindPoseMatName && realNodeName == "float_array") // bind pose matrices
 										if ( isBindPoseMatrices && realNodeName == "float_array") // bind pose matrices
 										{
-											bindPosMat[matCounter] = (float)atof((*it).c_str());
+											bindPosMat[matCounter] = (float)atof(tokens[i].c_str());
 											matCounter ++;
 											if (matCounter == 16)
 											{
@@ -512,26 +510,23 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 									std::string indexNodeName = indexNode->name();
 									std::string tokenBlock = indexNode->value();
 
-									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
+									std::vector<std::string> tokens;
+									SmartBody::util::tokenize(tokenBlock, tokens, " \r\n");
 
 									if (indexNodeName == "vcount")
 									{
-										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-											it != tokens.end();
-											++it)
+										for (size_t i = 0; i < tokens.size(); i++)
 										{
-											skinWeight->numInfJoints.push_back(atoi((*it).c_str()));
+											skinWeight->numInfJoints.push_back(atoi(tokens[i].c_str()));
 										}
 									}
 									else if (indexNodeName == "v")
 									{
-										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-											it != tokens.end();
-											++it)
+										for (size_t i = 0; i < tokens.size(); i++)
 										{
-											skinWeight->jointNameIndex.push_back(atoi((*it).c_str()));
-											it++;
-											skinWeight->weightIndex.push_back(atoi((*it).c_str()));
+											skinWeight->jointNameIndex.push_back(atoi(tokens[i].c_str()));
+											i++;
+											skinWeight->weightIndex.push_back(atoi(tokens[i].c_str()));
 										}
 									}
 									else
@@ -576,13 +571,12 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 										std::vector<std::string> refMesh;
 										refMesh.push_back(morphName);	// first one is the base shape
 										std::string tokenBlock = childNodeOfSource->value();
-										boost::char_separator<char> sep2(" \n");
-										boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep2);
-										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-											it != tokens.end();
-											++it)
+
+										std::vector<std::string> tokens;
+										SmartBody::util::tokenize(tokenBlock, tokens, " \r\n");										
+										for (size_t i = 0; i < tokens.size(); i++)
 										{
-											refMesh.push_back((*it));
+											refMesh.push_back(tokens[i]);
 										}
 										mesh->morphTargets.insert(make_pair(controllerId, refMesh));
 									}
@@ -2263,23 +2257,27 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					//size_t numTokens = splitter.NumTokens();
 					
 					std::string floatString = floatNode->value();
-					boost::char_separator<char> sep(" \n");
-					boost::tokenizer<boost::char_separator<char> > tokens(floatString, sep);
+					std::vector<std::string> tokens;
+					SmartBody::util::tokenize(floatString, tokens, " \r\n");
 					
 					floatArrayMap[sourceID] = std::vector<SrVec>();			
 					//for (size_t c = 0; c < numTokens; c++)
-					for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-							it != tokens.end();
-							)
+					for (size_t i = 0; i < tokens.size(); )
 					{
 						int nstep = stride > 3 ? 3 : stride;
 						SrVec tempV;
 						for (int k=0;k<nstep;k++)
 						{
-							tempV[k] = (float)atof((*it).c_str());
-							//tempV[k] = (float)atof(splitter.GetToken(c));
+							if (i < tokens.size())
+								tempV[k] = (float)atof(tokens[i].c_str());
+							else
+							{
+								SmartBody::util::log("Out of range when parsing dae: %d", tokens.size());
+								tempV[k] = 0.0f;
+							}
+ 							//tempV[k] = (float)atof(splitter.GetToken(c));
 
-							it++;
+							i++;
 							//c++;
 							//if (c >= numTokens)
 								//break;
@@ -2476,19 +2474,19 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 
 					pStride += 1;
 					boost::char_separator<char> sep(" \n");
-					boost::tokenizer<boost::char_separator<char> > tokens(pString, sep);
-					boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+
+					std::vector<std::string> tokens;
+					SmartBody::util::tokenize(pString, tokens, " \r\n");
 					//TextLineSplitterFast splitter(strlen(pString));
 					//splitter.SplitLine(pString, ' ');
 					int index = 0;
-					for (int i = 0; i < count; i++)
+					for (int c = 0; c < count; c++)
 					{
 						std::vector<int> fVec;
 						std::vector<int> ftVec;
 						std::vector<int> fnVec;
-						if (i >= count)
-							break;
-						for (int j = 0; j < vcountList[i]; j++)
+
+						for (int j = 0; j < vcountList[c]; j++)
 						{
 							//if (i >= count)
 								//break;
@@ -2498,21 +2496,21 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 								if (semantic == "VERTEX")
 								{
 									if (vertexSemantics.find("POSITION") != vertexSemantics.end())																								
-										fVec.push_back(atoi((*it).c_str()));
+										fVec.push_back(atoi(tokens[index].c_str()));
 										//fVec.push_back(atoi(splitter.GetToken(i)));
 
 									if (vertexSemantics.find("NORMAL") != vertexSemantics.end())
-										fnVec.push_back(atoi((*it).c_str()));									
+										fnVec.push_back(atoi(tokens[index].c_str()));
 										//fnVec.push_back(atoi(splitter.GetToken(i)));									
 								}
 								if (semantic == "TEXCOORD")
-									ftVec.push_back(atoi((*it).c_str()));
+									ftVec.push_back(atoi(tokens[index].c_str()));
 									//ftVec.push_back(atoi(splitter.GetToken(i)));
 
 								if (semantic == "NORMAL" && vertexSemantics.find("NORMAL") == vertexSemantics.end())
-									fnVec.push_back(atoi((*it).c_str()));
+									fnVec.push_back(atoi(tokens[index].c_str()));
 									//fnVec.push_back(atoi(splitter.GetToken(i)));
-								it++;
+
 								//i++;
 								//if (i >= count)
 									//break;
