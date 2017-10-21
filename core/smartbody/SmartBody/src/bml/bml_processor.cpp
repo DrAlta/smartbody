@@ -187,7 +187,8 @@ BML::Processor::Processor()
 	bml_feedback( false ),
 	ct_speed_min( CONTROLLER_SPEED_MIN_DEFAULT ),
 	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT ),
-	requestcb(NULL)
+	requestcb(NULL),
+	idCounter(1)
 {
 	//BMLDefs* bmlDefs = new BMLDefs();
 	BMLDefs bmlDefs;
