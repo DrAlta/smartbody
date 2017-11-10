@@ -27,7 +27,7 @@
 
 struct SceneListener : public SmartBody::SBSceneListener {
   void OnLogMessage( const std::string & message ) override;
-  SBContext * _context;
+  __weak SBContext * _context;
 };
 
 @interface SBContext () <AVAudioPlayerDelegate> {
@@ -43,7 +43,7 @@ struct SceneListener : public SmartBody::SBSceneListener {
 static SBContext *sharedInstance = nil;
 
 void SceneListener::OnLogMessage( const std::string & message ) {
-  id<SBContextDelegate> del = sharedInstance.delegate;
+  id<SBContextDelegate> del = _context.delegate;
   if (del) {
     [del context:sharedInstance
              log:[NSString stringWithUTF8String: message.c_str()]];
@@ -146,6 +146,15 @@ void SceneListener::OnLogMessage( const std::string & message ) {
     });
   }
   return sharedInstance;
+}
+
+- (void)dealloc
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  if (scene) {
+    _sceneListener._context = nil;
+    scene->removeSceneListener(&_sceneListener);
+  }
 }
 
 - (void)setupDrawingWithSize:(CGSize)size
