@@ -38,7 +38,7 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	setEnable(false);
 	setName("Realtime");
 	createBoolAttribute("debug", false, true, "Basic", 60, false, false, false, "Show debugging information.");
-	createActionAttribute("dumpData", true, "Basic", 60, false, false, false, "Dump the faceshift data.");
+	createActionAttribute("dumpData", true, "Basic", 60, false, false, false, "Dump the realtime data.");
 #if USE_PERCEPTIONNEURON > 0
 	createBoolAttribute("usePerceptionNeuron", false, true, "Perception Neuron", 10, false, false, false, "Uses the Perception Neuron interface.");
 	createStringAttribute("perceptionNeuronIP", "127.0.0.1", true, "Perception Neuron", 20, false, false, false, "Perception Neuron server IP.");
@@ -124,6 +124,7 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	this->setChannelNames(strstr.str());
 
 #endif
+	useFrame = false;
 }
 
 SBRealtimeManager::~SBRealtimeManager()
@@ -191,6 +192,8 @@ void SBRealtimeManager::setChannelNames(const std::string& channels)
 	channelTable.clear();
 	channelNames.clear();
 
+	useFrame = false;
+
 	std::vector<std::string> tokens;
 	SmartBody::util::tokenize(channels, tokens, " ");
 	
@@ -198,6 +201,58 @@ void SBRealtimeManager::setChannelNames(const std::string& channels)
 	{
 		channelNames.push_back(tokens[c]);
 		channelTable.insert(std::pair<std::string, std::string>(tokens[c], ""));
+	}
+}
+
+void SBRealtimeManager::setChannelMetadata(const std::string& channelsandamountsperchannel)
+{
+	channelMetadataMap.clear();
+	channelMetadataOrder.clear();
+
+	useFrame = true;
+
+	std::vector<std::string> tokens;
+	SmartBody::util::tokenize(channelsandamountsperchannel, tokens, " ");
+
+	int curIndex = 0;
+	for (size_t c = 0; c < tokens.size(); c++)
+	{
+		std::string& channelName = tokens[c];
+		if (c + 1 < tokens.size())
+		{
+			int numParams = atoi(tokens[c + 1].c_str());
+			if (numParams < 1)
+			{
+				SmartBody::util::log("Params needs to contain a value > 0: %s", channelsandamountsperchannel.c_str());
+			}
+
+			channelIndexStruct s;
+			s.index = curIndex;
+			s.size = numParams;
+
+			channelMetadataMap.insert(std::pair<std::string, channelIndexStruct>(channelName, s));
+			channelMetadataOrder.push_back(channelName);
+			curIndex += numParams;
+		}
+		else
+		{
+			SmartBody::util::log("Metadata needs to contain (channelname numparams): %s", channelsandamountsperchannel.c_str());
+		}
+		c++;
+	}
+}
+
+void SBRealtimeManager::setDataFrame(const std::string& frameDataStr)
+{
+	std::vector<std::string> tokens;
+	SmartBody::util::tokenize(frameDataStr, tokens, " ");
+	if (frameData.size() < tokens.size())
+		frameData.resize(tokens.size());
+
+	for (size_t t = 0; t < tokens.size(); t++)
+	{
+		double val = atof(tokens[t].c_str());
+		frameData[t] = val;
 	}
 }
 
@@ -238,6 +293,24 @@ std::string SBRealtimeManager::getData(const std::string& channel)
 SrQuat SBRealtimeManager::getDataQuat(const std::string& channel)
 {
 	SrQuat quat;
+
+	if (useFrame)
+	{
+		// get the index of the channel
+		std::map<std::string, channelIndexStruct>::iterator iter = channelMetadataMap.find(channel);
+		if (iter == channelMetadataMap.end())
+			return quat;
+		if ((*iter).second.size != 4)
+			return quat;
+		int index = (*iter).second.index;
+		double w = frameData[index];
+		double x = frameData[index + 1];
+		double y = frameData[index + 2];
+		double z = frameData[index + 2];
+		quat.set((float)w, (float)x, (float)y, (float)z);
+		return quat;
+	}
+
 	std::string data = getData(channel);
 	if (data == "")
 		return quat;
@@ -260,6 +333,21 @@ SrQuat SBRealtimeManager::getDataQuat(const std::string& channel)
 SrMat SBRealtimeManager::getDataMat(const std::string& channel)
 {
 	SrMat mat;
+
+	if (useFrame)
+	{
+		// get the index of the channel
+		std::map<std::string, channelIndexStruct>::iterator iter = channelMetadataMap.find(channel);
+		if (iter == channelMetadataMap.end())
+			return mat;
+		if ((*iter).second.size != 16)
+			return mat;
+		int index = (*iter).second.index;
+		for (int m = 0; m < 16; m++)
+			mat.set(m, (float)frameData[index + m]);
+		return mat;
+	}
+	
 	std::string data = getData(channel);
 	if (data == "")
 		return mat;
@@ -278,6 +366,23 @@ SrMat SBRealtimeManager::getDataMat(const std::string& channel)
 SrVec SBRealtimeManager::getDataVec(const std::string& channel)
 {
 	SrVec vec;
+
+	if (useFrame)
+	{
+		// get the index of the channel
+		std::map<std::string, channelIndexStruct>::iterator iter = channelMetadataMap.find(channel);
+		if (iter == channelMetadataMap.end())
+			return vec;
+		if ((*iter).second.size != 3)
+			return vec;
+		int index = (*iter).second.index;
+		vec[0] = (float) frameData[index];
+		vec[1] = (float) frameData[index + 1];
+		vec[2] = (float) frameData[index + 2];
+		return vec;
+	}
+
+
 	std::string data = getData(channel);
 	if (data == "")
 		return vec;
@@ -298,6 +403,16 @@ SrVec SBRealtimeManager::getDataVec(const std::string& channel)
 
 double SBRealtimeManager::getDataDouble(const std::string& channel)
 {
+	if (useFrame)
+	{
+		// get the index of the channel
+		std::map<std::string, channelIndexStruct>::iterator iter = channelMetadataMap.find(channel);
+		if (iter == channelMetadataMap.end())
+			return 0.0;
+		int index = (*iter).second.index;
+		return frameData[index];
+	}
+
 	double val = 0.0;
 	std::string data = getData(channel);
 	if (data == "")
@@ -310,6 +425,16 @@ double SBRealtimeManager::getDataDouble(const std::string& channel)
 
 int SBRealtimeManager::getDataInt(const std::string& channel)
 {
+	if (useFrame)
+	{
+		// get the index of the channel
+		std::map<std::string, channelIndexStruct>::iterator iter = channelMetadataMap.find(channel);
+		if (iter != channelMetadataMap.end())
+			return 0;
+		int index = (*iter).second.index;
+		return (int) frameData[index];
+	}
+
 	int val = 0;
 	std::string data = getData(channel);
 	if (data == "")
