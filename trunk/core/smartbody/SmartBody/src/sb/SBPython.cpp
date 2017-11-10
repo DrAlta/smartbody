@@ -427,6 +427,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getDataMat", &SBRealtimeManager::getDataMat, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a matrix.")
 		.def("getDataDouble", &SBRealtimeManager::getDataDouble, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a double.")
 		.def("getDataInt", &SBRealtimeManager::getDataInt, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as an integer.")
+
+		.def("setChannelMetadata", &SBRealtimeManager::setChannelMetadata, "Sets metadata describing the channels - name and data quantity.")
+		.def("setDataFrame", &SBRealtimeManager::setDataFrame, "Sets data per frame based on the channel metadata.")
 		;
 
 

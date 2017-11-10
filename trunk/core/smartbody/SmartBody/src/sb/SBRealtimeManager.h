@@ -56,9 +56,14 @@ class SBRealtimeManager : public SBService
 		SBAPI virtual void start();
 		SBAPI virtual void stop();
 
+		// string-based data
 		SBAPI virtual void setChannelNames(const std::string& names);
 		SBAPI std::vector<std::string>& getChannelNames();
-		
+
+		// floating point data
+		SBAPI virtual void setChannelMetadata(const std::string& names);
+		SBAPI virtual void setDataFrame(const std::string& frameData);
+				
 		SBAPI void notify(SBSubject* subject);
 
 		SBAPI void initConnection();
@@ -84,9 +89,23 @@ class SBRealtimeManager : public SBService
 #endif
 
 	protected:
+		// string-based data
 		std::vector<std::string> blendShapeNames;
 		std::map<std::string, std::string> channelTable;
 		std::vector<std::string> channelNames;
+
+		// floating point data
+		struct channelIndexStruct
+		{
+			int index;
+			int size;
+		};
+		std::map<std::string, channelIndexStruct> channelMetadataMap;
+		std::vector<std::string> channelMetadataOrder;
+		bool useFrame;
+
+		std::vector<channelIndexStruct> channelDataIndex;
+		std::vector<double> frameData;
 #if USE_PERCEPTIONNEURON > 0
 		SOCKET_REF m_sockTCPRef;
 		SOCKET_REF m_sockUDPRef;
