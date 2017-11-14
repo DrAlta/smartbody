@@ -535,8 +535,9 @@ void SBDrawFrameAR(int width, int height, ESContext *esContext, SrMat modelViewM
 	//SmartBody::util::log("After SBDrawCharacters_ES20");
 	drawLights(esContext);
 
-	// draw background
-	SBDrawBackground(esContext);	
+
+	// No background rendering in AR Mode
+	//SBDrawBackground(esContext);	
 }
 
 
@@ -551,11 +552,14 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 		SBInitGraphics(esContext);
         initShader = true;
 	}
+	//return;
 
 
 	UserData *userData = (UserData*) esContext->userData;
 	ShapeData *shapeData = (ShapeData*) esContext->shapeData;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SrVec backgroundColor = scene->getVec3Attribute("GUI.BackgroundColor");
+	
 
 	// setup textures
 	SbmTextureManager& texm = SbmTextureManager::singleton();
@@ -565,9 +569,9 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//ssm.buildShaders();
 
 
-	bool useRenderTarget = true;
-	if (useRenderTarget)
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
+	//bool useRenderTarget = false;
+	//if (useRenderTarget)
+	//	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 	SrCamera& cam = *scene->getActiveCamera();
 	// clear background
 	//glClearColor( 0.0f,0.0f,0.0f,1.0f );
@@ -577,13 +581,16 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 
 	if (!drawAR)
 	{
-		glClearColor(0.33f, 0.78f, 0.95f, 1.f);
+		//glClearColor(0.33f, 0.78f, 0.95f, 1.f);
+		//SmartBody::util::log("Background color = %f %f %f", backgroundColor[0], backgroundColor[1], backgroundColor[2]);
+		glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1.f);
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
 
 	SBUpdateCharacterGPUSkin();
+	
 
 	
 	
@@ -603,7 +610,8 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	cam.get_perspective_mat(matPerspective);
 	cam.get_view_mat(matModelView);
 	matModelView *= cam.getScale();
-	matModelView = matModelView*eyeView;
+	//matModelView = matModelView*eyeView;
+	matModelView = eyeView*matModelView;
 	//glViewport( 0, 0, width, height);
 	SrMat matMVP = matModelView * matPerspective;
 	//use the shape program object
@@ -632,22 +640,26 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	SBDrawBackground(esContext);
 
 	//SmartBody::util::log("SBDrawFrame_ES20::drawRenderTarget");
+	/*
 	if (useRenderTarget)
 	{
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);		
 		SBDrawFBOTex_ES20(width, height, esContext, eyeView);
 	}
+	*/
 	//SmartBody::util::log("After drawLights");
 }
 
-void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView)
+void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView, int texID)
 {
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	//glViewport( 0, 0, w, h);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SrVec2 texScale = SrVec2(1,1), texOffset = SrVec2(0,0);
-	drawBackgroundTexID(esContext->fboTexID, texScale, texOffset, esContext);
+	if (texID == -1) 
+		texID = esContext->fboTexID;
+	drawBackgroundTexID(texID, texScale, texOffset, esContext);
 }
 
 void SBUpdateCharacterGPUSkin()

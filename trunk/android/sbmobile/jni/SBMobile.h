@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <sr/sr_vec.h>
+#include <sr/sr_mat.h>
 #include <sb/SBTypes.h>
 void initSBMobilePythonModule();
 
@@ -28,7 +29,9 @@ public:
 
 	// Handle screen touch event
 	void resize(int w, int h);
+	void setTransformMatrces(SrMat& mv, SrMat& proj);
 	SrVec convertScreenSpaceTo3D(float x, float y, SrVec ground, SrVec upVector);
+	SrVec convertScreenSpaceTo3DAR(float x, float y, SrVec ground, SrVec upVector);
 	std::string testCharacterIntersection(float x, float y, std::string charName);
 
 	virtual bool eventScreenTouch(int action, float x, float y);
@@ -50,6 +53,7 @@ public:
   
 protected:
 	int screenWidth, screenHeight;
+	SrMat modelViewMat, projMat;
 #if defined(__ANDROID__)
 	jstring stringToJString(const std::string& str);
 #endif

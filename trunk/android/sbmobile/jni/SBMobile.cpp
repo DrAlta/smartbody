@@ -32,7 +32,7 @@
 
 #if defined(__ANDROID__)
 #include <GLES3/gl3.h>
-#elseif defined(SB_IPHONE)
+#elif defined(SB_IPHONE)
 #include <OpenGLES/ES3/gl.h>
 #include <OpenGLES/ES3/glext.h>
 #endif
@@ -72,7 +72,8 @@ BOOST_PYTHON_MODULE(SBMobile)
 		.def("stopVideo", &SBMobile::stopVideo, "Stop the video playback.")			
 		.def("playSound", &SBMobile::playSound, "Playback a sound file.") // Sound API
 		.def("stopSound", &SBMobile::stopSound, "Stop the sound playback.")
-		.def("convertScreenSpaceTo3D", &SBMobile::convertScreenSpaceTo3D, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")				
+		.def("convertScreenSpaceTo3D", &SBMobile::convertScreenSpaceTo3D, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")			
+		.def("convertScreenSpaceTo3DAR", &SBMobile::convertScreenSpaceTo3DAR, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")
 		.def("testCharacterIntersection", &SBMobile::testCharacterIntersection, boost::python::return_value_policy<boost::python::return_by_value>(), "Test intersection with a character.")						
 		.def("snapshotPNGResize", &SBMobile::snapshotPNGResize, "Save the current image to png file.")
 		.def("eventScreenTouch", &SBMobile::eventScreenTouch, &SBMobileWrap::default_eventScreenTouch, "Event called when the screen is touched.")
@@ -108,6 +109,13 @@ void SBMobile::resize( int w, int h )
 	screenWidth = w;
 	screenHeight = h;	
 	
+}
+
+
+void SBMobile::setTransformMatrces(SrMat& mv, SrMat& proj)
+{
+	modelViewMat = mv;
+	projMat = proj;
 }
 
 std::string SBMobile::testCharacterIntersection(float x, float y, std::string charName)
@@ -165,7 +173,36 @@ SrVec SBMobile::convertScreenSpaceTo3D(float x, float y, SrVec ground, SrVec upV
 	SrVec dest, src;				
 	SrPlane plane(ground, upVector);
 	dest = plane.intersect(p1, p2);
+	SmartBody::util::log("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+	SmartBody::util::log("touchPos = %f %f %f", dest[0], dest[1], dest[2]);
 	return dest;
+}
+
+
+SrVec SBMobile::convertScreenSpaceTo3DAR(float x, float y, SrVec ground, SrVec upVector)
+{
+	float screenX, screenY;
+	screenX = (float)(x*2.f) / screenWidth - 1.f;
+	screenY = (float)(y*2.f) / screenHeight - 1.f;
+	screenY *= -1.0;
+
+	SrMat invModelView = modelViewMat.inverse();
+	SrVec newUp = upVector*invModelView.get_rotation();
+	SrMat invMVP = (modelViewMat*projMat).inverse();
+
+	float nearPlane = 0.1f, farPlane = 100.f;
+
+	SrVec p1 = SrVec(screenX, screenY, nearPlane);
+	SrVec p2 = SrVec(screenX, screenY, farPlane);
+	p1 = p1*invMVP;
+	p2 = p2*invMVP;
+
+	SrPlane plane(ground, newUp);
+	SrVec dest = plane.intersect(p1, p2);
+	//SmartBody::util::log("AR mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+	//SmartBody::util::log("AR touchPos = %f %f %f", dest[0], dest[1], dest[2]);
+	return dest;
+
 }
 
 bool SBMobile::eventScreenTouch(int action, float x, float y)
