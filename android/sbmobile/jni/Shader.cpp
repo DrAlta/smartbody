@@ -309,8 +309,8 @@ extern "C"
                     
                     "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
                     "   mat3 tangentMat;                                                \n"
-                    "   tangentMat[0] = (uMVMatrix * vec4(aTangent,0.0)).xyz;            \n"
-                    "   tangentMat[2] = (uMVMatrix * vec4(aNormal,0.0)).xyz;           \n"
+					"   tangentMat[0] = normalize((uMVMatrix * vec4(aTangent,0.0)).xyz);            \n"
+					"   tangentMat[2] = normalize((uMVMatrix * vec4(aNormal,0.0)).xyz);           \n"
                     "   tangentMat[1] = cross(tangentMat[0], tangentMat[2]);            \n"
                     "   vec3 eyeVec = normalize(vertexPos*tangentMat);                  \n"
                     "   for (int i=0;i<numOfLights;i++)                                \n"
@@ -1066,10 +1066,10 @@ extern "C"
 		//SmartBody::util::log("gpuMeshInstance = %x, gpuMesh = %x, VBODeformPos = %x", gpuMeshInstance, gpuMesh, gpuMeshInstance->getVBODeformPos());
 		if (!gpuMeshInstance->getVBODeformPos())
 		{
-			//SbmShaderProgram::printOglError("GPUMeshUpdate #0 ");
+			SbmShaderProgram::printOglError("GPUMeshUpdate #0 ");
 			//SmartBody::util::log("gpuMesh doesn't have VBODeformPos, initBuffer");
 			gpuMeshInstance->initBuffer();
-			//SbmShaderProgram::printOglError("GPUMeshUpdate #0.5 ");
+			SbmShaderProgram::printOglError("GPUMeshUpdate #0.5 ");
 		}
 
 		// update blendshapes
@@ -1086,14 +1086,14 @@ extern "C"
 		//SmartBody::util::log("Before start transform feedback");
 		glTransformFeedbackVaryings(skinningShader->getShaderProgram(), 3, attr, GL_SEPARATE_ATTRIBS);
 		glLinkProgram(skinningShader->getShaderProgram());
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #1 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #1 ");
 		//SmartBody::util::log("After skinningShader glLinkProgram");
 
 		glEnableVertexAttribArray(0);
 		//SmartBody::util::log("Before bind PosVBO, PosVBO = %x", gpuMesh->getPosVBO());
 		//SmartBody::util::log("VBO = %x, VBOID = %d", gpuMesh->getPosVBO()->VBO(), gpuMesh->getPosVBO()->VBO()->m_iVBO_ID);;
 		gpuMesh->getPosVBO()->VBO()->BindBuffer();
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #2 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #2 ");
 		//SmartBody::util::log("After bind PosVBO");
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
@@ -1108,11 +1108,11 @@ extern "C"
 		glEnableVertexAttribArray(4);
 		gpuMesh->getBoneWeightVBO()->VBO()->BindBuffer();
 		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #3 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #3 ");
 
 		//SmartBody::util::log("After setup glVertexAttribPointer");
 		glEnable(GL_RASTERIZER_DISCARD);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #3.0 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #3.0 ");
 		//gpuMeshInstance->updateTransformBuffer();
 		//SmartBody::util::log("After update transform buffer");
 		std::vector<SrMat>& transBuffer = gpuMeshInstance->getTransformBuffer();
@@ -1120,37 +1120,37 @@ extern "C"
 		SrVec meshScale = meshInstance->getMeshScale();
 		//SmartBody::util::log("Before glUseProgram, program = %d", skinningShader->getShaderProgram());		
 		glUseProgram(skinningShader->getShaderProgram());
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #3.1 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #3.1 ");
 		//SmartBody::util::log("Before set glUniformMatrix4fv");
 		glUniformMatrix4fv(glGetUniformLocation(skinningShader->getShaderProgram(), "Transform"), transBuffer.size(), true, (GLfloat*)getPtr(transBuffer));
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #3.2 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #3.2 ");
 		glUniform1f(glGetUniformLocation(skinningShader->getShaderProgram(), "meshScale"), meshScale[0]);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #3.3 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #3.3 ");
 		//SmartBody::util::log("After set glUniform");
 		// bind transform feedback buffer
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, gpuMeshInstance->getVBODeformPos()->VBO()->m_iVBO_ID);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #4 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #4 ");
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, gpuMeshInstance->getVBODeformNormal()->VBO()->m_iVBO_ID);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, gpuMeshInstance->getVBODeformTangent()->VBO()->m_iVBO_ID);
 		//SmartBody::util::log("After glBindBufferBase");
 
-		glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, queryName);
+		//glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, queryName);
 		glBeginTransformFeedback(GL_POINTS);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #5 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #5 ");
 		//SmartBody::util::log("before glDrawArrays");
 		glDrawArrays(GL_POINTS, 0, gpuMeshInstance->_deformPosBuf.size());
 		//glDrawArrays(GL_POINTS, 0, 100);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #6 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #6 ");
 		//SmartBody::util::log("After glDrawArrays");
 		glEndTransformFeedback();
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #7 ");
+		SbmShaderProgram::printOglError("GPUMeshUpdate #7 ");
 		//SmartBody::util::log("After glEndTrasnformFeedback");
-		glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);	
+		//glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);	
 		//SbmShaderProgram::printOglError("GPUMeshUpdate #8 ");
 
 		GLuint PrimitivesWritten = 100;
-		glGetQueryObjectuiv(queryName, GL_QUERY_RESULT, &PrimitivesWritten);
-		//SbmShaderProgram::printOglError("GPUMeshUpdate #9 ");
+		//glGetQueryObjectuiv(queryName, GL_QUERY_RESULT, &PrimitivesWritten);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #9 ");
 		//SmartBody::util::log("Query name = %d, Output transform feedback = %d", queryName, PrimitivesWritten);
 
 		glUseProgram(0);

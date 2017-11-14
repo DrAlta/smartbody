@@ -28,7 +28,7 @@ extern "C"
 
 	void SBDrawFrameAR(int w, int h, ESContext *esContext, SrMat modelViewMat, SrMat perspectiveMat);
     void SBDrawFrame_ES20(int w, int h, ESContext *esContext, SrMat eyeView, bool drawAR = false);
-    void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView);
+    void SBDrawFBOTex_ES20(int w, int h, ESContext *esContext, SrMat eyeView, int texID = -1);
 	void SBUpdateCharacterGPUSkin();
 	void SBDrawCharacterGPUSkin(ESContext *esContext);
     void SBDrawCharacters_ES20(ESContext *esContext);

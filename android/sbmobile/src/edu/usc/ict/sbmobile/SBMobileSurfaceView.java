@@ -19,6 +19,7 @@ package edu.usc.ict.sbmobile;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -100,7 +101,9 @@ public class SBMobileSurfaceView extends GLSurfaceView {
         		sbReloadTexture = false;
         	}
             //Log.e("myapp", "onDrawFrame");
-            SBMobileLib.render();
+            float [] identityMatrix = new float[16];
+            Matrix.setIdentityM(identityMatrix, 0);
+            SBMobileLib.render(identityMatrix);
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {

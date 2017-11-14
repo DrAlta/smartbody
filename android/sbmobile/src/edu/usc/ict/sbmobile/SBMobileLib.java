@@ -45,9 +45,9 @@ public class SBMobileLib {
      public static native void executeSB(String sbmCmd);
      public static native String getLog();
      public static native void step();
-     public static native void render();
+     public static native void render(float [] modelViewMat);
      public static native void renderAR(float [] modelViewMat, float [] projMat);
-     public static native void renderFBOTex(int width, int height);
+     public static native void renderFBOTex(int width, int height, int texID);
      public static native void renderCardboard(float eyeView[]);
      public static native void reloadTexture();
      public static native void surfaceChanged(int width, int height);
