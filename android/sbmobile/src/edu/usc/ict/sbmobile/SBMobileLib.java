@@ -23,7 +23,14 @@ import android.util.Log;
 
 public class SBMobileLib {
 
+    public static abstract class AudioCallback
+    {
+        public abstract void onAudioPlayback(String soundFile);
+    }
+
      static MediaPlayer _mediaPlayer = null;
+    static AudioCallback _audioCallback = null;
+
      static {
 		 //System.loadLibrary("js");
          System.loadLibrary("python2.7");
@@ -46,7 +53,7 @@ public class SBMobileLib {
      public static native String getLog();
      public static native void step();
      public static native void render(float [] modelViewMat);
-     public static native void renderAR(float [] modelViewMat, float [] projMat);
+     public static native void renderAR(float [] modelViewMat, float [] projMat, int updateGaze);
      public static native void renderFBOTex(int width, int height, int texID);
      public static native void renderCardboard(float eyeView[]);
      public static native void reloadTexture();
@@ -72,6 +79,11 @@ public class SBMobileLib {
             if (loopSound)
                 _mediaPlayer.setLooping(true);
             _mediaPlayer.start();
+            if (_audioCallback != null)
+            {
+                _audioCallback.onAudioPlayback(soundFile);
+            }
+
         } catch (Exception e) {
             Log.e("SBM", "SBMobileLib: Problem playing sound " + soundFile);
             e.printStackTrace();
@@ -86,6 +98,10 @@ public class SBMobileLib {
             _mediaPlayer.release();
             _mediaPlayer = null;
         }
+    }
+    public static void setAudioCallback(AudioCallback callback)
+    {
+        _audioCallback = callback;
     }
 
 

@@ -55,7 +55,7 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_surfaceChanged(JNIEnv * env, jobject obj,  jint width, jint height);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_step(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env, jobject obj, jfloatArray modelview);
-	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj);
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj, jint updateGaze);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height, jint texID);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
@@ -210,7 +210,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env
 	SBDrawFrame_ES20(curW, curH, &esContext, modelViewMat, false);
 }
 
-JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj)
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * env, jobject obj, jfloatArray modelview, jfloatArray proj, jint updateGaze)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if (!scene)
@@ -227,33 +227,46 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * e
 		return;
 	}
 	SrMat id;
-
 	SrMat modelViewMat, projMat;
 	jfloat *bodyf = env->GetFloatArrayElements(modelview, 0);
 	for (int i = 0; i < 16; i++)
 		modelViewMat[i] = bodyf[i];
-
 	jfloat *projf = env->GetFloatArrayElements(proj, 0);
 	for (int i = 0; i < 16; i++)
 		projMat[i] = projf[i];
+
+	
 
 	//SmartBody::util::log("render AR, scene = %d, sbInit = %d", scene, sbInit);
 	SBDrawFrameAR(curW, curH, &esContext, modelViewMat, projMat);
 
 	
 	SmartBody::SBPawn* gazeTarget = scene->getPawn("None");
+	
 
 
-	SrMat invModelView = modelViewMat.inverse();
-	SrVec newGazePos = invModelView.get_translation();
+	
 
 	SBMobile* engine = SBMobile::getSBMobile();
 	if (engine)
 	{
 		engine->setTransformMatrces(modelViewMat, projMat);
 	}
+	
+	if (!gazeTarget) return;
 
-	//gazeTarget->setPosition(newGazePos);
+	if (updateGaze == 1)
+	{
+		SrMat invModelView = modelViewMat.inverse();
+		SrVec newGazePos = invModelView.get_translation();
+		gazeTarget->setPosition(newGazePos); // update to new gaze
+	}
+	else
+	{
+		SrVec newGazePos = scene->getVec3Attribute("defaultGazePos");
+		gazeTarget->setPosition(newGazePos);
+	}
+
 	//SBDrawFrame_ES20(curW, curH, &esContext, id, true);
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	//SBDrawFrame_ES20(curW, curH, &esContext, id, true);
