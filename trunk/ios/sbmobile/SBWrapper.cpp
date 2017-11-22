@@ -808,14 +808,14 @@ extern "C"
   {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
-    SmartBody::util::log("%s\n", command);
+    // SmartBody::util::log("%s\n", command);
   }
   
   void SBExecutePythonCmd(const char* command)
   {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->run(command);
-    SmartBody::util::log("%s\n", command);
+    // SmartBody::util::log("%s\n", command);
   }
   
   

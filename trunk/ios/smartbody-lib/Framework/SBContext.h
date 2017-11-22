@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <simd/matrix_types.h>
+#import <simd/vector_types.h>
 #if !defined(SWIFT_WARN_UNUSED_RESULT)
 # if __has_attribute(warn_unused_result)
 #  define SWIFT_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
@@ -33,8 +34,9 @@
 
 @protocol SBContextDelegate <NSObject>
 - (void)context:(SBContext * _Nonnull)context log:(NSString * _Nonnull)message NS_SWIFT_NAME(context(_:log:));
-- (void)context:(SBContext * _Nonnull)context didStartPlayingAudioAtURL:(NSURL * _Nonnull)url NS_SWIFT_NAME(context(_:didStartPlayingAudioAtURL:));
-- (void)context:(SBContext * _Nonnull)context didFinishPlayingAudioAtURL:(NSURL * _Nonnull)url successfully:(BOOL)flag NS_SWIFT_NAME(context(_:didFinishPlayingAudioAtURL:successfully:));
+- (void)contextWillStartPlayingAudio:(SBContext * _Nonnull)context  NS_SWIFT_NAME(contextWillStartPlayingAudio(_:));
+- (void)contextDidStartPlayingAudio:(SBContext * _Nonnull)context  NS_SWIFT_NAME(contextDidStartPlayingAudio(_:));
+- (void)context:(SBContext * _Nonnull)context didFinishPlayingAudioSuccessfully:(BOOL)flag NS_SWIFT_NAME(context(_:didFinishPlayingAudioSuccessfully:));
 @end
 
 @class AVAudioPlayer;
@@ -70,4 +72,16 @@ __attribute__((objc_subclassing_restricted))
 - (BOOL)boolForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (double)doubleForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+
+- (matrix_float4x4)modelViewMatrix:(CGSize)size NS_SWIFT_NAME(modelViewMatrix(size:));
+- (matrix_float4x4)projectionMatrix:(CGSize)size NS_SWIFT_NAME(projectionMatrix(size:));
+- (matrix_float2x3)boundingBoxForCharacter:(NSString * _Nonnull)name NS_SWIFT_NAME(boundingBox(character:));
+- (matrix_float4x4)transformForJoint:(NSString * _Nonnull)joint
+                           character:(NSString * _Nonnull)character NS_SWIFT_NAME(transform(of:in:));
+- (void)setGazeTarget:(simd_float3)target forKey:(NSString * _Nonnull)name;
+- (simd_float3)gazeTargetForKey:(NSString * _Nonnull)name NS_SWIFT_NAME(gazeTarget(forKey:));
+- (void)drawFrame:(CGSize)size
+  modelViewMatrix:(matrix_float4x4)modelViewMatrix
+ projectionMatrix:(matrix_float4x4)projectionMatrix NS_SWIFT_NAME(drawFrame(size:modelViewMatrix:projectionMatrix:));
+
 @end
