@@ -13,16 +13,20 @@
 #pragma clang diagnostic ignored "-Wdocumentation"
 #pragma clang diagnostic ignored "-Wcomma"
 
-#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 #include <sb/SBPawn.h>
+#include <sb/SBScene.h>
 #include <sb/SBSceneListener.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sr/sr_camera.h>
 
 #import "SBMobile.h"
 #import "SBWrapper.h"
 
 #pragma clang diagnostic pop
 
+#import <simd/matrix.h>
 #import "SBContext.h"
 
 struct SceneListener : public SmartBody::SBSceneListener {
@@ -112,6 +116,18 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 
 @end
 
+static inline simd_float3 vector2vector(const SrVec& vec) {
+  simd_float3 vector;
+  memcpy(&vector, vec.data(), 3 * sizeof(float));
+  return vector;
+}
+
+static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
+  matrix_float4x4 matrix;
+  memcpy(&matrix, mat.data(), sizeof(float) * 16);
+  return matrix;
+}
+
 @implementation SBContext
 
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL
@@ -175,10 +191,77 @@ void SceneListener::OnLogMessage( const std::string & message ) {
                    &esContext, identity);
 }
 
+- (matrix_float4x4)modelViewMatrix:(CGSize)size
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  SrCamera& cam = *scene->getActiveCamera();
+  
+  float aspectRatio = size.width / size.height;
+  cam.setAspectRatio(aspectRatio);
+  //SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+  
+  SrMat matModelView;
+  cam.get_view_mat(matModelView);
+  matModelView *= cam.getScale();
+  return matrix2matrix(matModelView);
+}
+
+- (matrix_float4x4)projectionMatrix:(CGSize)size
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  SrCamera& cam = *scene->getActiveCamera();
+  
+  float aspectRatio = size.width / size.height;
+  cam.setAspectRatio(aspectRatio);
+  //SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+  
+  SrMat matPerspective;
+  cam.get_perspective_mat(matPerspective);
+  return matrix2matrix(matPerspective);
+}
+
+- (matrix_float2x3)boundingBoxForCharacter:(NSString*)name {
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  SrBox box = scene->getCharacter(name.UTF8String)->getBoundingBox();
+  matrix_float2x3 m;
+  m.columns[0].x = box.a.x;
+  m.columns[0].y = box.a.y;
+  m.columns[0].z = box.a.z;
+  m.columns[1].x = box.b.x;
+  m.columns[1].y = box.b.y;
+  m.columns[1].z = box.b.z;
+  return m;
+}
+
+- (matrix_float4x4)transformForJoint:(NSString*)joint
+                           character:(NSString*)character
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  return matrix2matrix(scene->getCharacter(character.UTF8String)
+                       ->getSkeleton()
+                       ->getJointByName(joint.UTF8String)
+                       ->getMatrixGlobal());
+}
+
+- (void)setGazeTarget:(simd_float3)target forKey:(NSString*)name
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  SmartBody::SBPawn* gazeTarget = scene->getPawn(name.UTF8String);
+  SrVec newGazePos((const float*)&target);
+  gazeTarget->setPosition(newGazePos);
+}
+
+- (simd_float3)gazeTargetForKey:(NSString*)name
+{
+  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+  SmartBody::SBPawn* gazeTarget = scene->getPawn(name.UTF8String);
+  SrVec target = gazeTarget->getPosition();
+  return vector2vector(target);
+}
+
 - (void)drawFrame:(CGSize)size
   modelViewMatrix:(matrix_float4x4)modelViewMatrix
  projectionMatrix:(matrix_float4x4)projectionMatrix
-     gazeAtCamera:(BOOL)gazeAtCamera
 {
   [self setupDrawingWithSize:size];
   // Warning: we are relying on the storage models to be the same.
@@ -187,16 +270,23 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   
   SBDrawFrameAR((int)size.width, (int)size.height,
                 &esContext, modelView, projection);
+}
+
+- (void)drawFrame:(CGSize)size
+  modelViewMatrix:(matrix_float4x4)modelViewMatrix
+ projectionMatrix:(matrix_float4x4)projectionMatrix
+     gazeAtCamera:(BOOL)gazeAtCamera
+{
+  [self drawFrame:size
+  modelViewMatrix:modelViewMatrix
+ projectionMatrix:projectionMatrix];
   
   if (!gazeAtCamera) { return; }
   
-  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-  if (!scene) { return; }
-  SmartBody::SBPawn* gazeTarget = scene->getPawn("None");
-  
-  SrMat invModelView = modelView.inverse();
-  SrVec newGazePos = invModelView.get_translation();
-  gazeTarget->setPosition(newGazePos);
+  matrix_float4x4 invModelView = simd_inverse(modelViewMatrix);
+  simd_float3 target;
+  memcpy(&target, ((const float*)&invModelView)+12, 3 * sizeof(float));
+  [self setGazeTarget:target forKey:@"None"];
 }
 
 - (void)reloadTexture
@@ -272,8 +362,9 @@ void SceneListener::OnLogMessage( const std::string & message ) {
   if (!self.audioPlayer) return;
   self.audioPlayer.delegate = self;
   self.audioPlayer.numberOfLoops = loop ? -1 : 0;
+  [self.delegate contextWillStartPlayingAudio:self];
   [self.audioPlayer play];
-  [self.delegate context:self didStartPlayingAudioAtURL:url];
+  [self.delegate contextDidStartPlayingAudio:self];
 }
 
 - (void)stopSound
@@ -285,7 +376,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 {
   NSURL* url = player.url;
   if (!url) return;
-  [self.delegate context:self didFinishPlayingAudioAtURL:url successfully:flag];
+  [self.delegate context:self didFinishPlayingAudioSuccessfully:flag];
 }
 
 @end
