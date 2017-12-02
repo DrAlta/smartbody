@@ -220,6 +220,8 @@ XMLCh* BMLDefs::ATTR_SCHEDULEMODE = NULL;
 XMLCh* BMLDefs::ATTR_BLENDMODE = NULL;
 XMLCh* BMLDefs::ATTR_TRANSITION_LENGTH = NULL;
 XMLCh* BMLDefs::ATTR_DIRECTPLAY = NULL;
+XMLCh* BMLDefs::ATTR_OVERLAY = NULL;
+
 
 ////// XML ATTRIBUTES
 XMLCh* BMLDefs::ATTR_VALUE = NULL;
@@ -604,6 +606,7 @@ BMLDefs::BMLDefs()
 	ATTR_SCHEDULEMODE = XMLString::transcode("sbm:schedule-mode");
 	ATTR_TRANSITION_LENGTH = XMLString::transcode("sbm:transition-length");
 	ATTR_DIRECTPLAY = XMLString::transcode("sbm:direct-play");
+	ATTR_OVERLAY = XMLString::transcode("overlay");
 
 	////// XML ATTRIBUTES
 	ATTR_VALUE   = XMLString::transcode("value");

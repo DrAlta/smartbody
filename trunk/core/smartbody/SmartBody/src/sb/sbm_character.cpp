@@ -186,6 +186,8 @@ basic_locomotion_ct(NULL),
 generic_hand_ct(NULL),
 new_locomotion_ct(NULL),
 face_neutral( NULL ),
+realTimeLipSyncCt(NULL),
+overlayMotion_sched_p(CreateSchedulerCt(character_name, "overlay") ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
 	
@@ -263,6 +265,11 @@ SbmCharacter::~SbmCharacter( void )	{
 
 	if (motiongraph_ct)
 		motiongraph_ct->unref();
+	if (realTimeLipSyncCt)
+		realTimeLipSyncCt->unref();
+
+	if (overlayMotion_sched_p)
+		overlayMotion_sched_p->unref();
 
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -304,7 +311,7 @@ void SbmCharacter::createStandardControllers()
 {
 	posture_sched_p = CreateSchedulerCt( getName().c_str(), "posture" );
 	motion_sched_p = CreateSchedulerCt( getName().c_str(), "motion" );
-
+	overlayMotion_sched_p = CreateSchedulerCt(getName().c_str(), "overlay");
 	// procedural locomotion
 	// removed 10/27/12 AS
 	/*this->locomotion_ct =  new MeCtLocomotionClass();
@@ -452,7 +459,6 @@ void SbmCharacter::createStandardControllers()
 	motionplayer_ct->setName(mpName.c_str());
 	motionplayer_ct->setActive(false);
 
-
 	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
 	std::string datareceiverCtName = getName() + "_dataReceiverController";
 	this->datareceiver_ct->setName(datareceiverCtName.c_str());
@@ -486,10 +492,12 @@ void SbmCharacter::createStandardControllers()
 	reach_sched_p->ref();
 	grab_sched_p->ref();
 	constraint_sched_p->ref();
+	overlayMotion_sched_p->ref();
 
 	posture_sched_p->init(this);
 	motion_sched_p->init(this);
 	param_sched_p->init(this);
+	overlayMotion_sched_p->init(this);
 
 #if !defined(EMSCRIPTEN)
 	postprocess_ct->init(dynamic_cast<SmartBody::SBCharacter*>(this),"base");
@@ -541,6 +549,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
+	ct_tree_p->add_controller(overlayMotion_sched_p);
 	ct_tree_p->add_controller( record_ct );
 	
 

@@ -221,6 +221,7 @@ public:
 	MeCtSchedulerClass*	grab_sched_p; // grabbing (temp)
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
+	MeCtSchedulerClass*	overlayMotion_sched_p;  // full body motions
 
 	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
 	MeCtFace*				face_ct;
