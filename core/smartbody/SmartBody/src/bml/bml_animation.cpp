@@ -61,6 +61,10 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 	const XMLCh* loopID = elem->getAttribute(BMLDefs::ATTR_LOOP);
 	xml_utils::xml_translate(&loop, loopID);
 
+	std::string overlayType = "false";
+	const XMLCh* overlayTypeID = elem->getAttribute(BMLDefs::ATTR_OVERLAY);
+	xml_utils::xml_translate(&overlayType, overlayTypeID);
+
 	
 	if( animName != 0 && *animName != 0 )	{
 
@@ -100,8 +104,17 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 			name << unique_id << ' ' << motion->getName();
 			motionCt->setName( name.str().c_str() );  // TODO: include BML act and behavior ids
 			motionCt->init( const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp );
-			BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
-			return behavPtr; 
+			if (overlayType == "true")
+			{
+				BehaviorRequestPtr behavPtr(new MotionRequest(unique_id, localId, motionCt, request->actor->overlayMotion_sched_p, behav_syncs));
+				return behavPtr;
+			}
+			else
+			{
+				BehaviorRequestPtr behavPtr(new MotionRequest(unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs));
+				return behavPtr;
+			}
+
 		} else {
 			// TODO: exception?
 			//cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;

@@ -225,6 +225,7 @@ class BMLDefs
 		static XMLCh* ATTR_SCHEDULEMODE;
 		static XMLCh* ATTR_TRANSITION_LENGTH;
 		static XMLCh* ATTR_DIRECTPLAY;
+		static XMLCh* ATTR_OVERLAY;
 
 		static XMLCh* ATTR_VALUE;
 
