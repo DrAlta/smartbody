@@ -35,7 +35,7 @@ function set_environment {
 		sb_arch="x86_64"
 		sb_sdk="${sb_cap_platform}${SB_OSX_SDK_VERSION}.sdk"
 		sb_sys_root="$SB_XCODE_ROOT/Platforms/${sb_cap_platform}.platform/Developer/SDKs/${sb_sdk}"
-		sb_version_flags=" -mmacos-version-min=${SB_MIN_OSX_VERSION}"
+		sb_version_flags=" -mmacosx-version-min=${SB_MIN_OSX_VERSION}"
 		;;
 	"iphoneos")
 	  sb_cap_platform="iPhoneOS"
@@ -285,7 +285,7 @@ function make_xcode_project {
 # so we build it first for macosx, save the tool, and build for arm. Once we 
 # fail, we copy the tool and build again.
 function make_apr {
-  local APR_NAME="$(uncompress $(download "http://www-us.apache.org/dist/apr/apr-1.6.2.tar.gz") "apr-1.6.2")"
+  local APR_NAME="$(uncompress $(download "https://archive.apache.org/dist/apr/apr-1.6.2.tar.gz") "apr-1.6.2")"
 	local APR_CONFIG_FLAGS=" --disable-shared --disable-dso --enable-threads ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_process_shared_works=yes apr_cv_mutex_robust_shared=no apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8 apr_cv_mutex_recursive=yes"
 
   local native_gen_test_char="${SB_prefix_root_dir}/gen_test_char"
@@ -460,7 +460,7 @@ do
 
   make_apr
   cmake_lib "$(uncompress $(download "https://github.com/libexpat/libexpat/archive/R_2_2_4.tar.gz") "libexpat-R_2_2_4")/expat" "-DBUILD_tests=OFF -DBUILD_shared=OFF"
-  make_lib "$(uncompress $(download "http://www-us.apache.org/dist/apr/apr-util-1.6.0.tar.gz") "apr-util-1.6.0")" "--with-apr=${sb_prefix} --with-expat=${sb_prefix}"
+  make_lib "$(uncompress $(download "https://archive.apache.org/dist/apr/apr-util-1.6.0.tar.gz") "apr-util-1.6.0")" "--with-apr=${sb_prefix} --with-expat=${sb_prefix}"
   make_lib "$(uncompress $(download "http://www-us.apache.org/dist/activemq/activemq-cpp/3.9.4/activemq-cpp-library-3.9.4-src.tar.gz") "activemq-cpp-library-3.9.4" "${SB_patch_dir}/activemq.patch" )"  "--disable-ssl --with-apr=${sb_prefix} --enable-shared=no"
   make_lib "$(uncompress $(download "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz") "libsndfile-1.0.25" "${SB_patch_dir}/sndfile.patch")" "--disable-shared --disable-sqlite --disable-alsa --disable-external-libs "
   make_freealut
