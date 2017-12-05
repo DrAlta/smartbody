@@ -69,6 +69,22 @@ namespace SmartBody {
 			std::string getLogs();
 		};
 #endif
+        
+#ifdef SB_IPHONE
+        class IOSListener : public Listener
+        {
+        public:
+            std::list<std::string> logList;
+            
+        public:
+            IOSListener();
+            virtual ~IOSListener();
+            
+            virtual void OnMessage(const std::string & message);
+            std::string getLogs();
+        };
+#endif
+
 
 		class StdoutListener : public Listener
 		{
