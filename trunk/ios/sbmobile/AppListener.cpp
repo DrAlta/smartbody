@@ -14,6 +14,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBUtilities.h>
 
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 AppListener::AppListener()
 {
@@ -161,7 +162,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
             if (vec3Attribute)
             {
                 if (!pawn->dMeshInstance_p)
-                    pawn->dMeshInstance_p = new DeformableMeshInstance();
+                    pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
                 SrVec val = vec3Attribute->getValue();
                 pawn->dMeshInstance_p->setMeshScale(SrVec(val));
 				//SmartBody::util::log("Set mesh to size %f", val[0]);
@@ -202,14 +203,14 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
 						//SmartBody::util::log("useDeformableMesh : %d", value.c_str());
-						pawn->dMeshInstance_p = new DeformableMeshInstance();
+						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						//pawn->dMeshInstance_p = new DeformableMeshInstance();
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
 					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
 					{
 						//SmartBody::util::log("useStaticMesh1 : %d", value.c_str());
-						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 
@@ -217,7 +218,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
 						//SmartBody::util::log("useStaticMesh2 : %d", value.c_str());
-						pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 					}
