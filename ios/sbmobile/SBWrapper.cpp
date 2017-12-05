@@ -42,6 +42,7 @@
 #include <boost/filesystem/path.hpp>
 #include "AppListener.h"
 #include "Shader.h"
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #if defined(ANDROID_BUILD)
 #include <GLES3/gl3.h>
@@ -386,7 +387,7 @@ extern "C"
 //      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 
     SBSetupDrawing(width, height, esContext);
-    // ??? SBUpdateCharacterGPUSkin();
+    SBUpdateCharacterGPUSkin();
 
     //glViewport( 0, 0, width, height);
     SrMat matMVP = matModelView * matPerspective;
@@ -406,7 +407,8 @@ extern "C"
     glUniformMatrix4fv(userData->mvLoc, 1, GL_FALSE, matModelView.data());
     glUniformMatrix4fv(userData->mvpLoc, 1, GL_FALSE, matMVP.data());
     //SmartBody::util::log("Before SBDrawCharacters_ES20");
-    SBDrawCharacters_ES20(esContext);
+    //SBDrawCharacters_ES20(esContext);
+    SBDrawCharacterGPUSkin(esContext);
     //drawSkeleton(esContext);
     //draw lights
     //SmartBody::util::log("After SBDrawCharacters_ES20");
@@ -456,9 +458,47 @@ extern "C"
     glEnable(GL_DEPTH_TEST);
     glClearColor(1.0, 0.0, 0.0, 1.0);
     //glViewport( 0, 0, w, h);
+    SrVec2 texScale = SrVec2(1,1), texOffset = SrVec2(0,0);
+      
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    drawBackgroundTexID(esContext->fboTexID, esContext);
+    drawBackgroundTexID(esContext->fboTexID, texScale, texOffset, esContext);
   }
+    
+    void SBUpdateCharacterGPUSkin()
+    {
+        const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+        for (unsigned int i = 0; i < pawnNames.size(); i++)
+        {
+            SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+            DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+            if (meshInstance)
+            {
+                if (!meshInstance->isStaticMesh())
+                {
+                    SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
+                    GPUMeshUpdate(meshInstance);
+                }
+            }
+        }
+    }
+
+    
+    void SBDrawCharacterGPUSkin(ESContext *esContext)
+    {
+        const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+        for (unsigned int i = 0; i < pawnNames.size(); i++)
+        {
+            SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+            //SmartBody::util::log("draw pawn %s", pawn->getName().c_str());
+            //DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+            DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+            if (meshInstance)
+            {
+                drawMeshStaticVBO(meshInstance, esContext, false);
+            }
+        }
+    }
+
   
   void SBDrawCharacters_ES20(ESContext *esContext) {
     static bool meshUpdated = false;
