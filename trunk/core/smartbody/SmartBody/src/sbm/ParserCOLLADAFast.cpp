@@ -424,8 +424,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 								int i = 0;
 								for (size_t i = 0; i < tokens.size(); i++)
 								{
-									bindShapeMat[i] = (float)atof(tokens[i].c_str());
-									i++;
+									bindShapeMat[i] = (float)atof(tokens[i].c_str());									
 									if (i >= 16)
 										break;
 								}
