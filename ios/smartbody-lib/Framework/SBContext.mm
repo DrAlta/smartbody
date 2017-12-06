@@ -42,13 +42,23 @@ struct SceneListener : public SmartBody::SBSceneListener {
 }
 @end
 
+@interface NSString (Ext)
++ (nonnull instancetype)stringWithCPPString: (const std::string&)string;
+@end
+  
+@implementation NSString (Ext)
++ (nonnull instancetype)stringWithCPPString: (const std::string&)string {
+  return [NSString stringWithUTF8String: string.c_str()];
+}
+@end
+
 static SBContext *sharedInstance = nil;
 
 void SceneListener::OnLogMessage( const std::string & message ) {
   id<SBContextDelegate> del = _context.delegate;
   if (del) {
     [del context:sharedInstance
-             log:[NSString stringWithUTF8String: message.c_str()]];
+             log:[NSString stringWithCPPString: message]];
   }
 }
 
@@ -104,7 +114,7 @@ void SceneListener::OnLogMessage( const std::string & message ) {
 #ifndef SB_NO_PYTHON
   try {
     std::string result = boost::python::extract<std::string>(self->object);
-    return [NSString stringWithUTF8String:result.c_str()];
+    return [NSString stringWithCPPString: result];
   } catch (...) {
     PyErr_Print();
   }
@@ -339,7 +349,8 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
 
 - (NSString * _Nonnull)stringForKey:(NSString * _Nonnull)key
 {
-  return [NSString stringWithUTF8String: SmartBody::SBScene::getScene()->getStringAttribute([key UTF8String]).c_str()];
+  return [NSString stringWithCPPString: SmartBody::SBScene::getScene()
+          ->getStringAttribute([key UTF8String])];
 }
 
 - (BOOL)boolForKey:(NSString * _Nonnull)key
@@ -389,7 +400,9 @@ void SBMobile::stopVideo(std::string videoViewName)
 
 void SBMobile::playSound(std::string soundFilePath, bool looping)
 {
-  [sharedInstance playSoundFromFileAtPath:[NSString stringWithUTF8String:soundFilePath.c_str()] loop:looping];
+  [sharedInstance
+   playSoundFromFileAtPath: [NSString stringWithCPPString: soundFilePath]
+                      loop: looping];
 }
 
 void SBMobile::stopSound()

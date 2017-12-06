@@ -92,7 +92,7 @@ __attribute__((objc_subclassing_restricted))
  @param path the location of the sound clip
  @param loop if true, loop the clip playback
  */
-- (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
+- (void)playSoundFromFileAtPath:(NSString * _Nonnull)path loop:(BOOL)loop;
 
 /**
  Smartbody callback for the native platform to stop the audio playback.
