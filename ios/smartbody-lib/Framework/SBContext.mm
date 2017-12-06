@@ -40,8 +40,6 @@ struct SceneListener : public SmartBody::SBSceneListener {
   CGSize lastSize;
   BOOL reloadTexture;
 }
-- (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
-- (void)stopSound;
 @end
 
 static SBContext *sharedInstance = nil;
