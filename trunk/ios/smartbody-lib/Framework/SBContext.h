@@ -84,4 +84,21 @@ __attribute__((objc_subclassing_restricted))
   modelViewMatrix:(matrix_float4x4)modelViewMatrix
  projectionMatrix:(matrix_float4x4)projectionMatrix NS_SWIFT_NAME(drawFrame(size:modelViewMatrix:projectionMatrix:));
 
+/**
+ Smartbody callback for the native platform to play a sound clip. It's made
+ public so you can override the default implementation (AVAudioPlayer). If
+ you override the method, you have to call the delegate methods youself.
+
+ @param path the location of the sound clip
+ @param loop if true, loop the clip playback
+ */
+- (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
+
+/**
+ Smartbody callback for the native platform to stop the audio playback.
+ It's made public so you can override the default implementation
+ (AVAudioPlayer).
+ */
+- (void)stopSound;
+
 @end
