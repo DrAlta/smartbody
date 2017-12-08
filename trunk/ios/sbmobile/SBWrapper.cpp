@@ -386,7 +386,7 @@ extern "C"
 //    if (useRenderTarget)
 //      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
 
-    SBSetupDrawing(width, height, esContext);
+    //SBSetupDrawing(width, height, esContext);
     SBUpdateCharacterGPUSkin();
 
     //glViewport( 0, 0, width, height);
