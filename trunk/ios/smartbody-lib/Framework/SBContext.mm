@@ -138,6 +138,13 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
 
 @implementation SBContext
 
+- (nonnull instancetype)init
+{
+  NSAssert(false, "implement init or use one that has an argument.");
+  self = [super init];
+  return sharedInstance;
+}
+
 - (nonnull instancetype)initWithAssetsURL:(NSURL * _Nonnull)assetsURL
 {
   return [self initWithAssetsURL:assetsURL delegate:nil];
