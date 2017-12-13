@@ -452,7 +452,6 @@
 		62D546F81F7B2CE3001B14E9 /* Smartbody.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D546F41F7B2CB6001B14E9 /* Smartbody.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62D546F91F7B2CEA001B14E9 /* SBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 62D546F21F7B2CB6001B14E9 /* SBContext.mm */; };
 		62D546FA1F7B2CEE001B14E9 /* SBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D546F31F7B2CB6001B14E9 /* SBViewController.swift */; };
-		B20E74C41FD6095000985DE9 /* SBUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = B20E74C31FD6095000985DE9 /* SBUtilities.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1443,7 +1442,6 @@
 		62D546F21F7B2CB6001B14E9 /* SBContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBContext.mm; sourceTree = "<group>"; };
 		62D546F31F7B2CB6001B14E9 /* SBViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBViewController.swift; sourceTree = "<group>"; };
 		62D546F41F7B2CB6001B14E9 /* Smartbody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Smartbody.h; sourceTree = "<group>"; };
-		B20E74C31FD6095000985DE9 /* SBUtilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBUtilities.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1509,7 +1507,6 @@
 		6202005C1F6DA9AC004BBA67 /* sb */ = {
 			isa = PBXGroup;
 			children = (
-				B20E74C31FD6095000985DE9 /* SBUtilities.mm */,
 				6202005D1F6DA9AC004BBA67 /* DefaultAttributeTable.cpp */,
 				6202005F1F6DA9AC004BBA67 /* MiniBrain.cpp */,
 				620200621F6DA9AC004BBA67 /* nvbg.cpp */,
@@ -3194,7 +3191,6 @@
 				620202A71F6DA9AC004BBA67 /* me_ct_generic_hand.cpp in Sources */,
 				625246261F772C46007398F4 /* sbmesh.pb.cc in Sources */,
 				620203C81F6DA9AD004BBA67 /* SBCollisionManager.cpp in Sources */,
-				B20E74C41FD6095000985DE9 /* SBUtilities.mm in Sources */,
 				6202028A1F6DA9AC004BBA67 /* BMLSpeechObject.cpp in Sources */,
 				620202951F6DA9AC004BBA67 /* me_ct_breathing_interface.cpp in Sources */,
 				620203B91F6DA9AD004BBA67 /* SBAssetHandlerOgre.cpp in Sources */,

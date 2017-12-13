@@ -71,7 +71,7 @@ __attribute__((objc_subclassing_restricted))
 - (NSString * _Nonnull)stringForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (BOOL)boolForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
 - (double)doubleForKey:(NSString * _Nonnull)key SWIFT_WARN_UNUSED_RESULT;
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 
 - (matrix_float4x4)modelViewMatrix:(CGSize)size NS_SWIFT_NAME(modelViewMatrix(size:));
 - (matrix_float4x4)projectionMatrix:(CGSize)size NS_SWIFT_NAME(projectionMatrix(size:));
