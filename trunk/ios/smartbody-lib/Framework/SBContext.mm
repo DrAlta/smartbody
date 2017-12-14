@@ -40,6 +40,9 @@ struct SceneListener : public SmartBody::SBSceneListener {
   CGSize lastSize;
   BOOL reloadTexture;
 }
+- (void)playSoundFromFileAtPath:(NSString*)path loop:(BOOL)loop;
+- (void)sbCallback:(NSString*)msg;
+- (void)stopSound;
 @end
 
 @interface NSString (Ext)
@@ -383,6 +386,11 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
   [self.delegate contextDidStartPlayingAudio:self];
 }
 
+- (void)sbCallback:(NSString*)msg
+{
+    [self.delegate contextCallbackHandler:self callbackMessage:msg];
+}
+
 - (void)stopSound
 {
   [self.audioPlayer stop];
@@ -410,6 +418,11 @@ void SBMobile::playSound(std::string soundFilePath, bool looping)
   [sharedInstance
    playSoundFromFileAtPath: [NSString stringWithCPPString: soundFilePath]
                       loop: looping];
+}
+
+void SBMobile::handleCallback(std::string callbackMsg)
+{
+    [sharedInstance sbCallback:[NSString stringWithUTF8String:callbackMsg.c_str()]];
 }
 
 void SBMobile::stopSound()

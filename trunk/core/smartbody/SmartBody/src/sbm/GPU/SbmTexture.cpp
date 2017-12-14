@@ -71,6 +71,7 @@ SBAPI void SbmTextureManager::deleteTexture(int type, const char* textureName)
 	{
 		SbmTexture* tex = texMap[textureName];
 		texMap.erase(textureName);
+    SmartBody::util::log("Delete texture '%s'", tex->getName().c_str());
 		delete tex;
 	}
 }
@@ -428,6 +429,7 @@ SbmTexture::~SbmTexture(void)
 {
     if (buffer)
            delete [] buffer;
+    imgBuffer.clear();
     if (texID != 0)
        glDeleteTextures(1,&texID);	
 }
@@ -535,7 +537,7 @@ bool SbmTexture::loadImage( const char* fileName )
 
     // set the texture file name
     textureFileName = fileName;	
-	stbi_image_free(buffer);
+	  stbi_image_free(buffer);
     //SOIL_free_image_data(buffer);
     buffer = NULL;
     return true;

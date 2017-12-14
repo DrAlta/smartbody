@@ -618,10 +618,12 @@ SbmDeformableMeshGPU::SbmDeformableMeshGPU(void) : DeformableMesh()
 
 SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 {
+  SmartBody::util::log("Delete Deformable Mesh GPU '%s'", this->getName().c_str());
 	initShader = false;
 	if (VBOPos) delete VBOPos;
 	if (VBOTangent) delete VBOTangent;
 	if (VBOBiNormal) delete VBOBiNormal;
+  if (VBONormal) delete VBONormal;
 	if (VBOTexCoord) delete VBOTexCoord;
 	if (VBOTri) delete VBOTri;
 	if (VBOBoneID1) delete VBOBoneID1;	
@@ -1584,6 +1586,7 @@ SbmDeformableMeshGPUInstance::SbmDeformableMeshGPUInstance()
 
 SbmDeformableMeshGPUInstance::~SbmDeformableMeshGPUInstance()
 {
+  cleanBuffer();
 	if (TBOTran)
 		delete TBOTran;
 }

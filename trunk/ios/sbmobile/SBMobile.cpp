@@ -42,9 +42,9 @@ BOOST_PYTHON_MODULE(SBMobile)
 		// Sound API
 		.def("playSound", &SBMobile::playSound, "Playback a sound file.")
 		.def("stopSound", &SBMobile::stopSound, "Stop the sound playback.")
+        .def("handleCallback", &SBMobile::handleCallback, "Handle generic callback with a string message")
 		.def("snapshotPNGResize", &SBMobile::snapshotPNGResize, "Save the current image to png file.")
 		;	
-
 }
 
 void initSBMobilePythonModule()
@@ -95,6 +95,10 @@ jstring SBMobile::stringToJString( const std::string& str )
 }
 
 
+void SBMobile::handleCallback(std::string callbackMsg)
+{
+    
+}
 
 bool SBMobile::beforeCallJavaMethod( const std::string& className, const std::string& methodName, const std::string& methodDef, jclass& interfaceClass, jmethodID& method)
 {

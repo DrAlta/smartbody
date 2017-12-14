@@ -28,6 +28,7 @@
 # include <sr/sr_string_array.h>
 #include <set>
 # include <sr/sr_quat.h>
+#include <sb/SBUtilities.h>
 
 //# define SR_USE_TRACE1 // IO
 //# define SR_USE_TRACE2 // Validation of normals materials, etc
@@ -57,6 +58,7 @@ SrModel::SrModel ()
 
 SrModel::~SrModel ()
  {
+   SmartBody::util::log("Delete SrModel, name = '%s'", (const char*)name);
  }
 
 void SrModel::init ()

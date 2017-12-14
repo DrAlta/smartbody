@@ -51,10 +51,12 @@ SBAPI SBReach* SBReachManager::createReachWithTag( std::string characterName, st
 	{
 		// remove the old reach data
 		SBReach* reach = (*iter).second;
+    //return reach;
 		removeReach(reach);
 		_reaches.erase(iter);
 	}
 
+  
 	SBReach* reach = new SBReach(character, reachTag);
 	//_reaches.insert(pair<std::string, SBReach*>(characterName, reach));
 	_reaches[charReachTag] = reach;
@@ -74,6 +76,7 @@ void SBReachManager::removeReach(SBReach* reach)
 	// clean up all the reach structures...
 	// ...
 	// ...
+  delete reach;
 }
 
 int SBReachManager::getNumReaches()

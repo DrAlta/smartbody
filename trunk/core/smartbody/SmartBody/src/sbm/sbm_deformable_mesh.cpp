@@ -339,20 +339,37 @@ DeformableMesh::DeformableMesh() : SBAsset()
 
 DeformableMesh::~DeformableMesh() 
 {
+  SmartBody::util::log("Delete Deformable Mesh '%s'", this->getName().c_str());
 	skeleton->unref();
 
+  SmartBody::util::log("Dynamic Mesh size = %d, static Mesh size = %d", dMeshDynamic_p.size(), dMeshStatic_p.size());
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
+    SmartBody::util::log("Dynamic Mesh '%s' ref count = %d", (const char*)dMeshDynamic_p[i]->shape().name, dMeshDynamic_p[i]->getref());
 		dMeshDynamic_p[i]->unref();
 		//delete dMeshDynamic_p[i];
 	}
 	dMeshDynamic_p.clear();
 	for (unsigned int i = 0; i < dMeshStatic_p.size(); i++)
 	{
+    SmartBody::util::log("Static Mesh '%s' ref count = %d", (const char*)dMeshStatic_p[i]->shape().name, dMeshStatic_p[i]->getref());
 		dMeshStatic_p[i]->unref();
 		//delete dMeshStatic_p[i];
 	}
 	dMeshStatic_p.clear();
+  
+  std::map<std::string, std::vector<SrSnModel*> >::iterator it;
+  for (it  = blendShapeMap.begin();
+       it != blendShapeMap.end();
+       it++)
+  {
+    std::vector<SrSnModel*>& blendShapes = it->second;
+    for (unsigned int i=0;i<blendShapes.size();i++)
+      blendShapes[i]->unref();
+    blendShapes.clear();
+  }
+  blendShapeMap.clear();
+  
 	for (unsigned int i = 0; i < skinWeights.size(); i++)
 	{
 		SkinWeight* sw = skinWeights[i];
@@ -363,11 +380,17 @@ DeformableMesh::~DeformableMesh()
 		}
 	}	
 	skinWeights.clear();
-
+  
+  SbmTextureManager& texManager = SbmTextureManager::singleton();
 	for (size_t i = 0; i < subMeshList.size(); ++i)
 	{
 		if (subMeshList[i])
+    {
+      texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMeshList[i]->texName.c_str());
+      texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMeshList[i]->normalMapName.c_str());
+      texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMeshList[i]->specularMapName.c_str());
 			delete subMeshList[i];
+    }
 	}
 	subMeshList.clear();
 }
@@ -395,9 +418,9 @@ SBAPI void DeformableMesh::initDeformMesh( std::vector<SrModel*>& meshModelVec )
 		srSnModelDynamic->shape().name = meshModelVec[i]->name;
 
 		dMeshStatic_p.push_back(srSnModelStatic);
-		srSnModelStatic->ref();
+		//srSnModelStatic->ref();
 		dMeshDynamic_p.push_back(srSnModelDynamic);
-		srSnModelDynamic->ref();		
+		//srSnModelDynamic->ref();
 	}
 	
 }
@@ -515,6 +538,7 @@ bool DeformableMesh::buildBlendShapes()
 			}
 		}
 	}
+  delete meshKDTree;
 
 	return true;
 }
@@ -1032,6 +1056,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SbmSubMesh*> hairMeshList;
 	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
+  
+  for (size_t i = 0; i < subMeshList.size(); ++i)
+  {
+    if (subMeshList[i])
+    {
+      delete subMeshList[i];
+    }
+  }
 	subMeshList.clear();
 	SmartBody::util::log("subMeshList.size() = %d \n", meshSubsetMap.size());
 	for (vi  = meshSubsetMap.begin();
@@ -1473,6 +1505,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						diffuseTex->bakeAlphaIntoTexture(transTex);
 					}
+          delete transTex;
 				}
 				newModel->mtlTextureNameMap[matName] = prefixedName;
 			}
@@ -1497,6 +1530,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						specularTex->bakeAlphaIntoTexture(glossyTex);
 					}
+          delete glossyTex;
 				}
 
 				newModel->mtlSpecularTexNameMap[matName] = prefixedName;
@@ -1741,6 +1775,11 @@ bool DeformableMesh::readFromSmb(std::string inputFileName)
 	boost::filesystem::path p(inputFileName);
 	std::string filePath = p.parent_path().string();
 	loadAllFoundTextures(filePath);
+  
+  for (unsigned int i=0;i<models.size();i++)
+    delete models[i];
+  models.clear();
+  
 	
 	return true;
 }
@@ -1776,6 +1815,7 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		SrSnModel* srSnModelStatic = new SrSnModel();
 		srSnModelStatic->shape(*models[m]);
 		srSnModelStatic->shape().name = models[m]->name;
+    srSnModelStatic->ref();
 		modelMap.insert(std::pair<std::string, SrSnModel*>(std::string(models[m]->name), srSnModelStatic));
 		modelsUsed.insert(std::pair<std::string, bool>(std::string(models[m]->name), false));
 	}
@@ -1898,6 +1938,19 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 	boost::filesystem::path p(inputFileName);
 	std::string filePath = p.parent_path().string();
 	loadAllFoundTextures(filePath);
+  
+  for (unsigned int i=0;i<models.size();i++)
+    delete models[i];
+  models.clear();
+  
+  std::map<std::string, SrSnModel*>::iterator it;
+  for (it  = modelMap.begin();
+       it != modelMap.end();
+       it++)
+  {
+    it->second->unref();
+  }
+  modelMap.clear();
 	
 	return true;
 }

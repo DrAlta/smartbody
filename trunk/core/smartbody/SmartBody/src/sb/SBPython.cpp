@@ -856,7 +856,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	
 	boost::python::class_<SBAssetManager, boost::python::bases<SBObject> >("SBAssetManager")
 		.def("addSkeletonDefinition", &SBAssetManager::addSkeletonDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a name.")
-		.def("removeSkeletonDefinition", &SBScene::removeSkeletonDefinition, "Removes a skeleton with a given name.")
+		.def("removeSkeletonDefinition", &SBAssetManager::removeSkeletonDefinition, "Removes a skeleton with a given name.")
 		.def("createMotion", &SBAssetManager::createMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new motion given a name.")
 		.def("createSkeleton", &SBAssetManager::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
 		.def("getSkeleton", &SBAssetManager::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")

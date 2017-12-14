@@ -847,6 +847,8 @@ SBAPI void SBAssetManager::addMesh(DeformableMesh* mesh)
 
 SBAPI void SBAssetManager::removeMesh(DeformableMesh* mesh)
 {
+  if (!mesh) return;
+  
 	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(mesh->getName());
 	if (iter != _deformableMeshMap.end())
 	{
