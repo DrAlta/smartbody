@@ -23,6 +23,7 @@ public:
 	
 	// Sound API
 	void playSound(std::string soundFilePath, bool looping = false);
+    void handleCallback(std::string callbackMsg);
 	void stopSound();
 
 	void snapshotPNGResize(std::string imgFileName, int width, int height, int outW = -1, int outH = -1);

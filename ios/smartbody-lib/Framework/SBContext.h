@@ -37,6 +37,7 @@
 - (void)contextWillStartPlayingAudio:(SBContext * _Nonnull)context  NS_SWIFT_NAME(contextWillStartPlayingAudio(_:));
 - (void)contextDidStartPlayingAudio:(SBContext * _Nonnull)context  NS_SWIFT_NAME(contextDidStartPlayingAudio(_:));
 - (void)context:(SBContext * _Nonnull)context didFinishPlayingAudioSuccessfully:(BOOL)flag NS_SWIFT_NAME(context(_:didFinishPlayingAudioSuccessfully:));
+- (void)contextCallbackHandler:(SBContext * _Nonnull)context callbackMessage:(NSString * _Nonnull)callbackMessage NS_SWIFT_NAME(contextCallbackHandler(_:callbackMessage:));
 @end
 
 @class AVAudioPlayer;

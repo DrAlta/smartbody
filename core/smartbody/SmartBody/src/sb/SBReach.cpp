@@ -45,6 +45,14 @@ SBReach::SBReach(SBCharacter* character, std::string reTag)
 
 SBReach::~SBReach()
 {
+  std::map<int,MeCtReachEngine*>::iterator it;
+  for (it  = reachEngineMap.begin();
+       it != reachEngineMap.end();
+       it++)
+  {
+    delete it->second;
+  }
+  reachEngineMap.clear();
 }
 
 SBCharacter* SBReach::getCharacter()
