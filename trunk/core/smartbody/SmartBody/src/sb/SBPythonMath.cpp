@@ -117,7 +117,6 @@ void pythonFuncsMath()
 		.def("normalize", &SrQuat::normalize, "normalize the quaternion")
 		.def("setAxisAngle", &SrQuat::setAxisAngle, "sets the axis and angle of the quaternion")
     .def("getAxisAngle", &SrQuat::axisAngle, "get the axis and angle of the quaternion")
-		.def("getEuler", &SrQuat::getEuler, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the Euler angles of the quaternion.")
 		;	
 	
 	boost::python::class_<SrBox>("SrBox")
