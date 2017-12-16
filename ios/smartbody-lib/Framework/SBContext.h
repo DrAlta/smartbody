@@ -76,7 +76,6 @@ __attribute__((objc_subclassing_restricted))
 
 - (matrix_float4x4)modelViewMatrix:(CGSize)size NS_SWIFT_NAME(modelViewMatrix(size:));
 - (matrix_float4x4)projectionMatrix:(CGSize)size NS_SWIFT_NAME(projectionMatrix(size:));
-- (matrix_float2x3)boundingBoxForCharacter:(NSString * _Nonnull)name NS_SWIFT_NAME(boundingBox(character:));
 - (matrix_float4x4)transformForJoint:(NSString * _Nonnull)joint
                            character:(NSString * _Nonnull)character NS_SWIFT_NAME(transform(of:in:));
 - (void)setGazeTarget:(simd_float3)target forKey:(NSString * _Nonnull)name;

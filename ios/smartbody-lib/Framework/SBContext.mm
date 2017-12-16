@@ -238,19 +238,6 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
   return matrix2matrix(matPerspective);
 }
 
-- (matrix_float2x3)boundingBoxForCharacter:(NSString*)name {
-  SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-  SrBox box = scene->getCharacter(name.UTF8String)->getBoundingBox();
-  matrix_float2x3 m;
-  m.columns[0].x = box.a.x;
-  m.columns[0].y = box.a.y;
-  m.columns[0].z = box.a.z;
-  m.columns[1].x = box.b.x;
-  m.columns[1].y = box.b.y;
-  m.columns[1].z = box.b.z;
-  return m;
-}
-
 - (matrix_float4x4)transformForJoint:(NSString*)joint
                            character:(NSString*)character
 {
@@ -416,13 +403,13 @@ void SBMobile::stopVideo(std::string videoViewName)
 void SBMobile::playSound(std::string soundFilePath, bool looping)
 {
   [sharedInstance
-   playSoundFromFileAtPath: [NSString stringWithCPPString: soundFilePath]
-                      loop: looping];
+   playSoundFromFileAtPath:[NSString stringWithCPPString:soundFilePath]
+                      loop:looping];
 }
 
 void SBMobile::handleCallback(std::string callbackMsg)
 {
-    [sharedInstance sbCallback:[NSString stringWithUTF8String:callbackMsg.c_str()]];
+  [sharedInstance sbCallback:[NSString stringWithCPPString:callbackMsg]];
 }
 
 void SBMobile::stopSound()
