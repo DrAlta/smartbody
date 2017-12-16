@@ -176,6 +176,12 @@ void SrQuat::set ( const SrMat& m )
 	*/
  }
 
+void SrQuat::set(float ex, float ey, float ez)
+{
+	setEuler(SrVec(ex, ey, ez));
+	return;
+}
+
 void SrQuat::setEuler( const SrVec& ev  )
 {
  	//set(SrVec(ex,ey,ez));
