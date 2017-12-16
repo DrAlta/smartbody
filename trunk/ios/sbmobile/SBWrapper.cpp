@@ -306,6 +306,14 @@ extern "C"
       //SmartBody::util::log("First setup drawing, glViewport = %d %d", w, h);
       glViewport(0, 0, w, h);
       firstSetupDrawing = false;
+      
+      SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+      SrCamera& cam = *scene->getActiveCamera();
+      
+      float aspectRatio = float(w) / float(h);
+      cam.setAspectRatio(aspectRatio);
+      SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+      scene->run("adjustAspectRatio("+ boost::lexical_cast<std::string>(aspectRatio) + ")");
     }
     
     //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -436,7 +444,7 @@ extern "C"
     
     float aspectRatio = float(width) / float(height);
     cam.setAspectRatio(aspectRatio);
-    //SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
+    SmartBody::util::log("First render, aspect ratio = %f", aspectRatio);
 
     SrMat matPerspective, matModelView;
     cam.get_perspective_mat(matPerspective);
