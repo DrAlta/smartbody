@@ -176,10 +176,10 @@ void SrQuat::set ( const SrMat& m )
 	*/
  }
 
-void SrQuat::set( float ex, float ey, float ez )
+void SrQuat::setEuler( const SrVec& ev  )
 {
- 	set(SrVec(ex,ey,ez));
- 	return;
+ 	//set(SrVec(ex,ey,ez));
+ 	//return;
 // 	float cx, cy, cz, sx, sy, sz;
 // 
 // 	cx = sx = ex/2;
@@ -204,12 +204,13 @@ void SrQuat::set( float ex, float ey, float ez )
 // 	z = sz*w0 + cz*z0;
 
 // or
-  
-//  gwiz::quat_t euQ = gwiz::quat_t(gwiz::euler_t(ex,ey,ez));
-//  x = (float)euQ.x();
-//  y = (float)euQ.y();
-//  z = (float)euQ.z();
-//  w = (float)euQ.w();
+  float ex, ey, ez;
+  ex = ev[0]; ey = ev[1]; ez = ev[2];
+  gwiz::quat_t euQ = gwiz::quat_t(gwiz::euler_t(ex,ey,ez));
+  x = (float)euQ.x();
+  y = (float)euQ.y();
+  z = (float)euQ.z();
+  w = (float)euQ.w();
 }
 
 void SrQuat::get ( SrVec& axis, float& radians ) const

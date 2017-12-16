@@ -117,8 +117,8 @@ class SBAPI SrQuat
 
     /*! Defines SrQuat by extracting the rotation from the given rotation matrix. */
     void set ( const SrMat& m );
-
-	void set ( float ex, float ey, float ez);
+   
+    void setEuler ( const SrVec& eulerAngles);
 
     /*! Gets the current axis and angle of rotation (in radians) that SrQuat defines. */
     void get ( SrVec& axis, float& radians ) const;
