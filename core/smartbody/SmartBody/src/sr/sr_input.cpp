@@ -482,7 +482,7 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
     { //SR_TRACE1 ( "Alpha found..." );
       i = 0;
       while ( true )
-       { if ( !isalnum(c) && c!='_' ) break;
+       { if ( !isalnum(c) && c!='_'  && c!= '-') break;
          buf[i++]=c; 
          if ( i+1==size ) break;
          c = getchar_sr();
