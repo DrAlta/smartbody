@@ -27,7 +27,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <ctype.h>
-
+#include <string>
 # include <sr/sr_input.h>
 # include <sr/sr_string.h>
 # include <sr/sr_array.h>
@@ -41,6 +41,8 @@
 # define ISSTRING    _type==(srbyte)TypeString
 
 //=============================== SrInput =================================
+
+std::string SrInput::inputDelimiter = SR_INPUT_DELIMITERS;
 
 struct SrInput::UngetData
  {  struct Token { char* string; srbyte type; };
@@ -88,6 +90,7 @@ SrInput::SrInput ( const char *buff, char com )
       _type = (srbyte) TypeString;
     }
  }
+
 
 // static utility function:
 static void get_size ( FILE *fp, int &size, int &start )
@@ -186,6 +189,15 @@ FILE* SrInput::filept ()
  {
    return _type==TypeFile? _cur.f:0;
  }
+
+void SrInput::setSimpleParsing(bool useSimple)
+{
+  if (useSimple)
+    inputDelimiter = SR_INPUT_SIMPLE_DELIMITERS;
+  else
+    inputDelimiter = SR_INPUT_DELIMITERS;
+}
+
 
 bool SrInput::valid () const
  { 
@@ -366,7 +378,6 @@ static char get_escape_char ( char c )
 SrInput::TokenType SrInput::get_token ( SrString &buf )
  {
    # define UNGET(c) if(c>0)unget(c)
-
    int i;
    int c = ' ';
    int size = _max_token_size;
@@ -393,7 +404,7 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
     { //SR_TRACE1 ( "Got the End Of File!" );
       ret = EndOfFile;
     }
-   else if ( strchr(SR_INPUT_DELIMITERS,c) && c!='.' ) // '.' will be detected after checking a real
+   else if ( strchr(getDelimiter().c_str(),c) && c!='.' ) // '.' will be detected after checking a real
     { buf[0]=c; ret=Delimiter;
       //SR_TRACE1 ( "Got a Delimiter: "<<buf ); 
     }
@@ -440,7 +451,7 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
        }
       buf[i]=0;
 
-      if ( buf[0]=='.' && i==1 && strchr(SR_INPUT_DELIMITERS,'.') ) 
+      if ( buf[0]=='.' && i==1 && strchr(getDelimiter().c_str(),'.') )
         {
 			ret=Delimiter;
 			UNGET(c);

@@ -444,7 +444,7 @@ bool SrString::make_valid_string ( const char* s )
        { if ( i==0 && isdigit(s[i]) ) { need_quotes=true; break; }
          if ( isspace(s[i]) ) { need_quotes=true; break; }
          if ( s[i]=='"' ) { need_slash=true; break; }
-         if ( strchr(SR_INPUT_DELIMITERS,s[i]) ) { need_quotes=true; break; }
+         if ( strchr(SrInput::getDelimiter().c_str(),s[i]) ) { need_quotes=true; break; }
        }
     }
 

@@ -809,6 +809,7 @@ extern "C"
 		{
 			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
 			DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+      SmartBody::util::log("creating mesh buffer for pawn = %s", pawn->getName().c_str());
 			if (meshInstance)
 			{
 				if (!meshInstance->isStaticMesh())
@@ -817,6 +818,7 @@ extern "C"
 					SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 					if (gpuMesh && gpuMeshInstance)
 					{
+            SmartBody::util::log("pawn = %s, rebuildVertexBufferGPU", pawn->getName().c_str());
 						gpuMesh->rebuildVertexBufferGPU(true);
 						gpuMeshInstance->initBuffer();
 					}

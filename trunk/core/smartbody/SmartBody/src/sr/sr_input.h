@@ -30,9 +30,10 @@
 #include <sb/SBTypes.h>
 # include <stdio.h>
 # include <sr/sr_string.h>
-
+#include <string>
 /*! Defines which characters are considered as delimiters. */
 # define SR_INPUT_DELIMITERS "{}[]();,.=+-/^*%:&|!~<>#?@\\\'"
+# define SR_INPUT_SIMPLE_DELIMITERS "{}[]();,.=+/^*%:&|!~<>#?@\\\'"
 
 /*! \class SrInput sr_input.h
     \brief Parses a file or string buffer
@@ -90,8 +91,12 @@ class SrInput
     UngetData* _unget;            // unget char and token information
     char*      _filename;         // optional file name of the open file
     void _init ( char c );
+   static std::string inputDelimiter ;
    public : 
 
+   static SBAPI void setSimpleParsing(bool useSimple);
+   static SBAPI std::string getDelimiter() { return inputDelimiter; }
+  
     /*! Construct an input of type SrInput::TypeNull.
         SrInput will only be operational when linked to a file or string by calling
         an init() function later. While SrInput is of type Null, the valid() method will
