@@ -207,10 +207,12 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 	} else {
 		in.unget_token();
 	}
-
+  
+  SrInput::setSimpleParsing(true);
 	// 3. read channels
 	in >> _channels;
 	_postsize = _channels.floats();
+  SrInput::setSimpleParsing(false);
 
 	// 4. check if a start_kt is set
 	float start_kt = -1.0f;
