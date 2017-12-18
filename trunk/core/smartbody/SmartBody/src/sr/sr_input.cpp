@@ -40,6 +40,10 @@
 # define ISFILE      _type==(srbyte)TypeFile
 # define ISSTRING    _type==(srbyte)TypeString
 
+/*! Defines which characters are considered as delimiters. */
+# define SR_INPUT_DELIMITERS "{}[]();,.=-+/^*%:&|!~<>#?@\\\'"
+# define SR_INPUT_SIMPLE_DELIMITERS "{}[]();,.=+/^*%:&|!~<>#?@\\\'"
+
 //=============================== SrInput =================================
 
 std::string SrInput::inputDelimiter = SR_INPUT_DELIMITERS;

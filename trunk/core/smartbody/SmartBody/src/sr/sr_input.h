@@ -31,9 +31,7 @@
 # include <stdio.h>
 # include <sr/sr_string.h>
 #include <string>
-/*! Defines which characters are considered as delimiters. */
-# define SR_INPUT_DELIMITERS "{}[]();,.=+-/^*%:&|!~<>#?@\\\'"
-# define SR_INPUT_SIMPLE_DELIMITERS "{}[]();,.=+/^*%:&|!~<>#?@\\\'"
+
 
 /*! \class SrInput sr_input.h
     \brief Parses a file or string buffer
