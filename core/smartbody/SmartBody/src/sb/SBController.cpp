@@ -305,6 +305,24 @@ SBAPI void SBController::setChannelQuatGlobal( const std::string& channelName, S
 	SrQuat temp = inversePreRot * quat * preRot;
 	setJointChannelQuat(channelName, *_curFrame, temp);
 }
+  
+SrQuat SBController::convertChannelQuatGlobal(const std::string& channelName, SrQuat quat)
+{
+  SrQuat temp = quat;
+  if (!_pawn)
+    return temp;
+  if (!_curFrame)
+    return temp;
+  
+  SmartBody::SBJoint* joint = _pawn->getSkeleton()->getJointByMappedName(channelName);
+  if (!joint)
+    return temp;
+  
+  SrQuat preRot = SrQuat(joint->gmatZero());
+  SrQuat inversePreRot = preRot.inverse();
+  temp = inversePreRot * quat * preRot;
+  return temp;
+}
 
 void SBController::addControllerModifier(SBControllerModifier* modifier)
 {
