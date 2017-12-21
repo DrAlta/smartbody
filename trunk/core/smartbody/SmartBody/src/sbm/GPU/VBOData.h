@@ -3,6 +3,7 @@
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
 #include <string.h>
+#include <sb/SBUtilities.h>
 
 
 enum
@@ -154,6 +155,7 @@ VBOData<S>::VBOData(char* name, GLuint ArrayType, GLuint UsageType, std::vector<
 template <class S>
 VBOData<S>::~VBOData(void)
 {
+	//SmartBody::util::log("Delete VBOData, m_iVBO_ID = %d", m_iVBO_ID);
 	if (m_iVBO_ID)
 		glDeleteBuffers(1, &m_iVBO_ID);	
 }
@@ -161,6 +163,7 @@ VBOData<S>::~VBOData(void)
 template <class S>
 void VBOData<S>::BindBuffer()
 {
+	//SmartBody::util::log("VBOData<S>::BindBuffer, m_iVBO_ID = %d", m_iVBO_ID);
 	if (m_ArrayType == GL_ELEMENT_ARRAY_BUFFER)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iVBO_ID);
 	else
@@ -252,6 +255,7 @@ VBODataArray<S>::VBODataArray( char* name, GLuint type, int nSize )
 template<class S>
 VBODataArray<S>::~VBODataArray()
 {
+	//SmartBody::util::log("Delete VBODataArray, m_pVBO = %p", m_pVBO);
 	if (m_pVBO)
 		delete m_pVBO;
 }

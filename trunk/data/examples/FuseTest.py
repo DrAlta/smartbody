@@ -1,23 +1,8 @@
 print "Sample Fuse Character"
 
-obj = scene.getCamera("cameraDefault")
-if obj == None:
-	obj = scene.createCamera("cameraDefault")
-obj.setEye(20.1319, 140.187, 75.1732)
-obj.setCenter(0.628864, 135.233, 0.461255)
-obj.setUpVector(SrVec(0, 1, 0))
-obj.setScale(1)
-obj.setFov(1.0472)
-obj.setFarPlane(1000)
-obj.setNearPlane(0.01)
-obj.setAspectRatio(0.879121)
-
-scene.setVec3Attribute("GUI.BackgroundColor", .3, .78, .95)
-scene.setBoolAttribute("GUI.showFloor", False)
-
 # location of the Fuse model as a COLLADA file
 modelName = "FuseB"
-scene.loadAssetsFromPath("mesh/" + modelName)
+scene.loadAssetsFromPath("c:/users/Ari/Dropbox/fuse/" + modelName)
 
 obj = scene.createPawn("light0")
 obj.setPosition(SrVec(0, 180, 0))
@@ -41,7 +26,6 @@ scene.addAssetPath("script", "behaviorsets")
 scene.setBoolAttribute("internalAudio", True)
 
 skeleton = scene.getSkeleton(modelName + ".dae")
-
 scene.run("mixamo-map2.py")
 
 mixamoMap = scene.getJointMapManager().getJointMap("mixamorig")
@@ -85,8 +69,6 @@ fd.setViseme("tTeeth",  "")
 c.setFaceDefinition(fd)
 
 c.setStringAttribute("deformableMesh", modelName + ".dae")
-c.setStringAttribute("displayType", "GPUmesh")
-
 
 c.setActionAttribute("updateChannel")
 
@@ -96,12 +78,11 @@ c.setBoolAttribute('usePhoneBigram', True)
 c.setStringAttribute('voiceCode', 'CereVoice|Isabella|-|English|(East|Coast|America)')
 c.setStringAttribute('voice', 'remote')
 
-
+scene.run("runNVBG.py")
+nvbg = c.getNvbg().nvbg
 
 # setup gestures
-#scene.run('BehaviorSetGestures.py')
-scene.run('BehaviorSetPNGestures3.py')
-#scene.run('BehaviorSetFemaleGestures.py')
+scene.run('BehaviorSetGestures.py')
 setupBehaviorSet()
 retargetBehaviorSet('test')
 
@@ -293,12 +274,17 @@ character.addController(50, myc)
 #character.removeController(myc)
 
 
-# gestures
-#bml.execBML("*", "<body posture=\"ChrBrad@Idle01\"/>")
-# pn gestures 3
-bml.execBML("*", "<body posture=\"idle.skm\"/>")
-# female gestures
-#bml.execBML("*", "<body posture=\"ChrConnor@IdleStand01\"/>")
 
+bml.execBML("*", "<body posture=\"ChrBrad@Idle01\"/>")
 
+c.setStringAttribute('voiceCode', 'CereVoice|Isabella|-|English|(East|Coast|America)')
+c.setStringAttribute('voice', 'remote')
+
+scene.run("runNVBG.py")
+nvbg = c.getNvbg().nvbg
+
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet('test')
 

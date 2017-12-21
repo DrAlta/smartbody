@@ -269,7 +269,7 @@ void SBRenderer::resize(int w, int h)
 	height = h;
 }
 
-void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* viewData)
+void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights, bool isDrawFloor)
 {	
 	// update skinning transform
 
@@ -337,8 +337,8 @@ void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* 
 			renderMesh(meshInstance);
 		}
 	}
-
-	drawFloor(viewData);
+	if (isDrawFloor)
+		drawFloor();
 	glUseProgram(0);
 	gbuffer.unbindFBO();
 
@@ -866,9 +866,9 @@ void SBRenderer::registerGUI()
 
 
 
-void SBRenderer::drawFloor(FltkViewerData* viewerData)
+void SBRenderer::drawFloor()
 {
-	if (viewerData->showFloor)
+	//if (viewerData->showFloor)
 	{
 		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
@@ -880,7 +880,7 @@ void SBRenderer::drawFloor(FltkViewerData* viewerData)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 
-		viewerData->floorColor.get(mat_diffuse);
+		//viewerData->floorColor.get(mat_diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar);
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0);
@@ -938,8 +938,9 @@ void SBRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 	if (!gpuMeshInstance->getVBODeformPos())
 		gpuMeshInstance->initBuffer();
 	
-	// update blendshapes
-	gpuMeshInstance->gpuBlendShape();
+	// update blendshapes	
+	gpuMeshInstance->blendShapeStaticMesh();
+	gpuMeshInstance->gpuBlendShape(); // copy the static blendshape results to VBO buffer
 
 	static GLuint queryName = -1;
 	if (queryName == -1)

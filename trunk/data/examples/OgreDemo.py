@@ -42,7 +42,16 @@ sinbadPos = SrVec(0,5.16, 0)
 sinbad.setPosition(sinbadPos)
 sinbad.createStandardControllers()
 sinbad.setStringAttribute('deformableMesh', 'Sinbad.mesh.xml')
+<<<<<<< .mine
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet(sinbadName)
+'''
+||||||| .r6601
+=======
 
+>>>>>>> .r6619
 # setup locomotion
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
@@ -59,7 +68,7 @@ retargetBehaviorSet(sinbadName)
 
 
 sinbad.setStringAttribute("displayType", "GPUmesh")
-
+'''
 
 
 print 'Configuring scene parameters and camera'
@@ -77,3 +86,67 @@ camera.setAspectRatio(1.02)
 sim.start()
 bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
 sim.resume()
+
+
+g = scene.getGestureMapManager().getGestureMap("BradGesture")
+g.addGestureMapping("test", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+
+skeleton = "ChrBrad2.sk"
+stateNames = []
+stateNames.append("BeathHighBt")
+stateNames.append("BeathFistMidLf")
+stateNames.append("BeathLowBt")
+stateNames.append("ChopLf")
+stateNames.append("HereBt")
+stateNames.append("InclusivityNegBt")
+stateNames.append("InclusivityPosBt")
+stateNames.append("MeLf")
+stateNames.append("NegativeBt")
+stateNames.append("PointLf")
+stateNames.append("Shrug")
+stateNames.append("Stop")
+stateNames.append("Surround")
+
+motionNames = []
+motionNames.append("ChrBrad@Idle01_BeatHighBt01")
+motionNames.append("ChrBrad@Idle01_BeatHighBt03")
+motionNames.append("ChrBrad@Idle01_BeatFistMidLf01")
+motionNames.append("ChrBrad@Idle01_BeatFistMidLf02")
+motionNames.append("ChrBrad@Idle01_BeatLowBt01")
+motionNames.append("ChrBrad@Idle01_BeatLowBt02")
+motionNames.append("ChrBrad@Idle01_ChopLf01")
+motionNames.append("ChrBrad@Idle01_ChopLf02")
+motionNames.append("ChrBrad@Idle01_HereBt01")
+motionNames.append("ChrBrad@Idle01_HereBt02")
+motionNames.append("ChrBrad@Idle01_InclusivityNegBt01")
+motionNames.append("ChrBrad@Idle01_InclusivityNegBt02")
+motionNames.append("ChrBrad@Idle01_InclusivityPosBt01")
+motionNames.append("ChrBrad@Idle01_InclusivityPosBt02")
+motionNames.append("ChrBrad@Idle01_MeLf01")
+motionNames.append("ChrBrad@Idle01_MeLf02")
+motionNames.append("ChrBrad@Idle01_NegativeBt01")
+motionNames.append("ChrBrad@Idle01_NegativeBt02")
+motionNames.append("ChrBrad@Idle01_PointLf01")
+motionNames.append("ChrBrad@Idle01_PointLf02")
+motionNames.append("ChrBrad@Idle01_Shrug01")
+motionNames.append("ChrBrad@Idle01_Shrug02")
+motionNames.append("ChrBrad@Idle01_StopBt01")
+motionNames.append("ChrBrad@Idle01_StopBt02")
+motionNames.append("ChrBrad@Idle01_SurroundBt01")
+motionNames.append("ChrBrad@Idle01_SurroundBt02")
+
+for b in range(0, len(stateNames)):	
+	stateTest = scene.getBlendManager().createState1D(stateNames[b])
+	stateTest.setBlendSkeleton(skeleton)
+	motions = StringVec()
+	motions.append(motionNames[b * 2])
+	motions.append(motionNames[b * 2 + 1])
+
+	stateTest.addMotion(motionNames[b * 2], 0.0)
+	stateTest.addMotion(motionNames[b * 2 + 1], 1.0)
+	print "Added gesture blend " + stateNames[b]
+
+	
+	
+	
+bml.execBML(sinbadName, '<body posture="ChrBrad@Idle01"/>')

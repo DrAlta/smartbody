@@ -3,11 +3,11 @@ def createRetargetInstance(srcSkelName, tgtSkelName):
 	#endJoints.append('l_ankle')
 	#endJoints.append('l_forefoot')
 	endJoints.append('l_toe')
-	#endJoints.append('l_wrist') 
+	endJoints.append('l_wrist') 
 	#endJoints.append('r_ankle')		
 	#endJoints.append('r_forefoot')	
 	endJoints.append('r_toe')	
-	#endJoints.append('r_wrist')
+	endJoints.append('r_wrist')
 
 	relativeJoints = StringVec();
 	relativeJoints.append('JtPelvis')

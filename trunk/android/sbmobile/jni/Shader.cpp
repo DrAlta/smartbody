@@ -771,14 +771,19 @@ extern "C"
    		esContext->fboID  = texManager.createFBO(fboName.c_str());   
    		esContext->fboTexID = fboTex->getID();
 
+		// create default color textures to use in place when normal map or specular map is not available
+		texManager.createColorTexture("white_tex", SrColor::white);
+		texManager.createColorTexture("black_tex", SrColor::black);
+		texManager.createColorTexture("gray_tex", SrColor(0.2f, 0.2f, 0.2f, 0.2f));
+		texManager.createColorTexture("defaultNormal_tex", SrColor(0.5f, 0.5f, 1.0f));
 
 
    		glGenRenderbuffers(1, &esContext->fboDepthBuf);
    		glBindRenderbuffer(GL_RENDERBUFFER, esContext->fboDepthBuf);
    		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, esContext->width, esContext->height);
 
-   		//SmartBody::util::log("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
-   		//SmartBody::util::log("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
+   		SmartBody::util::log("esContext->width = %d, esContext->height = %d", esContext->width, esContext->height);
+   		SmartBody::util::log("fboID = %d, fboDepth = %d, fboTexID = %d", esContext->fboID, esContext->fboDepthBuf, esContext->fboTexID);
 
    		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, esContext->fboID);
    		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, esContext->fboDepthBuf);
@@ -801,7 +806,7 @@ extern "C"
 		glGenBuffers(1, &shapeData->jointPosObject);
 		glGenBuffers(1, &shapeData->boneIdxObject);
 
-
+		//SmartBody::util::log("Start Update GPU vertex buffer");
 		const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
 		for (unsigned int i = 0; i < pawnNames.size(); i++)
 		{
@@ -815,6 +820,7 @@ extern "C"
 					SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 					if (gpuMesh && gpuMeshInstance)
 					{
+						//SmartBody::util::log("rebuild vertex buffer GPU for pawn %s", pawn->getName().c_str());
 						gpuMesh->rebuildVertexBufferGPU(true);
 						gpuMeshInstance->initBuffer();
 					}
@@ -822,6 +828,7 @@ extern "C"
 				}
 			}
 		}
+		//SmartBody::util::log("After Update GPU vertex buffer");
 
 		//glClearColor ( 0.0f, 0.0f, 0.0f, 1.0f );
 		glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
@@ -1060,6 +1067,7 @@ extern "C"
 
 	void SHADER_API GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 	{
+		//SmartBody::util::log("GPUMesh Update Debug : Start ");
 		SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 		SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 
@@ -1071,15 +1079,17 @@ extern "C"
 			gpuMeshInstance->initBuffer();
 			SbmShaderProgram::printOglError("GPUMeshUpdate #0.5 ");
 		}
-
+		//SmartBody::util::log("GPUMesh Update Debug : gpuBlendShape");
 		// update blendshapes
 		gpuMeshInstance->gpuBlendShape();
-
+		//SmartBody::util::log("GPUMesh Update Debug : glGenQueries");
 		static GLuint queryName = -1;
 		if (queryName == -1)
 			glGenQueries(1, &queryName);
 		// setup transform feedback
 		const char* attr[3] = { "deformPos", "deformNormal", "deformTangent" };
+
+		//SmartBody::util::log("GPUMesh Update Debug : getShader");
 
 		SbmShaderManager& shaderManager = SbmShaderManager::singleton();
 		skinningShader = shaderManager.getShader("skinning_shader");
@@ -1333,6 +1343,12 @@ extern "C"
 			gpuMeshInstance->initBuffer();
 		SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
+		SbmTexture* whiteTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "white_tex");
+		SbmTexture* blackTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "black_tex");
+		SbmTexture* grayTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "gray_tex");
+		SbmTexture* defaultNormalTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "defaultNormal_tex");
+
 		std::vector<SrVec4>          QuaternionBuf;
 		std::vector<SrVec4>			 TranslationBuf;
 		
@@ -1430,6 +1446,11 @@ extern "C"
 				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
 				SbmTexture* normalMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMesh->normalMapName.c_str());
 				SbmTexture* specularMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
+
+				if (!tex) tex = whiteTex;
+				if (!normalMap) normalMap = defaultNormalTex;
+				if (!specularMap) specularMap = blackTex;
+				
 				//SmartBody::util::log("Render StaticMesh texName = %s, tex = %d", subMesh->texName.c_str(), tex);
 				if (tex && !showSkinWeight)
 				{
@@ -1481,6 +1502,7 @@ extern "C"
 					glBindTexture(GL_TEXTURE_2D, normalMap->getID());
 					glUniform1i(userData->normalMapLoc, 1);
 				}
+				
 				if (specularMap)
 				{
 					GLint activeTexture = -1;
