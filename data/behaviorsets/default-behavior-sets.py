@@ -35,9 +35,3 @@ behav.setScript("BehaviorSetMaleGestures.py")
 
 behav = behaviorSetManager.createBehaviorSet("PNGestures")
 behav.setScript("BehaviorSetPNGestures.py")
-
-behav = behaviorSetManager.createBehaviorSet("PNGestures2")
-behav.setScript("BehaviorSetPNGestures2.py")
-
-behav = behaviorSetManager.createBehaviorSet("PNGestures3")
-behav.setScript("BehaviorSetPNGestures3.py")

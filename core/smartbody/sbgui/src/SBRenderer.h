@@ -49,7 +49,7 @@ public:
 	
 	void resize(int w, int h);
 
-	void drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* viewData);
+	void drawTestDeferred(std::vector<SrLight>& lights, bool isDrawFloor);
 	void drawTestSSAO();	
 	void drawLightPass(std::vector<SrLight>& lights);
 	void drawIBLPass(std::vector<SrLight>& lights);
@@ -58,7 +58,7 @@ public:
 	void registerGUI();
 
 protected:
-	void drawFloor(FltkViewerData* viewerData);
+	void drawFloor();
 	void GPUMeshUpdate(DeformableMeshInstance* meshInstance);
 	void drawTextureQuadWithDepth(SbmTexture* tex, SbmTexture* depthTex);
 	

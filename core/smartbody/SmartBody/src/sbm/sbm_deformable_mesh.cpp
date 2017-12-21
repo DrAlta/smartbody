@@ -507,10 +507,12 @@ SBAPI void DeformableMesh::updateVertexBuffer()
 
 bool DeformableMesh::buildBlendShapes()
 {
+	//SmartBody::util::log("Start build blendshapes");
 	if (blendShapeMap.size() == 0) return false;
 	blendShapeNewVtxIdxMap.clear();
 	std::string neutralName = blendShapeMap.begin()->first;
 	int meshIdx = getMesh(neutralName);
+	//SmartBody::util::log("Start build blendshapes #1");
 	SrModel& neutralMesh = getStaticModel(meshIdx);
 	// build Kd-tree from posBuf
 	unsigned int numKNN = 10;
@@ -518,10 +520,13 @@ bool DeformableMesh::buildBlendShapes()
 	posCloud.pts = posBuf;
 	std::vector<float> knnPtDists(numKNN);
 	std::vector<size_t>   knnPtIdxs(numKNN);
+	//SmartBody::util::log("Start build blendshapes #2");
+	/*
 	MeshKDTree* meshKDTree = new MeshKDTree(3, posCloud, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 	meshKDTree->buildIndex();
 	// for each vertex in neutral blendshape model, search for closest vertex in Kd-tree
 	// if distance is zero, put vertex index in the blendShapeNewVtxIdxMap 
+	SmartBody::util::log("Start build blendshapes #3");
 	for (unsigned int i=0;i<neutralMesh.V.size(); i++)
 	{
 		SrVec inPt = neutralMesh.V[i];
@@ -538,8 +543,10 @@ bool DeformableMesh::buildBlendShapes()
 			}
 		}
 	}
-  delete meshKDTree;
-
+	SmartBody::util::log("Start build blendshapes #4");
+   delete meshKDTree;
+   */
+	//SmartBody::util::log("Start build blendshapes #5");
 	return true;
 }
 
@@ -795,7 +802,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			}
 		}
 	}
-	printf("new vtxs = %d\n",nTotalVtxs);
+	SmartBody::util::log("new vtxs = %d\n",nTotalVtxs);
 
 	// temporary storage 
 	posBuf.resize(nTotalVtxs);
@@ -2506,7 +2513,7 @@ void DeformableMeshInstance::blendShapes()
 
 		int tex_h = 1024;
 		int tex_w = 1024;
-
+		//std::string weightsStr = "weights = ";
 		for (size_t i = 0; i < targets.size(); ++i)
 		{
 			if (!targets[i])
@@ -2560,7 +2567,8 @@ void DeformableMeshInstance::blendShapes()
 
 			// Stores weights of each face
 			weights[i]		= w;
-
+			//if (fabs(w) > gwiz::epsilon4())
+			//	weightsStr += " " + boost::lexical_cast<std::string>(w);
 
 			//std::cerr << "weights[" << i << "]: " << w << "\n";
 			//SmartBody::util::log("weights[%s] = %f", (const char*)targets[i]->shape().name, w);
@@ -2629,6 +2637,7 @@ void DeformableMeshInstance::blendShapes()
 			newN[n].normalize();
 		}
 
+		//SmartBody::util::log("%s", weightsStr.c_str());
 
 		// END OF SECOND ATTEMPT
 		writeToBaseModel->shape().V = newV;

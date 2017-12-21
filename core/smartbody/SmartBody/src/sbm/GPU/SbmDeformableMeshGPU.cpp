@@ -1453,28 +1453,28 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 
 void SbmDeformableMeshGPU::cleanBuffer()
 {
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 1");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 1");
 	if (VBOPos) delete VBOPos;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 2");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 2");
 	if (VBOTangent) delete VBOTangent;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 3");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 3");
 	if (VBOBiNormal) delete VBOBiNormal;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 4");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 4");
 	if (VBONormal) delete VBONormal;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 5");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 5");
 	if (VBOTexCoord) delete VBOTexCoord;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 6");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 6");
 	if (VBOBoneID1) delete VBOBoneID1;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 7");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 7");
 	if (VBOWeight1) delete VBOWeight1;
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 8");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 8");
 
 	for (unsigned int i = 0; i < subMeshTris.size(); i++)
 	{
 		delete subMeshTris[i];
 	}
 	subMeshTris.clear();
-	//SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 9");
+	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 9");
 }
 
 bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
@@ -1493,16 +1493,24 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 {
 	//SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBufferGPU()");
 	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();
+	//SmartBody::util::log(" DeformableMesh::hasGLContext = %d", hasGLContext);
 	if (!hasGLContext) return false;
+	//SmartBody::util::log(" Skin Weight Size = %d", skinWeights.size());
 	if (skinWeights.size() == 0 )
 		return false;
 	if (initGPUVertexBuffer) return true;
 	bool hasSkinBuffer = DeformableMesh::buildSkinnedVertexBuffer();
 	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
-	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #0");
-	VBOPos		= new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
+	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #0");
+	//SmartBody::util::log("posBuf size = %d", posBuf.size());
+	VBOPos		= new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);	
+
+	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #0.5 VBOPos");
+	//SmartBody::util::log("tangentBuf size = %d", tangentBuf.size());
 	VBOTangent	= new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
-	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #1");
+
+	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #1 VBOTangent");
+	//SmartBody::util::log("binormalBuf size = %d", binormalBuf.size());
 	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
 	VBONormal	= new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
 	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #2");
@@ -1516,12 +1524,17 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
 #endif
 	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
+	//SmartBody::util::log("triBuf size = %d", triBuf.size());
 	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);	
+	SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #2 triBuf");
 	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{
 		SbmSubMesh* subMesh = subMeshList[i];
+		
+		//SmartBody::util::log("subMeshTriBuf size = %d", subMesh->triBuf.size());
 		VBOVec3i* subMeshTriBuf = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,subMesh->triBuf);
+		SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #3 subMesh");
 		subMeshTris.push_back(subMeshTriBuf);
 	}
 	// Texture Buffer Object
