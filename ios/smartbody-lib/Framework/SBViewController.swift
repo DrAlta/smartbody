@@ -36,12 +36,9 @@ open class SBViewController: GLKViewController, GLKViewControllerDelegate {
     context?.reloadTexture()
   }
 
-  open func teardownOpenGL() {
-    
+  open func teardownOpenGL() {    
   }
-    
   
-
   open override func viewDidLoad() {
     super.viewDidLoad()
     self.delegate = self
