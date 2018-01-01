@@ -168,6 +168,7 @@ SBPhonemeManager::~SBPhonemeManager()
 	}
 }
 
+
 void SBPhonemeManager::deleteDiphoneSet(const std::string& name)
 {
 	if (_diphoneMap.find(name) != _diphoneMap.end())
@@ -653,6 +654,69 @@ void SBPhonemeManager::generatePhoneTrigrams(const std::string& lipsyncSetName)
 	}
 
 }
+
+void SBPhonemeManager::export(const std::string filename)
+{
+	std::ofstream file(filename);
+	if (!file.good())
+	{
+		SmartBody::util::log("File %s cannot be opened for writing. No lip sync export done.", filename.c_str());
+		return;
+	}
+	// export the mappings
+	for (std::map<std::string, std::string>::iterator iter = _phonemeToCommonPhonemeMap.begin();
+		iter != _phonemeToCommonPhonemeMap.end();
+		iter++)
+	{
+		std::string from = (*iter).first;
+		std::string to = (*iter).second;
+		std::string fromLower = SmartBody::util::toLower(from);
+		std::string toLower = SmartBody::util::toLower(to);
+		file << "Map " << fromLower << " " << toLower << std::endl;
+	}
+
+
+	// export the animations
+	for (std::map<std::string, SBDiphone* >::iterator iter = _fastDiphoneMap.begin();
+		iter != _fastDiphoneMap.end();
+		iter++)
+	{
+		SBDiphone* diphone = (*iter).second;
+
+		std::string diphoneCode = (*iter).first;
+
+		std::vector<std::string> tokens;
+		SmartBody::util::tokenize(diphoneCode, tokens, "_");
+
+		std::string diphoneFrom = tokens[1];
+		std::string diphoneTo = tokens[2];
+
+		std::string diphoneFromLower = SmartBody::util::toLower(diphoneFrom);
+		std::string diphoneToLower = SmartBody::util::toLower(diphoneTo);
+
+		file << "Diphone " << diphoneFromLower << " " << diphoneToLower << std::endl;
+
+		int numVisemes = diphone->getNumVisemes();
+		std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+
+		for (int v = 0; v < numVisemes; v++)
+		{
+			file << "Shape " << visemeNames[v] << " ";
+			std::vector<float>& keys = diphone->getKeys(visemeNames[v]);
+			file << keys.size() << " ";
+			for (size_t k = 0; k < keys.size(); k++)
+			{
+				file << keys[k] << " ";
+			}
+			file << std::endl;
+		}
+	}
+
+	file.close();
+	SmartBody::util::log("File %s written.", filename.c_str());
+
+}
+
 
 void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, const std::string lipsyncFile, const std::string outputFile)
 {
