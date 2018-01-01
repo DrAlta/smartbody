@@ -483,7 +483,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getPhonemesRealtime", &SBPhonemeManager::getPhonemesRealtime, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phonemes associated with the given character.")
 		.def("getPhonemesRealtimeTimings", &SBPhonemeManager::getPhonemesRealtimeTimings, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phoneme timings associated with the given character.")
 		.def("saveLipSyncAnimation", &SBPhonemeManager::saveLipSyncAnimation, "Saves the lip sync animation to a .dae (COLLADA) file.")
-		.def("createFastMap", &SBPhonemeManager::createFastMap, "Optimizes the phoneme pair search.")
+		.def("exportForService", &SBPhonemeManager::exportForService, "Exports the data")
+		.def("createFastMap", &SBPhonemeManager::createFastMap, "Optimizes the phoneme pair search.");
 
 		;
 
