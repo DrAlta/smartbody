@@ -655,7 +655,7 @@ void SBPhonemeManager::generatePhoneTrigrams(const std::string& lipsyncSetName)
 
 }
 
-void SBPhonemeManager::export(const std::string filename)
+void SBPhonemeManager::exportForService(const std::string filename)
 {
 	std::ofstream file(filename);
 	if (!file.good())
@@ -697,7 +697,7 @@ void SBPhonemeManager::export(const std::string filename)
 		file << "Diphone " << diphoneFromLower << " " << diphoneToLower << std::endl;
 
 		int numVisemes = diphone->getNumVisemes();
-		std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+		const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
 
 		for (int v = 0; v < numVisemes; v++)
 		{
