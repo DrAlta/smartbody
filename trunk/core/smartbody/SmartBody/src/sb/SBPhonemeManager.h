@@ -75,7 +75,7 @@ class SBPhonemeManager : public SBService
 		SBAPI void generatePhoneTrigrams(const std::string& lipsyncSetName);
 
 		SBAPI void saveLipSyncAnimation(const std::string characterName, const std::string lipsyncFile, const std::string outputFile);
-		SBAPI void export(const std::string filename);
+		SBAPI void exportForService(const std::string filename);
 		SBAPI void createFastMap();
 
 	protected:
