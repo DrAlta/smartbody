@@ -103,8 +103,10 @@ class SBBmlProcessor
 		
 		SBAPI std::string execBML(std::string character, std::string bml);
 		SBAPI std::string execBMLFile(std::string character, std::string filename);
+		SBAPI std::string execBMLFileId(std::string character, std::string filename, std::string id);
 		SBAPI std::string execXML(std::string character, std::string xml);
 		SBAPI std::string execXMLFile(std::string character, std::string filename);
+		SBAPI std::string execXMLFileId(std::string character, std::string filename, std::string id);
 		SBAPI void execBMLAt(double time, std::string character, std::string bml);
 		SBAPI void execBMLFileAt(double time, std::string character, std::string filename);
 		SBAPI void execXMLAt(double time, std::string character, std::string xml);
@@ -119,9 +121,9 @@ class SBBmlProcessor
 		void scheduleBML(std::vector<BMLObject*>& behaviors);
 		void processBML(double time);
 
-		std::string build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
+		std::string build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq, std::string candidateMsgId = "" );
 		std::string send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
-			const std::string& seq_id, bool echo, bool send, const std::string& bml );
+			const std::string& seq_id, bool echo, bool send, const std::string& bml, std::string candidateMsgId = "");
 
 		BML::Processor* _bmlProcessor;
 		std::map<std::string, BMLObject*> _bmlHandlers;
