@@ -22,6 +22,7 @@
 # include <math.h>
 
 # include <sr/sr_mat.h>
+#include <sr/sr_euler.h>
 #include <boost/lexical_cast.hpp>
 //# include <sr/sr_utils.h>
 
@@ -606,6 +607,37 @@ SrMat SrMat::get_rotation() const
 SrVec SrMat::multVec( const SrVec& v1 )
 {	
 	return v1*(*this);
+}
+
+SrVec SrMat::decomposeEuler(const std::string& order)
+{
+	SrVec vec;
+
+	if (order == "XYZ")
+	{
+		sr_euler_angles_xyz((*this), vec[0], vec[1], vec[2]);
+	}
+	else if (order == "XZY")
+	{
+		sr_euler_angles_xzy((*this), vec[0], vec[1], vec[2]);
+	}
+	else if (order == "YXZ")
+	{
+		sr_euler_angles_yxz((*this), vec[0], vec[1], vec[2]);
+	}
+	else if (order == "YZX")
+	{
+		sr_euler_angles_yzx((*this), vec[0], vec[1], vec[2]);
+	}
+	else if (order == "ZXY")
+	{
+		sr_euler_angles_zxy((*this), vec[0], vec[1], vec[2]);
+	}
+	else if (order == "ZYX")
+	{
+		sr_euler_angles_zyx((*this), vec[0], vec[1], vec[2]);
+	}
+	return vec;
 }
 
 std::string SrMat::toString()
