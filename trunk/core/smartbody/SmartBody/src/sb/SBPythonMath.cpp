@@ -99,6 +99,7 @@ void pythonFuncsMath()
 		.def("transpose", &SrMat::transpose, "transposes the data in the matrix")
 		.def("multVec", &SrMat::multVec, "multiply the matrix with a vector")
 		.def("getTranslation", &SrMat::get_translation, "get the translation component of the matrix")
+		.def("decomposeEuler", &SrMat::decomposeEuler, "decomposes matrix into Euler angles. Use Euler angle order: XYZ, XZY, YXZ, ZXY, ZYX, YZX, YXZ")
 		;
 
 	boost::python::class_<SrQuat>("SrQuat")

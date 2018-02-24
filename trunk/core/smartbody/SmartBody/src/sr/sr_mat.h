@@ -300,6 +300,8 @@ class SBAPI SrMat
     /*! Sets SrMat to be the difference m1-m2. */
     void sub ( const SrMat &m1, const SrMat &m2 );
 
+	SrVec decomposeEuler(const std::string& order);
+
     /*! Distance between two matrices, considering them as a 16-dimensional vector. */
     SBAPI friend float dist ( const SrMat &a, const SrMat &b );
 
