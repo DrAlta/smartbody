@@ -154,6 +154,8 @@ class SBAPI SrQuat
     /*! Gets the equivalent transformation matrix. */
     SrMat& get_mat ( SrMat& m ) const;
 
+	SrMat getMat();
+
 	SrVec multVec(const SrVec& v);
 
     /*! Given a vector v and a quaternion q, the result of applying the rotation

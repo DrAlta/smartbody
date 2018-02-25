@@ -20,6 +20,7 @@
  */
 
 # include <sr/sr_quat.h>
+# include <sr/sr_euler.h>
 #include <sbm/gwiz_math.h>
 #include <boost/lexical_cast.hpp>
 #include <string>
@@ -314,6 +315,40 @@ SrMat& SrQuat::get_mat ( SrMat& m ) const
 
    return m;
  }
+
+SrMat SrQuat::getMat()
+{
+        float xx = x * x;
+        float yy = y * y;
+        float zz = z * z;
+        float xy = x * y;
+        float xz = x * z;
+        float yz = y * z;
+        float wx = w * x;
+        float wy = w * y;
+        float wz = w * z;
+
+	SrMat mat;
+        mat.setData(0, 0, 1.0 - 2.0*( yy + zz ));
+        mat.setData(0, 1, 2.0*( xy + wz ));
+	mat.setData(0, 2, 2.0*( xz - wy ));
+	mat.setData(0, 3, 0.0);
+	mat.setData(1, 0, 2.0*( xy - wz ));
+	mat.setData(1, 1, 1.0 - 2.0*( zz + xx ));
+	mat.setData(1, 2, 2.0*( yz + wx ));
+	mat.setData(1, 3, 0.0);
+	mat.setData(2, 0, 2.0*( xz + wy ));
+	mat.setData(2, 1,  2.0*( yz - wx ));
+	mat.setData(2, 2, 1.0 - 2.0*( xx + yy ));
+	mat.setData( 2, 3 , 0.0);
+	mat.setData( 3, 0 , 0.0);
+	mat.setData( 3, 1 , 0.0);
+	mat.setData( 3, 2 , 0.0);
+	mat.setData( 3, 3 , 1.0);
+
+	return mat;
+
+}
 
 
 void SrQuat::setAxisAngle(SrVec axis, double angle)
