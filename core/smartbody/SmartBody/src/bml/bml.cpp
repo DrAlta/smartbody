@@ -419,6 +419,10 @@ void BmlRequest::faceRequestProcess()
 	}
 }
 
+bool prioritySortFunction(GestureRequest* i, GestureRequest* j)
+{
+	return i->priority > j->priority;
+}
 
 void BmlRequest::gestureRequestProcess()
 {
@@ -435,6 +439,7 @@ void BmlRequest::gestureRequestProcess()
 	if (actor->getBoolAttribute("gestureRequest.experimentalCoarticulation"))
 	{
 		std::vector<GestureRequest*> gestures;
+		
 		for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i)
 		{
 			BehaviorRequest* behavior = (*i).get();
@@ -446,6 +451,11 @@ void BmlRequest::gestureRequestProcess()
 		}
 		if (gestures.size() <= 1)
 			return;
+
+		if (actor->getBoolAttribute("gestureRequest.experimentalPriorityCoarticulation"))
+		{
+			std::sort(gestures.begin(), gestures.end(), prioritySortFunction);
+		}
 
 		// first pass, remove lower priority overlapping gesture
 		for (size_t i = 0; i < gestures.size(); i++)
