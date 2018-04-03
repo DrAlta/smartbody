@@ -58,7 +58,7 @@ SrModel::SrModel ()
 
 SrModel::~SrModel ()
  {
-   SmartBody::util::log("Delete SrModel, name = '%s'", (const char*)name);
+   //SmartBody::util::log("Delete SrModel, name = '%s'", (const char*)name);
  }
 
 void SrModel::init ()

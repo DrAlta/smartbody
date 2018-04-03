@@ -452,41 +452,91 @@ void BmlRequest::gestureRequestProcess()
 		if (gestures.size() <= 1)
 			return;
 
+		std::vector<GestureRequest*> gesturePriorityList;
+		for (size_t g = 0; g < gestures.size(); g++)
+			gesturePriorityList.push_back(gestures[g]);
 		if (actor->getBoolAttribute("gestureRequest.experimentalPriorityCoarticulation"))
 		{
-			std::sort(gestures.begin(), gestures.end(), prioritySortFunction);
+			std::sort(gesturePriorityList.begin(), gesturePriorityList.end(), prioritySortFunction);
 		}
+		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+			for (size_t i = 0; i < gesturePriorityList.size(); i++)
+				SmartBody::util::log("Gesture priority order: %d ", gesturePriorityList[i]->priority);
 
 		// first pass, remove lower priority overlapping gesture
-		for (size_t i = 0; i < gestures.size(); i++)
+		for (size_t i = 0; i < gesturePriorityList.size(); i++)
 		{
 			// mark the motions as gestures
-			MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+			MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[i]->anim_ct);
 			motionController->setGesture(true);
 
-			if (gestures[i]->filtered)
+			if (gesturePriorityList[i]->filtered)
 				continue;
 
-			double currGestureStrokeStartAt = (double)gestures[i]->behav_syncs.sync_stroke_start()->time();
-			double currGestureStrokeAt = (double)gestures[i]->behav_syncs.sync_stroke()->time();
-			double currGestureStrokeEndAt = (double)gestures[i]->behav_syncs.sync_stroke_end()->time();
-			double currGestureRelaxAt = (double)gestures[i]->behav_syncs.sync_relax()->time();
+			double currGestureStrokeStartAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_start()->time();
+			double currGestureStrokeAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke()->time();
+			double currGestureStrokeEndAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_end()->time();
+			double currGestureRelaxAt = (double)gesturePriorityList[i]->behav_syncs.sync_relax()->time();
 
 
-			for (size_t j = i + 1; j < gestures.size(); j++)
+			for (size_t j = i + 1; j < gesturePriorityList.size(); j++)
 			{
-				if (gestures[j]->filtered)
+				if (gesturePriorityList[j]->filtered)
 					continue;
 
-				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_stroke_start()->time();
-				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
-				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke_end()->time();
-				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
+				double nextGestureStrokeStartAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_start()->time();
+				double nextGestureStrokeAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureStrokeEndAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_end()->time();
+				double nextGestureRelaxAt = (double)gesturePriorityList[j]->behav_syncs.sync_relax()->time();
 
 
 				// check for overlapping stroke phases
-				if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
+				if ((nextGestureStrokeStartAt > currGestureStrokeStartAt && nextGestureStrokeStartAt < currGestureStrokeEndAt) ||
+					(nextGestureStrokeEndAt > currGestureStrokeStartAt && nextGestureStrokeEndAt < currGestureStrokeEndAt))
+				//if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
 				{
+// determine the % overlap
+double curBlockTime = currGestureStrokeEndAt - currGestureStrokeStartAt;
+double nextBlockTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
+bool startOverlap = false;
+bool endOverlap = false;
+double overlappingTime = 0.0; 
+if (nextGestureStrokeStartAt > currGestureStrokeStartAt && nextGestureStrokeStartAt < currGestureStrokeEndAt)
+{
+	startOverlap = true;
+	overlappingTime = currGestureStrokeEndAt - nextGestureStrokeStartAt;
+}
+
+if (nextGestureStrokeEndAt > currGestureStrokeStartAt && nextGestureStrokeEndAt < currGestureStrokeEndAt)
+{
+	endOverlap = true;
+	overlappingTime = nextGestureStrokeEndAt - currGestureStrokeStartAt;
+}
+if (startOverlap && endOverlap)
+{
+	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		SmartBody::util::log("Complete overlap!");
+	overlappingTime = 100000.0;
+}
+else
+{
+	double percentage = overlappingTime / curBlockTime;
+	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		SmartBody::util::log("Overlap %d %d: %f", i, j, percentage);
+	double overlapTolerance = actor->getDoubleAttribute("gestureRequest.experimentalCoarticulationOverlap");
+	if (overlapTolerance > percentage)
+	{
+		// keep the gesture
+		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+			SmartBody::util::log("Withing tolerance, keeping it...");
+		continue;
+
+	}
+}
+
+
+
+
 					// remove the lower priority gesture
 					if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
 					{
@@ -516,21 +566,29 @@ void BmlRequest::gestureRequestProcess()
 						actor->setStringAttribute("gestureRequest.lastGestureRandom", str);
 						
 						if (which == 0)
-							gestures[j]->filtered = true;
+						{
+							gesturePriorityList[j]->filtered = true;
+							SmartBody::util::log("Gesture %d filtered randomly in conflict with gesture %d", j, i);
+						}
 						else
-							gestures[i]->filtered = true;
+						{
+							gesturePriorityList[i]->filtered = true;
+							SmartBody::util::log("Gesture %d filtered randomly in conflict with gesture %d", i, j);
+						}
 					}
 					else
 					{
-						if (gestures[i]->priority >= gestures[j]->priority)
+						if (gesturePriorityList[i]->priority >= gesturePriorityList[j]->priority)
 						{
-							gestures[j]->filtered = true;
+							gesturePriorityList[j]->filtered = true;
+							SmartBody::util::log("Gesture %d filtered because lower priority than gesture %d", j, i);
 							continue;
 						}
 						else
 						{
-							gestures[i]->filtered = true;
-							break;
+							gesturePriorityList[i]->filtered = true;
+							SmartBody::util::log("Gesture %d filtered because lower priority than gesture %d", i, j);
+							continue;
 						}
 					}
 
@@ -542,7 +600,11 @@ void BmlRequest::gestureRequestProcess()
 		for (size_t i = 0; i < gestures.size(); i++)
 		{
 			if (gestures[i]->filtered)
+			{
+				SmartBody::util::log("Gesture %d was filtered...", i);
 				continue;
+			}
+				
 
 			double currGestureStrokeStartAt = (double)gestures[i]->behav_syncs.sync_stroke_start()->time();
 			double currGestureStrokeAt = (double)gestures[i]->behav_syncs.sync_stroke()->time();
@@ -552,7 +614,10 @@ void BmlRequest::gestureRequestProcess()
 			for (size_t j = i + 1; j < gestures.size(); j++)
 			{
 				if (gestures[j]->filtered)
+				{
+					SmartBody::util::log("Gesture %d was filtered...", j);
 					continue;
+				}
 
 				double nextGestureStrokeReady = (double)gestures[j]->behav_syncs.sync_ready()->time();
 				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_stroke_start()->time();
@@ -562,7 +627,10 @@ void BmlRequest::gestureRequestProcess()
 				double nextFullStrokeTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
 				
 				if (nextFullStrokeTime <= 0.0) // bad metadata information, can't coarticuate gesture
+				{
+					SmartBody::util::log("Gesture %d has bad metadata information, ignoring...", i);
 					continue;
+				}
 
 				//if (nextGestureStrokeReady > currGestureRelaxAt)
 					//continue;
@@ -581,6 +649,7 @@ void BmlRequest::gestureRequestProcess()
 				if (!lWrist || !rWrist)
 				{
 					// no wrists to check for speed, so can't do coarticulation
+					SmartBody::util::log("Gesture %d has no wrist information to test for coarticulation, ignoring...", i);
 					nextMotion->disconnect();
 					continue;
 				}
@@ -625,7 +694,8 @@ void BmlRequest::gestureRequestProcess()
 					transitionTime *= actor->getDoubleAttribute("gestureRequest.transitionTimeMultiplier");
 				}
 
-				if (transitionTime > gestureInterval)
+				if (!actor->getBoolAttribute("experimentalIgnoreTransitionTime") &&
+				     transitionTime > gestureInterval)
 				{
 					// transition time is too fast to perform next gesture, remove it
 					gestures[j]->filtered = true;

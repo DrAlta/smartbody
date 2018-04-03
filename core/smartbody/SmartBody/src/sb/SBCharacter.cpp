@@ -105,6 +105,8 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Gestures", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
 	createBoolAttribute("gestureRequest.experimentalCoarticulation", false, true, "Gestures", 97, false, false, false, "Experimental coarticulation code.");
 	createBoolAttribute("gestureRequest.experimentalPriorityCoarticulation", false, true, "Gestures", 107, false, false, false, "Experimental coarticulation code.");
+	createDoubleAttribute("gestureRequest.experimentalCoarticulationOverlap", 0.0, true, "Gestures", 108, false, false, false, "Experimental coarticulation code.");
+	createBoolAttribute("gestureRequest.experimentalIgnoreTransitionTime", false, true, "Gestures", 109, false, false, false, "Experimental coarticulation code.");
 	createDoubleAttribute("gestureRequest.transitionTimeMultiplier", 1.0, true, "Gestures", 98, false, false, false, "Experimental coarticulation code; transition time adjustment.");
 	createBoolAttribute("gestureRequest.experimentalTransitions", false, true, "Gestures", 99, false, false, false, "Experimental transition code.");
 	createBoolAttribute("gestureRequest.coarticulateFace", false, true, "Gestures", 101, false, false, false, "Coarticulate facial action units via BML.");
