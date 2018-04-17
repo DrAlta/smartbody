@@ -339,20 +339,20 @@ DeformableMesh::DeformableMesh() : SBAsset()
 
 DeformableMesh::~DeformableMesh() 
 {
-  SmartBody::util::log("Delete Deformable Mesh '%s'", this->getName().c_str());
+  //SmartBody::util::log("Delete Deformable Mesh '%s'", this->getName().c_str());
 	skeleton->unref();
 
-  SmartBody::util::log("Dynamic Mesh size = %d, static Mesh size = %d", dMeshDynamic_p.size(), dMeshStatic_p.size());
+  //SmartBody::util::log("Dynamic Mesh size = %d, static Mesh size = %d", dMeshDynamic_p.size(), dMeshStatic_p.size());
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
-    SmartBody::util::log("Dynamic Mesh '%s' ref count = %d", (const char*)dMeshDynamic_p[i]->shape().name, dMeshDynamic_p[i]->getref());
+   // SmartBody::util::log("Dynamic Mesh '%s' ref count = %d", (const char*)dMeshDynamic_p[i]->shape().name, dMeshDynamic_p[i]->getref());
 		dMeshDynamic_p[i]->unref();
 		//delete dMeshDynamic_p[i];
 	}
 	dMeshDynamic_p.clear();
 	for (unsigned int i = 0; i < dMeshStatic_p.size(); i++)
 	{
-    SmartBody::util::log("Static Mesh '%s' ref count = %d", (const char*)dMeshStatic_p[i]->shape().name, dMeshStatic_p[i]->getref());
+   // SmartBody::util::log("Static Mesh '%s' ref count = %d", (const char*)dMeshStatic_p[i]->shape().name, dMeshStatic_p[i]->getref());
 		dMeshStatic_p[i]->unref();
 		//delete dMeshStatic_p[i];
 	}
@@ -521,7 +521,7 @@ bool DeformableMesh::buildBlendShapes()
 	std::vector<float> knnPtDists(numKNN);
 	std::vector<size_t>   knnPtIdxs(numKNN);
 	//SmartBody::util::log("Start build blendshapes #2");
-	/*
+	
 	MeshKDTree* meshKDTree = new MeshKDTree(3, posCloud, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 	meshKDTree->buildIndex();
 	// for each vertex in neutral blendshape model, search for closest vertex in Kd-tree
@@ -545,7 +545,7 @@ bool DeformableMesh::buildBlendShapes()
 	}
 	SmartBody::util::log("Start build blendshapes #4");
    delete meshKDTree;
-   */
+   
 	//SmartBody::util::log("Start build blendshapes #5");
 	return true;
 }
@@ -563,14 +563,14 @@ void DeformableMesh::rebuildVertexBuffer( bool rebuild )
 
 bool DeformableMesh::buildSkinnedVertexBuffer()
 {	
-	SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBuffer()");
+	//SmartBody::util::log(" DeformableMesh::buildSkinnedVertexBuffer()");
 	if (initSkinnedVertexBuffer) return true;
 
 	if (initStaticVertexBuffer && !isSkinnedMesh()) return true;
 
 	bool buildSkinnedBuffer = isSkinnedMesh();
 
-	SmartBody::util::log("Build Skinned Buffer");
+	SmartBody::util::log("Build Skinned Buffer for Mesh '%s'", this->getName().c_str());
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;	
 	std::vector<std::set<IntPair> > vtxNormalIdxMap;
 	std::vector<std::set<int> > vtxMaterialIdxMap;
@@ -605,7 +605,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	meshIndexList.clear();
 	boneJointIdxMap.clear();
 	bindPoseMatList.clear();
-	SmartBody::util::log("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
+	//SmartBody::util::log("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
 		for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
@@ -662,7 +662,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-		SmartBody::util::log("meshIndexList %d, matList.size() = %d \n", i, matList.size());
+		//SmartBody::util::log("meshIndexList %d, matList.size() = %d \n", i, matList.size());
 		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	
@@ -802,7 +802,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			}
 		}
 	}
-	SmartBody::util::log("new vtxs = %d\n",nTotalVtxs);
+	//SmartBody::util::log("new vtxs = %d\n",nTotalVtxs);
 
 	// temporary storage 
 	posBuf.resize(nTotalVtxs);
@@ -1072,7 +1072,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
     }
   }
 	subMeshList.clear();
-	SmartBody::util::log("subMeshList.size() = %d \n", meshSubsetMap.size());
+	//SmartBody::util::log("subMeshList.size() = %d \n", meshSubsetMap.size());
 	for (vi  = meshSubsetMap.begin();
 		vi != meshSubsetMap.end();
 		vi++)
@@ -1108,7 +1108,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		boost::algorithm::to_lower(lowMatName);		
 		if (mesh->material.useAlphaBlend)
 		{
-			SmartBody::util::log("alpha mesh = %s",mesh->matName.c_str());
+			//SmartBody::util::log("alpha mesh = %s",mesh->matName.c_str());
 			alphaMeshList.push_back(mesh);
 		}
 		else

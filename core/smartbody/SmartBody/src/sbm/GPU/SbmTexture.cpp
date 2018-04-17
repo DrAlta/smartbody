@@ -594,6 +594,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 #endif
 
 	//glTexParameteri(iType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 
 	bool isFloatTexture = (dataType == GL_FLOAT);
@@ -632,14 +633,19 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
     //if (buildMipMap)
     //    gluBuild2DMipmaps(iType, channels, width, height, texture_format, dataType, buffer);
     //else
+	GLint texSize;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+
+	SmartBody::util::log("build texture image buffer size = %d, maxTexture Size = %d", imgBuffer.size(), texSize);
         glTexImage2D(iType,0,internal_format, width,height,0,texture_format, dataType, buffer);
-	if (buildMipMap)
-		glGenerateMipmap(GL_TEXTURE_2D);
+	//if (buildMipMap)
+	//	glGenerateMipmap(GL_TEXTURE_2D);
 #elif defined(EMSCRIPTEN)    
     glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 	if (buildMipMap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 #else
+	SmartBody::util::log("texName = %s, iType = %d, width = %d, height = %d", textureName.c_str(), iType, width, height);
     glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, buffer);
 	if (buildMipMap)
 		glGenerateMipmap(GL_TEXTURE_2D);

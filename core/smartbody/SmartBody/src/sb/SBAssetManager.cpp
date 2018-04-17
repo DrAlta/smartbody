@@ -1853,7 +1853,9 @@ const std::string SBAssetManager::findFileName(const std::string& type, const st
 	std::string curFilename = path->next_filename( buffer, filename.c_str() );
 	while (curFilename.size() > 0)
 	{
+		SmartBody::util::log("next curFilename = '%s'", curFilename.c_str());
 		FILE* file = fopen(curFilename.c_str(), "r");
+		SmartBody::util::log("file = %d", file);
 		if (file)
 		{
 			fclose(file);

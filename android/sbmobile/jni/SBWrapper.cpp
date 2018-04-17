@@ -544,6 +544,7 @@ void SBDrawFrameAR(int width, int height, ESContext *esContext, SrMat modelViewM
 
 void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView, bool drawAR ) {
 	//SmartBody::util::log("draw!");
+	SbmShaderProgram::printOglError("drawFrame start");
 	static bool initShader = false;
 	static bool firstRender = true;
 	if (!initShader)
@@ -560,11 +561,11 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SrVec backgroundColor = scene->getVec3Attribute("GUI.BackgroundColor");
 	
-
+	SbmShaderProgram::printOglError("drawFrame #0");
 	// setup textures
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	texm.updateTexture();
-
+	SbmShaderProgram::printOglError("drawFrame #1");
 	//SbmShaderManager& ssm = SbmShaderManager::singleton();
 	//ssm.buildShaders();
 
@@ -578,7 +579,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
 	SBSetupDrawing(width, height, esContext);
 
-
+	SbmShaderProgram::printOglError("drawFrame #2");
 	if (!drawAR)
 	{
 		//glClearColor(0.33f, 0.78f, 0.95f, 1.f);
@@ -588,9 +589,9 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
-
+	SbmShaderProgram::printOglError("drawFrame #3");
 	SBUpdateCharacterGPUSkin();
-	
+	SbmShaderProgram::printOglError("drawFrame #4");
 
 	
 	
@@ -617,6 +618,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//use the shape program object
 	//SmartBody::util::log("Before use program");
 	glUseProgram (shapeData->programObject );
+	SbmShaderProgram::printOglError("drawFrame #5");
 	//SmartBody::util::log("After use program");
 	glUniformMatrix4fv(shapeData->mvpLoc, 1, GL_FALSE, (GLfloat *)matMVP.pt(0));
 	glUniformMatrix4fv(shapeData->mvLoc, 1, GL_FALSE, (GLfloat *)matModelView.pt(0));
@@ -624,6 +626,7 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//drawGrid(esContext);
 	//SmartBody::util::log("Before draw pawns");
 	SBDrawPawns(esContext);
+	SbmShaderProgram::printOglError("drawFrame #6");
 	// Use the program object
 	//SmartBody::util::log("Before userData useProgram");
 	glUseProgram ( userData->programObject );
@@ -632,13 +635,14 @@ void SBDrawFrame_ES20(int width, int height, ESContext *esContext, SrMat eyeView
 	//SmartBody::util::log("Before SBDrawCharacters_ES20");
 	//SBDrawCharacters_ES20(esContext);
 	SBDrawCharacterGPUSkin(esContext);
+	SbmShaderProgram::printOglError("drawFrame #7");
 	//draw lights
 	//SmartBody::util::log("After SBDrawCharacters_ES20");
 	drawLights(esContext);
 
 	// draw background
 	SBDrawBackground(esContext);
-
+	SbmShaderProgram::printOglError("drawFrame #8");
 	//SmartBody::util::log("SBDrawFrame_ES20::drawRenderTarget");
 	/*
 	if (useRenderTarget)

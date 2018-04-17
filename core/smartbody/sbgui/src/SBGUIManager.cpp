@@ -6,7 +6,7 @@
 #if _MSC_VER == 1500
 #define USE_CEGUI 0
 #else
-#define USE_CEGUI 1
+#define USE_CEGUI 0
 #endif
 #else
 #define USE_CEGUI 0

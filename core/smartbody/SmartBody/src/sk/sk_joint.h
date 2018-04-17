@@ -218,7 +218,7 @@ public:
 	/*! If the current local matrix is not up to date, it will
 	recalculate the local matrix based on the current
 	local translation and rotation parameterization */
-	void update_lmat ();
+	SBAPI void update_lmat ();
 
 	/*! Recursivelly updates the local matrix and the global
 	matrices of the joint and all its children. It assumes
