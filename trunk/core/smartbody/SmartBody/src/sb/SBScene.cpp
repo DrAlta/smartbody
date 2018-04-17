@@ -1438,6 +1438,7 @@ bool SBScene::runScript(const std::string& script)
 	}
 
 	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
+	SmartBody::util::log("script name = '%s', curFilename = '%s'", script.c_str(), curFilename.c_str());
 	if (curFilename != "")
 	{
 		try {

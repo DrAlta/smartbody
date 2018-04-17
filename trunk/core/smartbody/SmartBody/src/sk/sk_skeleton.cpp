@@ -90,9 +90,9 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBAsset()
 
 SkSkeleton::~SkSkeleton ()
 {
-	SmartBody::util::log("delete skeleton %s",getName().c_str());
+	//SmartBody::util::log("delete skeleton %s",getName().c_str());
 	init ();
-	SmartBody::util::log("channel ref count = %d",_channels->getref());
+	//SmartBody::util::log("channel ref count = %d",_channels->getref());
 	_channels->unref();
 }
 

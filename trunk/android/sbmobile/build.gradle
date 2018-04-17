@@ -1,21 +1,34 @@
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
     }
 }
 apply plugin: 'com.android.library'
+repositories {
+    google()
+}
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
 }
 
-android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
 
+android {
+    compileSdkVersion 21
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        multiDexEnabled true
+    }
 
     sourceSets {
         main {
@@ -48,3 +61,18 @@ android {
       abortOnError false
   }
 }
+
+
+task deleteJar(type: Delete) {
+    delete 'output_libs/sbmobile.jar'
+}
+
+task createJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('output_libs/')
+    include('classes.jar')
+    rename('classes.jar', 'sbmobile.jar')
+}
+
+createJar.dependsOn(deleteJar, build)
+

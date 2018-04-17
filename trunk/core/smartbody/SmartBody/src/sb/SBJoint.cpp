@@ -267,6 +267,22 @@ SrQuat SBJoint::getPostrotation()
 		return SrQuat();
 }
 
+SBAPI void SBJoint::setJointOrientation(SrQuat& q)
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		jointQuat->orientation(q);
+}
+
+SBAPI SrQuat SBJoint::getJointOrientation()
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		return jointQuat->orientation();
+	else
+		return SrQuat();
+}
+
 std::vector<SBJoint*> SBJoint::getDescendants()
 {
 	std::vector<SBJoint*> joints;

@@ -73,7 +73,7 @@ class SkJointQuat
         by derived classes, get_quat will be called. */
     SBAPI const SrQuat& value ();
 
-	const SrQuat& rawValue();
+	SBAPI const SrQuat& rawValue();
     
     /*! Freeze rotations, ie, make new calls to value(q) to have no effect */
     void deactivate () { _active=0; }

@@ -195,7 +195,7 @@ bool SrModel::import_ply( const char* file )
 			M.push_back(material);        
 			//SR_TRACE1 ( "new material: "<<in.last_token() );	
 			mtlnames.push_back ( mtlName.c_str() );
-			SmartBody::util::log("texture found : %s", texFile.c_str());
+			//SmartBody::util::log("texture found : %s", texFile.c_str());
 			mtlTextureNameMap[mtlName] = texFile;	
 		}
 		comment = ply_get_next_comment(ply,comment);
@@ -223,7 +223,7 @@ bool SrModel::import_ply( const char* file )
 	ply_set_read_cb(ply, "face", "texnumber", texNumber_cb, this, 0);
 
 #endif
-	SmartBody::util::log("%ld\n%ld\n", nvertices, ntriangles);
+	//SmartBody::util::log("%ld\n%ld\n", nvertices, ntriangles);
 	if (!ply_read(ply))
 		return false;
 	ply_close(ply);

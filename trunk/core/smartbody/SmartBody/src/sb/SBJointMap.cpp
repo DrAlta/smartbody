@@ -657,7 +657,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 
 	const std::vector<SkJoint*> jnts = skeleton->joints();
 
-	SmartBody::util::log("Automatic joint name matching for %s \n", skeleton->getName().c_str());
+	//SmartBody::util::log("Automatic joint name matching for %s \n", skeleton->getName().c_str());
 
 	// TODO: check joint names make sure they are unique !
 

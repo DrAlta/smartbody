@@ -5852,12 +5852,12 @@ void FltkViewer::drawDeformableModels()
 					bool showSkinWeight = (meshInstance->getVisibility() == 2);
 					SrGlRenderFuncs::renderDeformableMesh(meshInstance, showSkinWeight);
 					
-					glDisable(GL_DEPTH_TEST);
-					if (pawn->scene_p)
-						pawn->scene_p->set_visibility(1,0,0,0);
-					glColor3f(1.0, 1.0, 1.0);
-					_data->render_action.apply(pawn->scene_p);
-					glEnable(GL_DEPTH_TEST);
+// 					glDisable(GL_DEPTH_TEST);
+// 					if (pawn->scene_p)
+// 						pawn->scene_p->set_visibility(1,0,0,0);
+// 					glColor3f(1.0, 1.0, 1.0);
+// 					_data->render_action.apply(pawn->scene_p);
+// 					glEnable(GL_DEPTH_TEST);
 					
 				}
 			}

@@ -2531,17 +2531,15 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 								newModel->Ft.push_back(SrVec3i(ftVec[0], ftVec[1], ftVec[2]));
 							else
 								newModel->Ft.push_back(SrVec3i(0, 0, 0));
-							
+
 							if (fnVec.size() > x)
 								newModel->Fn.push_back(SrVec3i(fnVec[0], fnVec[x - 1], fnVec[x]));
-							else
+							else if (fnVec.size() > 2)
 								newModel->Fn.push_back(SrVec3i(fnVec[0], fnVec[1], fnVec[2]));
+							else
+								newModel->Fn.push_back(SrVec3i(fVec[0], fVec[x - 1], fVec[x]));
 						}
-					}
-					/*
-					if (tokens.size() != index)
-						SmartBody::util::log("ParserCOLLADAFast::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
-						*/
+					}					
 				}
 				meshCurNode = meshCurNode->next_sibling();
 			}

@@ -289,7 +289,8 @@ extern "C"
                     "};												\n"
                     "const int numOfLights = 4;						\n"
                     "attribute vec4 aPosition;						\n"
-                    "attribute vec3 aNormal, aTangent;				\n"
+                    "attribute vec3 aNormal; 			\n"
+					"attribute vec3 aTangent;			\n"
                     "uniform   mat4 uMVPMatrix;						\n"
                     "uniform   mat4 uMVMatrix;						\n"
                     "attribute vec2 aTexCoord;						\n"
@@ -484,7 +485,7 @@ extern "C"
                     "  vComputedLightColor.a = 1.0;                                  \n"
                     //"  gl_FragColor  = texColor * vComputedLightColor;				 \n"
                     "  gl_FragColor  = vComputedLightColor;				 \n"
-                    "  //gl_FragColor  =  vec4(texColor.a , texColor.a , texColor.a ,1.0);                   			     \n"
+                    //" gl_FragColor  =  vec4(texColor.r , texColor.g , texColor.b ,1.0);                   			     \n"
                     "}																	\n"
 
     ;
@@ -591,7 +592,7 @@ extern "C"
 		}
 		else
 		{
-			//SmartBody::util::log("shader is complied correctly");
+			SmartBody::util::log("shader is complied correctly");
 		}
 
 		return shader;
@@ -624,19 +625,19 @@ extern "C"
 
 		//step 4: attach vertexShader and fragmentShader to the program
 		glAttachShader(programObject, vertexShader);
-		//SbmShaderProgram::printOglError("esLoadShader::glAttachShader, vertexShader");
+		SbmShaderProgram::printOglError("esLoadShader::glAttachShader, vertexShader");
 		glAttachShader(programObject, fragmentShader);
-		//SbmShaderProgram::printOglError("esLoadShader::glAttachShader, fragmentShader");
+		SbmShaderProgram::printOglError("esLoadShader::glAttachShader, fragmentShader");
 		//step 5: link the program
 		glLinkProgram(programObject);
-		//SbmShaderProgram::printOglError("esLoadShader::glLinkProgram");
+		SbmShaderProgram::printOglError("esLoadShader::glLinkProgram");
 
 		//step 6: check linking result
 		glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
 		if(!linked)
 		{
 			GLint infoLen = 0;
-			//SmartBody::util::log("program %d error", programObject);
+			SmartBody::util::log("program %d error", programObject);
 			glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &infoLen);
 
 			if(infoLen > 0)
@@ -644,7 +645,7 @@ extern "C"
 				char *infoLog = (char*)malloc(sizeof(char) * infoLen);
 
 				glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
-				//SmartBody::util::log("Error linking program:\n%s\n", infoLog);
+				SmartBody::util::log("Error linking program:\n%s\n", infoLog);
 				free(infoLog);
 
 			}
@@ -654,7 +655,7 @@ extern "C"
 		}
 		else
 		{
-			//SmartBody::util::log("program %d is linked correctly", programObject);
+			SmartBody::util::log("program %d is linked correctly", programObject);
 		}
 
 		//setp 7: free shader resources
@@ -721,6 +722,9 @@ extern "C"
 		userData->positionLoc = glGetAttribLocation(userData->programObject, "aPosition");
 		userData->normalLoc   = glGetAttribLocation(userData->programObject, "aNormal");
         userData->tangentLoc   = glGetAttribLocation(userData->programObject, "aTangent");
+
+		//SmartBody::util::log("user->positionLoc = %d, normalLoc = %d, tangentLoc = %d", userData->positionLoc, userData->normalLoc, userData->tangentLoc);
+
 		userData->texCoordLoc = glGetAttribLocation(userData->programObject, "aTexCoord");
 		userData->mvpLoc	  = glGetUniformLocation(userData->programObject, "uMVPMatrix");
 		userData->mvLoc		  = glGetUniformLocation(userData->programObject, "uMVMatrix");
@@ -1070,7 +1074,7 @@ extern "C"
 		//SmartBody::util::log("GPUMesh Update Debug : Start ");
 		SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 		SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
-
+		SbmShaderProgram::printOglError("GPUMeshUpdate #Start ");
 		//SmartBody::util::log("gpuMeshInstance = %x, gpuMesh = %x, VBODeformPos = %x", gpuMeshInstance, gpuMesh, gpuMeshInstance->getVBODeformPos());
 		if (!gpuMeshInstance->getVBODeformPos())
 		{
@@ -1082,19 +1086,22 @@ extern "C"
 		//SmartBody::util::log("GPUMesh Update Debug : gpuBlendShape");
 		// update blendshapes
 		gpuMeshInstance->gpuBlendShape();
+		SbmShaderProgram::printOglError("GPUMeshUpdate #0.6 ");
 		//SmartBody::util::log("GPUMesh Update Debug : glGenQueries");
 		static GLuint queryName = -1;
 		if (queryName == -1)
 			glGenQueries(1, &queryName);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #0.7 ");
 		// setup transform feedback
 		const char* attr[3] = { "deformPos", "deformNormal", "deformTangent" };
-
+		SbmShaderProgram::printOglError("GPUMeshUpdate #0.8 ");
 		//SmartBody::util::log("GPUMesh Update Debug : getShader");
 
 		SbmShaderManager& shaderManager = SbmShaderManager::singleton();
 		skinningShader = shaderManager.getShader("skinning_shader");
 		//SmartBody::util::log("Before start transform feedback");
 		glTransformFeedbackVaryings(skinningShader->getShaderProgram(), 3, attr, GL_SEPARATE_ATTRIBS);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #0.9 ");
 		glLinkProgram(skinningShader->getShaderProgram());
 		SbmShaderProgram::printOglError("GPUMeshUpdate #1 ");
 		//SmartBody::util::log("After skinningShader glLinkProgram");
@@ -1164,12 +1171,15 @@ extern "C"
 		//SmartBody::util::log("Query name = %d, Output transform feedback = %d", queryName, PrimitivesWritten);
 
 		glUseProgram(0);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #10 ");
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
 		glDisableVertexAttribArray(3);
 		glDisableVertexAttribArray(4);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #11 ");
 		glDisable(GL_RASTERIZER_DISCARD);
+		SbmShaderProgram::printOglError("GPUMeshUpdate #12 ");
 	}
 
 	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
@@ -1328,6 +1338,8 @@ extern "C"
 
 	void SHADER_API drawMeshStaticVBO(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
 	{
+
+		SbmShaderProgram::printOglError("drawMeshStaticVBO start");
 		UserData *userData = (UserData*)esContext->userData;
 		glUseProgram(userData->programObject);
 		SmartBody::SBScene *scene = SmartBody::SBScene::getScene();
@@ -1356,6 +1368,7 @@ extern "C"
 		std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 
 		glEnable(GL_CULL_FACE);
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #0");
 		if (scene->getBoolAttribute("enableAlphaBlend")) {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1368,9 +1381,10 @@ extern "C"
 		{
 			glUniform1i(userData->blendTextureLightLoc, 0);
 		}
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #1");
 		//SmartBody::util::log("meshScale = %f", shape->getMeshScale());
 		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
-
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #2");
 		if (shape->_deformPosBuf.size() > 0)
 		{
 			glEnableVertexAttribArray(userData->positionLoc);
@@ -1380,26 +1394,35 @@ extern "C"
 			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
 		}
-
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #3");
 		if (mesh->normalBuf.size() > 0)
 		{
+			
 			glEnableVertexAttribArray(userData->normalLoc);
+			//SmartBody::util::log("userData->normalLoc = %d", userData->normalLoc);
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #4.1");
 			gpuMeshInstance->getVBODeformNormal()->VBO()->BindBuffer();
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #4.2");
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
 			//glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size() * sizeof(GLfloat) * 3, mesh->normalBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #4.3");
 		}
-
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #4");
 
 		if (mesh->tangentBuf.size() > 0)
 		{
 			glEnableVertexAttribArray(userData->tangentLoc);
+			//SmartBody::util::log("userData->tangentLoc = %d", userData->tangentLoc);
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #5.1");
 			gpuMeshInstance->getVBODeformTangent()->VBO()->BindBuffer();
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #5.2");
 			//glBindBuffer(GL_ARRAY_BUFFER, userData->meshTangentObject);
 			//glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size() * sizeof(GLfloat) * 3, mesh->tangentBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->tangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #5.3");
 		}
-
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #5");
 		//load the texture coordinates
 		if (mesh->texCoordBuf.size() > 0)
 		{
@@ -1409,7 +1432,7 @@ extern "C"
 			//glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size() * sizeof(GLfloat) * 2, mesh->texCoordBuf[0].data(), GL_DYNAMIC_DRAW);
 			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		}
-
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #6");
 		std::vector<VBOVec3i*>& subMeshTris = gpuMesh->getVBOSubMeshTris();
 		for (unsigned int i = 0; i < subMeshList.size(); i++)
 		{
@@ -1440,7 +1463,7 @@ extern "C"
 			subMesh->material.diffuse.get(color);
 			glUniform4f(userData->mtrlDiffuseLoc, color[0], color[1], color[2], 1.0);
 			glUniform1f(userData->mtrlShininessLoc, shininess);
-
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #7");
 			if (texturesType == "static" || texturesType == "dynamic")
 			{
 				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
@@ -1492,6 +1515,7 @@ extern "C"
 					//SmartBody::util::log("sTexture uniform loc = %d", userData->samplerLoc);
 					glUniform1i(userData->samplerLoc, 0);
 				}
+				SbmShaderProgram::printOglError("drawMeshStaticVBO #8");
 				if (normalMap)
 				{
 					GLint activeTexture = -1;
@@ -1502,7 +1526,7 @@ extern "C"
 					glBindTexture(GL_TEXTURE_2D, normalMap->getID());
 					glUniform1i(userData->normalMapLoc, 1);
 				}
-				
+				SbmShaderProgram::printOglError("drawMeshStaticVBO #9");
 				if (specularMap)
 				{
 					GLint activeTexture = -1;
@@ -1513,13 +1537,18 @@ extern "C"
 					glBindTexture(GL_TEXTURE_2D, specularMap->getID());
 					glUniform1i(userData->specularMapLoc, 2);
 				}
+				SbmShaderProgram::printOglError("drawMeshStaticVBO #10");
 			}
 
 			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
 			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, subMesh->triBuf[0].unsignedShortData(), GL_DYNAMIC_DRAW);
 			subMeshVBO->VBO()->BindBuffer();
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #11");
 			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
+			//SmartBody::util::log("Mesh size = %d", subMesh->triBuf.size());
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #12");
 			subMeshVBO->VBO()->UnbindBuffer();
+			SbmShaderProgram::printOglError("drawMeshStaticVBO #13");
 		}
 		if (scene->getBoolAttribute("enableAlphaBlend")) {
 			glDisable(GL_BLEND);
@@ -1529,6 +1558,7 @@ extern "C"
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glUseProgram(0);
+		SbmShaderProgram::printOglError("drawMeshStaticVBO #14");
 	}
 
 

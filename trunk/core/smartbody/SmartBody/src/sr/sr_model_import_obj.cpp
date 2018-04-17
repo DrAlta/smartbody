@@ -71,6 +71,7 @@ static SrColor read_color ( SrInput& in )
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
+	/*
 #if !defined(SB_IPHONE)
 	SrString s;
 	SrInput in;
@@ -97,6 +98,25 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	texManager.loadTexture(type, file, s);
 	
+#endif
+*/
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+	SrString s;
+	SrInput in;
+	std::string imageFile = file;
+	in.init(fopen(file, "r"));
+	int i = 0;
+	while (!in.valid() && i < paths.size())
+	{
+		s = paths[i++];
+		s << file;
+		imageFile = s;
+		in.init(fopen(s, "r"));
+	}
+	if (!in.valid()) return;
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	SmartBody::util::log("loading texture file = %s", imageFile.c_str());
+	texManager.loadTexture(type, file, s);
 #endif
 }
 
