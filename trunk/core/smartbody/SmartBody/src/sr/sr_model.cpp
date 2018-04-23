@@ -29,6 +29,7 @@
 #include <set>
 # include <sr/sr_quat.h>
 #include <sb/SBUtilities.h>
+#include <cmath>
 
 //# define SR_USE_TRACE1 // IO
 //# define SR_USE_TRACE2 // Validation of normals materials, etc
@@ -612,6 +613,14 @@ bool SrModel::load ( SrInput &in )
 	 {		
 		 Tangent[i].normalize();
 		 BiNormal[i].normalize();	
+		 //if (Tangent[i].norm() > 1.01f || Tangent[i].norm() < 0.99f)
+		 //	 SmartBody::util::log("Error, tangent for vtx %d is %s", i, Tangent[i].toString().c_str());
+		 /*
+		 if (std::isnan(Tangent[i][0]) || std::isnan(Tangent[i][1]) || std::isnan(Tangent[i][2]))
+			 SmartBody::util::log("Error, tangent for vtx %d is nan", i);
+		 if (std::isnan(BiNormal[i][0]) || std::isnan(BiNormal[i][1]) || std::isnan(BiNormal[i][2]))
+			 SmartBody::util::log("Error, binormal for vtx %d is nan", i);
+		  */
 		 //N[i].normalize();
 	 }
  }

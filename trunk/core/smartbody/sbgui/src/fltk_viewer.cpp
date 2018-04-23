@@ -1599,25 +1599,35 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 
 void FltkViewer::resize(int x, int y, int w, int h)
 {
-	SBRenderer::singleton().resize(w, h);
+	//SBRenderer::singleton().resize(w, h);
+	bool useDeferredRendering = SmartBody::SBScene::getScene()->getBoolAttribute("Renderer.UseDeferredRendering");
+	if (useDeferredRendering)
+		SBRenderer::singleton().resize(w, h);
+	else
+		SBBaseRenderer::singleton().resize(w, h);
 	Fl_Gl_Window::resize(x, y, w, h);
 }
 
-void FltkViewer::drawSBRender()
+void FltkViewer::drawSBRender(bool useDeferredShading)
 {
 	if (!visible()) return;
-	SBRenderer& renderer = SBRenderer::singleton();
+	SBBaseRenderer* renderer = NULL;
+	if (useDeferredShading)
+		renderer = &SBRenderer::singleton();
+	else
+		renderer = &SBBaseRenderer::singleton();
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	static bool firstRun = true;
 	bool hasShaderSupport = false;
 	if (!context_valid() || firstRun)
 	{
-		hasShaderSupport = ssm.initGLExtension();
-		renderer.initRenderer(w(), h());
-		renderer.initSSAO(w(), h());
+		hasShaderSupport = ssm.initGLExtension();	
+		//renderer->initSSAO(w(), h());
 		firstRun = false;
 	}
+	if (!renderer->isInitialized())
+		renderer->initRenderer(w(), h());
 
 	if (!valid())
 	{
@@ -1644,8 +1654,9 @@ void FltkViewer::drawSBRender()
 		texm.updateTexture();
 	}
 	updateLights();
-	renderer.drawTestDeferred(_lights, _data->showFloor);
-
+	renderer->setBackgroundColor(_data->bcolor);
+	renderer->draw(_lights, _data->showFloor);
+	
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
 	cam->setAspectRatio((float)w() / (float)h());
 	SrMat mat(SrMat::NotInitialized);
@@ -1659,6 +1670,7 @@ void FltkViewer::drawSBRender()
 	glScalef(cam->getScale(), cam->getScale(), cam->getScale());
 
 	drawInteraction(cam);
+	//drawFloor();
 
 }
    
@@ -1670,12 +1682,15 @@ void FltkViewer::draw()
 	bool useDeferredRendering = SmartBody::SBScene::getScene()->getBoolAttribute("Renderer.UseDeferredRendering");
 	if (useDeferredRendering)
 	{
-		drawSBRender();
+		drawSBRender(true);
+		return;
+	}
+	else
+	{
+		drawSBRender(false);
 		return;
 	}
 
-	
-	
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
