@@ -52,5 +52,5 @@ void main()
 	mat3 skin = TransformPos(pos,normal,tangent,BoneID1,BoneWeight1);	
 	deformPos = skin[0];
 	deformNormal = skin[1];
-	deformTangent = skin[2];
+	deformTangent = tangent;//skin[2];
 }

@@ -27,8 +27,9 @@ void main()
   gl_Position = modelViewProjMat*vec4(position, 1.0);
 
 
-  vNormal = normalize(modelViewMat*vec4(normal,0.0)).xyz;
-  vTangent = normalize(modelViewMat*vec4(tangent,0.0)).xyz;
-  vBiNormal = cross(vNormal, vTangent);//normalize(modelViewMat*vec4(binormal,0.0)).xyz;
+  vNormal = (modelViewMat*vec4(normal,0.0)).xyz;
+  vTangent = (modelViewMat*vec4(tangent,0.0)).xyz;
+  if (isnan(vTangent.x) || isnan(vTangent.y) || isnan(vTangent.z)) vTangent = vec3(0,0,0);
+  vBiNormal = cross(vNormal, vTangent);// normalize(modelViewMat*vec4(binormal,0.0)).xyz; // 
   vTexCoord = texcoord.xy;  
 }
