@@ -5,6 +5,7 @@
 #include "SBFrameBufferObject.h"
 
 #include <sr/sr_light.h>
+#include "SBBaseRenderer.h"
 
 
 class FltkViewerData;
@@ -30,7 +31,9 @@ public:
 };
 
 
-class SBRenderer
+
+
+class SBRenderer : public SBBaseRenderer
 {
 private:
 	// for singleton
@@ -41,36 +44,34 @@ public:
 	static SBRenderer& singleton();
 	static void destroy_singleton();
 
-	void drawDebugFBO();
+	virtual void initRenderer(int w, int h);
+	virtual void resize(int w, int h);
+	virtual void draw(std::vector<SrLight>& lights, bool isDrawFloor);
+	
 
 	SbmTexture* getCurEnvMap(bool diffuseMap = false);
-	void initRenderer(int w, int h);
-	void initSSAO(int w, int h);
 	
-	void resize(int w, int h);
+	void initSSAO(int w, int h);
 
-	void drawTestDeferred(std::vector<SrLight>& lights, bool isDrawFloor);
-	void drawTestSSAO();	
+	void drawDeferredRendering(std::vector<SrLight>& lights, bool isDrawFloor);
+	void drawForwardRendering(std::vector<SrLight>& lights, bool isDrawFloor);
+	void drawSSAOPass();	
 	void drawLightPass(std::vector<SrLight>& lights);
 	void drawIBLPass(std::vector<SrLight>& lights);
-	void renderMesh(DeformableMeshInstance* meshInstance);
+	
 
 	void registerGUI();
 
-protected:
-	void drawFloor();
-	void GPUMeshUpdate(DeformableMeshInstance* meshInstance);
+
 	void drawTextureQuadWithDepth(SbmTexture* tex, SbmTexture* depthTex);
-	
+	void drawDebugFBO();
 protected:	
-	int width, height;
+	
 
 	SbmShaderProgram* gbufferShader;
 	SBGBuffer gbuffer;	
-
 	SbmShaderProgram* lightPassShader; // compute lighting and combine with ambient occlusion
-	SbmShaderProgram* iblShader; // compute lighting and combine with ambient occlusion
-	SbmShaderProgram* skinningShader;
+	SbmShaderProgram* iblShader; // compute lighting and combine with ambient occlusion	
 	SbmShaderProgram* depthQuadShader;
 
 	SBFrameBufferObject lightPassFBO;

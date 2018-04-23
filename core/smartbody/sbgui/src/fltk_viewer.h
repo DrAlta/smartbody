@@ -380,7 +380,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 
 	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
-	void drawSBRender();
+	void drawSBRender(bool useDeferredShading);
 	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
 	void drawFloor(bool shadowPass = false);
 

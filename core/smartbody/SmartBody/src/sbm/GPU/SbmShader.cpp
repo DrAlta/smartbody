@@ -434,7 +434,10 @@ void SbmShaderManager::buildShaders()
 	{
 		SbmShaderProgram* program = vi->second;
 		if (!program->finishBuild())
+		{
+			SmartBody::util::log("Building shader '%s'", vi->first.c_str());
 			program->buildShader();
+		}
 	}
 }
 

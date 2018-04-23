@@ -881,6 +881,7 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClCompile Include="..\src\flu\Flu_Button.cpp" />
     <ClCompile Include="..\src\flu\Flu_Collapsable_Group.cpp" />
     <ClCompile Include="..\src\posecreator\PoseCreator.cpp" />
+    <ClCompile Include="..\src\SBBaseRenderer.cpp" />
     <ClCompile Include="..\src\SBFrameBufferObject.cpp" />
     <ClCompile Include="..\src\SBInterfaceListener.cpp" />
     <ClCompile Include="..\src\jointmapviewer\JointMapViewer.cpp" />
@@ -962,6 +963,7 @@ copy /Y ..\bin\.smartbodysettings ..\..\..\..\bin\smartbody\sbgui\bin
     <ClInclude Include="..\src\flu\Flu_Enumerations.h" />
     <ClInclude Include="..\src\flu\flu_export.h" />
     <ClInclude Include="..\src\posecreator\PoseCreator.h" />
+    <ClInclude Include="..\src\SBBaseRenderer.h" />
     <ClInclude Include="..\src\SBFrameBufferObject.h" />
     <ClInclude Include="..\src\SBInterfaceListener.h" />
     <ClInclude Include="..\src\jointmapviewer\JointMapViewer.h" />
