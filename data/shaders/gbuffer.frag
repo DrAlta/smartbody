@@ -9,7 +9,14 @@ layout(binding=0) uniform sampler2D uDiffuseTex;
 layout(binding=1) uniform sampler2D uNormalTex;
 layout(binding=2) uniform sampler2D uSpecularTex;
 
-uniform float alphaThreshold = 0.8;
+struct material {              
+  vec4  ambient;             
+  vec4    diffuse;             
+  float   shininess;             
+};                       
+
+uniform float alphaThreshold = 0.2;
+uniform   material  uMtrl;
 
 in vec4 vPos;
 in vec3 vNormal;
@@ -36,18 +43,18 @@ void main()
 {
   // Translate clip [-1,1] -> homogenous [0,1]
   vec4 texColor = texture(uDiffuseTex, vTexCoord);  
-  if (texColor.a < alphaThreshold) discard;    
+  float alpha = texColor.a*uMtrl.diffuse.a;
+  if (alpha < alphaThreshold) discard;    
   vec3 normalColor = normalize(texture2D(uNormalTex,vTexCoord).xyz* 2.0 - 1.0);
-  vec3 newtv = normalize(vTangent - vBiNormal*dot(vTangent,vBiNormal));
-  vec3 newbv = normalize(vBiNormal);
+  vec3 newtv = vTangent;//normalize(vTangent - vBiNormal*dot(vTangent,vBiNormal));
+  vec3 newbv = vBiNormal;//normalize(vBiNormal);
   vec3 newn  = vNormal;//normalize(cross(newtv,newbv));
-  vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z);
-
+  vec3 normalMapN = normalize(newn*normalColor.z-newtv*normalColor.x-newbv*normalColor.y);
+  //vec3 normalMapN = normalize(newn*normalColor.z);
+  
   vec3 specularColor = texture(uSpecularTex, vTexCoord).rgb;  
   float glossyColor = texture(uSpecularTex, vTexCoord).a;  
-
   viewPos = vPos.xyz;
-  //viewNormal = encodeNormal(vNormal); 
   viewNormal = normalMapN;
   specular = vec4(specularColor, glossyColor);//vec3(vTexCoord, 1.0);
   glossy = vec3(glossyColor, glossyColor, glossyColor);
