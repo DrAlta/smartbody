@@ -19,6 +19,7 @@ public:
 	virtual void initRenderer(int w, int h);
 	void renderMesh(DeformableMeshInstance* meshInstance, SbmShaderProgram* shaderProgram, bool deferredRender = true);
 	bool isInitialized() { return rendererInitialized;  }
+	void resetRenderer();
 	void setBackgroundColor(SrColor& bg) { backgroundColor = bg;  }
 
 protected:

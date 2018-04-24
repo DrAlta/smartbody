@@ -168,6 +168,7 @@ SBBaseRenderer::~SBBaseRenderer(void)
 
 void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 {
+	if (!isInitialized()) return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<std::string> pawnNames = scene->getPawnNames();
 #if 1
@@ -387,16 +388,22 @@ void SBBaseRenderer::resize(int w, int h)
 	height = h;
 }
 
+
+void SBBaseRenderer::resetRenderer()
+{
+	skinningShader = normalMapShader = NULL;
+	rendererInitialized = false;
+}
+
 void SBBaseRenderer::initRenderer(int w, int h)
 {
 	width = w;
 	height = h;
 
-	
-
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string shaderPath = scene->getMediaPath() + "/shaders/";
 	SbmShaderManager& shaderManager = SbmShaderManager::singleton();
+	
 	skinningShader = shaderManager.getShader("skinning_shader");
 	if (skinningShader)
 	{
