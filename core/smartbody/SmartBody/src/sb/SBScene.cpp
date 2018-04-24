@@ -499,6 +499,7 @@ void SBScene::cleanup()
 
 #if !defined(SB_IPHONE)
 	SbmTextureManager::destroy_singleton();
+	SbmShaderManager::destroy_singleton();
 #endif
 
 #ifndef SB_NO_PYTHON

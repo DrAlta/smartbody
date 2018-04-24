@@ -140,5 +140,6 @@ public:
 	SBAPI void buildShaders();
 	SBAPI void rebuildShaders();
 	SBAPI static int getShaderSupport();
+	SBAPI void releaseAllShaders();
 };
 #endif

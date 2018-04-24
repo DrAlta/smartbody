@@ -27,6 +27,7 @@
 #include <sb/SBVersion.hpp>
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBUtilities.h>
+#include "SBRenderer.h" 
 #include"resourceViewer/AttributeEditor.h"
 
 
@@ -669,6 +670,8 @@ void BaseWindow::ResetScene()
 	}
 	SmartBody::SBScene::destroyScene();
 
+	SBBaseRenderer::singleton().resetRenderer();
+	SBRenderer::singleton().resetRenderer();
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->startFileLogging("./smartbody.log");

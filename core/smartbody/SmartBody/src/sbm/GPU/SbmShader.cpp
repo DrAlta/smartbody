@@ -58,6 +58,20 @@ void SbmShaderManager::destroy_singleton() {
 
 int SbmShaderManager::getShaderSupport() { return shaderSupport; }
 
+
+SBAPI void SbmShaderManager::releaseAllShaders()
+{
+	std::map<std::string, SbmShaderProgram*>::iterator vi;
+	for (vi = shaderMap.begin();
+		vi != shaderMap.end();
+		vi++)
+	{
+		SbmShaderProgram* program = vi->second;
+		delete program;
+	}
+	shaderMap.clear();
+}
+
 SbmShaderProgram::SbmShaderProgram()
 {
 	vsID = -1; 
@@ -284,7 +298,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 /* Shader Manager                                                       */
 /************************************************************************/
 SbmShaderManager* SbmShaderManager::_singleton = NULL;
-int SbmShaderManager::shaderSupport = NO_GPU_SUPPORT;
+int SbmShaderManager::shaderSupport = SUPPORT_OPENGL_2_0;
 
 SbmShaderManager::SbmShaderManager(void)
 {
@@ -293,7 +307,7 @@ SbmShaderManager::SbmShaderManager(void)
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 	shaderSupport = SUPPORT_OPENGL_2_0;
 #else
-	shaderSupport = NO_GPU_SUPPORT;
+	shaderSupport = SUPPORT_OPENGL_2_0;
 #endif
 }
 
@@ -301,21 +315,14 @@ void SbmShaderManager::setViewer( SrViewer* vw )
 {
 	if (vw == NULL)
 	{
-		shaderInit = false;		
+		shaderInit = false;
 	}
 	viewer = vw;	
 }
 
 SbmShaderManager::~SbmShaderManager(void)
 {
-	std::map<std::string,SbmShaderProgram*>::iterator vi;
-	for ( vi  = shaderMap.begin();
-		  vi != shaderMap.end();
-		  vi++)
-	{
-		SbmShaderProgram* program = vi->second;
-		delete program;
-	}
+	releaseAllShaders();
 }
 
 bool SbmShaderManager::initOpenGL()

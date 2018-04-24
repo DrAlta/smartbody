@@ -268,6 +268,8 @@ void SBRenderer::resize(int w, int h)
 
 void SBRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 {
+	if (!isInitialized()) return;
+
 	this->drawDeferredRendering(lights, isDrawFloor);
 }
 
