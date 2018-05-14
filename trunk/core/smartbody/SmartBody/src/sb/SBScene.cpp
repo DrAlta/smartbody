@@ -274,6 +274,7 @@ void SBScene::initialize()
 	createStringAttribute("floorMaterial", "", true, "RenderingParameters", 200, false, false, false, "Material to be used for the floor.");
 
 	createStringAttribute("randomseed", "", true, "", 400, false, false, false, "Seed for random number generator.");
+	createBoolAttribute("blendshapeProximity", .0001, true, "", 121, false, false, false, "Blendshape vertex distance for mesh optimization.");
 
 #if ANDROID_BUILD
 	createBoolAttribute("useGPUBlendshapes",false,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");

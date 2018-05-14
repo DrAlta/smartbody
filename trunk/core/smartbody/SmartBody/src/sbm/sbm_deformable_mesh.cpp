@@ -2437,6 +2437,11 @@ void DeformableMeshInstance::blendShapes()
 		std::vector<SrPnt>& neutralN = baseModel->shape().N;
 		std::vector<SrVec> newV = neutralV;
 		std::vector<SrPnt> newN = neutralN;
+		double blendShapeProximity = gwiz::epsilon4();
+		if (SmartBody::SBScene::getScene()->hasAttribute("blendshapeProximity"))
+		{
+			blendShapeProximity = SmartBody::SBScene::getScene()->getDoubleAttribute("blendshapeProximity");
+		}
 
 		if (foundBaseModel && 
 			_character->getBoolAttribute("useOptimizedBlendShapes"))
@@ -2476,9 +2481,9 @@ void DeformableMeshInstance::blendShapes()
 					for (unsigned int v = 0; v < visemeV.size(); ++v)
 					{
 						vVec = visemeV[v] - neutralV[v];
-						if (fabs(vVec[0]) >  gwiz::epsilon4() ||
-							fabs(vVec[1]) >  gwiz::epsilon4() ||
-							fabs(vVec[2]) >  gwiz::epsilon4())
+						if (fabs(vVec[0]) >  blendShapeProximity ||
+							fabs(vVec[1]) >  blendShapeProximity ||
+							fabs(vVec[2]) >  blendShapeProximity )
 						{
 							std::pair<int, SrVec> temp;
 							temp.first = v;
@@ -2489,9 +2494,9 @@ void DeformableMeshInstance::blendShapes()
 					for (unsigned int n = 0; n < visemeN.size(); ++n)
 					{
 						nVec = visemeN[n] - neutralN[n];
-						if (fabs(nVec[0]) >  gwiz::epsilon4() ||
-							fabs(nVec[1]) >  gwiz::epsilon4() ||
-							fabs(nVec[2]) >  gwiz::epsilon4())	
+						if (fabs(nVec[0]) >  blendShapeProximity ||
+							fabs(nVec[1]) >  blendShapeProximity ||
+							fabs(nVec[2]) >  blendShapeProximity)	
 						{
 							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
 						}
