@@ -250,7 +250,7 @@ public :
 	SkMotion* buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameList, std::vector<std::string> from, std::vector<std::string> to);
 
 	// smooth out the window between [0,timeInterval] and [duration-timeInterval, duration] so the motion will look smooth when cycling
-	SkMotion* buildSmoothMotionCycle(float timeInterval);
+	SkMotion* buildSmoothMotionCycle(float timeInterval, bool smoothBase = false);
 
 	// retarget the motion from source skeleton to target skeleton
 	SBAPI SkMotion* buildRetargetMotionV2(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 

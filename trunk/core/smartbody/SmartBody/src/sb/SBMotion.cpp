@@ -1645,8 +1645,20 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 
 SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 {
-	 	
-	SkMotion* motion = buildSmoothMotionCycle(timeInterval);
+	bool smoothBase = false; 	
+	return motionSmoothCycle(timeInterval, smoothBase, name);
+
+}
+
+SBAPI SBMotion* SBMotion::smoothCycleWithBase(std::string name, float timeInterval)
+{
+	bool smoothBase = true;
+	return motionSmoothCycle(timeInterval, smoothBase, name);
+}
+
+SBAPI SBMotion* SBMotion::motionSmoothCycle(float timeInterval, bool smoothBase, std::string name)
+{
+	SkMotion* motion = buildSmoothMotionCycle(timeInterval, smoothBase);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
@@ -1661,13 +1673,14 @@ SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
-		sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
-    sbmotion->createStringAttribute("smoothMotion", this->getName(), false, "smoothing", 110, false, false, false, "Which motion has this motion been smoothed from");
-    sbmotion->createDoubleAttribute("smoothInterval", timeInterval, false, "smoothing", 120, false, false, false, "how long is the smooth time interval");
+		sbmotion->setTransformDepth(getTransformDepth() + 1); // increment the depth counter 
+		sbmotion->createStringAttribute("smoothMotion", this->getName(), false, "smoothing", 110, false, false, false, "Which motion has this motion been smoothed from");
+		sbmotion->createDoubleAttribute("smoothInterval", timeInterval, false, "smoothing", 120, false, false, false, "how long is the smooth time interval");
 	}
 
 	return sbmotion;
 }
+
 
 float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 {

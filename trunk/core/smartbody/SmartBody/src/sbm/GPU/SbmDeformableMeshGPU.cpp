@@ -1496,8 +1496,8 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	//SmartBody::util::log(" DeformableMesh::hasGLContext = %d", hasGLContext);
 	if (!hasGLContext) return false;
 	//SmartBody::util::log(" Skin Weight Size = %d", skinWeights.size());
-	if (skinWeights.size() == 0 )
-		return false;
+	//if (skinWeights.size() == 0 )
+	//	return false;
 	if (initGPUVertexBuffer) return true;
 	bool hasSkinBuffer = DeformableMesh::buildSkinnedVertexBuffer();
 	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
@@ -1515,8 +1515,12 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	VBONormal	= new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
 	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #2");
 	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
-	VBOBoneID1	= new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
-	VBOWeight1	= new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
+
+	if (skinWeights.size() != 0)
+	{
+		VBOBoneID1 = new VBOVec4f((char*)"BoneID1", VERTEX_BONE_ID_1, boneIDBuf_f[0]);
+		VBOWeight1 = new VBOVec4f((char*)"Weight1", VERTEX_BONE_WEIGHT_1, boneWeightBuf[0]);
+	}	
 	//SbmShaderProgram::printOglError("SbmDeformableMeshGPU::buildVertexBufferGPU #3");
 
 #if USE_SKIN_WEIGHT_SIZE_8

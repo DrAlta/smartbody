@@ -116,10 +116,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_controller_tree_root.hpp>
 #include <bml/bml_processor.hpp>
 #include <sr/sr_sn_group.h>
-#if !defined(SB_IPHONE) && !defined(__ANDROID__)
-#include <sbm/GPU/SbmShader.h>
-#endif
 
+#include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_gl.h>
 #include <sbm/KinectProcessor.h>

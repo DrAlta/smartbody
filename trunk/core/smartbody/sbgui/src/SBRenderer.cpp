@@ -357,6 +357,7 @@ void SBRenderer::drawDeferredRendering(std::vector<SrLight>& lights, bool isDraw
 void SBRenderer::drawForwardRendering(std::vector<SrLight>& lights, bool isDrawFloor)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	std::vector<std::string> pawnNames = scene->getPawnNames();
 #if 1
 	for (unsigned int i = 0; i < pawnNames.size(); i++)
