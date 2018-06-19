@@ -178,9 +178,14 @@ void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if (meshInstance)
 		{
+			// update blendshapes	
+			SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
+			if (!gpuMeshInstance->getVBODeformPos())
+				gpuMeshInstance->initBuffer();
+			gpuMeshInstance->blendShapeStaticMesh();
+			gpuMeshInstance->gpuBlendShape(); // copy the static blendshape results to VBO buffer
 			if (!meshInstance->isStaticMesh())
 			{
-				SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
 				GPUMeshUpdate(meshInstance);
 			}
 		}
@@ -316,13 +321,9 @@ void SBBaseRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 
-	if (!gpuMeshInstance->getVBODeformPos())
-		gpuMeshInstance->initBuffer();
+	
 
-	// update blendshapes	
-	gpuMeshInstance->blendShapeStaticMesh();
-	gpuMeshInstance->gpuBlendShape(); // copy the static blendshape results to VBO buffer
-
+	
 	static GLuint queryName = -1;
 	if (queryName == -1)
 		glGenQueries(1, &queryName);
