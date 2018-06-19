@@ -1023,7 +1023,7 @@ void extractQuatXZY(SrQuat& inQuat, SrQuat& outXZQuat, SrQuat& outYQuat)
 	outXZQuat.normalize();
 }
 
-SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
+SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval, bool smoothBase )
 {
 	SkChannelArray& mchan_arr = this->channels();
 	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
@@ -1083,7 +1083,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 				SrQuat curQ = SrQuat( new_p[ index ], new_p[ index + 1 ], new_p[ index + 2 ], new_p[ index + 3 ] );
 				
 				SrQuat finalQ;
-				if (jointName == "base") // only smooth & interpolate the XZ rotation components for base joint.
+				if (jointName == "base" || smoothBase) // only smooth & interpolate the XZ rotation components for base joint.
 				{
 					SrQuat tqXZ, tqY, curQXZ, curQY;
 					extractQuatXZY(targetQ, tqXZ, tqY);
@@ -1104,7 +1104,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 			}
 			else
 			{
-				if (jointName != "base") // only smooth & interpolate non-base translations.
+				if (jointName != "base" || smoothBase) // only smooth & interpolate non-base translations.
 				{
 					for (int j=0;j<chan.size();j++)
 					{

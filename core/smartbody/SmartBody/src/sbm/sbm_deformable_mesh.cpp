@@ -2813,11 +2813,13 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
 	_restPosBuf.resize(_mesh->posBuf.size());
 	_deformNormalBuf.resize(_mesh->normalBuf.size());
-	_deformTangentBuf.resize(_mesh->tangentBuf.size());
+	_deformTangentBuf.resize(_mesh->tangentBuf.size());	
+	_deformNormalBuf = _mesh->normalBuf;
+	_deformTangentBuf = _mesh->tangentBuf;
 	for (unsigned int i=0;i<_deformPosBuf.size();i++)
 	{
 		_restPosBuf[i] = _mesh->posBuf[i];
-		_deformPosBuf[i] = _mesh->posBuf[i];
+		_deformPosBuf[i] = _mesh->posBuf[i];		
 	}
 	updateJointList();
 }
