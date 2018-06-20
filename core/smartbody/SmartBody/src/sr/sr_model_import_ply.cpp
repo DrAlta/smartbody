@@ -210,7 +210,7 @@ bool SrModel::import_ply( const char* file )
 	paths.push ( path );
 
 	name = filename;
-	name.remove_file_extension();
+	//name.remove_file_extension();
 	nvertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, this, 0);
 	ply_set_read_cb(ply, "vertex", "y", vertex_cb, this, 1);
 	ply_set_read_cb(ply, "vertex", "z", vertex_cb, this, 2);

@@ -1696,12 +1696,21 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 		if (!writeToBaseModel)
 			return;
 
-		if (!skinWeight)
-			return;
+		//if (!skinWeight)
+		//	return;
 		//SmartBody::util::log("gpuBlendShape::before CPU BlendShape");
 		//DeformableMeshInstance::blendShapes();
 		//SmartBody::util::log("gpuBlendShape::after CPU Blendshape");
-		VBOVec3f* posVBO = gpuMesh->getPosVBO();		
+		SrMat bindShapeMat;
+		
+
+		VBOVec3f* posVBO = this->getVBODeformPos();
+		//gpuMesh->getPosVBO();		
+		if (skinWeight)
+		{
+			bindShapeMat = skinWeight->bindShapeMat;
+			posVBO = gpuMesh->getPosVBO();
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, posVBO->VBO()->m_iVBO_ID);
 		//SmartBody::util::log("gpuBlendShape::after glBindBuffer");
 #if defined(__ANDROID__) || defined(SB_IPHONE) 
@@ -1716,7 +1725,7 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 		for (int i = 0; i < baseModel.V.size(); i++)
 		{
 			int iVtx = vtxBaseIdx + i;
-			SrVec basePos = baseModel.V[i] * skinWeight->bindShapeMat;
+			SrVec basePos = baseModel.V[i] * bindShapeMat;
 			pData[iVtx * 3] = basePos[0];
 			pData[iVtx * 3 + 1] = basePos[1];
 			pData[iVtx * 3 + 2] = basePos[2];

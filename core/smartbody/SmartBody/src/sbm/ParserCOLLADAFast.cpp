@@ -2502,8 +2502,8 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 										fnVec.push_back(atoi(tokens[index].c_str()));
 										//fnVec.push_back(atoi(splitter.GetToken(i)));									
 								}
-								if (semantic == "TEXCOORD")
-									ftVec.push_back(atoi(tokens[index].c_str()));
+ 								if (semantic == "TEXCOORD")
+ 									ftVec.push_back(atoi(tokens[index].c_str()));
 									//ftVec.push_back(atoi(splitter.GetToken(i)));
 
 								if (semantic == "NORMAL" && vertexSemantics.find("NORMAL") == vertexSemantics.end())

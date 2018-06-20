@@ -1582,7 +1582,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	}
 	*/
 	printOglError2("drawAllGeometries()", 5);
-	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{	
+		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	}	
 
@@ -1668,6 +1669,12 @@ void FltkViewer::drawSBRender(bool useDeferredShading)
 	glLoadMatrix(cam->get_view_mat(mat));
 
 	glScalef(cam->getScale(), cam->getScale(), cam->getScale());
+
+	glEnable(GL_LIGHTING);
+	if (SmartBody::SBScene::getScene()->getRootGroup()) {
+		
+		_data->render_action.apply(SmartBody::SBScene::getScene()->getRootGroup());
+	}
 
 	drawInteraction(cam);
 	//drawFloor();
