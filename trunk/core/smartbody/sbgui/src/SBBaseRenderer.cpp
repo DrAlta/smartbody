@@ -240,8 +240,9 @@ void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 	for (unsigned int i = 0; i < pawnNames.size(); i++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+	
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
-		if (meshInstance)
+		if (meshInstance && meshInstance->getVisibility() != 0)
 		{
 			renderMesh(meshInstance, normalMapShader, false);
 		}
@@ -320,10 +321,6 @@ void SBBaseRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 {
 	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
-
-	
-
-	
 	static GLuint queryName = -1;
 	if (queryName == -1)
 		glGenQueries(1, &queryName);
