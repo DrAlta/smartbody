@@ -26,13 +26,19 @@
 #include <sb/SBUtilities.h>
 #include <external/rply/rply.h>
 
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#if !defined(EMSCRIPTEN)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
 #include <sstream>
 
 #define TEST_TEXTURE 1
+
+struct TexCoordData
+{
+	std::vector<SrVec2> T;
+	std::vector<SrVec> Ft;
+};
 
 static int vertex_cb(p_ply_argument argument) {
 	static int count = 0;
@@ -77,10 +83,42 @@ static int face_cb(p_ply_argument argument) {
 	else if (value_index >= 0 && value_index <= 2) // a triangle face
 	{
 		double argumentValue = ply_get_argument_value(argument);
-		model->F.back()[value_index] = (int)(float) argumentValue;		
+		model->F.back()[value_index] = argumentValue;//(int)(float) argumentValue;		
 	}		
 	return 1;
 }
+
+static int texCoord2_cb(p_ply_argument argument) {
+	long length, value_index;
+	long idx;
+	TexCoordData* model;
+	ply_get_argument_user_data(argument, (void**)&model, &idx);
+	ply_get_argument_property(argument, NULL, &length, &value_index);
+
+	if (value_index == -1) // first entry in the list
+	{
+		model->Ft.push_back(SrVec());
+		//SrModel::Face& fid = model->F[model->Ft.size()-1];
+		//model->Ft.top().set(fid[0],fid[1],fid[2]);
+		int tsize = (model->Ft.size() - 1) * 3;
+		model->Ft.back() = SrVec(tsize + 0, tsize + 1, tsize + 2);
+		for (int i = 0; i < 3; i++)
+			model->T.push_back(SrVec2());
+	}
+	else if (value_index >= 0 && value_index <= 5) // a triangle face
+	{
+		double argumentValue = ply_get_argument_value(argument);
+		int faceIndex = model->Ft.size() - 1;
+		int faceNumber = (value_index / 2);
+		if (value_index == 0 || value_index == 2 || value_index == 4)
+			model->T[faceIndex * 3 + faceNumber].x = (float)argumentValue;
+		else
+			model->T[faceIndex * 3 + faceNumber].y = (float)argumentValue;
+
+	}
+	return 1;
+}
+
 
 static int texCoord_cb(p_ply_argument argument) {	
 	long length, value_index;
@@ -138,7 +176,7 @@ static int texNumber_cb(p_ply_argument argument) {
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#if !defined(EMSCRIPTEN)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -156,6 +194,66 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	SmartBody::util::log("loading texture file = %s", imageFile.c_str());
 	texManager.loadTexture(type,file,s);		
 #endif
+}
+
+static void removeRedundantTexCoord(TexCoordData& tData, SrModel& model)
+{
+	std::vector<SrVec2>& T = tData.T;
+	std::vector<SrVec>& Ft = tData.Ft;
+
+	if (T.size() == 0) return;
+
+	class Pt2Comp { // simple comparison function
+	public:
+		bool operator ()(const SrPnt2& x, const SrPnt2 y) const
+		{
+			if (x[0] == y[0])
+				return x[1] < y[1];
+			else
+				return x[0] < y[0];
+		} // returns x>y
+	};
+
+	 // remove references to duplicated normals
+	int nsize = T.size();
+	int fsize = Ft.size();
+	std::map<SrPnt2, int, Pt2Comp> tMap;
+	std::map<int, int> tNewIdxMap;
+	std::vector<SrPnt2>  newTexCoordList;
+	for (int i = 0; i < T.size(); i++)
+	{
+		if (tMap.find(T[i]) == tMap.end())
+		{
+			int newIdx = newTexCoordList.size();
+			tMap[T[i]] = newIdx;
+			tNewIdxMap[i] = newIdx;
+			newTexCoordList.push_back(T[i]);
+		}
+		else
+		{
+			tNewIdxMap[i] = tMap[T[i]];
+		}
+	}
+
+	for (int k = 0; k < fsize; k++) // replace references to j by i
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			int oldIdx = Ft[k][i];
+			Ft[k][i] = tNewIdxMap[oldIdx];
+		}
+	}
+	T.resize(newTexCoordList.size());
+	for (unsigned int i = 0; i < newTexCoordList.size(); i++)
+		T[i] = newTexCoordList[i];
+
+	model.T = T;
+	model.Ft.clear();
+	for (unsigned int i = 0; i < Ft.size(); i++)
+	{
+		SrVec& f = Ft[i];
+		model.Ft.push_back(SrVec3i(f[0], f[1], f[2]));
+	}
 }
 
 /************************************************************************/
@@ -219,18 +317,21 @@ bool SrModel::import_ply( const char* file )
 	ply_set_read_cb(ply, "vertex", "blue", vertex_color_cb, this, 2);
 	ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, this, 0);
 #if TEST_TEXTURE
-	ntriangles = ply_set_read_cb(ply, "face", "texcoord", texCoord_cb, this, 0);
-	ply_set_read_cb(ply, "face", "texnumber", texNumber_cb, this, 0);
 
+	TexCoordData* tdata = new TexCoordData();
+	ntriangles = ply_set_read_cb(ply, "face", "texcoord", texCoord2_cb, tdata, 0);
+	ply_set_read_cb(ply, "face", "texnumber", texNumber_cb, this, 0);
+	
 #endif
 	//SmartBody::util::log("%ld\n%ld\n", nvertices, ntriangles);
 	if (!ply_read(ply))
 		return false;
 	ply_close(ply);
+	removeRedundantTexCoord(*tdata, *this);
 
 	validate ();
 	remove_redundant_materials ();
-	remove_redundant_texcoord();
+	//remove_redundant_texcoord();
 	//   remove_redundant_normals ();
 	compress ();
 
@@ -241,7 +342,7 @@ bool SrModel::import_ply( const char* file )
 // 	}
 
 #if TEST_TEXTURE
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#if !defined(EMSCRIPTEN)
 	for (int i=0;i<M.size();i++)
 	{
 		std::string matName = mtlnames[i];

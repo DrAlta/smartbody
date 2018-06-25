@@ -106,8 +106,7 @@ class SrModel : public SrSharedClass
 	std::vector<SrVec3i>       F;  //!< Triangular faces indices to V
 	std::vector<SrVec3i>      Fn;  //!< Indices to the normals in N (size can be<F.size())
 	std::vector<SrVec3i>      Ft;  //!< Indices to the texture coordinates in T
-
-
+	
 	std::vector<SrPnt>      VOrig;  //!< Vertices original (if changed)
 
 	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
