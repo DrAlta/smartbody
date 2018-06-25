@@ -23,6 +23,12 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <sbm/GPU/SbmTexture.h>
 
+#define TEST_ALIB 0
+
+#if TEST_ALIB
+#include <jerome/npc/npc.hpp>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -32,7 +38,19 @@
 #include "SBMobile.h"
 #include "esUtil.h"
 
-#if 1
+#if TEST_ALIB
+class Model
+{
+public:
+	Model() {}
+	~Model() {}
+	//alib::npc::Collection collection;
+	//std::map<std::string, alib::npc::detail::Ranker> rankerMap;
+	jerome::npc::Platform p;
+};
+Model* _model = NULL;
+#endif 
+
 vhcl::Log::AndroidListener androidListener;
 unsigned long prevTime = 0;
 int curW, curH;
@@ -44,7 +62,7 @@ static unsigned long getCurrentTime(void)
 	return now.tv_sec*1000000 + now.tv_nsec/1000;
 }
 
-#endif 
+
 
 extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_init(JNIEnv * env, jobject obj);	
@@ -61,6 +79,10 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
 
 	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
+
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_initClassifier(JNIEnv * env, jobject obj, jstring classifierName, jstring dialogManagerName);
+	JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_classify(JNIEnv * env, jobject obj, jstring characterName, jstring question);
+	JNIEXPORT jobjectArray  JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_classifyWithExternalID(JNIEnv * env, jobject obj, jstring characterName, jstring question);
 	
 
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_openConnection(JNIEnv * env, jobject obj);
@@ -72,6 +94,115 @@ extern "C" {
 	JNIEXPORT jdouble JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getDoubleAttribute(JNIEnv * env, jobject obj, jstring attrName);  
 	JNIEXPORT jint JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getIntAttribute(JNIEnv * env, jobject obj, jstring attrName); 
 };
+
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_initClassifier(JNIEnv * env, jobject obj, jstring classifierName, jstring dialogManagerName)
+{
+#if TEST_ALIB
+	//std::stringstream strstr2;
+	//strstr2 << "/sdcard/vhdata/" << filename;
+	const char* fileNameStr = (env)->GetStringUTFChars(classifierName, NULL);
+	std::ifstream file(fileNameStr);
+	if (file.good())
+		SmartBody::util::log("File stream '%s' is good.", fileNameStr);
+	else
+		SmartBody::util::log("File stream '%s' is not good.", fileNameStr);
+
+	if (_model)
+		delete _model;
+	_model = new Model();
+	auto error = _model->p.loadCollection(file);
+
+	if (error)
+		SmartBody::util::log("load collection error is %s", (*error).what());
+
+	jerome::npc::Collection& collection = _model->p.collection();
+	jerome::npc::Collection::states_type& states = collection.states();
+
+	jerome::npc::Collection::states_type::iterator vi;
+	for (vi = states.begin();
+		vi != states.end();
+		vi++)
+	{
+		jerome::String stateName = vi->name();
+		SmartBody::util::log("load collection, state name = '%s'", stateName.c_str());
+	}
+
+	std::string dialogNameStr = (const char*)((env)->GetStringUTFChars(dialogManagerName, NULL));
+	jerome::String mainStateMachineName;
+	std::ifstream dialogFile(dialogNameStr);
+	_model->p.loadDialogueManager(dialogFile, [&](const jerome::Result<jerome::String>& name) mutable { 
+		if (name) { 
+			mainStateMachineName = name.value(); 
+		} 
+		else { 
+			std::cerr << name.error().what() << std::endl; 
+		}});
+	//LOG("Start Training Classifier");
+	//auto trainError = _model->p.train("Anyone - The Twins");
+
+	SmartBody::util::log("Classifier Init Done");
+#endif
+}
+
+JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_classify(JNIEnv * env, jobject obj, jstring characterName, jstring question)
+{
+#if TEST_ALIB
+	SmartBody::util::log("Start Classify");
+	std::string charNameStr = (env)->GetStringUTFChars(characterName, NULL);
+	std::string questionStr = (env)->GetStringUTFChars(question, NULL);
+	//std::string charNameStr = "SaxonPerson - SaxonPerson";
+	//std::string questionStr = "what is your name";
+	std::string answer = "None";
+	SmartBody::util::log("Before get response");
+	boost::optional<jerome::npc::Utterance> response = _model->p.respond(charNameStr, questionStr);
+	SmartBody::util::log("After get response");
+	if (response)
+	{
+		answer = (*response).get("text");
+	}
+	SmartBody::util::log("After get answer");
+	return env->NewStringUTF(answer.c_str());
+#endif
+}
+
+JNIEXPORT jobjectArray  JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_classifyWithExternalID(JNIEnv * env, jobject obj, jstring characterName, jstring question)
+{
+#if TEST_ALIB
+	std::vector<std::string> ret;
+	std::string answer = "None";
+	std::string id = "None";
+	std::string type = "None";
+	const char* charNameStr = (env)->GetStringUTFChars(characterName, NULL);
+	const char* questionStr = (env)->GetStringUTFChars(question, NULL);
+
+	boost::optional<jerome::npc::Utterance> response = _model->p.respond(charNameStr, questionStr);
+	if (response)
+	{
+		answer = (*response).get("text");
+		//LOG("classifyWithExternalID, answer = %s", answer.c_str());
+		id = (*response).get("id");
+		//LOG("classifyWithExternalID, externalID = %s", id.c_str());
+
+		if ((*response).has("type"))
+			type = (*response).get("type");
+
+	}
+
+	jobjectArray result;
+	jstring str;
+	jsize len = 2;
+	result = (env)->NewObjectArray(len, (env)->FindClass("java/lang/String"), 0);
+	str = (env)->NewStringUTF(answer.c_str());
+	(env)->SetObjectArrayElement(result, 0, str);
+	str = (env)->NewStringUTF(id.c_str());
+	(env)->SetObjectArrayElement(result, 1, str);
+
+	return result;
+#endif
+}
+
+
 
 
 JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my)
@@ -168,6 +299,18 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setup(JNIEnv * env,
 	//esInitContext(&esContext);	
 	SBInitialize(); // initialize smartbody with media path
 	initSBMobilePythonModule(); // initialize Python APIs for SBMobile to enable video/audio playback through JNI
+
+#if TEST_ALIB
+	std::string dataFolder = "classifier";
+	std::stringstream strstr;
+	strstr << std::string(mediaPathStr) << "/" << dataFolder << "/kstem-lexicon-beta";
+	SmartBody::util::log("kstem folder = %s",strstr.str().c_str());
+	jerome::npc::Platform::setLexiconDirectory(strstr.str());
+	SmartBody::util::log("after setLexicon directory");
+	jerome::npc::Platform::initialize();
+	SmartBody::util::log("after init alib::npc::Platform");
+#endif
+
 	sbInit = true;
 }
 

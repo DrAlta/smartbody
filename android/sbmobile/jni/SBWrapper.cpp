@@ -675,6 +675,7 @@ void SBUpdateCharacterGPUSkin()
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if (meshInstance)
 		{
+			GPUBlendShapeUpdate(meshInstance);
 			if (!meshInstance->isStaticMesh())
 			{
 				SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
@@ -1032,14 +1033,9 @@ void SBUpdate(float t)
 			DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 			if(meshInstance)
 			{
+				meshInstance->blendShapeStaticMesh();
 				if (!meshInstance->isStaticMesh())
 				{
-					//SmartBody::util::log("pawn %s is deformable mesh", pawn->getName().c_str());
-					meshInstance->blendShapeStaticMesh();
-					//meshInstance->setVisibility(1);
-					//if (!meshInstance->isStaticMesh() && !meshUpdated)
-					//meshInstance->update();
-					//meshInstance->_skeleeton->update_global_matrices();
 					meshInstance->updateTransformBuffer();
 				}
 			}
