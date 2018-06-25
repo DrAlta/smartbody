@@ -55,6 +55,7 @@ std::vector<SBAsset*> SBAssetHandlerPly::getAssets(const std::string& path)
 	std::string extension =  boost::filesystem::extension( p );
 
 	SrModel* model = new SrModel();
+	SmartBody::util::log("Loading PLY asset '%s'...", convertedPath.c_str());
 	bool loadSuccess = model->import_ply(convertedPath.c_str());	
 	if (!loadSuccess)
 	{
@@ -62,7 +63,7 @@ std::vector<SBAsset*> SBAssetHandlerPly::getAssets(const std::string& path)
 	}
 	else
 	{
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
+#if !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
 		SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
 #else
 		DeformableMesh* mesh = new DeformableMesh();

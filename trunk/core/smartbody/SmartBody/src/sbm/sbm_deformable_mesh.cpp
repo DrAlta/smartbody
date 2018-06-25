@@ -527,22 +527,22 @@ bool DeformableMesh::buildBlendShapes()
 	// for each vertex in neutral blendshape model, search for closest vertex in Kd-tree
 	// if distance is zero, put vertex index in the blendShapeNewVtxIdxMap 
 	SmartBody::util::log("Start build blendshapes #3");
-	for (unsigned int i=0;i<neutralMesh.V.size(); i++)
-	{
-		SrVec inPt = neutralMesh.V[i];
-		meshKDTree->knnSearch(inPt.data(), numKNN, knnPtIdxs.data(), knnPtDists.data());
-		for (unsigned int k=0;k<numKNN;k++)
-		{
-			if (knnPtDists[k] < 1e-30) // almost identical vertex
-			{
-				if (blendShapeNewVtxIdxMap.find(i) == blendShapeNewVtxIdxMap.end())
-				{
-					blendShapeNewVtxIdxMap[i] = std::vector<int>();
-				}
-				blendShapeNewVtxIdxMap[i].push_back(knnPtIdxs[k]);
-			}
-		}
-	}
+// 	for (unsigned int i=0;i<neutralMesh.V.size(); i++)
+// 	{
+// 		SrVec inPt = neutralMesh.V[i];
+// 		meshKDTree->knnSearch(inPt.data(), numKNN, knnPtIdxs.data(), knnPtDists.data());
+// 		for (unsigned int k=0;k<numKNN;k++)
+// 		{
+// 			if (knnPtDists[k] < 1e-30) // almost identical vertex
+// 			{
+// 				if (blendShapeNewVtxIdxMap.find(i) == blendShapeNewVtxIdxMap.end())
+// 				{
+// 					blendShapeNewVtxIdxMap[i] = std::vector<int>();
+// 				}
+// 				blendShapeNewVtxIdxMap[i].push_back(knnPtIdxs[k]);
+// 			}
+// 		}
+// 	}
 	SmartBody::util::log("Start build blendshapes #4");
    delete meshKDTree;
    

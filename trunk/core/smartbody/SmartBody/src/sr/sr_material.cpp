@@ -30,7 +30,7 @@ SrMaterial::SrMaterial () :
  {
    shininess = 0;      
    transparency = 1.f;
-   useAlphaBlend = true;   
+   useAlphaBlend = false;   
  }
 
 void SrMaterial::init () 
@@ -41,7 +41,7 @@ void SrMaterial::init ()
    emission.set (   0,   0,   0, 255 );
    shininess = 0;       
    transparency = 1.f;
-   useAlphaBlend = true;
+   useAlphaBlend = false;
  }
 
 bool operator == ( const SrMaterial& m1, const SrMaterial& m2 )
