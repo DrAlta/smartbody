@@ -1069,13 +1069,13 @@ extern "C"
 
 	}
 
-	void SHADER_API GPUMeshUpdate(DeformableMeshInstance* meshInstance)
+	void SHADER_API GPUBlendShapeUpdate(DeformableMeshInstance* meshInstance)
 	{
-		//SmartBody::util::log("GPUMesh Update Debug : Start ");
 		SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 		SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
-		SbmShaderProgram::printOglError("GPUMeshUpdate #Start ");
-		//SmartBody::util::log("gpuMeshInstance = %x, gpuMesh = %x, VBODeformPos = %x", gpuMeshInstance, gpuMesh, gpuMeshInstance->getVBODeformPos());
+		SbmShaderProgram::printOglError("GPUBlendShapeUpdate #Start ");
+		if (!gpuMesh) return;
+
 		if (!gpuMeshInstance->getVBODeformPos())
 		{
 			SbmShaderProgram::printOglError("GPUMeshUpdate #0 ");
@@ -1086,6 +1086,16 @@ extern "C"
 		//SmartBody::util::log("GPUMesh Update Debug : gpuBlendShape");
 		// update blendshapes
 		gpuMeshInstance->gpuBlendShape();
+	}
+	void SHADER_API GPUMeshUpdate(DeformableMeshInstance* meshInstance)
+	{
+		//SmartBody::util::log("GPUMesh Update Debug : Start ");
+		SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
+		SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
+		SbmShaderProgram::printOglError("GPUMeshUpdate #Start ");
+		//SmartBody::util::log("gpuMeshInstance = %x, gpuMesh = %x, VBODeformPos = %x", gpuMeshInstance, gpuMesh, gpuMeshInstance->getVBODeformPos());
+		if (!gpuMesh) return;
+
 		SbmShaderProgram::printOglError("GPUMeshUpdate #0.6 ");
 		//SmartBody::util::log("GPUMesh Update Debug : glGenQueries");
 		static GLuint queryName = -1;

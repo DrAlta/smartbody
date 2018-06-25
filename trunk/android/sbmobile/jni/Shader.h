@@ -19,6 +19,7 @@ extern "C"
 	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight);
 	void SHADER_API drawMeshStatic(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight);
 	void SHADER_API drawMeshStaticVBO(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight);
+	void SHADER_API GPUBlendShapeUpdate(DeformableMeshInstance* meshInstance);
 	void SHADER_API GPUMeshUpdate(DeformableMeshInstance* meshInstance);
 	void SHADER_API testTransformFeedback();
 	void SHADER_API drawBackground(std::string backgroundName, ESContext *esContext);

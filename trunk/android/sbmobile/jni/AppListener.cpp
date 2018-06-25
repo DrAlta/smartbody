@@ -352,6 +352,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					}
 
 					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
+					SmartBody::util::log("useDeformableMesh = %d, meshInstance = %d", useDeformableMesh, meshInstance);
 					meshInstance->setDeformableMesh(mesh);
 					//meshInsance->setSkeleton(pawn->getSkeleton());
 					meshInstance->setPawn(pawn);
