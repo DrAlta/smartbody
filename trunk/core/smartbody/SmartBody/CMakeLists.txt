@@ -167,7 +167,7 @@ find_package(OpenGL REQUIRED)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set ( PROTOC ${CMAKE_SOURCE_DIR}/bin/protoc)
 else()
-set ( PROTOC protoc)
+set ( PROTOC ${CMAKE_SOURCE_DIR}/bin/protoc)
 endif()
 add_custom_target(protoctarget
 		COMMAND ${PROTOC} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmotion.proto 
@@ -706,6 +706,8 @@ target_link_libraries( SmartBody
 	${MORE_LIBS}
 	${PROTOCLIB}
 	${PROTOBUFLIB}
+	gcc
+	gcc_s
 )
 
 add_dependencies(SmartBody protoctarget)
