@@ -261,6 +261,7 @@ set( SBM_FLTK_SRC
 	./src/faceshiftviewer/FaceShiftViewer.cpp
 	./src/FLTKListener.cpp
 	./src/SBGUIManager.cpp
+	./src/SBBaseRenderer.cpp
 	./src/SBRenderer.cpp
 	./src/SBFrameBufferObject.cpp
 	
