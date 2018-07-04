@@ -54,7 +54,7 @@ void MeCtMotionRecorder::startRecording( double frameRate )
 	SkChannelArray& skelChannels = skel->channels();
 	for (int c = 0; c < skelChannels.size(); c++)
 	{
-		SkChannel& channel = skelChannels[c];
+		SkChannel& channel = skelChannels.get(c);
 		channels.add(channel);
 	}
 
