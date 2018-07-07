@@ -284,6 +284,10 @@ void SBScene::initialize()
 	SmartBody::util::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	SmartBody::util::g_log.AddListener(forwardListener);
+#ifndef WIN_BUILD
+	SmartBody::util::StdoutListener* stdoutListener = new SmartBody::util::StdoutListener();
+	SmartBody::util::g_log.AddListener(stdoutListener);
+#endif
 	
 	//consoleAttr->setValue(true); // set up the console logging
 	
