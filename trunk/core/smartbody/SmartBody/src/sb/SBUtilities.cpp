@@ -3,6 +3,10 @@
 #include <cstdarg>
 #include <cstdio>
 #include <memory>
+#include <iostream>
+#ifndef WIN_BUILD
+#include <wchar.h>
+#endif
 
 // from: http://oopweb.com/CPP/Documents/CPPHOWTO/Volume/C++Programming-HOWTO-7.html
 void SmartBody::util::tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
@@ -166,7 +170,45 @@ std::wstring SmartBody::util::vFormat(const wchar_t * fmt, va_list argPtr)
 
 	return result;
 #else
-	return L"";
+	// If the string is less than a certain amount of characters,
+	// allocate it on the stack because this saves the malloc/free time.
+	const int32_t bufSize = 512;
+	wchar_t stackBuffer[bufSize];
+
+	int32_t attemptedSize = bufSize - 1;
+
+	int32_t numChars = vswprintf(stackBuffer, attemptedSize, fmt, argPtr);
+	if (numChars >= 0)
+	{
+		// if we had exactly the number of characters, then the null doesn't automatically get appended
+		stackBuffer[attemptedSize] = '\0';
+
+		// Got it on the first try.
+		return std::wstring(stackBuffer);
+	}
+
+	// Define a given max size for the longest a string can be
+	const int32_t maxSize = 32768;
+
+	// Now use the heap.
+	wchar_t * heapBuffer = NULL;
+
+	while ((numChars == -1) && (attemptedSize < maxSize))
+	{
+		// Try a bigger size
+		attemptedSize *= 2;
+		delete[] heapBuffer;
+		heapBuffer = new wchar_t[attemptedSize + 1];
+		numChars = vswprintf(heapBuffer, attemptedSize, fmt, argPtr);
+		heapBuffer[attemptedSize] = '\0';  // make sure there's a null at the end, doesn't always get appended
+	}
+
+	std::wstring result = std::wstring(heapBuffer);
+
+	delete[] heapBuffer;
+	heapBuffer = NULL;
+
+	return result;
 #endif
 }
 
