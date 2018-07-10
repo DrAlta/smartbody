@@ -235,6 +235,8 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f, "Eyelids");
 	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f, "Eyelids");
 
+	addDefaultAttributeBool("eyelid.useBlinkViseme", false, "Eyelids");
+
 	// softeyes settings
 	addDefaultAttributeBool("eyelid.softeyes", true, "Eyelids");
 	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f, "Eyelids");
@@ -565,6 +567,12 @@ const std::string& MeCtEyeLidRegulator::controller_type( void )	const {
 void MeCtEyeLidRegulator::set_use_blink_viseme(bool val)
 {
 	use_blink_viseme = val;
+	if (this->_pawn)
+	{
+		SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(_pawn->getAttribute("eyelid.useBlinkViseme"));
+		boolAttribute->setValueFast(val);
+	}
+		
 }
 
 bool MeCtEyeLidRegulator::get_use_blink_viseme()
@@ -629,6 +637,12 @@ void MeCtEyeLidRegulator::notify(SBSubject* subject)
 		{
 			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			setBlinkTime(attr->getValue());
+
+		}
+		else if (name == "eyelid.useBlinkViseme")
+		{
+			SmartBody::BoolAttribute* attr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			this->set_use_blink_viseme(attr->getValue());
 
 		}
 	}
