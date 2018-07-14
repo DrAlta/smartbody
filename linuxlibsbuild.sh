@@ -38,15 +38,15 @@ make -j6 install
 
 cd ..
 
-echo "Building Irrlicht engine..."
-unzip irrlicht-1.8.3.zip
-cd irrlicht-1.8.3
-cd source/Irrlicht
-make -j6
-cd ../../..
-mv irrlicht-1.8.3 ..
+#echo "Building Irrlicht engine..."
+#unzip irrlicht-1.8.3.zip
+#cd irrlicht-1.8.3
+#cd source/Irrlicht
+#make -j6
+#cd ../../..
+#mv irrlicht-1.8.3 ..
 
-cd ..
+#cd ..
 
 
 
