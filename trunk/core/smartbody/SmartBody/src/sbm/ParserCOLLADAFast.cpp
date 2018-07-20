@@ -717,6 +717,8 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				float jorientz = 0.0f;
 				SrVec offset;
 
+				std::vector<SrQuat> allrots;
+
 				std::vector<std::string> orderVec;
 
 				if (parent == NULL && !skeleton.root())
@@ -777,20 +779,29 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
 							float finalValue = 0;
+							if (tokens.size() >= 4)
+								allrots.push_back(SrQuat(SrVec(atof(tokens[0].c_str()), atof(tokens[1].c_str()), atof(tokens[2].c_str())), M_PI / 180.0 * 	atof(tokens[3].c_str())));	
+							/*
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
+									
 							if (sidAttr == "jointOrientX") jorientx = finalValue;
 							if (sidAttr == "jointOrientY") jorienty = finalValue;
 							if (sidAttr == "jointOrientZ") jorientz = finalValue;
 							if (orderVec.size() != 3)
 								orderVec.push_back(sidAttr.substr(11, 1));
+								*/
 						}
 						if (sidAttr.substr(0, 6) == "rotate")
 						{
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
+							if (tokens.size() >= 4)
+								allrots.push_back(SrQuat(SrVec(atof(tokens[0].c_str()), atof(tokens[1].c_str()), atof(tokens[2].c_str())), M_PI / 180.0 * 	atof(tokens[3].c_str())));		
+							/*
 							float finalValue = 0;
+
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotateX") rotx = finalValue;
@@ -798,6 +809,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							if (sidAttr == "rotateZ") rotz = finalValue;
 							if (orderVec.size() != 3)
 								orderVec.push_back(sidAttr.substr(6, 1));
+							*/
 						}
 						if (sidAttr.substr(0, 8) == "rotation")
 						{
@@ -832,6 +844,15 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 
 				joint->offset(offset);
 
+				SrMat finalMat;
+				for (int q = allrots.size() - 1; q >= 0; q--)
+				{
+					SrMat m(allrots[q].getMat());
+					finalMat *= m;
+				}
+				SkJointQuat* jointQuat = joint->quat();
+				jointQuat->orientation(SrQuat(finalMat));
+				/*
 				SrMat rotMat;
 				rotx *= float(M_PI) / 180.0f;
 				roty *= float(M_PI) / 180.0f;
@@ -842,16 +863,18 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				SrQuat quat = SrQuat(rotMat);
 				SkJointQuat* jointQuat = joint->quat();
 				jointQuat->orientation(quat);
-
+				*/
+				/*
 				SrMat jorientMat;
 				jorientx *= float(M_PI) / 180.0f;
 				jorienty *= float(M_PI) / 180.0f;
 				jorientz *= float(M_PI) / 180.0f;
 				sr_euler_mat(order, jorientMat, jorientx, jorienty, jorientz);
+				
 								
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->prerot(jorientQ);
-				
+				*/
 				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
 				{
