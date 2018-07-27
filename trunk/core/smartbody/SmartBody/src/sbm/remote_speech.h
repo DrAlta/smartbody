@@ -55,7 +55,7 @@ class remote_speech: public SmartBody::SpeechInterface {
          */
 
 		// Default Constructor/Destructor
-		remote_speech( float timeOutInSeconds = 10 );
+		remote_speech( float timeOutInSeconds = 20 );
 		virtual ~remote_speech();
 
 		// Methods
