@@ -684,7 +684,7 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 		ostringstream frame_data_os;
 		frame_data_os << "kt " << time << " fr ";
 
-		SkChannelArray& channels = _pawn->getSkeleton()->channels();
+		SkChannelArray& channels =_context->channels();
 		int num_channels = channels.size();
 		SrBuffer<float>& buff = frame.buffer();
 
@@ -704,7 +704,7 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 				frame_data_os << axis.x << " ";
 				frame_data_os << axis.y << " ";
 				frame_data_os << axis.z << " ";
-				count += 3;
+				count += channel_size;
 			}
 			else
 			{

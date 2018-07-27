@@ -1753,7 +1753,7 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 bool SbmDeformableMeshGPUInstance::initBuffer()
 {	
 	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
-	SmartBody::util::log("SbmDeformableMeshGPUInstance::initBuffer, mesh = %d, gpuMesh = %d", _mesh, gpuMesh);
+	//SmartBody::util::log("SbmDeformableMeshGPUInstance::initBuffer, mesh = %d, gpuMesh = %d", _mesh, gpuMesh);
 	if (!gpuMesh)
 		return false;
 	bool hasVertexBuffer = gpuMesh->buildVertexBufferGPU();	
