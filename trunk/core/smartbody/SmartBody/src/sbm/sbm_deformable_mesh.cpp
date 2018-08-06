@@ -1490,7 +1490,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 		SrStringArray paths;
 		paths.push(path);
 
-#if 0
+#if 1
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
 
 		for (size_t i = 0; i < newModel->M.size(); i++)
