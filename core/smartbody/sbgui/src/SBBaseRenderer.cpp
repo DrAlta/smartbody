@@ -134,8 +134,8 @@ char fShaderNormalMapStr[] =
 "  }                                                             \n"
 "  vComputedLightColor.a = alpha;                                  \n"
 //"  gl_FragColor  = texColor * vComputedLightColor;				 \n"
-//"  gl_FragColor  = vComputedLightColor;				 \n"
-" gl_FragColor  =  vec4(texColor.r , texColor.g , texColor.b ,alpha);                   			     \n"
+"  gl_FragColor  = vComputedLightColor;				 \n"
+//" gl_FragColor  =  vec4(texColor.r , texColor.g , texColor.b ,alpha);                   			     \n"
 //" gl_FragColor  =  vec4(vNormal.r, vNormal.g, vNormal.b ,1.0);                   			     \n"
 "}																	\n"
 
