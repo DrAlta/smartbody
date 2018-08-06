@@ -23,6 +23,12 @@
 #include <RootWindow.h>
 #include <fltk_viewer.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "external/stb/stb_image.h"
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "external/stb/stb_image_write.h"
+
+
 
 #ifndef SB_NO_PYTHON
 
@@ -232,6 +238,274 @@ void saveDeformableMeshScale(const std::string& meshName, const std::string& ske
 	ParserOpenCOLLADA::exportCollada(outDir, skelName, meshName, moNames, true, true, false, scale);
 }
 
+inline float clamp(float x, float a, float b) { return std::max(a, std::min(b, x)); }
+inline float saturate(float x) { return clamp(x, 0.f, 1.f); }
+
+void lab2rgb(float* lab, unsigned char* rgb, unsigned int size)
+{
+	float temp1[16] = { 1, 1, 1, 0,
+					   1, 1, -1, 0,
+					   1, -2, 0, 0,
+					   0, 0,  0, 0 };
+	float temp2[16] = { sqrt(3.f) / 3.f, 0, 0, 0,
+						0, sqrt(6.f) / 6.f, 0 , 0,
+						0, 0, sqrt(2.f) / 2.f , 0,
+						0, 0,  0,  0};
+	SrMat m1_lab2rgb = SrMat(temp1);
+	SrMat m2_lab2rgb = SrMat(temp2);
+
+	float aLMS2RGB[16] = { 4.4679f, -3.5873f, 0.1193f , 0,
+						 -1.2186f, +2.3809f, -0.1624f, 0,
+						  0.0497f, -0.2439f, 1.2045f , 0,
+							0,        0,        0,     0};
+	SrMat mLMS2RGB = SrMat(aLMS2RGB);
+
+	m1_lab2rgb.transpose();
+	m2_lab2rgb.transpose();
+	mLMS2RGB.transpose();
+
+	for (unsigned int i = 0; i < size; i = i + 4)
+	{
+		float l = lab[i];
+		float a = lab[i + 1];
+		float b = lab[i + 2];
+		SrVec lab(l, a, b);
+
+		//Convert to LMS
+		//SrVec LMS = m1_lab2rgb * m2_lab2rgb * lab;
+		SrVec LMS = lab * m2_lab2rgb * m1_lab2rgb;
+		LMS = SrVec(pow(10, LMS.x), pow(10, LMS.y), pow(10, LMS.z));//pow(SrVec(10), LMS);
+		//Convert to RGB
+		//auto rgbv = mLMS2RGB * LMS;
+		auto rgbv = LMS * mLMS2RGB;
+		rgb[i] = static_cast<unsigned char>(255.*saturate(rgbv.x));
+		rgb[i + 1] = static_cast<unsigned char>(255.*saturate(rgbv.y));
+		rgb[i + 2] = static_cast<unsigned char>(255.*saturate(rgbv.z));
+	}
+}
+
+void rgb2lab(unsigned char* rgb, float* lab, unsigned int size)
+{
+	float temp1[16] = { 1.f / sqrt(3.f) , 0, 0, 0,  
+					   0, 1.f / sqrt(6.f), 0 , 0, 
+					   0, 0, 1.f / sqrt(2.f), 0,
+					   0, 0, 0, 0};
+	float temp2[16] = { 1, 1, 1, 0, 
+						1, 1, -2, 0,
+						1, -1, 0, 0,
+						0, 0, 0, 0};
+
+	SrMat m1_rgb2lab = SrMat(temp1);
+	SrMat m2_rgb2lab = SrMat(temp2);
+
+	
+
+	float aRGB2LMS[16] = { 0.3811f, 0.5783f, 0.0402f, 0, 
+						  0.1967f, 0.7244f, 0.0782f, 0,
+						  0.0241f, 0.1288f, 0.8444f, 0,
+						  0,       0,       0,       0};
+	SrMat tmRGB2LMS = SrMat(aRGB2LMS);
+
+	m1_rgb2lab.transpose();
+	m2_rgb2lab.transpose();
+	tmRGB2LMS.transpose();
+	for (unsigned int i = 0; i < size; i = i + 4)
+	{
+		// log10(0) = -inf, so gotta use FLT_TRUE_MIN
+		// otherwise, image stats are fucked up
+		float r = std::max(FLT_TRUE_MIN, rgb[i] / 255.f);
+		float g = std::max(FLT_TRUE_MIN, rgb[i + 1] / 255.f);
+		float b = std::max(FLT_TRUE_MIN, rgb[i + 2] / 255.f);
+		SrVec rgb(r, g, b);
+
+		//Convert to LMS
+		//SrVec LMS = tmRGB2LMS * rgb;
+		SrVec LMS = rgb * tmRGB2LMS;
+		LMS = SrVec(log10(LMS.x), log10(LMS.y), log10(LMS.z));
+
+		//Convert to lab
+		//SrVec labv = m1_rgb2lab * m2_rgb2lab  * LMS;
+		SrVec labv = LMS * m2_rgb2lab * m1_rgb2lab;
+
+		lab[i] = labv.x;
+		lab[i + 1] = labv.y;
+		lab[i + 2] = labv.z;
+	}
+}
+
+void computeImageMeanAndStd(float* lab, unsigned char* mask, int imgSize, SrVec& outMean, SrVec& outStd)
+{
+	int pixCount = 0;
+	SrVec imgMean = SrVec(0,0,0), imgStd = SrVec(0,0,0);
+	for (unsigned int i = 0; i < imgSize; i++)
+	{
+		int labIdx = i * 4;
+		if (mask[i] == 0) continue;
+		SrVec pix = SrVec(lab[labIdx], lab[labIdx + 1], lab[labIdx + 2]);
+		//SmartBody::util::log("Pix %d = %s", i, pix.toString().c_str());
+		imgMean += pix;
+		pixCount++;
+	}
+
+	SmartBody::util::log("Image Pix Count = %d", pixCount);
+	imgMean /= pixCount;
+
+	for (unsigned int i = 0; i < imgSize; i++)
+	{
+		int labIdx = i * 4;
+		if (mask[i] == 0) continue;
+		for (int k=0;k<3;k++)
+			imgStd[k] += pow(lab[labIdx+k] - imgMean[k], 2);
+	}
+
+	for (int k = 0; k < 3; k++)
+		imgStd[k] = sqrtf(imgStd[k] / pixCount);
+	outMean = imgMean;
+	outStd = imgStd;
+
+	SmartBody::util::log("Image Mean = %s, Std = %s", outMean.toString().c_str(), outStd.toString().c_str());
+}
+
+void imageColorTransfer(std::string srcImg, std::string srcMask, std::string tgtImg, std::string tgtMask, std::string outImage)
+{
+	int srcWidth, srcHeight, srcChannel;
+	int forceImgChannel = 4;
+	int forceMaskChannel = 1;
+	unsigned char* srcBuf = stbi_load(srcImg.c_str(), &srcWidth, &srcHeight, &srcChannel, forceImgChannel);
+	unsigned char* srcMaskBuf = stbi_load(srcMask.c_str(), &srcWidth, &srcHeight, &srcChannel, forceMaskChannel);
+
+	int tgtWidth, tgtHeight, tgtChannel;
+	unsigned char* tgtBuf = stbi_load(tgtImg.c_str(), &tgtWidth, &tgtHeight, &tgtChannel, forceImgChannel);
+	unsigned char* tgtMaskBuf = stbi_load(tgtMask.c_str(), &tgtWidth, &tgtHeight, &tgtChannel, forceMaskChannel);
+
+	int srcSize = srcHeight*srcWidth;
+	int tgtSize = tgtHeight*tgtWidth;
+	float* srcLab = new float[srcSize*forceImgChannel];
+	float* tgtLab = new float[tgtSize*forceImgChannel];
+
+	rgb2lab(srcBuf, srcLab, srcSize*forceImgChannel);
+	rgb2lab(tgtBuf, tgtLab, tgtSize*forceImgChannel);
+
+	SrVec srcMean, srcStd, tgtMean, tgtStd;
+	computeImageMeanAndStd(srcLab, srcMaskBuf, srcSize, srcMean, srcStd);
+	computeImageMeanAndStd(tgtLab, tgtMaskBuf, tgtSize, tgtMean, tgtStd);
+
+	SrVec newStdRato;
+	for (int k = 0; k < 3; k++)
+		newStdRato[k] = tgtStd[k] / srcStd[k];
+	for (int i = 0; i < srcSize; i ++)
+	{
+		if (srcMaskBuf[i] == 0) continue;
+		int labIdx = i * 4;
+		for (int k = 0; k < 3; k++)
+		{
+			// adjust source image in LAB space based on target image's Mean and Std
+			srcLab[labIdx + k] = (srcLab[labIdx + k] - srcMean[k])*newStdRato[k] + tgtMean[k];
+		}
+	}
+	lab2rgb(srcLab, srcBuf, srcSize*forceImgChannel);
+	int imageWriteSuccess = stbi_write_png(outImage.c_str(), srcWidth, srcHeight, 4, srcBuf, srcWidth*4);
+	SmartBody::util::log("Writing PNG %s, result = %d", outImage.c_str(), imageWriteSuccess);
+}
+
+
+
+
+void createCustomMeshFromBlendshapes(std::string templateMeshName, std::string blendshapesDir, std::string baseMeshName, std::string hairMeshName, std::string outMeshName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(templateMeshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Error creating custom mesh from blendshapes :: mesh '%s' does not exist.", templateMeshName.c_str());
+		return;
+	}
+
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = mesh->blendShapeMap.begin();
+		iter != mesh->blendShapeMap.end();
+		iter++)
+	{
+		std::vector<SrSnModel*>& targets = (*iter).second;
+		for (size_t t = 0; t < targets.size(); t++) // ignore first target since it is a base mesh
+		{
+			if (targets[t] == NULL)
+				continue;
+			SrModel& curModel = targets[t]->shape();
+			SrModel newShape;
+			std::string blendshapeName = curModel.name;
+
+			if (t == 0)
+				blendshapeName = baseMeshName;
+			//SmartBody::util::log("mesh '%s', blendShapeName = '%s'", templateMeshName.c_str(), blendshapeName.c_str());
+			std::string meshFileNamae = blendshapesDir + "/" + blendshapeName;
+			newShape.import_ply(meshFileNamae.c_str());
+			if (newShape.V.size() == curModel.V.size())
+			{
+				curModel.V = newShape.V;
+				curModel.N = newShape.N;
+			}
+			if (t == 0)
+			{
+				SrModel& staticBaseModel = mesh->dMeshStatic_p[0]->shape();
+				staticBaseModel.V = newShape.V;
+				staticBaseModel.N = newShape.N;
+
+				SrModel& dynamicBaseModel = mesh->dMeshDynamic_p[0]->shape();
+				dynamicBaseModel.V = newShape.V;
+				dynamicBaseModel.N = newShape.N;
+
+				SrModel hairModel;
+				std::string hairFileName = blendshapesDir + "/" + hairMeshName;
+				hairModel.import_ply(hairFileName.c_str());
+
+				SrSnModel* hairSrSn = new SrSnModel();
+				std::string hairName = "HairMesh";
+				hairSrSn->shape(hairModel);
+				hairSrSn->shape().name = hairName.c_str();
+				mesh->dMeshStatic_p.push_back(hairSrSn);
+
+				SkinWeight* hairSkin = new SkinWeight();
+				SkinWeight* headSkin = mesh->skinWeights[0];
+				SrMat hairBindShape = headSkin->bindShapeMat;
+				SrMat hairBindPose;
+				std::string headJointName = "Head";
+				SmartBody::util::log("headSkin bindShape Mat = %s", hairBindShape.toString().c_str());
+				for (unsigned int i = 0; i < headSkin->infJointName.size(); i++)
+				{
+					if (headSkin->infJointName[i] == headJointName)
+					{
+						//SmartBody::util::log("headSkin inf joint %d : '%s'", i, headSkin->infJointName[i].c_str());
+						hairBindPose = headSkin->bindPoseMat[i];
+						//SmartBody::util::log("headSkin bindPose Mat %d = %s", i, bindPose.toString().c_str());
+					}
+				}
+
+				hairSkin->bindShapeMat = hairBindShape;
+				hairSkin->bindPoseMat.push_back(hairBindPose);
+				hairSkin->infJointName.push_back(headJointName);
+				hairSkin->sourceMesh = hairName;
+				hairSkin->bindWeight.push_back(1.0f);
+				for (unsigned int i = 0; i < hairModel.V.size(); i++)
+				{
+					hairSkin->jointNameIndex.push_back(0);
+					hairSkin->numInfJoints.push_back(1);
+					hairSkin->weightIndex.push_back(0);
+				}
+				mesh->skinWeights.push_back(hairSkin);
+			}
+		}
+	}
+
+	// handle hair mesh
+	
+
+
+	std::string outputMeshFile = blendshapesDir + "/" + outMeshName;
+	mesh->saveToDmb(outputMeshFile);
+	// load base model
+	//mesh->rebuildVertexBuffer(true);
+}
+
 //	Callback function for Python module Misc to run the checkVisibility function
 std::vector<std::string> checkVisibility(const std::string& character)
 {
@@ -375,6 +649,9 @@ BOOST_PYTHON_MODULE(AutoRig)
 	boost::python::def("saveDeformableMesh", saveDeformableMesh, "Save the deformable model to the target directory");
 	boost::python::def("saveDeformableMeshScale", saveDeformableMeshScale, "Save the deformable model with scaling factor to the target directory");
 	boost::python::def("setPawnMesh", setPawnMesh, "Set the deformable model to the target pawn");
+	boost::python::def("createCustomMeshFromBlendshapes", createCustomMeshFromBlendshapes, "create a new custom mesh with a different set of blendshapes.");
+	boost::python::def("imageColorTransfer", imageColorTransfer, "color transfer of source image using the color styles of target image.");
+
 
 	boost::python::class_<SBAutoRigManager>("SBAutoRigManager")
 		.def("getAutoRigManager", &SBAutoRigManager::singletonPtr, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the autorigging manager")

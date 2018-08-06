@@ -4,6 +4,8 @@
 #include <sbm/sbm_deformable_mesh.h>
 #include <sr/sr_light.h>
 
+
+
 class SBBaseRenderer
 {
 private:
@@ -25,6 +27,7 @@ public:
 protected:
 	void drawFloor(bool deferrredRender = true);
 	void GPUMeshUpdate(DeformableMeshInstance* meshInstance);
+	void GPUBlendShapeUpdate(DeformableMeshInstance* meshInstance);
 protected:
 	SbmShaderProgram* skinningShader;
 	SbmShaderProgram* normalMapShader;

@@ -426,6 +426,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 								
 							}
 
+							SrVec blendShapeOffset = pawn->getVec3Attribute("blendShape.translationOffset");
 							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
 							if (blendshapeIter !=  mesh->blendShapeMap.end())
 							{
@@ -447,8 +448,11 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 										if (blendshapeIter !=  mesh->blendShapeMap.end())
 											(*shapeIter).second[count] = shapeName;
 										DeformableMesh* shapeModel = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+									
 										if (shapeModel)
 										{
+											shapeModel->dMeshStatic_p[0]->shape().translate(blendShapeOffset);
+											shapeModel->dMeshDynamic_p[0]->shape().translate(blendShapeOffset);
 											(*blendshapeIter).second[count] = shapeModel->dMeshStatic_p[0];
 											shapeModel->dMeshStatic_p[0]->ref();
 										}
