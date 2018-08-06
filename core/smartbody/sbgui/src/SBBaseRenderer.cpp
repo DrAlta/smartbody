@@ -51,6 +51,7 @@ char vShaderNormalMapStr[] =
 "uniform   mat4 uMVMatrix;						\n"
 "uniform   lightSource uLights[numOfLights];    \n"
 "out   vec2 vTexCoord;						\n"
+"out   vec3 vNormal;                        \n"
 "out   vec3 lightDir[numOfLights], halfVec[numOfLights];  \n"
 "uniform   float uMeshScale;					\n"
 "const float c_zero = 0.0;											\n"
@@ -65,6 +66,7 @@ char vShaderNormalMapStr[] =
 "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
 "   mat3 tangentMat;                                                \n"
 "   vec3 vTangent = aTangent;										\n"
+"   vNormal = aNormal;										\n"
 "	if (isnan(vTangent.x) || isnan(vTangent.y) || isnan(vTangent.z)) vTangent = vec3(1,0,0); \n"
 "   tangentMat[0] = normalize((uMVMatrix * vec4(vTangent,0.0)).xyz);            \n"
 "   tangentMat[2] = normalize((uMVMatrix * vec4(aNormal,0.0)).xyz);           \n"
@@ -96,6 +98,7 @@ char fShaderNormalMapStr[] =
 "const int numOfLights = 3;						\n"
 "in   vec3 lightDir[numOfLights], halfVec[numOfLights];\n"
 "in   vec2 vTexCoord;											\n"
+"in   vec3 vNormal;											\n"
 "layout(binding=0) uniform sampler2D sTexture; \n"
 "layout(binding=1) uniform sampler2D normalTexture; \n"
 "layout(binding=2) uniform sampler2D specularTexture; \n"
@@ -119,8 +122,8 @@ char fShaderNormalMapStr[] =
 "{																	\n"
 "  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
 "  float alpha = texColor.a*uMtrl.diffuse.a;"
-"  if (alpha < 0.8) discard;                                   \n"
-"  //if (texColor.a < 0.2) discard;                                   \n"
+"  //if (alpha < 0.8) discard;                                   \n"
+"  if (texColor.a < 0.2) discard;                                   \n"
 "  vec3 normal = 2.0 * texture2D(normalTexture, vTexCoord.st).rgb - 1.0;\n"
 "  vec4 specularColor = texture2D( specularTexture, vTexCoord );				\n"
 "  normal = normalize (normal);                                  \n"
@@ -131,9 +134,9 @@ char fShaderNormalMapStr[] =
 "  }                                                             \n"
 "  vComputedLightColor.a = alpha;                                  \n"
 //"  gl_FragColor  = texColor * vComputedLightColor;				 \n"
-"  gl_FragColor  = vComputedLightColor;				 \n"
-//" gl_FragColor  =  vec4(texColor.r , texColor.g , texColor.b ,1.0);                   			     \n"
-//" gl_FragColor  =  vec4(lightDir[0].x, lightDir[0].y, lightDir[0].z ,1.0);                   			     \n"
+//"  gl_FragColor  = vComputedLightColor;				 \n"
+" gl_FragColor  =  vec4(texColor.r , texColor.g , texColor.b ,alpha);                   			     \n"
+//" gl_FragColor  =  vec4(vNormal.r, vNormal.g, vNormal.b ,1.0);                   			     \n"
 "}																	\n"
 
 ;
@@ -176,16 +179,12 @@ void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
-		if (meshInstance)
+		if (meshInstance && meshInstance->getDeformableMesh())
 		{
-			// update blendshapes	
-			SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
-			if (!gpuMeshInstance->getVBODeformPos())
-				gpuMeshInstance->initBuffer();
-			gpuMeshInstance->blendShapeStaticMesh();
-			gpuMeshInstance->gpuBlendShape(); // copy the static blendshape results to VBO buffer
+			GPUBlendShapeUpdate(meshInstance);
 			if (!meshInstance->isStaticMesh())
 			{
+				SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
 				GPUMeshUpdate(meshInstance);
 			}
 		}
@@ -240,9 +239,8 @@ void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 	for (unsigned int i = 0; i < pawnNames.size(); i++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
-	
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
-		if (meshInstance && meshInstance->getVisibility() != 0)
+		if (meshInstance)
 		{
 			renderMesh(meshInstance, normalMapShader, false);
 		}
@@ -321,6 +319,9 @@ void SBBaseRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 {
 	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
+
+	if (!gpuMesh) return;
+
 	static GLuint queryName = -1;
 	if (queryName == -1)
 		glGenQueries(1, &queryName);
@@ -493,7 +494,8 @@ void SBBaseRenderer::renderMesh(DeformableMeshInstance* meshInstance, SbmShaderP
 	if (!gpuMeshInstance->getVBODeformPos())
 		gpuMeshInstance->initBuffer();
 
-	glDisable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
 	//VBOVec3f* posVBO = gpuMeshInstance->getVBODeformPos();
 	//posVBO->VBO()->UpdateWithData(meshInstance->_deformPosBuf);
@@ -513,8 +515,8 @@ void SBBaseRenderer::renderMesh(DeformableMeshInstance* meshInstance, SbmShaderP
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glEnableVertexAttribArray(3);
-	//gpuMeshInstance->getVBODeformTangent()->VBO()->BindBuffer();
-	gpuMesh->getTangentVBO()->VBO()->BindBuffer();
+	gpuMeshInstance->getVBODeformTangent()->VBO()->BindBuffer();
+	//gpuMesh->getTangentVBO()->VBO()->BindBuffer();
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 //  	glEnableVertexAttribArray(4);
@@ -543,14 +545,14 @@ void SBBaseRenderer::renderMesh(DeformableMeshInstance* meshInstance, SbmShaderP
 		SbmSubMesh* subMesh = subMeshList[i];	
 		VBOVec3i* subMeshVBO = subMeshTris[i];
 		glMaterial(subMesh->material);		
-		if (subMesh->material.useAlphaBlend)
-		{
-			glDisable(GL_CULL_FACE);
-		}
-		else
-		{
-			glEnable(GL_CULL_FACE);
-		}
+// 		if (subMesh->material.useAlphaBlend)
+// 		{
+// 			glDisable(GL_CULL_FACE);
+// 		}
+// 		else
+// 		{
+// 			glEnable(GL_CULL_FACE);
+// 		}
 
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn = skel->getPawn();		
@@ -627,4 +629,17 @@ void SBBaseRenderer::renderMesh(DeformableMeshInstance* meshInstance, SbmShaderP
 	glDisableVertexAttribArray(3);	
 }
 
+void SBBaseRenderer::GPUBlendShapeUpdate(DeformableMeshInstance* meshInstance)
+{
+	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
+	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
+
+	if (!gpuMesh) return;
+
+	if (!gpuMeshInstance->getVBODeformPos())
+		gpuMeshInstance->initBuffer();
+	// update blendshapes	
+	gpuMeshInstance->blendShapeStaticMesh();
+	gpuMeshInstance->gpuBlendShape(); // copy the static blendshape results to VBO buffer
+}
 
