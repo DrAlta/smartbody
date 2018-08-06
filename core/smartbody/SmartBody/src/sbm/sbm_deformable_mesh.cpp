@@ -895,10 +895,11 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 
 			meshColorBuf[iVtx] = meshColor;
 
+			SrMat bindShapeRotate = bindShapeMat.get_rotation();
 			SrVec& lt =	dMeshStatic->shape().Tangent[i];		
 			SrVec& lb = dMeshStatic->shape().BiNormal[i];
-			tangentBuf[iVtx] = lt*bindShapeMat;
-			binormalBuf[iVtx] = lb*bindShapeMat;
+			tangentBuf[iVtx] = lt*bindShapeRotate;
+			binormalBuf[iVtx] = lb*bindShapeRotate;
 				
 			//normalBuffer(iVtx) = Vec3f(ln[0],ln[1],ln[2]);
 
@@ -1155,6 +1156,8 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		std::vector<SrSnModel*>& targets = (*iter).second;
 		for (size_t t = 1; t < targets.size(); t++) // ignore first target since it is a base mesh
 		{
+			if (targets[t] == NULL)
+				continue;
 			SrModel& curModel = targets[t]->shape();
 			modelsToSave.push_back(&curModel);
 		}
@@ -1487,6 +1490,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 		SrStringArray paths;
 		paths.push(path);
 
+#if 0
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
 
 		for (size_t i = 0; i < newModel->M.size(); i++)
@@ -1543,8 +1547,9 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 				newModel->mtlSpecularTexNameMap[matName] = prefixedName;
 			}
 		}
+#endif
 		
-		if (newModel->Fn.size() == 0)
+		//if (newModel->Fn.size() == 0)
 		{
 			newModel->computeNormals();
 		}
@@ -1620,10 +1625,12 @@ void DeformableMesh::computeNormals()
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
 		dMeshDynamic_p[i]->shape().computeNormals();
+		//dMeshDynamic_p[i]->shape().computeTangentBiNormal();
 	}
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
 		dMeshStatic_p[i]->shape().computeNormals();
+		//dMeshDynamic_p[i]->shape().computeTangentBiNormal();
 	}
 }
 
@@ -1965,6 +1972,8 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 {
 	// load texture specifically into SmartBody after parsing the texture file names
+	SrStringArray paths;
+	paths.push_path(textureDirectory.c_str()); 
 	std::map<std::string,std::string>::iterator iter;
 	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
 	{
@@ -1972,66 +1981,91 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
+// 			if (tex)
+// 			{
+// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
+// 				tex = NULL;
+// 			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
-				std::string textureLabel = iter->second;				
-        std::string::size_type labelIndex = textureLabel.find_first_of("|");
+				std::string textureLabel = iter->second;
+				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+#if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(7);
 				prefixIndex = textureFile.find_first_of("file://");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(6);
-				std::string textureName = textureDirectory + "/" + textureFile;
+#endif
+				//std::string textureName = textureDirectory + "/" + textureFile;
+				std::string textureName = ParserCOLLADAFast::getFinalTextureFileName(textureFile, paths);
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
-				texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str(), textureName.c_str());
+				else
+					texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str(), textureName.c_str());
 			}
 		}
 		for (iter = dMeshStatic_p[i]->shape().mtlNormalTexNameMap.begin(); iter != dMeshStatic_p[i]->shape().mtlNormalTexNameMap.end(); ++iter)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
+// 			if (tex)
+// 			{
+// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
+// 				tex = NULL;
+// 			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+#if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(7);
 				prefixIndex = textureFile.find_first_of("file://");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(6);
-				std::string textureName = textureDirectory + "/" + textureFile;
+#endif
+				std::string textureName = ParserCOLLADAFast::getFinalTextureFileName(textureFile, paths);
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
-				texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str(), textureName.c_str());
+				else
+					texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str(), textureName.c_str());
 			}
 		}
 		for (iter = dMeshStatic_p[i]->shape().mtlSpecularTexNameMap.begin(); iter != dMeshStatic_p[i]->shape().mtlSpecularTexNameMap.end(); ++iter)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
+// 			if (tex)
+// 			{
+// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
+// 				tex = NULL;
+// 			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+#if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(7);
 				prefixIndex = textureFile.find_first_of("file://");
 				if (prefixIndex == 0)
 					textureFile = textureFile.substr(6);
-				std::string textureName = textureDirectory + "/" + textureFile;
+#endif
+				std::string textureName = ParserCOLLADAFast::getFinalTextureFileName(textureFile, paths);
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
-				texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str(), textureName.c_str());
+				else
+					texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str(), textureName.c_str());
 			}
 		}
 	}
@@ -2158,7 +2192,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
 	{
 		bool foundBaseModel = false;
-
+		std::vector<SrSnModel*>& targets = (*mIter).second;
 		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 		{
 			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
@@ -2172,7 +2206,15 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		if (writeToBaseModel == NULL)
 		{
 			//SmartBody::util::log("base model to write to cannot be found");
-			continue;
+			if (_mesh->dMeshStatic_p.size() == 0 || targets.size() == 0)
+				continue;
+			if (_mesh->dMeshStatic_p[0]->shape().V.size() == targets[0]->shape().V.size())
+			{
+				// can't find the base model, assuming it's the first mesh
+				//SmartBody::util::log("Can't find BlendShape BaseModel, will assume it's the first mesh.");
+				writeToBaseModel = _mesh->dMeshStatic_p[0];
+				//readBaseModel = _mesh->dMeshDynamic_p[0];
+			}
 		}
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
@@ -2391,6 +2433,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* readBaseModel = NULL;
 	SrSnModel* baseModel = NULL;
 
 	// find the base shape from static meshes
@@ -2408,6 +2451,7 @@ void DeformableMeshInstance::blendShapes()
 			{
 				//	If base shape, copies pointer to _mesh->dMeshStatic (here is where the result resulting vertices position are stored)
 				writeToBaseModel = _mesh->dMeshStatic_p[i];
+				readBaseModel = _mesh->dMeshDynamic_p[i];
 				break;
 			}
 		}
@@ -2415,7 +2459,16 @@ void DeformableMeshInstance::blendShapes()
 		if (writeToBaseModel == NULL)
 		{
 			//SmartBody::util::log("base model to write to cannot be found");
-			continue;
+			//continue;
+			if (_mesh->dMeshStatic_p.size() == 0 || targets.size() == 0)
+				continue;
+			if (_mesh->dMeshStatic_p[0]->shape().V.size() == targets[0]->shape().V.size())
+			{
+				// can't find the base model, assuming it's the first mesh
+				//SmartBody::util::log("Can't find BlendShape BaseModel, will assume it's the first mesh.");
+				writeToBaseModel = _mesh->dMeshStatic_p[0];
+				readBaseModel = _mesh->dMeshDynamic_p[0];
+			}
 		}
 		for (size_t i = 0; i < targets.size(); ++i)
 		{
@@ -2431,12 +2484,17 @@ void DeformableMeshInstance::blendShapes()
 			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
+		
 
 		//SrArray<SrPnt>& neutralV = baseModel->shape().V;
 		std::vector<SrVec>& neutralV = baseModel->shape().V;
 		std::vector<SrPnt>& neutralN = baseModel->shape().N;
 		std::vector<SrVec> newV = neutralV;
 		std::vector<SrPnt> newN = neutralN;
+		
+		//std::vector<SrVec> newV = readBaseModel->shape().V;
+		//std::vector<SrPnt> newN = readBaseModel->shape().N;
+		
 		double blendShapeProximity = gwiz::epsilon4();
 		if (SmartBody::SBScene::getScene()->hasAttribute("blendshapeProximity"))
 		{
@@ -2515,7 +2573,7 @@ void DeformableMeshInstance::blendShapes()
 		std::vector<GLuint> texIDs(targets.size(), 0);
 
 		std::vector<std::string> texture_names(targets.size());
-
+		
 		int tex_h = 1024;
 		int tex_w = 1024;
 		//std::string weightsStr = "weights = ";
@@ -3101,7 +3159,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	{
 		SrSnModel* writeToBaseModel = NULL;
 		int vtxBaseIdx = 0;
-
+		std::vector<SrSnModel*>& targets = (*mIter).second;
 		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 		{
 			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
@@ -3117,7 +3175,18 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 		}
 
 		if (!writeToBaseModel)
-			continue;
+		{
+			if (_mesh->dMeshStatic_p.size() == 0 || targets.size() == 0)
+				continue;
+			if (_mesh->dMeshStatic_p[0]->shape().V.size() == targets[0]->shape().V.size())
+			{
+				// can't find the base model, assuming it's the first mesh
+				//SmartBody::util::log("Can't find BlendShape BaseModel, will assume it's the first mesh.");
+				writeToBaseModel = _mesh->dMeshStatic_p[0];
+				vtxBaseIdx = 0;
+			}
+			//continue;
+		}
 
 		std::map<int, std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
 		std::map<int, std::vector<int> >& vtxBlendShapeVtxIdxMap = _mesh->blendShapeNewVtxIdxMap;

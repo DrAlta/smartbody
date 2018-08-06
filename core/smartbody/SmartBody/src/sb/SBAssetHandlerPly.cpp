@@ -76,10 +76,10 @@ std::vector<SBAsset*> SBAssetHandlerPly::getAssets(const std::string& path)
 		//	model->V[j] *= factor;
 		//}
 		
-		if (model->Fn.size() == 0)
-		{
-			model->computeNormals();
-		}
+// 		if (model->Fn.size() == 0)
+// 		{
+// 			model->computeNormals();
+// 		}
 
 		SrSnModel* srSnModelStatic = new SrSnModel();
 		srSnModelStatic->shape(*model);

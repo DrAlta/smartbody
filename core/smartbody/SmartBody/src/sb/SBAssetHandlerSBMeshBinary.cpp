@@ -70,7 +70,10 @@ namespace SmartBody {
 		{
 			bool ok = mesh->readFromDmb(convertedPath);
 			if (ok)
+			{
+				mesh->computeNormals();
 				assets.push_back(mesh);
+			}
 			else
 				delete mesh;
     } else {

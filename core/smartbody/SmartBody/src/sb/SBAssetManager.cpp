@@ -852,6 +852,7 @@ SBAPI void SBAssetManager::removeMesh(DeformableMesh* mesh)
 	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(mesh->getName());
 	if (iter != _deformableMeshMap.end())
 	{
+		SmartBody::util::log("Remove mesh '%s'", mesh->getName().c_str());
 		_deformableMeshMap.erase(iter);
 	}
 

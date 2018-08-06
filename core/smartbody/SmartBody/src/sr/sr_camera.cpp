@@ -98,8 +98,8 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
    setCenter(c.x, c.y, c.z);
    setUpVector(up);
    setFov(SR_TORAD(60));
-   setNearPlane( 1.0f);
-   setFarPlane( 10000.0f );
+   setNearPlane( 0.1f);
+   setFarPlane( 100.0f );
    setAspectRatio(1.0f);
    setScale(1.0f);
  }

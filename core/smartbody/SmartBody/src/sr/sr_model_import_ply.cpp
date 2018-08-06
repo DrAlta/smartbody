@@ -335,6 +335,8 @@ bool SrModel::import_ply( const char* file )
 	//   remove_redundant_normals ();
 	compress ();
 
+	computeNormals();
+
 // 	for (int i=0;i<T.size();i++)
 // 	{
 // 		if (i%100 == 0)
