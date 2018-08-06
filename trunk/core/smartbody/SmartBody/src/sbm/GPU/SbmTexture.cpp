@@ -177,8 +177,10 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
         SbmTexture* texture = new SbmTexture(textureName);
         if(!texture->loadImage(fileName))
         {
-            SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
-        }
+            //SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
+			delete texture;
+			return;
+        }		
         texMap[strTex] = texture;
     }
 }
@@ -645,7 +647,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 	if (buildMipMap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 #else
-	SmartBody::util::log("texName = %s, iType = %d, width = %d, height = %d", textureName.c_str(), iType, width, height);
+	//SmartBody::util::log("texName = %s, iType = %d, width = %d, height = %d", textureName.c_str(), iType, width, height);
     glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, buffer);
 	if (buildMipMap)
 		glGenerateMipmap(GL_TEXTURE_2D);

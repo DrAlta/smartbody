@@ -623,7 +623,7 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 	if (VBOPos) delete VBOPos;
 	if (VBOTangent) delete VBOTangent;
 	if (VBOBiNormal) delete VBOBiNormal;
-  if (VBONormal) delete VBONormal;
+    if (VBONormal) delete VBONormal;
 	if (VBOTexCoord) delete VBOTexCoord;
 	if (VBOTri) delete VBOTri;
 	if (VBOBoneID1) delete VBOBoneID1;	
@@ -1675,6 +1675,7 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 		SrSnModel* writeToBaseModel = NULL;
 		SkinWeight* skinWeight = NULL;
 		int vtxBaseIdx = 0;
+		std::vector<SrSnModel*>& targets = (*mIter).second;
 		//SmartBody::util::log("gpuBlendShape::gpuMesh->dMeshStatic_p.size() = %d", gpuMesh->dMeshStatic_p.size());
 		for (size_t i = 0; i < gpuMesh->dMeshStatic_p.size(); ++i)
 		{
@@ -1693,8 +1694,23 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 				vtxBaseIdx += gpuMesh->dMeshStatic_p[i]->shape().V.size();
 			}
 		}
+
 		if (!writeToBaseModel)
-			return;
+		{
+			if (gpuMesh->dMeshStatic_p.size() == 0 || targets.size() == 0)
+				return;
+			if (gpuMesh->dMeshStatic_p[0]->shape().V.size() == targets[0]->shape().V.size())
+			{
+				// can't find the base model, assuming it's the first mesh
+				//SmartBody::util::log("Can't find BlendShape BaseModel, will assume it's the first mesh.");
+				writeToBaseModel = gpuMesh->dMeshStatic_p[0];
+				skinWeight = gpuMesh->skinWeights[0];
+				vtxBaseIdx = 0;
+			}
+			//continue;
+		}
+// 		if (!writeToBaseModel)
+// 			return;
 
 		//if (!skinWeight)
 		//	return;

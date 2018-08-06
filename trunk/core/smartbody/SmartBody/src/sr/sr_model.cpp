@@ -1461,6 +1461,7 @@ void SrModel::restoreOriginalVertices()
 
 SBAPI void SrModel::computeNormals(int flat)
 {
+	//return;
 	
 
 // 	if (flat)

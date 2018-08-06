@@ -772,16 +772,18 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					{
 						rapidxml::xml_attribute<>* sidAt= infoNode->first_attribute("sid");
 						std::string sidAttr = sidAt->value();
-
+#define ALL_ROTATION 0
 						if (sidAttr.substr(0, 11) == "jointOrient")
 						{
 							std::string jointOrientationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
-							float finalValue = 0;
+
+#if ALL_ROTATION
 							if (tokens.size() >= 4)
 								allrots.push_back(SrQuat(SrVec(atof(tokens[0].c_str()), atof(tokens[1].c_str()), atof(tokens[2].c_str())), M_PI / 180.0 * 	atof(tokens[3].c_str())));	
-							/*
+#else
+							float finalValue = 0;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 									
@@ -790,18 +792,19 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							if (sidAttr == "jointOrientZ") jorientz = finalValue;
 							if (orderVec.size() != 3)
 								orderVec.push_back(sidAttr.substr(11, 1));
-								*/
+								
+#endif
 						}
 						if (sidAttr.substr(0, 6) == "rotate")
 						{
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
 							SmartBody::util::tokenize(rotationString, tokens, " \n");
+#if ALL_ROTATION
 							if (tokens.size() >= 4)
 								allrots.push_back(SrQuat(SrVec(atof(tokens[0].c_str()), atof(tokens[1].c_str()), atof(tokens[2].c_str())), M_PI / 180.0 * 	atof(tokens[3].c_str())));		
-							/*
+#else
 							float finalValue = 0;
-
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotateX") rotx = finalValue;
@@ -809,7 +812,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 							if (sidAttr == "rotateZ") rotz = finalValue;
 							if (orderVec.size() != 3)
 								orderVec.push_back(sidAttr.substr(6, 1));
-							*/
+#endif
 						}
 						if (sidAttr.substr(0, 8) == "rotation")
 						{
@@ -843,7 +846,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 
 
 				joint->offset(offset);
-
+#if ALL_ROTATION
 				SrMat finalMat;
 				for (int q = allrots.size() - 1; q >= 0; q--)
 				{
@@ -852,7 +855,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				}
 				SkJointQuat* jointQuat = joint->quat();
 				jointQuat->orientation(SrQuat(finalMat));
-				/*
+#else
 				SrMat rotMat;
 				rotx *= float(M_PI) / 180.0f;
 				roty *= float(M_PI) / 180.0f;
@@ -863,18 +866,15 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				SrQuat quat = SrQuat(rotMat);
 				SkJointQuat* jointQuat = joint->quat();
 				jointQuat->orientation(quat);
-				*/
-				/*
+
 				SrMat jorientMat;
 				jorientx *= float(M_PI) / 180.0f;
 				jorienty *= float(M_PI) / 180.0f;
 				jorientz *= float(M_PI) / 180.0f;
-				sr_euler_mat(order, jorientMat, jorientx, jorienty, jorientz);
-				
-								
+				sr_euler_mat(order, jorientMat, jorientx, jorienty, jorientz);								
 				SrQuat jorientQ = SrQuat(jorientMat);
-				jointQuat->prerot(jorientQ);
-				*/
+				jointQuat->prerot(jorientQ);				
+#endif
 				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
 				{
@@ -2725,6 +2725,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 	}
 	SrString s;
 	SrInput in;
+	//SmartBody::util::log("getFinalTextureFileName, finalFileName = '%s'", finalFileName.c_str());
 	std::string imageFile = finalFileName;
 	std::string finalTexturePath = "";
 	bool foundFile = false;
@@ -2744,6 +2745,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 		{
 			boost::filesystem::path texturePath(paths[0]);
 			boost::filesystem::path textureSource(imageFile);
+			
 			texturePath /= textureSource; 
 			finalTexturePath = boost::filesystem::complete(texturePath).string();
 			in.init(fopen(finalTexturePath.c_str(), "r"));
@@ -2756,7 +2758,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 
 			boost::filesystem::path texturePath2(paths[0]);
 			boost::filesystem::path textureFilename(textureSource.filename());
-			texturePath2 /= textureFilename;
+			texturePath2 /= textureSource.filename();
 			finalTexturePath = boost::filesystem::complete(texturePath2).string();
 
 			in.init(fopen(finalTexturePath.c_str(), "r"));
@@ -2771,7 +2773,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 	
 	if (!foundFile)
 	{
-		SmartBody::util::log("Could not find texture in file %s", filename.c_str());
+		//SmartBody::util::log("Could not find texture in file %s", filename.c_str());
 		return "";
 	}
 
