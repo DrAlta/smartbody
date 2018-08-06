@@ -51,6 +51,6 @@ void main()
 	vec3 pos = vec3(position.xyz)*meshScale;
 	mat3 skin = TransformPos(pos,normal,tangent,BoneID1,BoneWeight1);	
 	deformPos = skin[0];
-	deformNormal = skin[1];
-	deformTangent = tangent;//skin[2];
+	deformNormal = normalize(skin[1]);
+	deformTangent = normalize(skin[2]);
 }
