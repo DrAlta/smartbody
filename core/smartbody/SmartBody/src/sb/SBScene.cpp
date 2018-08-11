@@ -284,7 +284,7 @@ void SBScene::initialize()
 	SmartBody::util::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	SmartBody::util::g_log.AddListener(forwardListener);
-#ifndef WIN_BUILD
+#if !defined(WIN_BUILD) && !defined(NATIVE_FRAMEWORK_BUILD)
 	SmartBody::util::StdoutListener* stdoutListener = new SmartBody::util::StdoutListener();
 	SmartBody::util::g_log.AddListener(stdoutListener);
 #endif
@@ -491,8 +491,10 @@ void SBScene::cleanup()
 	_viewerFactory = NULL;
 	_ogreViewerFactory = NULL;
 	
+#ifndef USE_NATIVE_AUDIO
 	AUDIO_Close();
 	AUDIO_Init();
+#endif
 
 	if (_vhmsgManager->isEnable() && _vhmsgManager->isConnected())
 		_vhmsgManager->send( "vrProcEnd sbm" );
@@ -875,6 +877,7 @@ void SBScene::notify( SBSubject* subject )
 {
 	BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(subject);
 
+#ifndef USE_NATIVE_AUDIO
 	if (boolAttr && boolAttr->getName() == "internalAudio")
 	{
 		bool val = boolAttr->getValue();
@@ -890,7 +893,9 @@ void SBScene::notify( SBSubject* subject )
 		}
 		return;
 	}
-	else if (boolAttr && boolAttr->getName() == "enableConsoleLogging")
+#endif
+
+  if (boolAttr && boolAttr->getName() == "enableConsoleLogging")
 	{
 		bool val = boolAttr->getValue();
 		if (val)
@@ -906,7 +911,8 @@ void SBScene::notify( SBSubject* subject )
 			SmartBody::util::g_log.RemoveAllListeners();
 		}
 	}
-	else if (boolAttr && boolAttr->getName() == "bmlstatus")
+
+  if (boolAttr && boolAttr->getName() == "bmlstatus")
 	{
 		this->getBmlProcessor()->getBMLProcessor()->set_bml_feedback(boolAttr->getValue());
 	}

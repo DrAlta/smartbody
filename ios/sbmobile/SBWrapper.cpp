@@ -66,7 +66,7 @@ extern "C"
 #endif
   
   static SrCamera* cameraReset;
-  static vhcl::Log::StdoutListener listener;
+//  static vhcl::Log::StdoutListener listener;
   
   
 #if USE_GL_FIXED_PIPELINE

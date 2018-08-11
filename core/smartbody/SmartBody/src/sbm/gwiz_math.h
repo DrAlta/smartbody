@@ -198,7 +198,7 @@ namespace gwiz {
 
 #if 1
   // Ubuntu warning suppression
- 	static double use_warn_suppress(void)	{
+ 	static inline double use_warn_suppress(void)	{
 		static double x = use_warn_suppress(); // use once
 		x = epsilon4(); x = epsilon5(); x = epsilon6(); 
 		x = epsilon7(); x = epsilon8(); x = epsilon9();

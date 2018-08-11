@@ -1612,27 +1612,27 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
 		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
 
+#ifndef USE_NATIVE_AUDIO
 		// if internal audio is on, use the internal sound player
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
 #if !defined(__FLASHPLAYER__)
-		SmartBody::util::log("Play AudioFile = %s", soundFile.c_str() );
-		
-        AUDIO_Play( soundFile.c_str() );			
+          SmartBody::util::log("Play AudioFile = %s", soundFile.c_str() );
+          AUDIO_Play( soundFile.c_str() );
 #else
-		std::string souldFileBase = boost::filesystem::basename(soundFile);
-		std::string soundFileBaseMP3 = souldFileBase + ".mp3";
-		SmartBody::util::log("Sound file name: %s", soundFileBaseMP3.c_str());
-			inline_as3(
-				"import flash.media.Sound;\n\
-				 import flash.net.URLRequest;\n\
-				 var fileString : String = CModule.readString(%0, %1);\n\
-				 var request:URLRequest = new URLRequest(fileString);\n\
-				 var soundFactory:Sound = new Sound();\n\
-				 soundFactory.load(request);\n\
-				 soundFactory.play();\n"
-				 : : "r"(soundFileBaseMP3.c_str()), "r"(strlen(soundFileBaseMP3.c_str()))
-				);
+          std::string souldFileBase = boost::filesystem::basename(soundFile);
+          std::string soundFileBaseMP3 = souldFileBase + ".mp3";
+          SmartBody::util::log("Sound file name: %s", soundFileBaseMP3.c_str());
+            inline_as3(
+              "import flash.media.Sound;\n\
+               import flash.net.URLRequest;\n\
+               var fileString : String = CModule.readString(%0, %1);\n\
+               var request:URLRequest = new URLRequest(fileString);\n\
+               var soundFactory:Sound = new Sound();\n\
+               soundFactory.load(request);\n\
+               soundFactory.play();\n"
+               : : "r"(soundFileBaseMP3.c_str()), "r"(strlen(soundFileBaseMP3.c_str()))
+              );
 #endif
         }
         else
@@ -1641,6 +1641,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
 #endif
         }
+#endif
 
         return CMD_SUCCESS;
     }
@@ -1733,21 +1734,23 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         }
         }
 #endif
-		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
-        {
-		AUDIO_Stop(soundFile.c_str());
-		}
-		else
-		{
-#ifndef SB_NO_BONEBUS
-	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
-#endif
-		}
 
-        return CMD_SUCCESS;
+#ifndef USE_NATIVE_AUDIO
+      if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
+      {
+        AUDIO_Stop(soundFile.c_str());
+      }
+      else
+      {
+#ifndef SB_NO_BONEBUS
+        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+#endif
+      }
+#endif
+      return CMD_SUCCESS;
     }
 
-    return CMD_NOT_FOUND;
+  return CMD_NOT_FOUND;
 }
 
 
