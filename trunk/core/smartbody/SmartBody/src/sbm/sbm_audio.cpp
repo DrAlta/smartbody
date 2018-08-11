@@ -20,18 +20,18 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 // sbm_audio.cpp
 
-#include "vhcl.h"
-
 #include "sbm_audio.h"
 
+#ifndef USE_NATIVE_AUDIO
+
+#include "vhcl.h"
 #include "vhcl_audio.h"
 #include <sstream>
 #include <cstdlib>
 #include <sb/SBUtilities.h>
 
 
-vhcl::Audio * g_audio = NULL;
-
+static vhcl::Audio * g_audio = NULL;
 
 bool AUDIO_Init()
 {
@@ -80,3 +80,27 @@ void AUDIO_Close()
 	delete g_audio;
 	g_audio = NULL;
 }
+
+#else
+
+bool AUDIO_Init()
+{
+  return true;
+}
+
+
+void AUDIO_Play( const char * audio_file )
+{
+}
+
+void AUDIO_Stop( const char * audio_file )
+{
+}
+
+
+void AUDIO_Close()
+{
+}
+
+#endif
+

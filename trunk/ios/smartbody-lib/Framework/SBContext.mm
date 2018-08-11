@@ -163,8 +163,8 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
       self.delegate = delegate;
       
       SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-      _sceneListener._context = self;
-      scene->addSceneListener(&_sceneListener);
+      self->_sceneListener._context = self;
+      scene->addSceneListener(&self->_sceneListener);
       
       SmartBody::util::log("Start running SBIOSInitialize");
       std::string path1 = [assetsURL.path UTF8String];
@@ -175,6 +175,8 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
       
       scene->addAssetPath("script", "scripts");
       SBInitScene("init.py");
+      // required as we are using our native implementation
+      scene->setBoolAttribute("internalAudio", false);
       SmartBody::util::log("After running SBIOSInitialize");
       sharedInstance = self;
     });
