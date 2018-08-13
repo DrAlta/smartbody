@@ -451,7 +451,6 @@ void BmlRequest::gestureRequestProcess()
 		}
 		if (gestures.size() <= 1)
 			return;
-
 		std::vector<GestureRequest*> gesturePriorityList;
 		for (size_t g = 0; g < gestures.size(); g++)
 			gesturePriorityList.push_back(gestures[g]);
@@ -459,6 +458,47 @@ void BmlRequest::gestureRequestProcess()
 		{
 			std::sort(gesturePriorityList.begin(), gesturePriorityList.end(), prioritySortFunction);
 		}
+
+		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		{
+			SmartBody::util::log("2WHY CAN'T I SEE THIS?");
+			double earliestTime = 9999999.0;
+			for (size_t g = 0; g < gestures.size(); g++)
+			{
+				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
+				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
+				double currGestureStrokeStartAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_start()->time();
+				double currGestureStrokeAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke()->time();
+				double currGestureStrokeEndAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_end()->time();
+				double currGestureRelaxAt = (double)gesturePriorityList[g]->behav_syncs.sync_relax()->time();
+				SmartBody::util::log("%4d)  %s %f %f %f %f %f", g, motionController->motion()->getName().c_str(), currGestureReadyAt, currGestureStrokeStartAt, currGestureStrokeAt, currGestureStrokeEndAt, currGestureRelaxAt);
+				if (currGestureReadyAt< earliestTime)
+					earliestTime = currGestureReadyAt;
+			}
+			for (size_t g = 0; g < gestures.size(); g++)
+			{
+				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
+				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
+				double currGestureStrokeStartAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_start()->time();
+				double currGestureStrokeAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke()->time();
+				double currGestureStrokeEndAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_end()->time();
+				double currGestureRelaxAt = (double)gesturePriorityList[g]->behav_syncs.sync_relax()->time();
+				std::stringstream strstr;
+				for (int num = 0; num < (int) ((currGestureReadyAt - earliestTime) * 10.0); num++)
+					strstr << "1";
+				for (int num = 0; num < (int) ((currGestureStrokeStartAt - currGestureReadyAt) * 10.0); num++)
+					strstr << "1";
+				for (int num = 0; num < (int) ((currGestureStrokeAt - currGestureStrokeStartAt ) * 10.0); num++)
+					strstr << "2";
+				for (int num = 0; num < (int) ((currGestureStrokeEndAt - currGestureStrokeAt ) * 10.0); num++)
+					strstr << "3";
+				for (int num = 0; num < (int) ((currGestureRelaxAt - currGestureStrokeEndAt ) * 10.0); num++)
+					strstr << "4";
+				SmartBody::util::log("%4d) %s", g, strstr.str().c_str());
+				
+			}
+		}
+
 		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 			for (size_t i = 0; i < gesturePriorityList.size(); i++)
 				SmartBody::util::log("Gesture priority order: %d ", gesturePriorityList[i]->priority);
