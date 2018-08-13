@@ -1,5 +1,4 @@
 #include "SBMobile.h"
-#include <vhcl.h>
 #include <sb/SBUtilities.h>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>

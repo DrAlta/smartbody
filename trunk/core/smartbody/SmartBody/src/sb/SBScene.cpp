@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "SBScene.h"
-#include <vhcl.h>
 #ifdef WIN32
 #include <direct.h>
 #endif
@@ -491,7 +490,7 @@ void SBScene::cleanup()
 	_viewerFactory = NULL;
 	_ogreViewerFactory = NULL;
 	
-#ifndef USE_NATIVE_AUDIO
+#ifndef SB_NO_VHCL_AUDIO
 	AUDIO_Close();
 	AUDIO_Init();
 #endif
@@ -877,7 +876,7 @@ void SBScene::notify( SBSubject* subject )
 {
 	BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(subject);
 
-#ifndef USE_NATIVE_AUDIO
+#ifndef SB_NO_VHCL_AUDIO
 	if (boolAttr && boolAttr->getName() == "internalAudio")
 	{
 		bool val = boolAttr->getValue();

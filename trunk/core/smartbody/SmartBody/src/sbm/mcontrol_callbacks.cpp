@@ -1612,7 +1612,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
 		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
 
-#ifndef USE_NATIVE_AUDIO
+#ifndef SB_NO_VHCL_AUDIO
 		// if internal audio is on, use the internal sound player
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
@@ -1735,7 +1735,7 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         }
 #endif
 
-#ifndef USE_NATIVE_AUDIO
+#ifndef SB_NO_VHCL_AUDIO
       if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
       {
         AUDIO_Stop(soundFile.c_str());
