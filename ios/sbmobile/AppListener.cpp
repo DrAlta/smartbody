@@ -3,7 +3,6 @@
 //
 
 #include "AppListener.h"
-#include <vhcl.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBPython.h>
 #include <sb/SBCharacter.h>

@@ -22,7 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "sbm_audio.h"
 
-#ifndef USE_NATIVE_AUDIO
+#ifndef SB_NO_VHCL_AUDIO
 
 #include "vhcl.h"
 #include "vhcl_audio.h"

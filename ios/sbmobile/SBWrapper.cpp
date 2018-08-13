@@ -6,8 +6,11 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#if !defined(SB_NO_VHMSG)
 #include "vhcl.h"
 #include <vhmsg-tt.h>
+#endif
+
 #include "SBWrapper.h"
 
 #include <sb/SBScene.h>
@@ -882,9 +885,9 @@ extern "C"
     }
   }
   
-  
   void SBInitVHMSGConnection()
   {
+#if !defined(SB_NO_VHMSG)
     //if (!mcuInit) return;
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     const char* serverName = "172.16.33.14";
@@ -916,9 +919,12 @@ extern "C"
     {
       SmartBody::util::log("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
     }
+#else
+    SmartBody::util::log("SBInitVHMSGConnection():: Smartbody was compiled without VHMSG support");
+#endif
   }
-  
-  
+
+
   void SBCameraOperation(float dx, float dy, int cameraMode)
   {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -981,7 +987,9 @@ extern "C"
 
 void SBCloseVHMSGConnection()
 {
+#if !defined(SB_NO_VHMSG)
   vhmsg::ttu_close();
+#endif
 }
 
 bool SBPythonCommandVoid( const char * command)

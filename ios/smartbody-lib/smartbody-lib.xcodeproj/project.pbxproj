@@ -430,24 +430,19 @@
 		625246411F776298007398F4 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246401F776298007398F4 /* libc++.tbd */; };
 		625246531F7762CB007398F4 /* libSteerLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246421F7762CA007398F4 /* libSteerLib.a */; };
 		625246541F7762CB007398F4 /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246431F7762CA007398F4 /* libprotobuf.a */; };
-		625246551F7762CB007398F4 /* libvhcl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246441F7762CA007398F4 /* libvhcl.a */; };
-		625246561F7762CB007398F4 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246451F7762CA007398F4 /* libalut.a */; };
 		625246571F7762CB007398F4 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246461F7762CA007398F4 /* libboost_filesystem.a */; };
 		625246581F7762CB007398F4 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246471F7762CA007398F4 /* libpython2.7.a */; };
 		625246591F7762CB007398F4 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246481F7762CA007398F4 /* libboost_system.a */; };
 		6252465A1F7762CB007398F4 /* libxerces-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246491F7762CA007398F4 /* libxerces-c.a */; };
 		6252465B1F7762CB007398F4 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464A1F7762CA007398F4 /* libexpat.a */; };
-		6252465C1F7762CB007398F4 /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464B1F7762CA007398F4 /* libactivemq-cpp.a */; };
-		6252465D1F7762CB007398F4 /* libvhmsg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464C1F7762CB007398F4 /* libvhmsg.a */; };
 		6252465E1F7762CB007398F4 /* libboost_numpy.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464D1F7762CB007398F4 /* libboost_numpy.a */; };
 		6252465F1F7762CB007398F4 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464E1F7762CB007398F4 /* libboost_python.a */; };
 		625246601F7762CB007398F4 /* libpprAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6252464F1F7762CB007398F4 /* libpprAI.a */; };
-		625246611F7762CB007398F4 /* libaprutil-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246501F7762CB007398F4 /* libaprutil-1.a */; };
-		625246621F7762CB007398F4 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246511F7762CB007398F4 /* libapr-1.a */; };
-		625246631F7762CB007398F4 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246521F7762CB007398F4 /* libsndfile.a */; };
 		625246651F77633C007398F4 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246641F77633C007398F4 /* OpenAL.framework */; };
 		629B5E1E1F781BEC000B66E3 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E1D1F781BEC000B66E3 /* GLKit.framework */; };
 		629B5E291F784CED000B66E3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629B5E281F784CED000B66E3 /* AVFoundation.framework */; };
+		62AED1B22122059600ADA8F4 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 62AED1B12122059600ADA8F4 /* libz.tbd */; };
+		62AED1B3212208CF00ADA8F4 /* libvhcl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 625246441F7762CA007398F4 /* libvhcl.a */; };
 		62D546F71F7B2CE3001B14E9 /* SBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D546F11F7B2CB6001B14E9 /* SBContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62D546F81F7B2CE3001B14E9 /* Smartbody.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D546F41F7B2CB6001B14E9 /* Smartbody.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62D546F91F7B2CEA001B14E9 /* SBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 62D546F21F7B2CB6001B14E9 /* SBContext.mm */; };
@@ -1437,6 +1432,7 @@
 		625246641F77633C007398F4 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		629B5E1D1F781BEC000B66E3 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		629B5E281F784CED000B66E3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		62AED1B12122059600ADA8F4 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		62D546F01F7B2CB6001B14E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		62D546F11F7B2CB6001B14E9 /* SBContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBContext.h; sourceTree = "<group>"; };
 		62D546F21F7B2CB6001B14E9 /* SBContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBContext.mm; sourceTree = "<group>"; };
@@ -1463,27 +1459,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62AED1B22122059600ADA8F4 /* libz.tbd in Frameworks */,
 				629B5E291F784CED000B66E3 /* AVFoundation.framework in Frameworks */,
 				629B5E1E1F781BEC000B66E3 /* GLKit.framework in Frameworks */,
 				625246651F77633C007398F4 /* OpenAL.framework in Frameworks */,
 				625246531F7762CB007398F4 /* libSteerLib.a in Frameworks */,
 				625246541F7762CB007398F4 /* libprotobuf.a in Frameworks */,
-				625246551F7762CB007398F4 /* libvhcl.a in Frameworks */,
-				625246561F7762CB007398F4 /* libalut.a in Frameworks */,
 				625246571F7762CB007398F4 /* libboost_filesystem.a in Frameworks */,
 				625246581F7762CB007398F4 /* libpython2.7.a in Frameworks */,
 				625246591F7762CB007398F4 /* libboost_system.a in Frameworks */,
 				6252465A1F7762CB007398F4 /* libxerces-c.a in Frameworks */,
 				6252465B1F7762CB007398F4 /* libexpat.a in Frameworks */,
-				6252465C1F7762CB007398F4 /* libactivemq-cpp.a in Frameworks */,
-				6252465D1F7762CB007398F4 /* libvhmsg.a in Frameworks */,
 				6252465E1F7762CB007398F4 /* libboost_numpy.a in Frameworks */,
 				6252465F1F7762CB007398F4 /* libboost_python.a in Frameworks */,
 				625246601F7762CB007398F4 /* libpprAI.a in Frameworks */,
-				625246611F7762CB007398F4 /* libaprutil-1.a in Frameworks */,
-				625246621F7762CB007398F4 /* libapr-1.a in Frameworks */,
-				625246631F7762CB007398F4 /* libsndfile.a in Frameworks */,
 				625246411F776298007398F4 /* libc++.tbd in Frameworks */,
+				62AED1B3212208CF00ADA8F4 /* libvhcl.a in Frameworks */,
 				6252463F1F776291007398F4 /* OpenGLES.framework in Frameworks */,
 				6252463D1F77628A007398F4 /* Accelerate.framework in Frameworks */,
 				6252463A1F7761AE007398F4 /* libsbmobile.a in Frameworks */,
@@ -2610,6 +2601,7 @@
 		62F2B77C1F733EB3001915B5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				62AED1B12122059600ADA8F4 /* libz.tbd */,
 				629B5E281F784CED000B66E3 /* AVFoundation.framework */,
 				629B5E1D1F781BEC000B66E3 /* GLKit.framework */,
 				625246641F77633C007398F4 /* OpenAL.framework */,
@@ -3361,8 +3353,10 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-DUSE_NATIVE_AUDIO",
+					"-DSB_NO_VHCL_AUDIO",
 					"-DNATIVE_FRAMEWORK_BUILD",
+					"-DSB_NO_VHMSG",
+					"-DSB_NO_VHCL",
 				);
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;
@@ -3446,8 +3440,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
-					"-DUSE_NATIVE_AUDIO",
+					"-DSB_NO_VHCL_AUDIO",
 					"-DNATIVE_FRAMEWORK_BUILD",
+					"-DSB_NO_VHMSG",
+					"-DSB_NO_VHCL",
 				);
 				SB_BUILD_ROOT = ../build/output;
 				SB_SRC_ROOT = ../../core/smartbody;

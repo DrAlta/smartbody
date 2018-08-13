@@ -15,7 +15,6 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
-#include <vhcl_log.h>
 #include "Shader.h"
 #include "sb/SBScene.h"
 #include "sb/SBAttribute.h"
