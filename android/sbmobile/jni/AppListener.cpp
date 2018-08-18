@@ -185,6 +185,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 				DeformableMesh* mesh = assetManager->getDeformableMesh(value);
 				if (!mesh)
 				{
+					SmartBody::util::log("Error, can't find mesh = '%s'", value.c_str());
 					int index = value.find(".");
 					if (index != std::string::npos)
 					{

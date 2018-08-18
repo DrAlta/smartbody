@@ -32,8 +32,10 @@ public class SBMobileLib {
     static AudioCallback _audioCallback = null;
 
      static {
-		 //System.loadLibrary("js");
+         //System.loadLibrary("gnustl_shared");
+         //System.loadLibrary("js");
          System.loadLibrary("python2.7");
+         //System.loadLibrary("jerome");
          System.loadLibrary("sbmobile");
      }
 
@@ -64,6 +66,13 @@ public class SBMobileLib {
 	 public static native double  getDoubleAttribute(String attrName);
 	 public static native int getIntAttribute(String attrName);
      public static native void setBackground(String fileName, String textureName, int texRotate);
+     public static native void createCustomMeshFromBlendshapes(String templateMeshName, String blendshapesDir, String baseMeshName, String hairMeshName, String outMeshName);
+     public static native void imageColorTransfer(String srcImag, String srcMask, String tgtImg, String tgtMask, String outImage);
+
+
+     public static native void initClassifier(String classifierName, String dialogManagerName);
+     public static native String classify(String characterName, String question);
+     public static native String [] classifyWithExternalID(String characterName, String question);
 
     public static void playSound(String soundFile, boolean loopSound)
     {

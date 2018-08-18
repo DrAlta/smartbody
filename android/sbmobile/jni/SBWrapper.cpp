@@ -777,6 +777,107 @@ void SBDrawGrid(ESContext *esContext) {
 
 
     
+void SBCreateCustomMeshFromBlendshapes(std::string templateMeshName, std::string blendshapesDir, std::string baseMeshName, std::string hairMeshName, std::string outMeshName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(templateMeshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Error creating custom mesh from blendshapes :: mesh '%s' does not exist.", templateMeshName.c_str());
+		return;
+	}
+
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = mesh->blendShapeMap.begin();
+		iter != mesh->blendShapeMap.end();
+		iter++)
+	{
+		std::vector<SrSnModel*>& targets = (*iter).second;
+		for (size_t t = 0; t < targets.size(); t++) // ignore first target since it is a base mesh
+		{
+			if (targets[t] == NULL)
+				continue;
+			SrModel& curModel = targets[t]->shape();
+			SrModel newShape;
+			std::string blendshapeName = (const char*)curModel.name;
+
+			if (t == 0)
+				blendshapeName = baseMeshName;
+			//SmartBody::util::log("mesh '%s', blendShapeName = '%s'", templateMeshName.c_str(), blendshapeName.c_str());
+			std::string meshFileNamae = blendshapesDir + "/" + blendshapeName;
+			newShape.import_ply(meshFileNamae.c_str());
+			if (newShape.V.size() == curModel.V.size())
+			{
+				curModel.V = newShape.V;
+				curModel.N = newShape.N;
+			}
+			if (t == 0)
+			{
+				SrModel& staticBaseModel = mesh->dMeshStatic_p[0]->shape();
+				staticBaseModel.V = newShape.V;
+				staticBaseModel.N = newShape.N;
+
+				SrModel& dynamicBaseModel = mesh->dMeshDynamic_p[0]->shape();
+				dynamicBaseModel.V = newShape.V;
+				dynamicBaseModel.N = newShape.N;
+
+				SrModel hairModel;
+				std::string hairFileName = blendshapesDir + "/" + hairMeshName;
+				hairModel.import_ply(hairFileName.c_str());
+
+				SrSnModel* hairSrSn = new SrSnModel();
+				std::string hairName = "HairMesh";
+				hairSrSn->shape(hairModel);
+				hairSrSn->shape().name = hairName.c_str();
+				mesh->dMeshStatic_p.push_back(hairSrSn);
+
+				SkinWeight* hairSkin = new SkinWeight();
+				SkinWeight* headSkin = mesh->skinWeights[0];
+				SrMat hairBindShape = headSkin->bindShapeMat;
+				SrMat hairBindPose;
+				std::string headJointName = "Head";
+				SmartBody::util::log("headSkin bindShape Mat = %s", hairBindShape.toString().c_str());
+				for (unsigned int i = 0; i < headSkin->infJointName.size(); i++)
+				{
+					if (headSkin->infJointName[i] == headJointName)
+					{
+						//SmartBody::util::log("headSkin inf joint %d : '%s'", i, headSkin->infJointName[i].c_str());
+						hairBindPose = headSkin->bindPoseMat[i];
+						//SmartBody::util::log("headSkin bindPose Mat %d = %s", i, bindPose.toString().c_str());
+					}
+				}
+
+				hairSkin->bindShapeMat = hairBindShape;
+				hairSkin->bindPoseMat.push_back(hairBindPose);
+				hairSkin->infJointName.push_back(headJointName);
+				hairSkin->sourceMesh = hairName;
+				hairSkin->bindWeight.push_back(1.0f);
+				for (unsigned int i = 0; i < hairModel.V.size(); i++)
+				{
+					hairSkin->jointNameIndex.push_back(0);
+					hairSkin->numInfJoints.push_back(1);
+					hairSkin->weightIndex.push_back(0);
+				}
+				mesh->skinWeights.push_back(hairSkin);
+			}
+		}
+	}
+
+	// handle hair mesh
+	std::string outputMeshFile = blendshapesDir + "/" + outMeshName;
+	mesh->saveToDmb(outputMeshFile);
+	// load base model
+	//mesh->rebuildVertexBuffer(true);
+	// delete the hair mesh and skin weights
+	{
+		SkinWeight* hairSkin = mesh->skinWeights.back();
+		SrSnModel*  hairModel = mesh->dMeshStatic_p.back();
+		delete hairSkin;
+		delete hairModel;
+		mesh->skinWeights.pop_back();
+		mesh->dMeshStatic_p.pop_back();
+	}
+}
+
 void SBDrawFrame(int width, int height, SrMat eyeViewMat)
 {
 #if USE_GL_FIXED_PIPELINE
