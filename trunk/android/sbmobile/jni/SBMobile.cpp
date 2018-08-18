@@ -199,7 +199,7 @@ SrVec SBMobile::convertScreenSpaceTo3DAR(float x, float y, SrVec ground, SrVec u
 
 	SrPlane plane(ground, newUp);
 	SrVec dest = plane.intersect(p1, p2);
-	//SmartBody::util::log("AR mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+	//SmartBody::util::log("AR mouse click = %f, %f,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
 	//SmartBody::util::log("AR touchPos = %f %f %f", dest[0], dest[1], dest[2]);
 	return dest;
 

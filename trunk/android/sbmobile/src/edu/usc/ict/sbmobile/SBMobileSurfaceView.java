@@ -97,7 +97,7 @@ public class SBMobileSurfaceView extends GLSurfaceView {
         public void onDrawFrame(GL10 gl) {
         	if (sbReloadTexture)
         	{
-                SBMobileLib.reloadTexture();
+                //SBMobileLib.reloadTexture();
         		sbReloadTexture = false;
         	}
             //Log.e("myapp", "onDrawFrame");

@@ -35,6 +35,7 @@ extern "C"
 	void SBDrawBackground(ESContext* esContext);
     void SBDrawPawns(ESContext *esContext);
     void SBDrawGrid(ESContext *esContext);
+	void SBCreateCustomMeshFromBlendshapes(std::string templateMeshName, std::string blendshapesDir, std::string baseMeshName, std::string hairMeshName, std::string outMeshName);
 #if 0
     void SBDrawFrame(int w, int h, SrMat eyeView);
     void SBDrawCharacters();

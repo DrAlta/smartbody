@@ -332,7 +332,7 @@ extern "C"
 		 "layout(location = 2) in vec3 tangent; \n"
 		 "layout(location = 3) in vec4 BoneID1; \n"
 		 "layout(location = 4) in vec4 BoneWeight1; \n"
-		 "uniform mat4 Transform[63]; \n"
+		 "uniform mat4 Transform[70]; \n"
 		 "uniform float meshScale; \n"
 		 "out vec3 deformPos; \n"
 		 "out vec3 deformNormal; \n"
@@ -1554,6 +1554,7 @@ extern "C"
 			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, subMesh->triBuf[0].unsignedShortData(), GL_DYNAMIC_DRAW);
 			subMeshVBO->VBO()->BindBuffer();
 			SbmShaderProgram::printOglError("drawMeshStaticVBO #11");
+			//SmartBody::util::log("Mesh size = %d", subMesh->triBuf.size());
 			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
 			//SmartBody::util::log("Mesh size = %d", subMesh->triBuf.size());
 			SbmShaderProgram::printOglError("drawMeshStaticVBO #12");

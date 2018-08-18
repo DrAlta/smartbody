@@ -19,6 +19,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 #include <sb/SBUtilities.h>
+#include <sr/sr_camera.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <sbm/GPU/SbmTexture.h>
@@ -36,6 +37,7 @@
 #include <sys/time.h>
 #include "SBWrapper.h"
 #include "SBMobile.h"
+#include "ImageTransfer.h"
 #include "esUtil.h"
 
 #if TEST_ALIB
@@ -77,6 +79,9 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderFBOTex(JNIEnv * env, jobject obj, jint width, jint height, jint texID);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderCardboard(JNIEnv * env, jobject obj, jfloatArray arr);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_createCustomMeshFromBlendshapes(JNIEnv * env, jobject obj, jstring templateMeshName, jstring blendshapesDir, jstring baseMeshName, jstring hairMeshName, jstring outMeshName);
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_imageColorTransfer(JNIEnv * env, jobject obj, jstring srcImg, jstring srcMask, jstring tgtImg, jstring tgtMask, jstring outImg);
+
 
 	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
 
@@ -230,6 +235,31 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_setBackground(JNIEn
 }
 
 
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_createCustomMeshFromBlendshapes(JNIEnv * env, jobject obj, jstring templateMeshName, jstring blendshapesDir, jstring baseMeshName, jstring hairMeshName, jstring outMeshName)
+{
+	const char* templateMeshStr = (env)->GetStringUTFChars(templateMeshName, NULL);
+	const char* blendshapesDirStr = (env)->GetStringUTFChars(blendshapesDir, NULL);
+	const char* baseMeshNameStr = (env)->GetStringUTFChars(baseMeshName, NULL);
+	const char* hairMeshNameStr = (env)->GetStringUTFChars(hairMeshName, NULL);
+	const char* outMeshNameStr = (env)->GetStringUTFChars(outMeshName, NULL);
+	SBCreateCustomMeshFromBlendshapes(templateMeshStr, blendshapesDirStr, baseMeshNameStr, hairMeshNameStr, outMeshNameStr);
+}
+
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_imageColorTransfer(JNIEnv * env, jobject obj, jstring srcImg, jstring srcMask, jstring tgtImg, jstring tgtMask, jstring outImg)
+{
+	const char* srcImgStr = (env)->GetStringUTFChars(srcImg, NULL);
+	const char* srcMaskStr = (env)->GetStringUTFChars(srcMask, NULL);
+	const char* tgtImgStr = (env)->GetStringUTFChars(tgtImg, NULL);
+	const char* tgtMaskStr = (env)->GetStringUTFChars(tgtMask, NULL);
+	const char* outImgStr = (env)->GetStringUTFChars(outImg, NULL);
+
+	imageColorTransfer(srcImgStr, srcMaskStr, tgtImgStr, tgtMaskStr, outImgStr);
+}
+
+
+
+
 JNIEXPORT jstring JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_getStringAttribute(JNIEnv * env, jobject obj, jstring attrName)
 {
 	const char* attrNameStr = (env)->GetStringUTFChars( attrName , NULL ) ;
@@ -349,6 +379,17 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_render(JNIEnv * env
 	jfloat *bodyf = env->GetFloatArrayElements(modelview, 0);
 	for (int i = 0; i < 16; i++)
 		modelViewMat[i] = bodyf[i];
+
+	SBMobile* engine = SBMobile::getSBMobile();
+	if (engine)
+	{
+		SrMat viewMat, projMat;
+		SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
+		cam->get_view_mat(viewMat);
+		cam->get_perspective_mat(projMat);
+		viewMat = modelViewMat*viewMat;
+		engine->setTransformMatrces(viewMat, projMat);
+	}
 	//SBDrawFrame(VHEngine::curW, VHEngine::curH, id);
 	SBDrawFrame_ES20(curW, curH, &esContext, modelViewMat, false);
 }
@@ -402,6 +443,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * e
 	{
 		SrMat invModelView = modelViewMat.inverse();
 		SrVec newGazePos = invModelView.get_translation();
+		SmartBody::util::log("gaze user position = %s", newGazePos.toString().c_str());
 		gazeTarget->setPosition(newGazePos); // update to new gaze
 	}
 	else
