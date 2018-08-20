@@ -484,7 +484,7 @@ void BmlRequest::gestureRequestProcess()
 				double currGestureRelaxAt = (double)gesturePriorityList[g]->behav_syncs.sync_relax()->time();
 				std::stringstream strstr;
 				for (int num = 0; num < (int) ((currGestureReadyAt - earliestTime) * 10.0); num++)
-					strstr << "1";
+					strstr << "0";
 				for (int num = 0; num < (int) ((currGestureStrokeStartAt - currGestureReadyAt) * 10.0); num++)
 					strstr << "1";
 				for (int num = 0; num < (int) ((currGestureStrokeAt - currGestureStrokeStartAt ) * 10.0); num++)
