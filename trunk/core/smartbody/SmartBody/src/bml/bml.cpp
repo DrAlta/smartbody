@@ -461,7 +461,6 @@ void BmlRequest::gestureRequestProcess()
 
 		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 		{
-			SmartBody::util::log("2WHY CAN'T I SEE THIS?");
 			double earliestTime = 9999999.0;
 			for (size_t g = 0; g < gestures.size(); g++)
 			{
@@ -514,6 +513,9 @@ void BmlRequest::gestureRequestProcess()
 				continue;
 
 			double currGestureStrokeStartAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_start()->time();
+			// make sure that the first gesture doesn't get usurped - push the stroke start back to time 0
+			if (i == 0)
+				currGestureStrokeStartAt = 0.0;
 			double currGestureStrokeAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke()->time();
 			double currGestureStrokeEndAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_end()->time();
 			double currGestureRelaxAt = (double)gesturePriorityList[i]->behav_syncs.sync_relax()->time();
@@ -531,8 +533,10 @@ void BmlRequest::gestureRequestProcess()
 
 
 				// check for overlapping stroke phases
-				if ((nextGestureStrokeStartAt > currGestureStrokeStartAt && nextGestureStrokeStartAt < currGestureStrokeEndAt) ||
-					(nextGestureStrokeEndAt > currGestureStrokeStartAt && nextGestureStrokeEndAt < currGestureStrokeEndAt))
+				if (((nextGestureStrokeStartAt > currGestureStrokeStartAt) && 
+					 (nextGestureStrokeStartAt < currGestureStrokeEndAt)) ||
+					((nextGestureStrokeEndAt > currGestureStrokeStartAt) && 
+					 (nextGestureStrokeEndAt < currGestureStrokeEndAt)))
 				//if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
 				{
 // determine the % overlap
