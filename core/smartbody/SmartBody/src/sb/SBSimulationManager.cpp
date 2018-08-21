@@ -307,6 +307,8 @@ bool SBSimulationManager::isRunning()
 
 bool SBSimulationManager::isStopped()
 {
+	if (timer_p)
+		return !timer_p->isRunning();
 	return _simStopped;
 }
 

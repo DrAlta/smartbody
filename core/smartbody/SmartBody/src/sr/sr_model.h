@@ -42,6 +42,11 @@ class SrSphere;
 #include <map>
 #include <string>
 #include <vector>
+struct TexCoordData
+{
+        std::vector<SrVec2> T;
+        std::vector<SrVec> Ft;
+};
 
 /*! \class SrModel sr_model.h
     \brief a model composed of triangular faces
@@ -280,6 +285,7 @@ class SrModel : public SrSharedClass
 
 	SBAPI int getNumMaterials();
 	SBAPI SrMaterial& getMaterial(int num);
+	static void removeRedundantTexCoord(TexCoordData& tData, SrModel& model);
  };
 
 //================================ End of File =================================================

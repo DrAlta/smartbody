@@ -514,8 +514,8 @@ void BmlRequest::gestureRequestProcess()
 
 			double currGestureStrokeStartAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_start()->time();
 			// make sure that the first gesture doesn't get usurped - push the stroke start back to time 0
-			if (i == 0)
-				currGestureStrokeStartAt = 0.0;
+			//if (i == 0)
+		//		currGestureStrokeStartAt = 0.0;
 			double currGestureStrokeAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke()->time();
 			double currGestureStrokeEndAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_end()->time();
 			double currGestureRelaxAt = (double)gesturePriorityList[i]->behav_syncs.sync_relax()->time();

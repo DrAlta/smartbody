@@ -105,8 +105,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_ct_motion_player.h>
 
 #ifdef USE_GOOGLE_PROFILER
-#include <google/profiler.h>
-#include <google/heap-profiler.h>
+#include <gperftools/profiler.h>
+#include <gperftools/heap-profiler.h>
 #endif
 
 #ifdef __FLASHPLAYER__

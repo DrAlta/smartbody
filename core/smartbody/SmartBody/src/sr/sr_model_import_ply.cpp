@@ -34,11 +34,6 @@
 
 #define TEST_TEXTURE 1
 
-struct TexCoordData
-{
-	std::vector<SrVec2> T;
-	std::vector<SrVec> Ft;
-};
 
 static int vertex_cb(p_ply_argument argument) {
 	static int count = 0;
@@ -196,7 +191,7 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 #endif
 }
 
-static void removeRedundantTexCoord(TexCoordData& tData, SrModel& model)
+void SrModel::removeRedundantTexCoord(TexCoordData& tData, SrModel& model)
 {
 	std::vector<SrVec2>& T = tData.T;
 	std::vector<SrVec>& Ft = tData.Ft;

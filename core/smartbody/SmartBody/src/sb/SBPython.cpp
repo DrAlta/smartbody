@@ -826,7 +826,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("executeAction", &SBEventHandler::executeAction, &SBEventHandlerWrap::default_executeAction, "Execute the event handler.")
 		;
 
-	boost::python::class_<PythonControllerWrap, boost::noncopyable, boost::python::bases<SBController>, boost::shared_ptr<PythonControllerWrap> > ("PythonController")
+	boost::python::class_<PythonControllerWrap, boost::noncopyable, boost::python::bases<SBController,SBObject>, boost::shared_ptr<PythonControllerWrap> > ("PythonController")
 		.def("start", &PythonController::start, &PythonControllerWrap::default_start, "start.")
 		.def("stop", &PythonController::stop, &PythonControllerWrap::default_stop, "stop.")
 		.def("init", &PythonController::init, &PythonControllerWrap::default_init, "init.")
