@@ -68,7 +68,6 @@ class SBAnimationBlendManager;
 class SBReachManager;
 class SBSteerManager;
 class SBRealtimeManager;
-class SBFaceShiftManager;
 class SBServiceManager;
 class SBPhysicsManager;
 class SBBoneBusManager;
@@ -185,7 +184,6 @@ class SBScene : public SBObject
 		SBAPI SBReachManager* getReachManager();
 		SBAPI SBSteerManager* getSteerManager();
 		SBAPI SBRealtimeManager* getRealtimeManager();
-		SBAPI SBFaceShiftManager* getFaceShiftManager();
 		SBAPI SBServiceManager* getServiceManager();
 		SBAPI SBPhysicsManager* getPhysicsManager();
 		SBAPI SBBoneBusManager* getBoneBusManager();
@@ -344,7 +342,6 @@ class SBScene : public SBObject
 		SBReachManager* _reachManager;
 		SBSteerManager* _steerManager;
 		SBRealtimeManager* _realtimeManager;
-		SBFaceShiftManager* _faceShiftManager;
 		SBServiceManager* _serviceManager;
 		SBPhysicsManager* _physicsManager;
 		SBBoneBusManager* _boneBusManager;

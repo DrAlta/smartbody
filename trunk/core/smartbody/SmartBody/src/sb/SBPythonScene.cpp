@@ -24,7 +24,6 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBRealtimeManager.h>
-#include <sb/SBFaceShiftManager.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBReach.h>
 #include <sb/SBReachManager.h>
@@ -196,7 +195,6 @@ void pythonFuncsScene()
 		.def("getMotionGraphManager", &SBScene::getMotionGraphManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion graph manager.")
 		.def("getHandConfigurationManager", &SBScene::getHandConfigurationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the hand configuration manager.")
 		.def("getRealtimeManager", &SBScene::getRealtimeManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the real time data manager.")
-		.def("getFaceShiftManager", &SBScene::getFaceShiftManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the FaceShift manager.")
 		.def("getDebuggerServer", &SBScene::getDebuggerServer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the debugger server.")
 
 

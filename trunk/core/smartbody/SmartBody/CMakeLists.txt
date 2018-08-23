@@ -631,7 +631,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBDebuggerServer.cpp
         ./src/sb/SBDebuggerClient.cpp
         ./src/sb/SBDebuggerUtility.cpp
-        ./src/sb/SBFaceShiftManager.cpp
         ./src/sb/SBRealtimeManager.cpp
 	./src/sb/SBRigNode.cpp
 	./src/sb/SBUtilities.cpp

@@ -880,6 +880,12 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 			}
 		}
 
+		double pressedLipsWidenAmount = character->getDoubleAttribute("constrainPressedLips");
+		if (pressedLipsWidenAmount > 0.0)
+		{
+			constrainWidenCurve(visemeProcessedData[bmpIndex]->getFloatCurve(), pressedLipsWidenAmount);
+		}
+
 		if (openIndex >= 0)
 		{
 			VisemeData* debugconstrainCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
@@ -1614,12 +1620,12 @@ void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vect
 	int secEndId = -1;
 	for (size_t i = 0; i < otherY.size() - 1; ++i)
 	{
-		if (otherY[i] == 0 && otherY[i + 1] > 0)
+		if (fabs(otherY[i]) < .001 && otherY[i + 1] > 0)
 		{
 			secStart = otherX[i];
 			secStartId = i;
 		}
-		if (otherY[i] > 0 && otherY[i + 1] == 0)
+		if (otherY[i] > 0 && fabs(otherY[i + 1]) < .001)
 		{
 			secEnd = otherX[i + 1];
 			secEndId = i + 1;
@@ -1677,6 +1683,53 @@ void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vect
 		openCurve.push_back(openY[i]);
 	}
 }
+
+void BML::SpeechRequest::constrainWidenCurve(std::vector<float>& widenCurve, float amount)
+{
+	std::vector<float> widenX;
+	std::vector<float> widenY;
+
+	for (size_t i = 0; i < widenCurve.size(); ++i)
+	{
+		if (i % 2 == 0)
+			widenX.push_back(widenCurve[i]);
+		else
+			widenY.push_back(widenCurve[i]);
+	}
+
+	widenCurve.clear();
+	for (size_t i = 0; i < widenY.size(); ++i)
+	{
+		if (widenY[i] > .99)
+		{
+			double offsetAmount = amount;
+			if (i > 0)
+			{
+				if (widenX[i - 1] < widenX[i] - amount)
+					offsetAmount = widenX[i - 1] - widenX[i] + .001;
+			}
+			widenCurve.push_back(widenX[i] - offsetAmount);
+			widenCurve.push_back(widenY[i]);
+			widenCurve.push_back(widenX[i]);
+			widenCurve.push_back(widenY[i]);
+			if (i < widenY.size() - 1)
+			{
+				if (widenX[i + 1] < widenX[i] + amount)
+					offsetAmount = widenX[i + 1] - widenX[i] - .001;
+			}
+			widenCurve.push_back(widenX[i] + offsetAmount);
+			widenCurve.push_back(widenY[i]);
+		}
+		else
+		{
+			widenCurve.push_back(widenX[i]);
+			widenCurve.push_back(widenY[i]);
+		}
+	}
+
+}
+
+
 
 void BML::SpeechRequest::schedule( time_sec now ) {
 	//// TODO: Sync to prior behaviors

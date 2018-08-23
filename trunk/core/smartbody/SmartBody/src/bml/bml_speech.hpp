@@ -203,6 +203,7 @@ namespace BML {
 		static void filterCurve(std::vector<float>&c, float speedLimit);
 
 		static void constrainCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio = 1.0f);
+		static void constrainWidenCurve(std::vector<float>& widenCurve, float time);
 
 		static bool getLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float& i_x, float& i_y);
 

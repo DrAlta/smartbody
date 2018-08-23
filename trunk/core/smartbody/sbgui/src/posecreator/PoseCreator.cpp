@@ -8,7 +8,6 @@
 #include <sbm/lin_win.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBFaceDefinition.h>
-#include <sb/SBFaceShiftManager.h>
 
 PoseCreator::PoseCreator(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h), GenericViewer(x, y, w, h), SBWindowListener()
 {

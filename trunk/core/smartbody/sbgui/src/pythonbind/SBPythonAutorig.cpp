@@ -432,7 +432,7 @@ void createCustomMeshFromBlendshapes(std::string templateMeshName, std::string b
 				continue;
 			SrModel& curModel = targets[t]->shape();
 			SrModel newShape;
-			std::string blendshapeName = curModel.name;
+			std::string blendshapeName = (const char*) curModel.name;
 
 			if (t == 0)
 				blendshapeName = baseMeshName;

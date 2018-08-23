@@ -426,6 +426,7 @@ bool prioritySortFunction(GestureRequest* i, GestureRequest* j)
 
 void BmlRequest::gestureRequestProcess()
 {
+	bool useGestureLog = actor->getBoolAttribute("gestureRequest.gestureLog");
 	std::string str = actor->getStringAttribute("gestureRequest.lastGestureRandom");
 
 	std::vector<int> lastChoices;
@@ -459,7 +460,7 @@ void BmlRequest::gestureRequestProcess()
 			std::sort(gesturePriorityList.begin(), gesturePriorityList.end(), prioritySortFunction);
 		}
 
-		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		if (useGestureLog)
 		{
 			double earliestTime = 9999999.0;
 			for (size_t g = 0; g < gestures.size(); g++)
@@ -498,7 +499,7 @@ void BmlRequest::gestureRequestProcess()
 			}
 		}
 
-		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		if (useGestureLog)
 			for (size_t i = 0; i < gesturePriorityList.size(); i++)
 				SmartBody::util::log("Gesture priority order: %d ", gesturePriorityList[i]->priority);
 
@@ -558,20 +559,20 @@ if (nextGestureStrokeEndAt > currGestureStrokeStartAt && nextGestureStrokeEndAt 
 }
 if (startOverlap && endOverlap)
 {
-	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+	if (useGestureLog)
 		SmartBody::util::log("Complete overlap!");
 	overlappingTime = 100000.0;
 }
 else
 {
 	double percentage = overlappingTime / curBlockTime;
-	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+	if (useGestureLog)
 		SmartBody::util::log("Overlap %d %d: %f", i, j, percentage);
 	double overlapTolerance = actor->getDoubleAttribute("gestureRequest.experimentalCoarticulationOverlap");
 	if (overlapTolerance > percentage)
 	{
 		// keep the gesture
-		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		if (useGestureLog)
 			SmartBody::util::log("Withing tolerance, keeping it...");
 		continue;
 
@@ -612,13 +613,13 @@ else
 						if (which == 0)
 						{
 							gesturePriorityList[j]->filtered = true;
-							if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+							if (useGestureLog)
 								SmartBody::util::log("Gesture %d filtered randomly in conflict with gesture %d", j, i);
 						}
 						else
 						{
 							gesturePriorityList[i]->filtered = true;
-							if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+							if (useGestureLog)
 								SmartBody::util::log("Gesture %d filtered randomly in conflict with gesture %d", i, j);
 						}
 					}
@@ -627,14 +628,14 @@ else
 						if (gesturePriorityList[i]->priority >= gesturePriorityList[j]->priority)
 						{
 							gesturePriorityList[j]->filtered = true;
-							if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+							if (useGestureLog)
 								SmartBody::util::log("Gesture %d filtered because lower priority than gesture %d", j, i);
 							continue;
 						}
 						else
 						{
 							gesturePriorityList[i]->filtered = true;
-							if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+							if (useGestureLog)
 								SmartBody::util::log("Gesture %d filtered because lower priority than gesture %d", i, j);
 							continue;
 						}
@@ -649,7 +650,7 @@ else
 		{
 			if (gestures[i]->filtered)
 			{
-				if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+				if (useGestureLog)
 					SmartBody::util::log("Gesture %d was filtered...", i);
 				continue;
 			}
@@ -664,8 +665,7 @@ else
 			{
 				if (gestures[j]->filtered)
 				{
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 							SmartBody::util::log("Gesture %d was filtered...", j);
 					continue;
 				}
@@ -750,7 +750,7 @@ else
 				{
 					// transition time is too fast to perform next gesture, remove it
 					gestures[j]->filtered = true;
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 					{
 						SmartBody::util::log("Gesture %s filtered because transition time %f from last gesture insufficient to match stroke time %f.", nextMotion->getName().c_str(), transitionTime, gestureInterval);
 					}
@@ -835,7 +835,8 @@ else
 				{
 					if (j + 1 < tokens.size())
 					{
-						SmartBody::util::log("blend name is %s", tokens[j + 1].c_str());
+						if (useGestureLog)
+							SmartBody::util::log("blend name is %s", tokens[j + 1].c_str());
 						blendObject = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(tokens[j + 1]);
 					}
 				}
@@ -843,7 +844,8 @@ else
 				{
 					if (j + 1 < tokens.size())
 					{
-						SmartBody::util::log("x is %s", tokens[j + 1].c_str());
+						if (useGestureLog)
+							SmartBody::util::log("x is %s", tokens[j + 1].c_str());
 						x = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -851,7 +853,8 @@ else
 				{
 					if (j + 1 < tokens.size())
 					{
-						SmartBody::util::log("y is %s", tokens[j + 1].c_str());
+						if (useGestureLog)
+							SmartBody::util::log("y is %s", tokens[j + 1].c_str());
 						y = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -859,7 +862,8 @@ else
 				{
 					if (j + 1 < tokens.size())
 					{
-						SmartBody::util::log("z is %s", tokens[j + 1].c_str());
+						if (useGestureLog)
+							SmartBody::util::log("z is %s", tokens[j + 1].c_str());
 						z = atof(tokens[j + 1].c_str());
 					}
 				}
@@ -911,7 +915,8 @@ else
 				}
 				float offset = localStrokeTime - localStartTime;
 				blends[i]->behav_syncs.sync_start()->set_time(start - offset);
-				SmartBody::util::log("stroke time for blend is %f, start time for blend is %f", start, start - offset);
+				if (useGestureLog)
+					SmartBody::util::log("stroke time for blend is %f, start time for blend is %f", start, start - offset);
 				delete tempBlendData;
 				tempBlendData = NULL;
 			}
@@ -949,7 +954,7 @@ else
 		double motionStroke = motion->time_stroke_emphasis();
 		double motionRelax = motion->time_relax();
 
-		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		if (useGestureLog)
 		{
 			SmartBody::util::log("...");
 			SmartBody::util::log("Processing %s (motion name %s)", gestures[i]->anim_ct->getName().c_str(), motion->getName().c_str());
@@ -994,7 +999,7 @@ else
 		{
 			transitionToStroke = true;
 			blendTime = currGestureStrokeAt - prevGestureRelaxAt;
-			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+			if (useGestureLog)
 			{
 				SmartBody::util::log("Transition directly to stroke");
 			}
@@ -1032,7 +1037,7 @@ else
 				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
 				if (!motionInList)
 					continue;
-				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+				if (useGestureLog)
 					SmartBody::util::log("Motion in list: %s", currGestureList[l].c_str());
 				motionInList->connect(tempSkel);
 						if (actor->getBoolAttribute("gestureRequest.matchingHandness"))
@@ -1043,11 +1048,11 @@ else
 					bool motionActive = (lMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) || (rMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
 					bool leftHand = (prevLMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (lMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
 					bool rightHand = (prevRMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (rMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
-					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+					if (useGestureLog)
 						SmartBody::util::log("PrevMotion: %f, %f CurrMotion: %f, %f", prevLMotionSpeed, prevRMotionSpeed, lMotionSpeed, rMotionSpeed);
 					if (prevMotionActive && motionActive && !leftHand && !rightHand)
 					{
-						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						if (useGestureLog)
 							SmartBody::util::log("Motion Filtered");
 						motionInList->disconnect();
 						continue;
@@ -1061,7 +1066,7 @@ else
 				float desiredRWristSpeed = (currRWristPos - prevRWristPos).len() / (float)blendTime;
 				float speedDiffL = lWristSpeed - desiredLWristSpeed;
 				float speedDiffR = rWristSpeed - desiredRWristSpeed;
-				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+				if (useGestureLog)
 				{
 					SmartBody::util::log("lSpd: %f, rSpd: %f, transLSpd: %f, transRSpd: %f, diffL: %f, diffR: %f", lWristSpeed, rWristSpeed, desiredLWristSpeed, desiredRWristSpeed, speedDiffL, speedDiffR);
 				}
@@ -1083,7 +1088,7 @@ else
 			}
 			else if (closestMotion->getName() != sbMotion->getName())
 			{
-				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+				if (useGestureLog)
 					SmartBody::util::log("gestureRequestProcess: after calculating the closest gesture, changing from %s to %s", sbMotion->getName().c_str(), closestMotion->getName().c_str());
 				motion_ct->init(const_cast<SbmCharacter*>(actor), closestMotion, 0.0, 1.0);
 			}
@@ -1097,7 +1102,7 @@ else
 				shouldFilter = true;
 				logIndex = 0;
 			}
-			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+			if (useGestureLog)
 			{
 				SmartBody::util::log("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
 				SmartBody::util::log("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
@@ -1163,7 +1168,7 @@ else
 						{
 							SmartBody::util::log("gestureRequestProcess: ERROR blend time is shorter than desired transition time, should not happen.");
 						}
-						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						if (useGestureLog)
 						{
 							SmartBody::util::log("gestureRequestProcess: desiredRelaxTimeL: %f, desiredRelaxTimeR: %f, actual desiredRelaxTime: %f (local)", desiredTransitionTimeL, desiredTransitionTimeR, desiredTransitionTime);
 							SmartBody::util::log("gestureRequestProcess: desired transition speed %f is lower than current gesture speed %f (l_wrist)", lWristTransitionDistance / blendTime, currLWristSpeed);
@@ -1199,11 +1204,11 @@ else
 		}
 		if (shouldFilter)	// filter the gesture
 		{
-			if (logIndex == 1 && actor->getBoolAttribute("gestureRequest.gestureLog"))
+			if (useGestureLog)
 			{
 				SmartBody::util::log("gestureRequestProcess: filter reason -> previous relax is later than current stroke start");
 			}
-			if (logIndex == 0 && actor->getBoolAttribute("gestureRequest.gestureLog"))
+			if (useGestureLog)
 			{
 				SmartBody::util::log("gestureRequestProcess: filter reason -> blending time too short");
 			}
@@ -1241,13 +1246,13 @@ else
 				if (which == 0)
 				{
 					gestures[j]->filtered = true;
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
 				}
 				else
 				{
 					gestures[i]->filtered = true;
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
 				}
 			}
@@ -1256,13 +1261,13 @@ else
 				if (gestures[i]->priority > gestures[j]->priority)
 				{
 					gestures[j]->filtered = true;
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
 				}
 				else
 				{
 					gestures[i]->filtered = true;
-					if (actor->getBoolAttribute("gestureRequest.gestureLog") == true)
+					if (useGestureLog)
 						SmartBody::util::log("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
 				}
 			}
@@ -1273,7 +1278,7 @@ else
 	}
 
 	// LOG in case if something goes wrong
-	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+	if (useGestureLog)
 	{
 		for (size_t i = 0; i < gestures.size(); ++i)
 		{
