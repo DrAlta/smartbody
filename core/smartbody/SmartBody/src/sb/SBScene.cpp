@@ -40,7 +40,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 
-#include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
@@ -57,10 +56,10 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSteerAgent.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBRealtimeManager.h>
-#include <sb/SBFaceShiftManager.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBService.h>
 #include <sb/SBPhysicsManager.h>
+
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
@@ -124,6 +123,11 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+
+
+
+
+
 // for minizip compression
 
 #if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
@@ -192,7 +196,6 @@ void SBScene::initialize()
 	_blendManager = new SBAnimationBlendManager();
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
-	_faceShiftManager = new SBFaceShiftManager();
 	_realtimeManager = new SBRealtimeManager();
 	_serviceManager = new SBServiceManager();
 	_physicsManager = new SBPhysicsManager();
@@ -223,7 +226,6 @@ void SBScene::initialize()
 	_serviceManager->addService(_collisionManager);
 	_serviceManager->addService(_vhmsgManager);
 	_serviceManager->addService(_realtimeManager);
-	_serviceManager->addService(_faceShiftManager);
 	_serviceManager->addService(_phonemeManager);
 	_serviceManager->addService(_profiler);
 	_serviceManager->addService(_debuggerServer);
@@ -1523,11 +1525,6 @@ SBSteerManager* SBScene::getSteerManager()
 SBAPI SBRealtimeManager* SBScene::getRealtimeManager()
 {
 	return _realtimeManager;
-}
-
-SBAPI SBFaceShiftManager* SBScene::getFaceShiftManager()
-{
-	return _faceShiftManager;
 }
 
 SBServiceManager* SBScene::getServiceManager()
@@ -4317,7 +4314,7 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 	int headJointIdx = -1;
 	int neckJointIdx = -1;
 	SmartBody::util::log("before find head joints");
-	for (unsigned int i = 0; i < skel->getNumJoints(); i++)
+	for (int i = 0; i < skel->getNumJoints(); i++)
 	{
 		SmartBody::SBJoint* joint = skel->getJoint(i);
 #if 1
@@ -5531,5 +5528,4 @@ void SBScene::setLastScriptDirectory(std::string dir)
 }
 
 };
-
 

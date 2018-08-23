@@ -98,7 +98,7 @@ SbmShaderProgram::~SbmShaderProgram()
 void SbmShaderProgram::initShaderProgram( const char* vsName, const char* fsName )
 {
 	// we can initialize the shader name first, before there is a opengl context
-	if (vsName)
+	if (vsName && strlen(vsName) > 0)
 	{
 		vsFilename = vsName;
 		char *vs = NULL;		
@@ -108,7 +108,7 @@ void SbmShaderProgram::initShaderProgram( const char* vsName, const char* fsName
 		free(vs);	
 
 	}
-	if (fsName)
+	if (fsName && strlen(fsName) > 0)
 	{
 		fsFilename = fsName;
 		char *fs = NULL;		

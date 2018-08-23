@@ -36,7 +36,6 @@
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBRealtimeManager.h>
-#include <sb/SBFaceShiftManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
@@ -122,7 +121,6 @@ namespace boost
 	template<> const volatile SmartBody::SBPhysicsManager* get_pointer(const volatile SmartBody::SBPhysicsManager* p) { return p; }
 	template<> const volatile SmartBody::SBRealtimeManager* get_pointer(const volatile SmartBody::SBRealtimeManager* p) { return p; }
 	template<> const volatile SmartBody::SBDebuggerServer* get_pointer(const volatile SmartBody::SBDebuggerServer* p) { return p; }
-	template<> const volatile SmartBody::SBFaceShiftManager* get_pointer(const volatile SmartBody::SBFaceShiftManager* p) { return p; }
 	template<> const volatile SmartBody::SBScript* get_pointer(const volatile SmartBody::SBScript* p) { return p; }
 	template<> const volatile SmartBody::SBFaceDefinition* get_pointer(const volatile SmartBody::SBFaceDefinition* p) { return p; }
 	template<> const volatile SmartBody::SBBehavior* get_pointer(const volatile SmartBody::SBBehavior* p) { return p; }
@@ -396,7 +394,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("execBMLFileAt", &SBBmlProcessor::execBMLFileAt, "Execute the BML instructions contained in a file for a given character at a time in the future..")
 		.def("execXMLAt", &SBBmlProcessor::execXMLAt, "Execute a generic XML instruction to a given character at a time in the future.. Adds the <?xml..> header.")
 		.def("interruptCharacter", &SBBmlProcessor::interruptCharacter, "Interrupts all BML behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
-		.def("interruptBML", &SBBmlProcessor::interruptBML, "InterrufaceShiftManager.getCoeffValuepts a soecific BML block behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
+		.def("interruptBML", &SBBmlProcessor::interruptBML, "Interrupts a specific BML block behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
 
 		;
 
@@ -432,12 +430,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 		.def("setChannelMetadata", &SBRealtimeManager::setChannelMetadata, "Sets metadata describing the channels - name and data quantity.")
 		.def("setDataFrame", &SBRealtimeManager::setDataFrame, "Sets data per frame based on the channel metadata.")
-		;
-
-
-	boost::python::class_<SBFaceShiftManager, boost::python::bases<SBService> >("SBFaceShiftManager")
-		.def("getCoeffValue", &SBFaceShiftManager::getCoeffValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Get coefficient value of a specific blend shape.")
-		.def("getHeadRotation", &SBFaceShiftManager::getHeadRotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Get head rotation.")
 		;
 
 	boost::python::class_<SBDebuggerServer, boost::python::bases<SBService> >("SBDebuggerServer")

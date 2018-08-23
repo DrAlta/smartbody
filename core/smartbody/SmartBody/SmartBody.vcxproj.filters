@@ -1138,9 +1138,6 @@
     <ClCompile Include="src\sb\SBHandConfiguration.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="src\sb\SBFaceShiftManager.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="src\external\faceshift\fsbinarystream.cpp">
       <Filter>external\faceshift</Filter>
     </ClCompile>
@@ -2410,9 +2407,6 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBHandConfiguration.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sb\SBFaceShiftManager.h">
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\external\faceshift\fsbinarystream.h">

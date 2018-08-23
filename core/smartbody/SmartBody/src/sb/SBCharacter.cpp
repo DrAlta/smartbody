@@ -155,6 +155,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by ShCh facial shape.");
 	createDoubleAttribute("openConstraintByW", 0.5, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by W facial shape.");
 	createDoubleAttribute("openConstraintByWide", 0.5, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by Wide facial shape.");
+	createDoubleAttribute("constrainPressedLips", 0.0, true, "Lip Sync", 165, false, false, false, "Extra time to keep lips pressed together.");
 	createDoubleAttribute("lipSyncScale", 1, true, "Lip Sync", 156, false, false, false, "Scale factor for lip sync curves.");
 	createStringAttribute("lipSyncSetName", "", true, "Lip Sync", 157, false, false, false, "Name of the lip sync set to be used when using phone bigram method.");
 	createBoolAttribute("lipSyncSplineCurve", true, true, "Lip Sync", 158, false, false, false, "Use spline/linear curve.");
