@@ -2783,7 +2783,6 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 
 void ParserCOLLADAFast::load_texture(int type, const char* textureName, const char* file, const SrStringArray& paths)
 {
-	
 	std::string finalTexturePath = getFinalTextureFileName(file, paths);
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	texManager.loadTexture(type, textureName, finalTexturePath.c_str());

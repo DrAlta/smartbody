@@ -49,6 +49,7 @@ char vShaderNormalMapStr[] =
 "layout(location = 3) in vec3 aTangent;			\n"
 "uniform   mat4 uMVPMatrix;						\n"
 "uniform   mat4 uMVMatrix;						\n"
+"uniform   mat4 uModelMatrix;                   \n"
 "uniform   lightSource uLights[numOfLights];    \n"
 "out   vec2 vTexCoord;						\n"
 "out   vec3 vNormal;                        \n"
@@ -62,8 +63,8 @@ char vShaderNormalMapStr[] =
 "   vTexCoord = aTexCoord;			\n"
 "   vec3 pos = vec3(aPosition.xyz)* 1.0;						\n"
 "	vec4 skinPos = vec4(pos.xyz,1.0);		                        \n"
-"	gl_Position = uMVPMatrix * skinPos;								\n"
-"   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,1.0)));          \n"
+"	gl_Position = uMVPMatrix * uModelMatrix * skinPos;								\n"
+"   vec3 vertexPos = -normalize(vec3(uMVMatrix * uModelMatrix* vec4(skinPos.xyz,1.0)));          \n"
 "   mat3 tangentMat;                                                \n"
 "   vec3 vTangent = aTangent;										\n"
 "   vNormal = aNormal;										\n"
@@ -186,7 +187,7 @@ void SBBaseRenderer::draw(std::vector<SrLight>& lights, bool isDrawFloor)
 			{
 				SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
 				GPUMeshUpdate(meshInstance);
-			}
+			}			
 		}
 	}
 #endif
@@ -267,7 +268,8 @@ void SBBaseRenderer::drawFloor(bool deferredRender)
 			glUniform1f(mtrlShininessLoc, 100.0);
 		}
 
-		
+		SrMat modelMat = SrMat::id;		
+		glUniformMatrix4fv(glGetUniformLocation(normalMapShader->getShaderProgram(), "uModelMatrix"), 1, GL_FALSE, (GLfloat*)&modelMat);
 
 		std::string defaultTexName = "gray_tex";
 		std::string defaultNormalTex = "defaultNormal_tex";
@@ -493,6 +495,14 @@ void SBBaseRenderer::renderMesh(DeformableMeshInstance* meshInstance, SbmShaderP
 	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
 	if (!gpuMeshInstance->getVBODeformPos())
 		gpuMeshInstance->initBuffer();
+
+	SrMat modelMat = SrMat::id;
+	if (gpuMeshInstance->isStaticMesh())
+	{
+		modelMat = gpuMeshInstance->getSkeleton()->root()->gmat();
+	}
+
+	glUniformMatrix4fv(glGetUniformLocation(normalMapShader->getShaderProgram(), "uModelMatrix"), 1, GL_FALSE, (GLfloat*)&modelMat);
 
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);

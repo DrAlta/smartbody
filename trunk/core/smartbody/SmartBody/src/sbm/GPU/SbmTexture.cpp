@@ -167,7 +167,7 @@ std::vector<std::string> SbmTextureManager::getTextureNames( int type )
 void SbmTextureManager::loadTexture(int iType, const char* textureName, const char* fileName )
 {
     std::string strTex		= textureName;
-
+	SmartBody::util::log("Loading texture '%s'.", textureName);
     // Retrieves texture map type: DIFFUSE, SPECULAR, GLOSSY, or NORMAL
     StrTextureMap& texMap	= findMap(iType);
 
@@ -432,8 +432,14 @@ SbmTexture::~SbmTexture(void)
     if (buffer)
            delete [] buffer;
     imgBuffer.clear();
-    if (texID != 0)
-       glDeleteTextures(1,&texID);	
+	cleanTexture();
+
+}
+
+void SbmTexture::cleanTexture()
+{
+	if (texID != 0)
+		glDeleteTextures(1, &texID);
 }
 
 bool SbmTexture::loadHDRImage(const char* fileName)
@@ -547,6 +553,7 @@ bool SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 {	
+	//SmartBody::util::log("Building texture '%s'", this->getName().c_str());
     //SmartBody::util::log("Start Build Texture");
     if (!getBuffer()) return;
 #if !defined(__native_client__)
@@ -560,8 +567,11 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
     myGLEnable(iType);	
 #endif
 
-	if (texID == -1 || recreateTexture)
-		glGenTextures(1,&texID);
+	if (texID == 0 || recreateTexture)
+	{
+		cleanTexture();
+		glGenTextures(1, &texID);
+	}
 
     glBindTexture(iType,texID);
 
@@ -639,7 +649,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
 
 	SmartBody::util::log("build texture image buffer size = %d, maxTexture Size = %d", imgBuffer.size(), texSize);
-        glTexImage2D(iType,0,internal_format, width,height,0,texture_format, dataType, buffer);
+    glTexImage2D(iType,0,internal_format, width,height,0,texture_format, dataType, buffer);
 	//if (buildMipMap)
 	//	glGenerateMipmap(GL_TEXTURE_2D);
 #elif defined(EMSCRIPTEN)    
@@ -653,21 +663,12 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 		glGenerateMipmap(GL_TEXTURE_2D);
 #endif
 
-    //SmartBody::util::log("texture id = %u, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
-
-    //glGenerateMipmap(iType);
-    //SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
 #if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
     GLclampf iPrority = 1.0;
     glPrioritizeTextures(1,&texID,&iPrority);
-#endif
-    //TextureDebug();	
+#endif    
     glBindTexture(iType,0);	
-    finishBuild = true;
-    //SmartBody::util::log("Finish build texture");
-    //SbmShaderProgram::printOglError("SbmTexture.cpp:300");
-    //SmartBody::util::log("Texture name = %s, texture ID = %d",textureName.c_str(),texID);	
-    //imdebug("rgb w=%d h=%d %p", width, height, buffer);
+    finishBuild = true;    
 #endif
 }
 

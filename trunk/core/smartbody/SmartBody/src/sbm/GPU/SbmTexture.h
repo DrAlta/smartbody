@@ -126,6 +126,9 @@ protected:
 public:
 	SBAPI SbmTexture(const char* texName);
 	SBAPI ~SbmTexture(void);
+
+	void cleanTexture();
+
 	SBAPI bool hasBuild() { return finishBuild; }
 	SBAPI bool isTransparent() { return transparentTexture; }
 	bool isBuildMipMap() const { return buildMipMap; }
