@@ -366,6 +366,49 @@ void computeImageMeanAndStd(float* lab, unsigned char* mask, int imgSize, SrVec&
 	SmartBody::util::log("Image Mean = %s, Std = %s", outMean.toString().c_str(), outStd.toString().c_str());
 }
 
+void deformableMeshTextureReplace(std::string meshName, std::string textureName, std::string inputImageFileName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Error replacing texture '%s', mesh '%s' doesn't exist.", textureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	bool meshTextureExist = false;
+	std::string finalTextureName = "";
+	for (unsigned int i = 0; i < mesh->subMeshList.size(); i++)
+	{
+		SbmSubMesh* subMesh = mesh->subMeshList[i];
+		//if (subMesh->texName == textureName)
+		//	meshTextureExist = true;
+		if (subMesh->texName.find(textureName) != std::string::npos) // texture name exists in the submesh
+		{
+			finalTextureName = subMesh->texName;
+			meshTextureExist = true;
+			break;
+		}
+	}
+	if (!meshTextureExist)
+	{
+		SmartBody::util::log("Error replacing texture '%s', texture doesn't exist in mesh '%s'.", textureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	SmartBody::util::log("Found texture '%s' in the deformable mesh '%s'.", finalTextureName.c_str(), meshName.c_str());
+	// replace textures with new image files
+	SbmTexture* texture = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, finalTextureName.c_str());
+	if (!texture)
+	{
+		SmartBody::util::log("Error replacing texture '%s', texture doesn't exist.", finalTextureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	texture->loadImage(inputImageFileName.c_str());
+	texture->buildTexture();
+}
+
 void imageColorTransfer(std::string srcImg, std::string srcMask, std::string tgtImg, std::string tgtMask, std::string outImage)
 {
 	int srcWidth, srcHeight, srcChannel;
@@ -651,6 +694,9 @@ BOOST_PYTHON_MODULE(AutoRig)
 	boost::python::def("setPawnMesh", setPawnMesh, "Set the deformable model to the target pawn");
 	boost::python::def("createCustomMeshFromBlendshapes", createCustomMeshFromBlendshapes, "create a new custom mesh with a different set of blendshapes.");
 	boost::python::def("imageColorTransfer", imageColorTransfer, "color transfer of source image using the color styles of target image.");
+	boost::python::def("deformableMeshTextureReplace", deformableMeshTextureReplace, "color transfer of source image using the color styles of target image.");
+
+	
 
 
 	boost::python::class_<SBAutoRigManager>("SBAutoRigManager")
