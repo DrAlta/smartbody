@@ -34,9 +34,9 @@ public:
 public:
 	// utility functions
 	void screenParallelPlane(SrCamera& cam,const SrVec &center,SrVec &dirx,SrVec &diry);
-	SrVec worldToScreen(const SrCamera& cam, const SrVec& pos);
-	SrVec worldToEye(const SrCamera& cam, const SrVec& pos);
-	SrVec screenToWorld(const SrCamera& cam, const SrVec& win);
+	SrVec worldToScreen(SrCamera& cam, const SrVec& pos);
+	SrVec worldToEye(SrCamera& cam, const SrVec& pos);
+	SrVec screenToWorld(SrCamera& cam, const SrVec& win);
 	SrVec mouseToWorld(SrCamera& cam, float fx, float fy, float tx, float ty);
 };
 

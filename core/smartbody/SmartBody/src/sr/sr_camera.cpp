@@ -18,11 +18,11 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
  
-
+# include <sr/sr_camera.h>
 # include <math.h>
 # include <sr/sr_box.h>
 # include <sr/sr_plane.h>
-# include <sr/sr_camera.h>
+# include <sr/sr_mat.h>
 #include <sstream>
 
 #include <sbm/gwiz_math.h>
@@ -77,6 +77,7 @@ SrCamera::SrCamera () : SBPawn()
 	createDoubleAttribute("far", 1000, true, "Camera", 260, false, false, false, "");
 	createDoubleAttribute("aspectRatio", .879121, true, "Camera", 270, false, false, false, "");
 	createDoubleAttribute("scale", 1.0, true, "Camera", 280, false, false, false, "");
+	cameraDirty = true;
 	
    init ();
    setBoolAttribute("visible", false); // don't show the camera in the scene by default
@@ -166,6 +167,10 @@ void SrCamera::setEye(float x, float y, float z)
 	posZ->setValueFast(z);
 	
 	updateOrientation();	
+
+	cameraDirty = true;
+	
+	
 }
 
 SrVec SrCamera::getEye()
@@ -187,6 +192,8 @@ void SrCamera::setCenter(float x, float y, float z)
 	centerZ->setValueFast(z);
 
 	updateOrientation();
+
+	cameraDirty = true;
 }
 
 SrVec SrCamera::getCenter()
@@ -198,6 +205,8 @@ void SrCamera::setUpVector(SrVec u)
 {
 	up = u;
 	updateOrientation();
+
+	cameraDirty = true;
 }
 
 SrVec SrCamera::getUpVector()
@@ -223,6 +232,8 @@ void SrCamera::setFov(float fov)
 
 	SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("fov"));
 	attr->setValueFast(fovy);
+
+	cameraDirty = true;
 }
 
 float SrCamera::getFov()
@@ -236,6 +247,8 @@ void SrCamera::setNearPlane(float n)
 
 	SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("near"));
 	attr->setValueFast(znear);
+
+	cameraDirty = true;
 }
 
 float SrCamera::getNearPlane()
@@ -249,6 +262,8 @@ void SrCamera::setFarPlane(float f)
 
 	SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("far"));
 	attr->setValueFast(zfar);
+
+	cameraDirty = true;
 
 }
 
@@ -283,10 +298,17 @@ void SrCamera::init ()
    setScale(1.0f);
  }
 
-SrMat& SrCamera::get_view_mat ( SrMat &m ) const
+SrMat& SrCamera::get_view_mat ( SrMat &m )
  {
-   m.look_at ( eye, center, up );
-   return m;
+	if (cameraDirty)
+	{
+		curViewMatrix.look_at(eye, center, up);
+		cameraDirty = false;
+	}
+	
+	m = curViewMatrix;
+	
+	return m;
  }
 
 SrMat& SrCamera::get_perspective_mat ( SrMat &m ) const
@@ -347,6 +369,7 @@ void SrCamera::view_all ( const SrBox &box, float fovy_radians )
    //zfar = SR_ABS(eye.z)+delta;
 
    scale = 1.0f;
+   cameraDirty = true;
  }
 
 void SrCamera::apply_translation_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy )
@@ -381,12 +404,14 @@ void SrCamera::operator+= ( const SrVec& v )
  {
    eye += v;
    center += v;
+   cameraDirty = true;
  }
 
 void SrCamera::operator-= ( const SrVec& v )
  {
    eye -= v;
    center -= v;
+   cameraDirty = true;
  }
 
 //=============================== friends ==========================================
@@ -471,6 +496,21 @@ void SrCamera::setPosition(SrVec position)
 	this->setEye(position.x, position.y, position.z);
 }
 
+void SrCamera::setUpFromRotations(double x, double y, double z)
+{
+	// compose new up vector from rotations
+	SrMat xmat;
+	xmat.rotx(x * 3.14159 / 180.0);
+	SrMat ymat;
+	ymat.roty(y * 3.14159 / 180.0);
+	SrMat zmat;
+	zmat.rotz(z * 3.14159 / 180.0);
+	SrMat finalMat = xmat * ymat * zmat;
+	SrVec up(0, 1, 0);
+	SrVec finalUp = up * finalMat;
+	setUpVector(finalUp);
+}
+
 void SrCamera::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBPawn::notify(subject);
@@ -482,59 +522,56 @@ void SrCamera::notify(SmartBody::SBSubject* subject)
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getEye();
-			vec.x = (float) val;
+			vec.x = (float)val;
 			setEye(vec.x, vec.y, vec.z);
 		}
 		else if (attribute->getName() == "posY")
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getEye();
-			vec.y = (float) val;
+			vec.y = (float)val;
 			setEye(vec.x, vec.y, vec.z);
 		}
 		else if (attribute->getName() == "posZ")
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getEye();
-			vec.z = (float) val;
+			vec.z = (float)val;
 			setEye(vec.x, vec.y, vec.z);
 		}
 		else if (attribute->getName() == "centerX")
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getCenter();
-			vec.x = (float) val;
+			vec.x = (float)val;
 			setCenter(vec.x, vec.y, vec.z);
 		}
 		else if (attribute->getName() == "centerY")
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getCenter();
-			vec.y = (float) val;
+			vec.y = (float)val;
 			setCenter(vec.x, vec.y, vec.z);
 		}
 		else if (attribute->getName() == "centerZ")
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec vec = getCenter();
-			vec.z = (float) val;
+			vec.z = (float)val;
 			setCenter(vec.x, vec.y, vec.z);
 		}
-		if (attribute->getName() == "rotX")
+		if (attribute->getName() == "rotX" ||
+			attribute->getName() == "rotY" ||
+			attribute->getName() == "rotZ")
 		{
-			double val = this->getDoubleAttribute(attribute->getName());
-			SrVec hpr = this->getHPR();
-		
-		}
-		else if (attribute->getName() == "rotY")
-		{
-			double val = this->getDoubleAttribute(attribute->getName());
-			SrVec hpr = this->getHPR();
-		}
-		else if (attribute->getName() == "rotZ")
-		{
-			double val = this->getDoubleAttribute(attribute->getName());
-			SrVec hpr = this->getHPR();
+			double x = this->getDoubleAttribute("rotX");
+			double y = this->getDoubleAttribute("rotY");
+			double z = this->getDoubleAttribute("rotZ");
+			setUpFromRotations(x, y, z);
+			updateOrientation();
+			SrVec up = getUpVector();
+			SmartBody::Vec3Attribute* upAttr = dynamic_cast<SmartBody::Vec3Attribute*>(this->getAttribute("up"));
+			upAttr->setValueFast(up);
 		}
 		else if (attribute->getName() == "fov")
 		{
@@ -560,6 +597,25 @@ void SrCamera::notify(SmartBody::SBSubject* subject)
 		{
 			double val = this->getDoubleAttribute(attribute->getName());
 			setScale((float) val);
+		}
+		else if (attribute->getName() == "up")
+		{
+			SrVec up = this->getVec3Attribute(attribute->getName());
+			this->setUpVector(up);
+			SrMat mat;
+			SrVec origUp(0, 1, 0);
+
+			mat.rot(origUp, up);
+			SrVec euler = mat.decomposeEuler("XYZ");
+			SmartBody::DoubleAttribute* rotXAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotX"));
+			SmartBody::DoubleAttribute* rotYAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotY"));
+			SmartBody::DoubleAttribute* rotZAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotZ"));
+
+			rotXAttr->setValueFast(euler.x);
+			rotYAttr->setValueFast(euler.y);
+			rotZAttr->setValueFast(euler.z);
+			
+			
 		}
 	}
 }
