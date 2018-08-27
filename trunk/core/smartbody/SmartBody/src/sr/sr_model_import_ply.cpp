@@ -174,20 +174,26 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 #if !defined(EMSCRIPTEN)
 	SrString s;
 	SrInput in;
-	std::string imageFile = file;
+	std::string filename = file;
+	std::vector<std::string> tokens;
+	SmartBody::util::tokenize(file, tokens, "|");
+	if (tokens.size() == 2)
+		filename = tokens[1];
+
+	std::string imageFile = filename;
 	in.init( fopen(file,"r"));	
 	int i = 0;
 	while ( !in.valid() && i < paths.size())
 	{
 		s = paths[i++];
-		s << file;
+		s << filename.c_str();
 		imageFile = s;
 		in.init ( fopen(s,"r") );
 	}
 	if (!in.valid()) return;			
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	SmartBody::util::log("loading texture file = %s", imageFile.c_str());
-	texManager.loadTexture(type,file,s);		
+	texManager.loadTexture(type, file, s);		
 #endif
 }
 
@@ -257,6 +263,16 @@ void SrModel::removeRedundantTexCoord(TexCoordData& tData, SrModel& model)
 bool SrModel::import_ply( const char* file )
 {
 
+	SrString path=file;
+	SrString filename;
+	path.extract_file_name(filename);
+	
+	SrStringArray paths;
+	paths.push ( path );
+
+	name = filename;
+	//name.remove_file_extension();
+
 	long nvertices, ntriangles;
 	M.push_back(SrMaterial());
 	M.back().diffuse = SrColor::gray;
@@ -289,21 +305,15 @@ bool SrModel::import_ply( const char* file )
 			//SR_TRACE1 ( "new material: "<<in.last_token() );	
 			mtlnames.push_back ( mtlName.c_str() );
 			//SmartBody::util::log("texture found : %s", texFile.c_str());
-			mtlTextureNameMap[mtlName] = texFile;	
+			std::stringstream strstr2;
+			strstr2 << name << "|" << texFile;
+			mtlTextureNameMap[mtlName] = strstr2.str();	
 		}
 		comment = ply_get_next_comment(ply,comment);
 	}
 #endif
 
-	SrString path=file;
-	SrString filename;
-	path.extract_file_name(filename);
 	
-	SrStringArray paths;
-	paths.push ( path );
-
-	name = filename;
-	//name.remove_file_extension();
 	nvertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, this, 0);
 	ply_set_read_cb(ply, "vertex", "y", vertex_cb, this, 1);
 	ply_set_read_cb(ply, "vertex", "z", vertex_cb, this, 2);
@@ -343,13 +353,16 @@ bool SrModel::import_ply( const char* file )
 	for (int i=0;i<M.size();i++)
 	{
 		std::string matName = mtlnames[i];
+		std::stringstream strstr; 
 		if (mtlTextureNameMap.find(matName) != mtlTextureNameMap.end())
 		{
-			load_texture(SbmTextureManager::TEXTURE_DIFFUSE,mtlTextureNameMap[matName].c_str(),paths);	   
+			strstr << mtlTextureNameMap[matName];
+			load_texture(SbmTextureManager::TEXTURE_DIFFUSE, strstr.str().c_str(), paths);	   
 		}	
 		if (mtlNormalTexNameMap.find(matName) != mtlNormalTexNameMap.end())
 		{
-			load_texture(SbmTextureManager::TEXTURE_NORMALMAP,mtlNormalTexNameMap[matName].c_str(),paths);	   
+			strstr << mtlNormalTexNameMap[matName];
+			load_texture(SbmTextureManager::TEXTURE_NORMALMAP, strstr.str().c_str(),paths);	   
 		}
 	}
 #endif

@@ -89,14 +89,14 @@ void ObjectControl::screenParallelPlane(
 
 
 
-SrVec ObjectControl::worldToEye( const SrCamera& cam, const SrVec& pos )
+SrVec ObjectControl::worldToEye( SrCamera& cam, const SrVec& pos )
 {
 	SrMat mat;
 	cam.get_view_mat(mat);
 	return pos*mat;	
 }
 
-SrVec ObjectControl::worldToScreen( const SrCamera& cam, const SrVec& pos )
+SrVec ObjectControl::worldToScreen(  SrCamera& cam, const SrVec& pos )
 {
 	GLdouble modelView[16], projection[16];
 	int viewport[4];
@@ -111,7 +111,7 @@ SrVec ObjectControl::worldToScreen( const SrCamera& cam, const SrVec& pos )
 	return SrVec((float)winX,(float)winY,(float)winZ);	
 }
 
-SrVec ObjectControl::screenToWorld( const SrCamera& cam, const SrVec& win )
+SrVec ObjectControl::screenToWorld(  SrCamera& cam, const SrVec& win )
 {
 	GLdouble modelView[16], projection[16];
 	int viewport[4];

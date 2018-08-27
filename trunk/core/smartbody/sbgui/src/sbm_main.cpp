@@ -406,6 +406,7 @@ int mcu_snapshot_func2(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	int yb = (y - ya) / 256;//assemble the header
 	unsigned char header[18] = { 0,0,2,0,0,0,0,0,0,0,0,0,(char)xa,(char)xb,(char)ya,(char)yb,24,0 };
 	// write header and data to file
+	SmartBody::util::log("Snapshot to %s", output_file.c_str());
 	fstream File(output_file, ios::out | ios::binary);
 	File.write(reinterpret_cast<char *>(header), sizeof(char) * 18);
 	File.write(reinterpret_cast<char *>(data), sizeof(char)*imageSize);
@@ -438,7 +439,7 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		snapshotCounter++;
 		output_file = output_file_os.str();
 	}
-	// Allocate a picture buffer 
+	// Allocate a picture buffer snap
 	Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
 	SmartBody::util::log("  File to save to: %s", output_file.c_str());
 
