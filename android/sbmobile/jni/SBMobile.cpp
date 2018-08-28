@@ -173,8 +173,8 @@ SrVec SBMobile::convertScreenSpaceTo3D(float x, float y, SrVec ground, SrVec upV
 	SrVec dest, src;				
 	SrPlane plane(ground, upVector);
 	dest = plane.intersect(p1, p2);
-	SmartBody::util::log("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
-	SmartBody::util::log("touchPos = %f %f %f", dest[0], dest[1], dest[2]);
+	//SmartBody::util::log("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x, y, p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+	//SmartBody::util::log("touchPos = %f %f %f", dest[0], dest[1], dest[2]);
 	return dest;
 }
 

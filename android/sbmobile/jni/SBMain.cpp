@@ -81,6 +81,7 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_reloadTexture(JNIEnv * env, jobject obj);	
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_createCustomMeshFromBlendshapes(JNIEnv * env, jobject obj, jstring templateMeshName, jstring blendshapesDir, jstring baseMeshName, jstring hairMeshName, jstring outMeshName);
 	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_imageColorTransfer(JNIEnv * env, jobject obj, jstring srcImg, jstring srcMask, jstring tgtImg, jstring tgtMask, jstring outImg);
+	JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_deformableMeshTextureReplace(JNIEnv * env, jobject obj, jstring mesnName, jstring texName, jstring imgFileName);
 
 
 	JNIEXPORT jboolean JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
@@ -256,6 +257,16 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_imageColorTransfer(
 
 	imageColorTransfer(srcImgStr, srcMaskStr, tgtImgStr, tgtMaskStr, outImgStr);
 }
+
+
+JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_deformableMeshTextureReplace(JNIEnv * env, jobject obj, jstring mesnName, jstring texName, jstring imgFileName)
+{
+	const char* meshNameStr = (env)->GetStringUTFChars(mesnName, NULL);
+	const char* texNameStr = (env)->GetStringUTFChars(texName, NULL);
+	const char* imgFileNameStr = (env)->GetStringUTFChars(imgFileName, NULL);
+	deformableMeshTextureReplace(meshNameStr, texNameStr, imgFileNameStr);
+}
+
 
 
 

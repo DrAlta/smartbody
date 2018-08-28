@@ -1,6 +1,10 @@
 #include "ImageTransfer.h"
 #include <algorithm>
+#include <sb/SBScene.h>
 #include <sb/SBUtilities.h>
+#include <sb/SBAssetManager.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_mat.h>
 
 //#define STB_IMAGE_IMPLEMENTATION
@@ -169,5 +173,48 @@ void imageColorTransfer(std::string srcImg, std::string srcMask, std::string tgt
 	lab2rgb(srcLab, srcBuf, srcSize*forceImgChannel);
 	int imageWriteSuccess = stbi_write_png(outImage.c_str(), srcWidth, srcHeight, 4, srcBuf, srcWidth * 4);
 	//SmartBody::util::log("Writing PNG %s, result = %d", outImage.c_str(), imageWriteSuccess);
+}
+
+void deformableMeshTextureReplace(std::string meshName, std::string textureName, std::string inputImageFileName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Error replacing texture '%s', mesh '%s' doesn't exist.", textureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	bool meshTextureExist = false;
+	std::string finalTextureName = "";
+	for (unsigned int i = 0; i < mesh->subMeshList.size(); i++)
+	{
+		SbmSubMesh* subMesh = mesh->subMeshList[i];
+		//if (subMesh->texName == textureName)
+		//	meshTextureExist = true;
+		if (subMesh->texName.find(textureName) != std::string::npos) // texture name exists in the submesh
+		{
+			finalTextureName = subMesh->texName;
+			meshTextureExist = true;
+			break;
+		}
+	}
+	if (!meshTextureExist)
+	{
+		SmartBody::util::log("Error replacing texture '%s', texture doesn't exist in mesh '%s'.", textureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	SmartBody::util::log("Found texture '%s' in the deformable mesh '%s'.", finalTextureName.c_str(), meshName.c_str());
+	// replace textures with new image files
+	SbmTexture* texture = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, finalTextureName.c_str());
+	if (!texture)
+	{
+		SmartBody::util::log("Error replacing texture '%s', texture doesn't exist.", finalTextureName.c_str(), meshName.c_str());
+		return;
+	}
+
+	texture->loadImage(inputImageFileName.c_str());
+	texture->buildTexture();
 }
 
