@@ -19,7 +19,7 @@ SBM_PATH := ../../../core/smartbody/SmartBody/
 #include $(CLEAR_VARS)
 include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody/jni/Android.mk
 
-include $(SBM_ANDROID_LOCAL_PATH)/../../alib/jni/Android.mk
+#include $(SBM_ANDROID_LOCAL_PATH)/../../alib/jni/Android.mk
 
 #include $(CLEAR_VARS)
 #LOCAL_MODULE := libalib_prebuilt
@@ -32,6 +32,7 @@ include $(SBM_ANDROID_LOCAL_PATH)/../../alib/jni/Android.mk
 #include $(PREBUILT_SHARED_LIBRARY)
 
 #ALIB_LIBS :=  libxml_prebuilt icuuc_prebuilt libnlopt_prebuilt  libxslt_prebuilt boost-thread-prebuilt boost-system-prebuilt libalib_prebuilt
+#JEROME_LIBS := libjerome
 
 LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
@@ -58,7 +59,7 @@ LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
 #LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -DUSE_CEREVOICE
 LOCAL_SRC_FILES :=  SBMain.cpp Shader.cpp ImageTransfer.cpp esUtil.c AppListener.cpp SBWrapper.cpp SBMobile.cpp 
 LOCAL_LDLIBS    := -landroid -llog -lGLESv3
-LOCAL_STATIC_LIBRARIES := smartbody  xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt libjerome openal alut tremolo sndfile $(CEREVOICE_LIBS) $(ALIB_LIBS)
+LOCAL_STATIC_LIBRARIES := smartbody  xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt  openal alut tremolo sndfile $(JEROME_LIBS) $(CEREVOICE_LIBS) $(ALIB_LIBS)
 LOCAL_SHARED_LIBRARIES := python-prebuilt-share libjs_prebuilt
 
 include $(BUILD_SHARED_LIBRARY) 
