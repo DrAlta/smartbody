@@ -68,9 +68,11 @@ public class SBMobileLib {
      public static native void setBackground(String fileName, String textureName, int texRotate);
      public static native void createCustomMeshFromBlendshapes(String templateMeshName, String blendshapesDir, String baseMeshName, String hairMeshName, String outMeshName);
      public static native void imageColorTransfer(String srcImag, String srcMask, String tgtImg, String tgtMask, String outImage);
+     public static native void deformableMeshTextureReplace(String meshName, String texName, String imgFileName);
 
 
-     public static native void initClassifier(String classifierName, String dialogManagerName);
+
+    public static native void initClassifier(String classifierName, String dialogManagerName);
      public static native String classify(String characterName, String question);
      public static native String [] classifyWithExternalID(String characterName, String question);
 
