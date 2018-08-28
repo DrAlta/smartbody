@@ -61,6 +61,6 @@ LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
 LOCAL_SRC_FILES :=  SBMain.cpp Shader.cpp ImageTransfer.cpp esUtil.c AppListener.cpp SBWrapper.cpp SBMobile.cpp 
 LOCAL_LDLIBS    := -landroid -llog -lGLESv3
 LOCAL_STATIC_LIBRARIES := smartbody  xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt  openal alut tremolo sndfile $(JEROME_LIBS) $(CEREVOICE_LIBS) $(ALIB_LIBS)
-LOCAL_SHARED_LIBRARIES := python-prebuilt-share $(JEROME_SHARED)
-
+#LOCAL_SHARED_LIBRARIES := python-prebuilt-share $(JEROME_SHARED)
+LOCAL_SHARED_LIBRARIES := python-prebuilt-share 
 include $(BUILD_SHARED_LIBRARY) 
