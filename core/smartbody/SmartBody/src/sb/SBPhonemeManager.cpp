@@ -47,6 +47,8 @@ SBPhonemeManager::SBPhonemeManager()
 
 	addPhonemeMapping("SIL", "_");
 	addPhonemeMapping("PAU", "_");
+	addPhonemeMapping("sp", "_");
+	addPhonemeMapping("spn", "_");
 	addPhonemeMapping("AW", "Ah");
 	addPhonemeMapping("AA", "Aa");
 	addPhonemeMapping("AE", "Ah");

@@ -206,6 +206,15 @@ void SrCamera::setUpVector(SrVec u)
 	up = u;
 	updateOrientation();
 
+	SrMat mat;
+	SrVec origUp(0, 1, 0);
+
+	mat.rot(origUp, up);
+	SrVec euler = mat.decomposeEuler("XYZ");
+	SmartBody::DoubleAttribute* rotXAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotX"));
+	SmartBody::DoubleAttribute* rotYAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotY"));
+	SmartBody::DoubleAttribute* rotZAttr = dynamic_cast<SmartBody::DoubleAttribute*>(this->getAttribute("rotZ"));
+
 	cameraDirty = true;
 }
 
