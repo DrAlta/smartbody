@@ -1848,6 +1848,24 @@ SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacte
 	double timeStop2 = motion2->getTimeStop();
 	motion->setSyncPoint("stop", (1.0 - amount) * timeStop1 + amount * timeStop2);
 
+	// approximate the gesture speeds and locations
+	SrVec startGestureLoc1 = motion1->getGestureStartLocation();
+	SrVec startGestureLoc2 = motion2->getGestureStartLocation();
+	SrVec holdGestureLoc1 = motion1->getGestureHoldLocation();
+	SrVec holdGestureLoc2 = motion2->getGestureHoldLocation();
+	double speed1 = motion1->getGestureSpeed();
+	double speed2 = motion2->getGestureSpeed();
+	double finalSpeed = (1.0 - amount) * speed1 + amount * speed2;
+	motion->setGestureSpeed(finalSpeed);
+	SrVec diffStart = startGestureLoc2 - startGestureLoc1;
+	SrVec finalStart = startGestureLoc1 + amount * diffStart;
+	motion->setGestureStartLocation(finalStart);
+
+	SrVec diffHold = holdGestureLoc2 - holdGestureLoc1;
+	SrVec finalHold = holdGestureLoc1 + amount * diffHold;
+	motion->setGestureHoldLocation(finalHold);
+
+
 	return motion;
 }
 

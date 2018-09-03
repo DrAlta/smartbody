@@ -240,6 +240,16 @@ class SBMotion : public SkMotion
 		SBMotion* buildPrestrokeHoldMotion(float holdTime, SBMotion* idleMotion);
 		SBMotion* buildPoststrokeHoldMotion(float holdTime, std::vector<std::string>& joints, float scale, float freq, SBMotion* idleMotion);
 
+		bool isGestureSpeedCalculated();
+		bool isGestureSpeedValid();
+		void calculateGestureSpeed();
+		double getGestureSpeed();
+		void setGestureSpeed(double speed);
+		SrVec getGestureHoldLocation();
+		SrVec getGestureStartLocation();
+		void setGestureHoldLocation(SrVec vec);
+		void setGestureStartLocation(SrVec vec);
+
 		// serializable data
 		std::string sName;
 		int sNumChannels;
@@ -269,6 +279,13 @@ class SBMotion : public SkMotion
 		
 		MotionType _motionType;
 		float _scale;
+
+		bool _isGestureSpeedCalculated;
+		bool _isGestureSpeedValid;
+		double _gestureSpeed;
+		double _gestureDistance;
+		SrVec _holdLocation;
+		SrVec _startLocation;
 
 		SBMotion* _offsetMotion;
 		std::vector<std::string> _similarPoses;

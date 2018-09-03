@@ -138,6 +138,12 @@ SBMotion::SBMotion(const SBMotion& motion)
 	_scale = 1.f;
 	_offsetMotion = NULL;
 	_offsetParent = NULL;
+
+	_gestureSpeed = 0.0;
+	_gestureDistance = 0.0;
+	_startLocation = SrVec(0, 0, 0);
+	_holdLocation = SrVec(0, 0, 0);
+
 }
 
 void SBMotion::setMotion(const SBMotion& motion)
@@ -4039,6 +4045,117 @@ SBMotion* SBMotion::buildPrestrokeHoldMotion(float holdTime, SBMotion* idleMotio
 	return newMotion;
 }
 
+bool SBMotion::isGestureSpeedCalculated()
+{
+	return _isGestureSpeedCalculated;
+
+}
+
+void SBMotion::calculateGestureSpeed()
+{
+	_isGestureSpeedCalculated = false;
+	_isGestureSpeedValid = true;
+	_startLocation = SrVec(0, 0, 0);
+	_holdLocation = SrVec(0, 0, 0);
+	std::string skeletonName = this->getMotionSkeletonName();
+	if (skeletonName == "")
+	{
+		SmartBody::util::log("Gesture %s has motion skeleton, cannot calculate gesture speed...", this->getName().c_str());
+		return;
+	}
+	SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->createSkeleton(skeletonName);
+	if (skeleton == NULL)
+	{
+		SmartBody::util::log("Gesture %s has motion skeleton %s but does not exist, cannot calculate gesture speed...", this->getName().c_str(), skeletonName.c_str());
+		return;
+	}
+
+	this->connect(skeleton);
+	SBJoint* lWrist = skeleton->getJointByMappedName("l_wrist");
+	SBJoint* rWrist = skeleton->getJointByMappedName("r_wrist");
+	if (!lWrist || !rWrist)
+	{
+		// no wrists to check for speed, so can't do coarticulation
+		SmartBody::util::log("Gesture %s has no wrist information to test for coarticulation, cannot calculate gesture speed...", this->getName().c_str());
+		this->disconnect();
+		return;
+	}
+
+	float startTime = (float) this->time_stroke_start();
+	float endTime = (float) this->time_stroke_end();
+	float gestureTime = endTime - startTime;
+	if (fabs(gestureTime) < .001 || gestureTime < 0.0)
+	{
+		SmartBody::util::log("Gesture %s has no stroke speed, cannot calculate speed...", this->getName().c_str());
+		this->disconnect();
+		_isGestureSpeedValid = false;
+		return;
+	}
+
+	SrVec lWristPosStart = this->getJointPosition(lWrist, startTime);
+	SrVec rWristPosStart = this->getJointPosition(rWrist, startTime);
+
+	SrVec lWristPosEnd = this->getJointPosition(lWrist, endTime);
+	SrVec rWristPosEnd = this->getJointPosition(rWrist, endTime);
+				
+	this->disconnect();
+				
+	SrVec leftDistanceVec = lWristPosEnd - lWristPosStart;
+	SrVec rightDistanceVec = rWristPosEnd - rWristPosStart;
+
+	double leftDistance = leftDistanceVec.len(); 
+	double leftSpeed = leftDistance / gestureTime;
+	double rightDistance = rightDistanceVec.len();
+	double rightSpeed = rightDistance / gestureTime;
+
+	if (leftSpeed > rightSpeed)
+	{
+		_gestureSpeed = leftSpeed;
+		_holdLocation = lWristPosEnd;
+		_startLocation = lWristPosStart;
+	}
+	else
+	{
+		_gestureSpeed = rightSpeed;
+		_holdLocation = rWristPosEnd;
+		_startLocation = rWristPosStart;
+	}
+
+	_isGestureSpeedCalculated = true;
+	_isGestureSpeedValid = true;
+}
+
+double SBMotion::getGestureSpeed()
+{
+	return _gestureSpeed;
+}
+
+void SBMotion::setGestureSpeed(double speed)
+{
+	_gestureSpeed = speed;
+	_isGestureSpeedCalculated = true;
+	_isGestureSpeedValid = true;
+}
+
+SrVec SBMotion::getGestureHoldLocation()
+{
+	return _holdLocation;
+}
+
+SrVec SBMotion::getGestureStartLocation()
+{
+	return _startLocation;
+}
+
+void SBMotion::setGestureHoldLocation(SrVec vec)
+{
+	_holdLocation = vec;
+}
+
+void SBMotion::setGestureStartLocation(SrVec vec)
+{
+	_startLocation = vec;
+}
 
 
 };

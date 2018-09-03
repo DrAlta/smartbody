@@ -381,6 +381,13 @@ namespace BML {
 		int priority;
 		std::vector<std::string> gestureList;
 
+		double workReadyTime;
+		double workStrokeStartTime;
+		double workStrokeEndTime;
+		double workRelaxTime;
+		bool workIgnore;
+
+
 	private:
 		std::string joints;
 		float scale;
