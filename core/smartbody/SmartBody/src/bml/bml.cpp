@@ -424,6 +424,322 @@ bool prioritySortFunction(GestureRequest* i, GestureRequest* j)
 	return i->priority > j->priority;
 }
 
+bool timeSortFunction(GestureRequest* i, GestureRequest* j)
+{
+	return i->behav_syncs.sync_stroke_start()->time() < j->behav_syncs.sync_stroke_start()->time();
+}
+
+void showGestureSchedule(std::vector<GestureRequest*>& gestures)
+{
+	double earliestTime = 9999999.0;
+	for (size_t g = 0; g < gestures.size(); g++)
+	{
+		if (gestures[g]->filtered == true)
+			continue;
+		
+		MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[g]->anim_ct);
+		double currGestureReadyAt = (double)gestures[g]->behav_syncs.sync_ready()->time();
+		double currGestureStrokeStartAt = (double)gestures[g]->behav_syncs.sync_stroke_start()->time();
+		double currGestureStrokeAt = (double)gestures[g]->behav_syncs.sync_stroke()->time();
+		double currGestureStrokeEndAt = (double)gestures[g]->behav_syncs.sync_stroke_end()->time();
+		double currGestureRelaxAt = (double)gestures[g]->behav_syncs.sync_relax()->time();
+		SmartBody::util::log("%4d)  %s %f %f %f %f %f", g, motionController->motion()->getName().c_str(), currGestureReadyAt, currGestureStrokeStartAt, currGestureStrokeAt, currGestureStrokeEndAt, currGestureRelaxAt);
+		if (currGestureReadyAt< earliestTime)
+			earliestTime = currGestureReadyAt;
+	}
+	for (size_t g = 0; g < gestures.size(); g++)
+	{
+		if (gestures[g]->filtered == true)
+			continue;
+		
+		MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[g]->anim_ct);
+		double currGestureReadyAt = (double)gestures[g]->behav_syncs.sync_ready()->time();
+		double currGestureStrokeStartAt = (double)gestures[g]->behav_syncs.sync_stroke_start()->time();
+		double currGestureStrokeAt = (double)gestures[g]->behav_syncs.sync_stroke()->time();
+		double currGestureStrokeEndAt = (double)gestures[g]->behav_syncs.sync_stroke_end()->time();
+		double currGestureRelaxAt = (double)gestures[g]->behav_syncs.sync_relax()->time();
+		std::stringstream strstr;
+		for (int num = 0; num < (int) ((currGestureReadyAt - earliestTime) * 10.0); num++)
+			strstr << "0";
+		for (int num = 0; num < (int) ((currGestureStrokeStartAt - currGestureReadyAt) * 10.0); num++)
+			strstr << "1";
+		for (int num = 0; num < (int) ((currGestureStrokeAt - currGestureStrokeStartAt ) * 10.0); num++)
+			strstr << "2";
+		for (int num = 0; num < (int) ((currGestureStrokeEndAt - currGestureStrokeAt ) * 10.0); num++)
+			strstr << "3";
+		for (int num = 0; num < (int) ((currGestureRelaxAt - currGestureStrokeEndAt ) * 10.0); num++)
+			strstr << "4";
+		SmartBody::util::log("%4d) %s", g, strstr.str().c_str());
+				
+	}
+}
+
+bool hasOverlap(GestureRequest* a, GestureRequest* b)
+{
+	bool startOverlap = (b->workStrokeStartTime >= a->workStrokeStartTime) &&
+						(b->workStrokeStartTime <= a->workStrokeEndTime);
+
+	bool endOverlap =	(b->workStrokeEndTime >= a->workStrokeStartTime) &&
+						(b->workStrokeEndTime <= a->workStrokeEndTime);
+	if (startOverlap || endOverlap)
+		return true;
+	else
+		return false;
+}
+
+bool canCoarticulate(GestureRequest* a, GestureRequest* b, bool showLog)
+{
+	// gestures don't overlap at all
+	if (a->workRelaxTime < b->workReadyTime)
+		return true;
+
+	MeCtMotion* aController = dynamic_cast<MeCtMotion*> (a->anim_ct);
+	SBMotion* aMotion = dynamic_cast<SBMotion*>(aController->motion());
+
+	MeCtMotion* bController = dynamic_cast<MeCtMotion*> (b->anim_ct);
+	SBMotion* bMotion = dynamic_cast<SBMotion*>(bController->motion());
+
+	// make sure coarticulation can occur within speed constraints
+	float gestureSpeed = (float) bMotion->getGestureSpeed();
+
+	// determine how long it will take to transition from the end of stroke end of one motion to the stroke start of the other
+	SrVec holdPos = aMotion->getGestureHoldLocation();
+	SrVec startPos = bMotion->getGestureStartLocation();
+	float gestureDistance = (startPos - holdPos).len();
+
+	// determine the hold and transition periods to the new motion
+	float transitionTime = 0.0;
+	if (fabs(gestureSpeed) > .001f)
+	{
+		transitionTime = gestureDistance / gestureSpeed;
+	}
+
+	double gestureInterval = b->workStrokeStartTime - a->workStrokeEndTime;
+
+	if (transitionTime > gestureInterval)
+	{
+		// transition time is too fast to perform next gesture
+		if (showLog)
+		{
+			SmartBody::util::log("transition time is too fast to perform next gesture from %s to %s", aMotion->getName().c_str(), bMotion->getName().c_str());
+		}
+		return false;
+	}
+
+	return true;
+}
+
+void getCandidateGestureSet(std::vector<GestureRequest*>& gestures, bool showLog)
+{
+	std::sort(gestures.begin(), gestures.end(), prioritySortFunction);
+	for (size_t i = 0; i < gestures.size() - 1; i++)
+	{
+		if (gestures[i]->filtered)
+			continue;
+		for (size_t j = i + 1; j < gestures.size(); j++)
+		{
+			if (gestures[j]->filtered)
+				continue;
+
+			if (hasOverlap(gestures[i], gestures[j]))
+			{
+				if (gestures[i]->priority >= gestures[j]->priority)
+				{
+					gestures[j]->workIgnore = true;
+				}
+				else
+				{
+					gestures[i]->workIgnore = true;
+				}
+			}
+		}
+	}
+}
+
+int evaluateGestureCompatibility(std::vector<GestureRequest*>& gestures, bool showLog)
+{
+	std::sort(gestures.begin(), gestures.end(), prioritySortFunction);
+	std::vector<GestureRequest*> timeSortedGestures;
+	for (size_t i = 0; i < gestures.size(); i++)
+		timeSortedGestures.push_back(gestures[i]);
+	std::sort(timeSortedGestures.begin(), timeSortedGestures.end(), timeSortFunction);
+
+	// evaluate by priority each gesture and the next candidate gesture
+	for (size_t i = 0; i < gestures.size(); i++)
+	{
+		if (gestures[i]->filtered || gestures[i]->workIgnore)
+			continue;
+		int nextGesture = -1;
+		bool found = false;
+		// find the gesture in order, and compare to the next gesture in time
+		for (size_t j = 0; j < timeSortedGestures.size(); j++)
+		{
+			if (timeSortedGestures[j] == gestures[i])
+			{
+				nextGesture = j + 1;
+				for (int v = nextGesture; v < gestures.size(); v++)
+				{
+					if (timeSortedGestures[v]->filtered ||
+						timeSortedGestures[v]->workIgnore)
+						continue;
+			
+					nextGesture = v;
+					found = true;
+					break;
+					
+				}
+				
+				break;
+			}
+		}
+		if (nextGesture == -1 || 
+			!found)
+			continue;
+		
+		if (!canCoarticulate(gestures[i], timeSortedGestures[nextGesture], showLog))
+		{
+			if (gestures[i]->priority >= timeSortedGestures[nextGesture]->priority)
+			{
+				if (showLog)
+				{
+					MeCtMotion* aController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+					SBMotion* aMotion = dynamic_cast<SBMotion*>(aController->motion());
+					MeCtMotion* bController = dynamic_cast<MeCtMotion*> (timeSortedGestures[nextGesture]->anim_ct);
+					SBMotion* bMotion = dynamic_cast<SBMotion*>(bController->motion());
+
+					SmartBody::util::log("Gesture %s filtered because lower priority than gesture %s", aMotion->getName().c_str(), bMotion->getName().c_str());
+				}
+				timeSortedGestures[nextGesture]->filtered = true;
+			}
+			else
+			{
+				if (showLog)
+				{
+					MeCtMotion* aController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+					SBMotion* aMotion = dynamic_cast<SBMotion*>(aController->motion());
+					MeCtMotion* bController = dynamic_cast<MeCtMotion*> (timeSortedGestures[nextGesture]->anim_ct);
+					SBMotion* bMotion = dynamic_cast<SBMotion*>(bController->motion());
+
+					SmartBody::util::log("Gesture %s filtered because lower priority than gesture %s", bMotion->getName().c_str(), aMotion->getName().c_str());
+				}
+				gestures[i]->filtered = true;
+			}
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+void coarticulateGestures(std::vector<GestureRequest*>& gestures, bool showLog)
+{
+	std::sort(gestures.begin(), gestures.end(), timeSortFunction);
+	for (size_t i = 0; i < gestures.size() - 1; i++)
+	{
+		if (gestures[i]->filtered)
+			continue;
+		if (gestures[i]->workIgnore)
+		{
+			gestures[i]->filtered = true;
+			continue;
+		}
+			
+
+		MeCtMotion* aController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+		SBMotion* aMotion = dynamic_cast<SBMotion*>(aController->motion());
+
+		for (size_t j = i + 1; j < gestures.size(); j++)
+		{
+			if (gestures[j]->filtered)
+				continue;
+			if (gestures[j]->workIgnore)
+			{
+				gestures[j]->filtered = true;
+				continue;
+			}
+
+			MeCtMotion* bController = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
+			SBMotion* bMotion = dynamic_cast<SBMotion*>(bController->motion());
+
+			// gestures don't overlap at all
+			if (gestures[i]->workRelaxTime < gestures[j]->workReadyTime)
+				continue;
+
+			// make sure coarticulation can occur within speed constraints
+			float gestureSpeed = (float) bMotion->getGestureSpeed();
+
+			// determine how long it will take to transition from the end of stroke end of one motion to the stroke start of the other
+			SrVec holdPos = aMotion->getGestureHoldLocation();
+			SrVec startPos = bMotion->getGestureStartLocation();
+			float gestureDistance = (startPos - holdPos).len();
+
+			// determine the hold and transition periods to the new motion
+			float transitionTime = 0.0;
+			if (fabs(gestureSpeed) > .001f)
+			{
+				transitionTime = gestureDistance / gestureSpeed;
+			}
+
+			double gestureInterval = gestures[j]->workStrokeStartTime - gestures[i]->workStrokeEndTime;
+
+			double holdTime = gestureInterval - transitionTime;
+			aController->setHoldTime(aMotion->time_stroke_end());
+			aController->setHoldDuration(holdTime);
+			
+			gestures[i]->behav_syncs.sync_relax()->set_time(gestures[i]->workStrokeEndTime + holdTime);
+			gestures[i]->behav_syncs.sync_end()->set_time(gestures[i]->workStrokeEndTime + holdTime + transitionTime);
+
+			double prestrokeHoldTime = transitionTime;
+			double gesturePrepareTime = bMotion->time_stroke_start() - bMotion->time_start();
+			if (prestrokeHoldTime > gesturePrepareTime)
+			{
+				// make sure the transition time isn't so slow that we calculate that the gesture has to move
+				// more slowly than originally intended
+				prestrokeHoldTime = gesturePrepareTime;
+			}
+
+			bController->setPrestrokeHoldTime(bMotion->time_stroke_start() - transitionTime);
+			bController->setPrestrokeHoldDuration(transitionTime);
+
+			gestures[j]->behav_syncs.sync_start()->set_time(gestures[i]->workStrokeEndTime + holdTime);
+			gestures[j]->behav_syncs.sync_ready()->set_time(gestures[j]->workStrokeStartTime);
+		}
+	}
+}
+
+void coarticulate(std::vector<GestureRequest*>& gestures, bool showLog)
+{
+	int numConflictingGestures = 1;
+
+	int passNumber = 0;
+	if (showLog)
+	{
+		std::sort(gestures.begin(), gestures.end(), prioritySortFunction);
+		SmartBody::util::log("Gesture pass %d", passNumber);
+		showGestureSchedule(gestures);
+	}
+		
+
+	while (numConflictingGestures > 0)
+	{
+		passNumber++;
+		for (size_t i = 0; i < gestures.size() - 1; i++)
+			gestures[i]->workIgnore = false;
+		
+		getCandidateGestureSet(gestures, showLog);
+		numConflictingGestures = evaluateGestureCompatibility(gestures, showLog);
+		if (numConflictingGestures == 0)
+		{
+			coarticulateGestures(gestures, showLog);
+		}
+		if (showLog)
+		{
+			SmartBody::util::log("Gesture pass %d", passNumber);
+			showGestureSchedule(gestures);
+		}
+	}
+}
+
 void BmlRequest::gestureRequestProcess()
 {
 	bool useGestureLog = actor->getBoolAttribute("gestureRequest.gestureLog");
@@ -448,10 +764,20 @@ void BmlRequest::gestureRequestProcess()
 			if (gesture)
 			{
 				gestures.push_back(gesture);
+				
+				gesture->workReadyTime = (double) gesture->behav_syncs.sync_ready()->time();
+				gesture->workStrokeStartTime = (double) gesture->behav_syncs.sync_stroke_start()->time();
+				gesture->workStrokeEndTime = (double) gesture->behav_syncs.sync_stroke_end()->time();
+				gesture->workRelaxTime = (double) gesture->behav_syncs.sync_relax()->time();
+				gesture->workIgnore = false;
 			}
 		}
 		if (gestures.size() <= 1)
 			return;
+		coarticulate(gestures, useGestureLog);
+		return;
+
+
 		std::vector<GestureRequest*> gesturePriorityList;
 		for (size_t g = 0; g < gestures.size(); g++)
 			gesturePriorityList.push_back(gestures[g]);
@@ -463,7 +789,7 @@ void BmlRequest::gestureRequestProcess()
 		if (useGestureLog)
 		{
 			double earliestTime = 9999999.0;
-			for (size_t g = 0; g < gestures.size(); g++)
+			for (size_t g = 0; g < gesturePriorityList.size(); g++)
 			{
 				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
 				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
@@ -475,7 +801,7 @@ void BmlRequest::gestureRequestProcess()
 				if (currGestureReadyAt< earliestTime)
 					earliestTime = currGestureReadyAt;
 			}
-			for (size_t g = 0; g < gestures.size(); g++)
+			for (size_t g = 0; g < gesturePriorityList.size(); g++)
 			{
 				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
 				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
@@ -513,74 +839,66 @@ void BmlRequest::gestureRequestProcess()
 			if (gesturePriorityList[i]->filtered)
 				continue;
 
-			double currGestureStrokeStartAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_start()->time();
+			double currGestureStrokeStartAt = gesturePriorityList[i]->workStrokeStartTime;
 			// make sure that the first gesture doesn't get usurped - push the stroke start back to time 0
 			//if (i == 0)
 		//		currGestureStrokeStartAt = 0.0;
-			double currGestureStrokeAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke()->time();
-			double currGestureStrokeEndAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_end()->time();
-			double currGestureRelaxAt = (double)gesturePriorityList[i]->behav_syncs.sync_relax()->time();
-
+			double currGestureStrokeEndAt = gesturePriorityList[i]->workStrokeEndTime;
+			
 
 			for (size_t j = i + 1; j < gesturePriorityList.size(); j++)
 			{
 				if (gesturePriorityList[j]->filtered)
 					continue;
 
-				double nextGestureStrokeStartAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_start()->time();
-				double nextGestureStrokeAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke()->time();
-				double nextGestureStrokeEndAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_end()->time();
-				double nextGestureRelaxAt = (double)gesturePriorityList[j]->behav_syncs.sync_relax()->time();
-
+				double nextGestureStrokeStartAt = gesturePriorityList[j]->workStrokeStartTime;
+				double nextGestureStrokeEndAt = gesturePriorityList[j]->workStrokeEndTime;
 
 				// check for overlapping stroke phases
-				if (((nextGestureStrokeStartAt > currGestureStrokeStartAt) && 
-					 (nextGestureStrokeStartAt < currGestureStrokeEndAt)) ||
-					((nextGestureStrokeEndAt > currGestureStrokeStartAt) && 
-					 (nextGestureStrokeEndAt < currGestureStrokeEndAt)))
-				//if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
+				bool startOverlap = (nextGestureStrokeStartAt >= currGestureStrokeStartAt) &&
+									(nextGestureStrokeStartAt <= currGestureStrokeEndAt);
+
+				bool endOverlap =	(nextGestureStrokeEndAt >= currGestureStrokeStartAt) &&
+									(nextGestureStrokeEndAt <= currGestureStrokeEndAt);
+
+				if (startOverlap || endOverlap)
 				{
-// determine the % overlap
-double curBlockTime = currGestureStrokeEndAt - currGestureStrokeStartAt;
-double nextBlockTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
-bool startOverlap = false;
-bool endOverlap = false;
-double overlappingTime = 0.0; 
-if (nextGestureStrokeStartAt > currGestureStrokeStartAt && nextGestureStrokeStartAt < currGestureStrokeEndAt)
-{
-	startOverlap = true;
-	overlappingTime = currGestureStrokeEndAt - nextGestureStrokeStartAt;
-}
+					// determine the % overlap
+					double curBlockTime = currGestureStrokeEndAt - currGestureStrokeStartAt;
+					double nextBlockTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
+					bool startOverlap = false;
+					bool endOverlap = false;
+					double overlappingTime = 0.0; 
+					if (startOverlap)
+					{
+						overlappingTime = currGestureStrokeEndAt - nextGestureStrokeStartAt;
+					}
 
-if (nextGestureStrokeEndAt > currGestureStrokeStartAt && nextGestureStrokeEndAt < currGestureStrokeEndAt)
-{
-	endOverlap = true;
-	overlappingTime = nextGestureStrokeEndAt - currGestureStrokeStartAt;
-}
-if (startOverlap && endOverlap)
-{
-	if (useGestureLog)
-		SmartBody::util::log("Complete overlap!");
-	overlappingTime = 100000.0;
-}
-else
-{
-	double percentage = overlappingTime / curBlockTime;
-	if (useGestureLog)
-		SmartBody::util::log("Overlap %d %d: %f", i, j, percentage);
-	double overlapTolerance = actor->getDoubleAttribute("gestureRequest.experimentalCoarticulationOverlap");
-	if (overlapTolerance > percentage)
-	{
-		// keep the gesture
-		if (useGestureLog)
-			SmartBody::util::log("Withing tolerance, keeping it...");
-		continue;
+					if (endOverlap)
+					{
+						overlappingTime = nextGestureStrokeEndAt - currGestureStrokeStartAt;
+					}
+					if (startOverlap && endOverlap)
+					{
+						if (useGestureLog)
+							SmartBody::util::log("Complete overlap!");
+						overlappingTime = 100000.0;
+					}
+					else
+					{
+						double percentage = overlappingTime / curBlockTime;
+						if (useGestureLog)
+							SmartBody::util::log("Overlap %d %d: %f", i, j, percentage);
+						double overlapTolerance = actor->getDoubleAttribute("gestureRequest.experimentalCoarticulationOverlap");
+						if (overlapTolerance > percentage)
+						{
+							// keep the gesture
+							if (useGestureLog)
+								SmartBody::util::log("Withing tolerance, keeping it...");
+							continue;
 
-	}
-}
-
-
-
+						}
+					}
 
 					// remove the lower priority gesture
 					if (actor->getBoolAttribute("gestureRequest.coarticulateRandomPriority"))
@@ -646,9 +964,9 @@ else
 		}
 
 		// second pass, find gestures for coarticulation
-		for (size_t i = 0; i < gestures.size(); i++)
+		for (size_t i = 0; i < gesturePriorityList.size(); i++)
 		{
-			if (gestures[i]->filtered)
+			if (gesturePriorityList[i]->filtered)
 			{
 				if (useGestureLog)
 					SmartBody::util::log("Gesture %d was filtered...", i);
@@ -656,25 +974,23 @@ else
 			}
 				
 
-			double currGestureStrokeStartAt = (double)gestures[i]->behav_syncs.sync_stroke_start()->time();
-			double currGestureStrokeAt = (double)gestures[i]->behav_syncs.sync_stroke()->time();
-			double currGestureStrokeEndAt = (double)gestures[i]->behav_syncs.sync_stroke_end()->time();
-			double currGestureRelaxAt = (double)gestures[i]->behav_syncs.sync_relax()->time();
+			double currGestureStrokeStartAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_start()->time();
+			double currGestureStrokeEndAt = (double)gesturePriorityList[i]->behav_syncs.sync_stroke_end()->time();
 
-			for (size_t j = i + 1; j < gestures.size(); j++)
+			MeCtMotion* curMotionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[i]->anim_ct);
+			SBMotion* curMotion = dynamic_cast<SBMotion*>(curMotionController->motion());
+
+			for (size_t j = i + 1; j < gesturePriorityList.size(); j++)
 			{
-				if (gestures[j]->filtered)
+				if (gesturePriorityList[j]->filtered)
 				{
 					if (useGestureLog)
 							SmartBody::util::log("Gesture %d was filtered...", j);
 					continue;
 				}
 
-				double nextGestureStrokeReady = (double)gestures[j]->behav_syncs.sync_ready()->time();
-				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_stroke_start()->time();
-				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
-				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke_end()->time();
-				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
+				double nextGestureStrokeStartAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_start()->time();
+				double nextGestureStrokeEndAt = (double)gesturePriorityList[j]->behav_syncs.sync_stroke_end()->time();
 				double nextFullStrokeTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
 				
 				if (nextFullStrokeTime <= 0.0) // bad metadata information, can't coarticuate gesture
@@ -691,50 +1007,24 @@ else
 				// coarticulation: hold and transition to new gesture
 				// determine the speed of the stroke in order to determine 
 				// how long the hold and transition periods should be
-				MeCtMotion* nextMotionController = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
+				MeCtMotion* nextMotionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[j]->anim_ct);
 				SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
-				SmartBody::SBSkeleton* tempSkel = SmartBody::SBScene::getScene()->createSkeleton(actor->getSkeleton()->getName());
-				nextMotion->connect(tempSkel);
-				SBJoint* lWrist = tempSkel->getJointByMappedName("l_wrist");
-				SBJoint* rWrist = tempSkel->getJointByMappedName("r_wrist");
-				if (!lWrist || !rWrist)
+
+				if (!nextMotion->isGestureSpeedCalculated())
 				{
-					// no wrists to check for speed, so can't do coarticulation
-					SmartBody::util::log("Gesture %d has no wrist information to test for coarticulation, ignoring...", i);
-					nextMotion->disconnect();
+					SmartBody::util::log("Gesture %d speed has not been calculated, ignoring...", i);
 					continue;
 				}
 
-
-				SrVec lWristPosStart = nextMotion->getJointPosition(lWrist, (float)nextMotion->time_stroke_start());
-				SrVec rWristPosStart = nextMotion->getJointPosition(rWrist, (float)nextMotion->time_stroke_start());
-
-				SrVec lWristPosEnd = nextMotion->getJointPosition(lWrist, (float)nextMotion->time_stroke_end());
-				SrVec rWristPosEnd = nextMotion->getJointPosition(rWrist, (float)nextMotion->time_stroke_end());
-				
-				nextMotion->disconnect();
-				
-				SrVec leftDistanceVec = lWristPosEnd - lWristPosStart;
-				SrVec rightDistanceVec = rWristPosEnd - rWristPosStart;
-
-				double leftDistance = leftDistanceVec.len();
-				double leftSpeed = leftDistance / nextFullStrokeTime;
-				double rightDistance = rightDistanceVec.len();
-				double rightSpeed = rightDistance / nextFullStrokeTime;
-
-				// assume faster movement determines the handedness of the gesture
-				// if gesture uses both hands, doesn't matter which one is used
-				double gestureSpeed = rightSpeed;
-				double gestureDistance = rightDistance;
-				if (leftSpeed > rightSpeed)
-				{
-					gestureSpeed = leftSpeed;
-					gestureDistance = leftDistance;
-				}
+				float gestureSpeed = (float) nextMotion->getGestureSpeed();
+				// determine how long it will take to transition from the end of stroke end of one motion to the stroke start of the other
+				SrVec holdPos = curMotion->getGestureHoldLocation();
+				SrVec startPos = nextMotion->getGestureStartLocation();
+				float gestureDistance = (startPos - holdPos).len();
 
 				// determine the hold and transition periods to the new motion
-				double transitionTime = 0.0;
-				if (fabs(gestureSpeed) > .001)
+				float transitionTime = 0.0;
+				if (fabs(gestureSpeed) > .001f)
 				{
 					transitionTime = gestureDistance / gestureSpeed;
 				}
@@ -749,7 +1039,7 @@ else
 				     transitionTime > gestureInterval)
 				{
 					// transition time is too fast to perform next gesture, remove it
-					gestures[j]->filtered = true;
+					gesturePriorityList[j]->filtered = true;
 					if (useGestureLog)
 					{
 						SmartBody::util::log("Gesture %s filtered because transition time %f from last gesture insufficient to match stroke time %f.", nextMotion->getName().c_str(), transitionTime, gestureInterval);
@@ -766,8 +1056,31 @@ else
 				else
 				{
 					double holdTime = gestureInterval - transitionTime;
+					if (holdTime < 0)
+					{
+						// it takes too long to match the movement speed
+						// so filter the lower priority gesture
+						if (gesturePriorityList[i]->priority >= gesturePriorityList[j]->priority)
+						{
+							gesturePriorityList[j]->filtered = true;
+							if (useGestureLog)
+							{
+								SmartBody::util::log("Gesture %d was filtered because not enough transition time from %d (interval = %f, time needed = %f)...", j, i, gestureInterval, transitionTime);
+								continue;
+							}
+						}
+						else
+						{
+							gesturePriorityList[i]->filtered = true;
+							if (useGestureLog)
+							{
+								SmartBody::util::log("Gesture %d was filtered because not enough transition time to %d (interval = %f, time needed = %f)...", i, j, gestureInterval, transitionTime);
+								continue;
+							}
+						}
+					}
 					//double holdTime = nextGestureStrokeStartAt - currGestureStrokeEndAt;
-					MeCtMotion* prevMotionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+					MeCtMotion* prevMotionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[i]->anim_ct);
 					SBMotion* prevMotion = dynamic_cast<SBMotion*>(prevMotionController->motion());
 
 					if (!actor->getBoolAttribute("gestureRequest.experimentalTransitions"))
@@ -776,8 +1089,8 @@ else
 						prevMotionController->setHoldDuration(holdTime);
 					}
 					
-					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
-					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime + transitionTime);
+					gesturePriorityList[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
+					gesturePriorityList[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime + transitionTime);
 
 					SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
 					double prestrokeHoldTime = transitionTime;
@@ -795,12 +1108,84 @@ else
 						nextMotionController->setPrestrokeHoldDuration(transitionTime);
 					}
 
-					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt + holdTime);
-					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt);
+					gesturePriorityList[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt + holdTime);
+					gesturePriorityList[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt);
 
 				}
 			}
 		}
+
+		if (useGestureLog)
+		{
+			// show the final gesture schedule
+			SmartBody::util::log("Gesture Schedule:");
+			double earliestTime = 9999999.0;
+			std::sort(gesturePriorityList.begin(), gesturePriorityList.end(), timeSortFunction);
+
+			for (size_t g = 0; g < gesturePriorityList.size(); g++)
+			{
+				if (gesturePriorityList[g]->filtered)
+					continue;
+				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
+				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
+				double currGestureStrokeStartAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_start()->time();
+				double currGestureStrokeAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke()->time();
+				double currGestureStrokeEndAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_end()->time();
+				double currGestureRelaxAt = (double)gesturePriorityList[g]->behav_syncs.sync_relax()->time();
+				SmartBody::util::log("%4d)  %s %f %f %f %f %f", g, motionController->motion()->getName().c_str(), currGestureReadyAt, currGestureStrokeStartAt, currGestureStrokeAt, currGestureStrokeEndAt, currGestureRelaxAt);
+				if (currGestureReadyAt< earliestTime)
+					earliestTime = currGestureReadyAt;
+			}
+			
+			for (size_t g = 0; g < gesturePriorityList.size(); g++)
+			{
+				if (gesturePriorityList[g]->filtered)
+					continue;
+				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
+				double currGestureReadyAt = (double)gesturePriorityList[g]->behav_syncs.sync_ready()->time();
+				double currGestureStrokeStartAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_start()->time();
+				double currGestureStrokeAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke()->time();
+				double currGestureStrokeEndAt = (double)gesturePriorityList[g]->behav_syncs.sync_stroke_end()->time();
+				double currGestureRelaxAt = (double)gesturePriorityList[g]->behav_syncs.sync_relax()->time();
+				std::stringstream strstr;
+				for (int num = 0; num < (int) ((currGestureReadyAt - earliestTime) * 10.0); num++)
+					strstr << "0";
+				for (int num = 0; num < (int) ((currGestureStrokeStartAt - currGestureReadyAt) * 10.0); num++)
+					strstr << "1";
+				for (int num = 0; num < (int) ((currGestureStrokeAt - currGestureStrokeStartAt ) * 10.0); num++)
+					strstr << "2";
+				for (int num = 0; num < (int) ((currGestureStrokeEndAt - currGestureStrokeAt ) * 10.0); num++)
+					strstr << "3";
+				for (int num = 0; num < (int) ((currGestureRelaxAt - currGestureStrokeEndAt ) * 10.0); num++)
+					strstr << "4";
+				SmartBody::util::log("%4d) %s", g, strstr.str().c_str());
+
+				MeCtMotion* mController = dynamic_cast<MeCtMotion*> (gesturePriorityList[g]->anim_ct);
+					
+				double prestrokeHoldTime = mController->getPrestrokeHoldTime();
+				double prestrokeHoldDuration = mController->getPrestrokeHoldDuration();
+				double holdTime = mController->getHoldTime();
+				double holdDuration = mController->getHoldDuration();
+
+				std::stringstream strstr2;
+				for (int num = 0; num < (int) ((prestrokeHoldTime - earliestTime) * 10.0); num++)
+					strstr2 << "-";
+				for (int num = 0; num < (int) (((prestrokeHoldTime + prestrokeHoldDuration) - earliestTime) * 10.0); num++)
+					strstr2 << "P";
+				SmartBody::util::log("P%3d) %s", g, strstr2.str().c_str());
+
+				std::stringstream strstr3;
+				for (int num = 0; num < (int) ((holdTime - earliestTime)* 10.0); num++)
+					strstr2 << "-";
+				for (int num = 0; num < (int) (((holdTime  + holdDuration) - earliestTime)* 10.0); num++)
+					strstr2 << "H";
+				SmartBody::util::log("H%3d) %s", g, strstr3.str().c_str());				
+
+				
+			}
+		}
+
+
 		
 
 		return;
@@ -2667,6 +3052,12 @@ GestureRequest::GestureRequest( const std::string& unique_id, const std::string&
 	joints = js;
 	scale = s;
 	freq = f;
+
+	workStrokeStartTime = 0.0;
+	workStrokeEndTime = 0.0;
+	workReadyTime = 0.0;
+	workRelaxTime = 0.0;
+	workIgnore = false;
 }
 
 // Parameterized Animation Request

@@ -178,7 +178,8 @@ void pythonFuncsMotion()
 		.def("buildPrestrokeHoldMotion", &SBMotion::buildPrestrokeHoldMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Builds a pre-stroke hold motion with noise.")
 		.def("buildPoststrokeHoldMotion", &SBMotion::buildPoststrokeHoldMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Builds a post-stroke hold motion with noise.")
 		.def("removeChannels", &SBMotion::removeChannels, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new motion by removing translation or rotation channels from a given set of joints.")
-
+		.def("calculateGestureSpeed", &SBMotion::calculateGestureSpeed,  "Calculates the gesture speed for use during coarticulation.")
+		
 		;
 
 	boost::python::class_<SBMotionNode>("SBMotionNode")
