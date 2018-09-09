@@ -434,11 +434,11 @@ namespace BML {
 
 
 	public: ///// Methods
-		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, float smooth, SbmCharacter* actor,
 			        const BehaviorSyncPoints& behav_syncs );
-		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, const SbmCharacter* actor,
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, SbmCharacter* actor,
 					const BehaviorSyncPoints& behav_syncs );
-		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, float pitch, float decay, const SbmCharacter* actor,
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, float pitch, float decay, SbmCharacter* actor,
 					const BehaviorSyncPoints& behav_syncs );
 	};
 

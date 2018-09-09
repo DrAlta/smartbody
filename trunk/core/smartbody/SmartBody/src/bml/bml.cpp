@@ -3078,7 +3078,7 @@ ParameterizedAnimationRequest::ParameterizedAnimationRequest( MeCtParamAnimation
 }
 
 //  NodRequest
-NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, float smooth, SbmCharacter* actor,
 			            const BehaviorSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
     type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(-1), warp(-1), period(-1), accel(-1), pitch(-1), decay(-1)
@@ -3121,8 +3121,8 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
 #define DFL_SHAKE_REF_DEG	45.0f
 #define DFL_TOSS_REF_DEG    30.f
 	
-
-    nod->init(NULL);
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(actor);
+    nod->init(character);
     //  TODO: Set a controller name
     switch( type ) {
         case VERTICAL:
@@ -3142,7 +3142,7 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
 #define DFL_NOD_BOBBLE_DFL_DUR		2.0f
 #define DFL_NOD_BOBBLE_REF_DEG		15.0f
 
-NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, const SbmCharacter* actor,
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, SbmCharacter* actor,
 					   const BehaviorSyncPoints& syncs_in )
 : MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
     type(type), repeats(1.0f), frequency(1.0f), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(-1), decay(-1)
@@ -3174,12 +3174,12 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
     else if( extent < -1 )
         extent = -1;
 
-    nod->init(NULL);
+    nod->init(actor);
 	nod->set_wiggle(axis, (float)endTime, extent*DFL_NOD_BOBBLE_REF_DEG, period, warp, accel, smooth);
 
 }
 
-NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, float pitch, float decay, const SbmCharacter* actor,
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, float pitch, float decay, SbmCharacter* actor,
 					   const BehaviorSyncPoints& syncs_in )
 : MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
     type(type), repeats(1.0f), frequency(1.0f), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(pitch), decay(decay)
@@ -3211,7 +3211,7 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
     else if( extent < -1 )
         extent = -1;
 
-    nod->init(NULL);
+    nod->init(actor);
 	nod->set_waggle(axis, (float)endTime, extent*DFL_NOD_BOBBLE_REF_DEG, period, pitch, warp, accel, decay, smooth);
 }
 

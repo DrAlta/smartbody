@@ -2543,6 +2543,7 @@ bool SBAssetManager::addModelToMesh(std::string templateMeshName, std::string mo
 	if (mesh->skinWeights.size() == 0)
 	{
 		SmartBody::util::log("Mesh %s has no skin weights, model %s will be added but not skinned.", templateMeshName.c_str(), modelFile.c_str());
+		
 		return false;
 	}
 	

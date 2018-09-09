@@ -65,6 +65,18 @@ bool SkChannelArray::doesChannelExist(std::string name, SkChannel::Type t)
 		}
 	}
 
+	// check the mapped names
+	std::map<std::string, std::map<SkChannel::Type, int> >::iterator iter2 = _channelMapedNameMap.find(name);
+	if (iter2 != _channelMapedNameMap.end())
+	{
+		std::map<SkChannel::Type, int>& typeMap = (*iter2).second;
+		std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(t);
+		if (typeIter != typeMap.end())
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
