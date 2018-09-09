@@ -573,6 +573,12 @@ bool SrModel::load ( SrInput &in )
 		 {
 			 // bad indices
 		 }
+		 else if (tidx[0] < 0 ||
+			 tidx[1] < 0 ||
+			 tidx[2] < 0)
+		 {
+			 // bad indices
+		 }
 		 else
 		 {
 			 for (int k=0;k<2;k++)

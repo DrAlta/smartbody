@@ -454,7 +454,7 @@ JNIEXPORT void JNICALL Java_edu_usc_ict_sbmobile_SBMobileLib_renderAR(JNIEnv * e
 	{
 		SrMat invModelView = modelViewMat.inverse();
 		SrVec newGazePos = invModelView.get_translation();
-		SmartBody::util::log("gaze user position = %s", newGazePos.toString().c_str());
+		//SmartBody::util::log("gaze user position = %s", newGazePos.toString().c_str());
 		gazeTarget->setPosition(newGazePos); // update to new gaze
 	}
 	else
