@@ -880,6 +880,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getDeformableMesh", &SBAssetManager::getDeformableMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a deformable mesh given name")
 		.def("getMesh", &SBAssetManager::getDeformableMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a deformable mesh given name")
 		.def("createMeshFromBlendMasks", &SBAssetManager::createMeshFromBlendMasks, "Writes out a mesh and texture based on: neutralShapeFile, neutralTextureFile, expressiveShapeFile, expressiveTextureFile, maskTextureFile, outputMeshFile, outputTextureFile")
+		.def("addModelToMesh", &SBAssetManager::addModelToMesh, "Adds a submesh to a model.")
+		.def("addBlendshapeToModel", &SBAssetManager::addBlendshapeToModel, "Adds a blendshape to a mesh, or replaces the blendshape within the mesh.")
 		;
 
 

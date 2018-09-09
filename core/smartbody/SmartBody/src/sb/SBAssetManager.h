@@ -86,6 +86,8 @@ class SBAssetManager : public SBObject
 		SBAPI std::vector<std::string>& getAssetHistory();
 		SBAPI void clearAssetHistory();
 
+		SBAPI bool addBlendshapeToModel(std::string templateMeshName, std::string modelFile, std::string shapeName, std::string submeshName);
+		SBAPI bool addModelToMesh(std::string templateMeshName, std::string modelFile, std::string newModelName, std::string rigidBindJoint, std::string bindPoseCopySubMeshName);
 		
 protected:
 

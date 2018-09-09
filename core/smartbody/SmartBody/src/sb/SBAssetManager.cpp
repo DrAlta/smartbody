@@ -864,6 +864,7 @@ SBAPI void SBAssetManager::removeMesh(DeformableMesh* mesh)
 	delete mesh;
 }
 
+
 int SBAssetManager::getNumMeshes()
 {
 	return _deformableMeshMap.size();
@@ -2484,6 +2485,198 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 	return true;
 
+}
+
+bool SBAssetManager::addModelToMesh(std::string templateMeshName, std::string modelFile, std::string newModelName, std::string rigidBindJoint, std::string bindPoseCopySubMeshName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(templateMeshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Cannot find template mesh %s in order to add mesh via file %s.", templateMeshName.c_str(), modelFile.c_str());
+		return false;
+	}
+
+	// load the new model
+	SrModel model;
+	bool ok = model.import_ply(modelFile.c_str());
+	if (!ok)
+	{
+		SmartBody::util::log("Cannot find new model %s to add to mesh %s.", modelFile.c_str(), templateMeshName.c_str());
+		return false;
+	}
+
+	SrSnModel* modelSrSn = new SrSnModel();
+	modelSrSn->shape(model);
+	modelSrSn->shape().name = newModelName.c_str();
+	modelSrSn->ref();
+
+	// does a mesh with this name already exist? If so, replace it
+	bool found = false;
+	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
+	{
+		SrSnModel* staticModel = mesh->dMeshStatic_p[m];
+		SrModel& s = staticModel->shape();
+		std::string curShapeName = (const char*) s.name;
+		if (curShapeName == newModelName)
+		{
+			// model already exists, replace it
+			SrSnModel* curModel = mesh->dMeshStatic_p[m];
+			curModel->unref();
+			mesh->dMeshStatic_p[m] = modelSrSn;
+			mesh->dMeshStatic_p[m]->changed(true);
+			SrSnModel* curDynamicModel = mesh->dMeshDynamic_p[m];
+			curDynamicModel->unref();
+			mesh->dMeshDynamic_p[m] = modelSrSn;
+			mesh->dMeshDynamic_p[m]->changed(true);
+			found = true;
+		}
+
+	}
+
+	if (!found)
+	{
+		mesh->dMeshStatic_p.push_back(modelSrSn);
+		mesh->dMeshDynamic_p.push_back(modelSrSn);
+	}
+
+	if (mesh->skinWeights.size() == 0)
+	{
+		SmartBody::util::log("Mesh %s has no skin weights, model %s will be added but not skinned.", templateMeshName.c_str(), modelFile.c_str());
+		return false;
+	}
+	
+	// copy the skin weights from the proper mesh using a joint, bind matrix
+	SkinWeight* existingSkinWeights = mesh->skinWeights[0];
+	
+	SkinWeight* modelSkin = new SkinWeight();
+	
+	SrMat existingBindShapeMat = existingSkinWeights->bindShapeMat;
+	SrMat modelBindPose;
+	std::string jointName = rigidBindJoint;
+
+	for (unsigned int i = 0; i < existingSkinWeights->infJointName.size(); i++)
+	{
+		if (existingSkinWeights->infJointName[i] == jointName)
+		{
+			modelBindPose = existingSkinWeights->bindPoseMat[i];
+			break;
+		}
+	}
+
+	modelSkin->bindShapeMat = existingBindShapeMat;
+	modelSkin->bindPoseMat.push_back(modelBindPose);
+	modelSkin->infJointName.push_back(rigidBindJoint);
+	modelSkin->sourceMesh = newModelName;
+	modelSkin->bindWeight.push_back(1.0f);
+	for (unsigned int i = 0; i < model.V.size(); i++)
+	{
+		modelSkin->jointNameIndex.push_back(0);
+		modelSkin->numInfJoints.push_back(1);
+		modelSkin->weightIndex.push_back(0);
+	}
+	mesh->skinWeights.push_back(modelSkin);
+	return true;
+}
+
+bool SBAssetManager::addBlendshapeToModel(std::string templateMeshName, std::string modelFile, std::string shapeName, std::string submeshName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(templateMeshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Cannot find template mesh %s in order to add blendshape via file %s.", templateMeshName.c_str(), modelFile.c_str());
+		return false;
+	}
+
+	// load the new model
+	SrModel blendshapeModel;
+	bool ok = blendshapeModel.import_ply(modelFile.c_str());
+	if (!ok)
+	{
+		SmartBody::util::log("Cannot find new model %s to add as blendshape to mesh %s.", modelFile.c_str(), templateMeshName.c_str());
+		return false;
+	}
+
+	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
+	{
+		SrSnModel* staticModel = mesh->dMeshStatic_p[m];
+		SrModel& s = staticModel->shape();
+		std::string curShapeName = (const char*) s.name;
+		if (curShapeName == submeshName)
+		{
+			// make sure that the blendshape matches the existing model
+			if (s.V.size() != blendshapeModel.V.size())
+			{
+				SmartBody::util::log("Submesh %s has %d vertice, candidate blendshape %s has %d vertices, so cannot create the blendshape.", shapeName.c_str(), s.V.size(), modelFile.c_str(), blendshapeModel.V.size());
+				return false;
+			}
+			// loop through the morph target to see if this controller already exists
+			std::map<std::string, std::vector<SrSnModel*> >::iterator mapIter = mesh->blendShapeMap.find(submeshName);
+			if (mapIter == mesh->blendShapeMap.end())
+			{
+				// no controller for this exists yet, set one up
+				SrSnModel* baseModel = new SrSnModel();
+				baseModel->shape(blendshapeModel);
+				baseModel->shape().name = shapeName.c_str();
+				baseModel->changed(true);
+				baseModel->visible(false);
+				baseModel->ref();
+
+				// since this is the base model, overwrite the submesh's V and N
+				mesh->dMeshStatic_p[m]->shape().V = baseModel->shape().V;
+				mesh->dMeshStatic_p[m]->shape().N = baseModel->shape().N;
+
+				std::vector<SrSnModel*> modelList;
+				modelList.push_back(baseModel);
+				mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(submeshName, modelList));
+				std::vector<std::string> morphTargetList;
+				morphTargetList.push_back(shapeName);
+				mesh->morphTargets.insert(std::pair<std::string, std::vector<std::string> >(submeshName, morphTargetList));
+			}
+			else
+			{
+				// controller exists, see if the shape also exists
+				bool found = false;
+				std::vector<SrSnModel*>& existingShapeModels = (*mapIter).second;
+				for (size_t s = 0; s < existingShapeModels.size(); s++)
+				{
+					std::string modelName = (const char*) existingShapeModels[s]->shape().name;
+					if (modelName == shapeName)
+					{
+						// shape already exists
+						// replace it if the vertices match
+						existingShapeModels[s]->shape().V = blendshapeModel.V;
+						existingShapeModels[s]->shape().N = blendshapeModel.N;
+
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					SrSnModel* baseModel = new SrSnModel();
+					baseModel->shape(blendshapeModel);
+					baseModel->shape().name = shapeName.c_str();
+					baseModel->changed(true);
+					baseModel->visible(false);
+					baseModel->ref();
+
+					existingShapeModels.push_back(baseModel);
+					std::map<std::string, std::vector<std::string> >::iterator morphNameIter = mesh->morphTargets.find(submeshName);
+					if (morphNameIter == mesh->morphTargets.end())
+					{
+						SmartBody::util::log("Couldn't find controller name %s in morph target list, strange...", submeshName.c_str());
+						return false;
+					}
+					(*morphNameIter).second.push_back(shapeName);
+				}
+
+			}
+
+		}
+	}
+	return true;
 }
 
 
