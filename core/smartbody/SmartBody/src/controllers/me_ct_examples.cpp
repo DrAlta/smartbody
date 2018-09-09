@@ -258,8 +258,11 @@ void MeCtSimpleNod::init(SmartBody::SBPawn* pawn)
 	};
 	int i;
 
-	for( i = 0; i < 3; i++ )	{
-		_channels.add( joint_labels[ i ], SkChannel::Quat );
+	SkChannelArray& characterChannels = pawn->getSkeleton()->channels();
+	for( i = 0; i < 3; i++ )
+	{
+		if (characterChannels.doesChannelExist(joint_labels[ i ], SkChannel::Type::Quat))
+			_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
 
 	_first_eval = true;
