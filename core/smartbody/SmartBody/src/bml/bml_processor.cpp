@@ -716,6 +716,19 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				float velocity = xml_utils::xml_parse_float( BMLDefs::ATTR_VELOCITY, elem, DFL_NOD_VELOCITY );
 				float smooth = xml_utils::xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, DFL_NOD_SMOOTH );
 
+	if (type == BML::HEAD_NOD)
+	{
+		amount *= request->actor->getDoubleAttribute("headNodGain");
+	}
+	else if (type == BML::HEAD_SHAKE)
+	{
+		amount *= request->actor->getDoubleAttribute("headShakeGain");
+	}
+	else if (type == BML::HEAD_TOSS)
+	{
+		amount *= request->actor->getDoubleAttribute("headTossGain");
+	}
+	
                 return BehaviorRequestPtr( 
 					new NodRequest( 
 						unique_id,
@@ -838,6 +851,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 					float warp = xml_utils::xml_parse_float( BMLDefs::ATTR_NODWARP, elem, DFL_NOD_WARP );
 					float accel = xml_utils::xml_parse_float( BMLDefs::ATTR_NODACCEL, elem, DFL_NOD_ACCEL );
 
+		amount *= request->actor->getDoubleAttribute("headWiggleGain");
 					return BehaviorRequestPtr(
 						new NodRequest( 
 							unique_id,
@@ -861,6 +875,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 					float accel = xml_utils::xml_parse_float( BMLDefs::ATTR_NODACCEL, elem, DFL_NOD_ACCEL2 );
 					float decay = xml_utils::xml_parse_float( BMLDefs::ATTR_NODDECAY, elem, DFL_NOD_DECAY );
 
+		amount *= request->actor->getDoubleAttribute("headWaggleGain");
 					return BehaviorRequestPtr(
 						new NodRequest( 
 							unique_id,

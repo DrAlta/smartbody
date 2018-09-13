@@ -210,6 +210,11 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createBoolAttribute("isReaching", false, true, "Reaching", 158, false, false, false, "Whether a character is reaching.");
 
 
+	createDoubleAttribute("headNodGain", 1.0, true, "BML", 400, false, false, false, "Scaling factor for head nods.");
+	createDoubleAttribute("headShakeGain", 1.0, true, "BML", 401, false, false, false, "Scaling factor for head shakes.");
+	createDoubleAttribute("headTossGain", 1.0, true, "BML", 402, false, false, false, "Scaling factor for head tosses.");
+	createDoubleAttribute("headWiggleGain", 1.0, true, "BML", 403, false, false, false, "Scaling factor for wiggles.");
+	createDoubleAttribute("headWaggleGain", 1.0, true, "BML", 404, false, false, false, "Scaling factor for waggles.");
 
 
 	std::vector<std::string> voiceTypes;
