@@ -501,6 +501,8 @@ bool canCoarticulate(GestureRequest* a, GestureRequest* b, bool showLog)
 
 	// make sure coarticulation can occur within speed constraints
 	float gestureSpeed = (float) bMotion->getGestureSpeed();
+	if (fabs(gestureSpeed) < .001)
+		SmartBody::util::log("Gesture speed for motion %s has not been calculated %f", bMotion->getName().c_str(), gestureSpeed);
 
 	// determine how long it will take to transition from the end of stroke end of one motion to the stroke start of the other
 	SrVec holdPos = aMotion->getGestureHoldLocation();
