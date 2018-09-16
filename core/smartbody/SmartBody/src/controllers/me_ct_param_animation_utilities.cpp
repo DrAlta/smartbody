@@ -488,6 +488,12 @@ SrMat PAMotions::getBaseMatFromBuffer(SrBuffer<float>& buffer)
 	mat.set(12, buffer[baseBuffId.x]);
 	mat.set(13, buffer[baseBuffId.y]);
 	mat.set(14, buffer[baseBuffId.z]);
+
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("blendFix"))
+	{
+		mat = SrMat();
+	}
+	
 	return mat;
 }
 
