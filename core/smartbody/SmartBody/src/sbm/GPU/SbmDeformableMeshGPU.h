@@ -69,7 +69,7 @@ public:
 public:
 	virtual void update();
 	virtual bool buildVertexBufferGPU();	
-	bool rebuildVertexBufferGPU(bool rebuild);
+	SBAPI bool rebuildVertexBufferGPU(bool rebuild);
 	void skinTransformGPU(DeformableMeshInstance* meshInstance);
 	static void initShaderProgram();	
 	VBOVec3f* getPosVBO() { return VBOPos; }
