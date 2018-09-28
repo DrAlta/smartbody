@@ -175,6 +175,67 @@ void imageColorTransfer(std::string srcImg, std::string srcMask, std::string tgt
 	//SmartBody::util::log("Writing PNG %s, result = %d", outImage.c_str(), imageWriteSuccess);
 }
 
+void replaceSubMesh(std::string deformableMeshName, std::string subMeshName, std::string inputMeshFileName)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(deformableMeshName);
+	if (!mesh)
+	{
+		SmartBody::util::log("Error repalce submesh :: mesh '%s' does not exist.", deformableMeshName.c_str());
+		return;
+	}
+
+	int subMeshIdx = mesh->getMesh(subMeshName);
+	if (subMeshIdx == -1)
+	{
+		SmartBody::util::log("Error repalce submesh :: submesh '%s' does not exist.", subMeshName.c_str());
+		return;
+	}
+
+	// copy new model to replace the original submesh
+	SmartBody::util::log("Replacing submesh '%s', submesh index = %d", subMeshName.c_str(), subMeshIdx);
+	SrModel inputModel;
+	inputModel.import_ply(inputMeshFileName.c_str());
+	//SrModel& staticBaseModel = mesh->dMeshStatic_p[subMeshIdx]->shape();
+	//SrModel& dynamicBaseModel = mesh->dMeshDynamic_p[subMeshIdx]->shape();
+	mesh->dMeshStatic_p[subMeshIdx]->shape(inputModel);
+	mesh->dMeshDynamic_p[subMeshIdx]->shape(inputModel);
+	mesh->dMeshStatic_p[subMeshIdx]->shape().name = subMeshName.c_str();
+	mesh->dMeshDynamic_p[subMeshIdx]->shape().name = subMeshName.c_str();
+
+	// update skin weights with new vertices
+	SkinWeight* subSkin = mesh->skinWeights[subMeshIdx];
+	subSkin->bindWeight.clear();
+	subSkin->jointNameIndex.clear();
+	subSkin->numInfJoints.clear();
+	subSkin->weightIndex.clear();
+	subSkin->bindWeight.push_back(1.0f);
+	for (unsigned int i = 0; i < inputModel.V.size(); i++)
+	{
+		subSkin->jointNameIndex.push_back(0);
+		subSkin->numInfJoints.push_back(1);
+		subSkin->weightIndex.push_back(0);
+	}
+	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)mesh;
+	gpuMesh->rebuildVertexBuffer(true);
+	gpuMesh->rebuildVertexBufferGPU(true); // rebuild vertex buffers
+										   // update mesh instance
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector < std::string > pawnNames = scene->getPawnNames();
+	for (unsigned int i = 0; i < pawnNames.size(); i++)
+	{
+		SmartBody::SBPawn* pawn = scene->getPawn(pawnNames[i]);
+		DeformableMeshInstance* pawnMeshInst = pawn->getActiveMesh();
+		if (pawnMeshInst && pawnMeshInst->getDeformableMesh() == mesh) // need to update mesh instance for this pawn
+		{
+			SmartBody::util::log("Updating deformable model in pawn '%s'", pawnNames[i].c_str());
+			SbmDeformableMeshGPUInstance* gpuMeshInst = (SbmDeformableMeshGPUInstance*)pawnMeshInst;
+			gpuMeshInst->initBuffer();
+		}
+	}
+}
+
+
 void deformableMeshTextureReplace(std::string meshName, std::string textureName, std::string inputImageFileName)
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();

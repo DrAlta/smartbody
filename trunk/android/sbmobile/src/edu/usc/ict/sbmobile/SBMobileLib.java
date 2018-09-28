@@ -69,6 +69,8 @@ public class SBMobileLib {
      public static native void createCustomMeshFromBlendshapes(String templateMeshName, String blendshapesDir, String baseMeshName, String hairMeshName, String outMeshName);
      public static native void imageColorTransfer(String srcImag, String srcMask, String tgtImg, String tgtMask, String outImage);
      public static native void deformableMeshTextureReplace(String meshName, String texName, String imgFileName);
+     public static native void replaceSubMesh(String meshName, String subMeshName, String inputMeshName);
+
 
 
 
