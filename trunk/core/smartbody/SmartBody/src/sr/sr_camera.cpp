@@ -307,7 +307,7 @@ void SrCamera::init ()
    setScale(1.0f);
  }
 
-SrMat& SrCamera::get_view_mat ( SrMat &m )
+SrMat& SrCamera::get_view_mat ( SrMat &m ) 
  {
 	if (cameraDirty)
 	{
