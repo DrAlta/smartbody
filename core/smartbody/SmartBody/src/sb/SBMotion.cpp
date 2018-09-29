@@ -337,6 +337,14 @@ void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 	{
 		int postureSize = _channels.floats();
 		int frameSize = _frames.size();
+
+		// don't add the frame if it isn't at a later time than the last frame
+		if (frameSize > 0 && fabs(_frames[frameSize - 1].keytime - frameTime) < .0001)
+		{
+			SmartBody::util::log("Frame %d uses the same time as last frame %f, ignoring...", frameSize, frameTime);
+			return;
+		}
+
 		_frames.resize(_frames.size() + 1);
 		_frames[frameSize].keytime = frameTime;
 		_frames[frameSize].posture = (float*) malloc ( sizeof(float)*postureSize );
