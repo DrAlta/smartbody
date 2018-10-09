@@ -2278,3 +2278,21 @@ void BML::SpeechRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr reque
 
 	speech_impl->requestComplete( speech_request_id );
 }
+
+BehaviorSpan BML::SpeechRequest::getBehaviorSpan()
+{
+	BehaviorSpan span = behav_syncs.getBehaviorSpan( PERSISTENCE_THRESHOLD );
+
+	size_t numPhonemes = this->getPhonemes().size();
+	if (numPhonemes > 0)
+	{
+		BML::VecOfVisemeData& p = this->getPhonemes();
+		SmartBody::VisemeData* v = p[numPhonemes - 1];
+		float t = v->time();
+		span.end = span.start + (double) t;
+	}
+		
+	
+
+	return span;
+}

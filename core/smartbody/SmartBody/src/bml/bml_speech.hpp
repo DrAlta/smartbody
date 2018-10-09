@@ -177,6 +177,8 @@ namespace BML {
 		std::string getSpeechXML();
 		std::string getSpeechText();
 
+		BehaviorSpan getBehaviorSpan();
+
 		/**
 		* Returns the debugging viseme curves
 		*/
