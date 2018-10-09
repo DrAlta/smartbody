@@ -25,7 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBTypes.h>
 
 SBAPI bool AUDIO_Init();
-void AUDIO_Play( const char * audio_file );
+float AUDIO_Play( const char * audio_file );
 void AUDIO_Stop( const char * audio_file );
 SBAPI void AUDIO_Close();
 

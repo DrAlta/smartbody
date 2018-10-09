@@ -1609,8 +1609,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		strstr << soundFile << " " << characterName;
 		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 		std::string characterObjectName = SmartBody::SBScene::getScene()->getStringFromObject(character);
-		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
-		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
+		float soundDuration = 0.0f;
 
 #ifndef SB_NO_VHCL_AUDIO
 		// if internal audio is on, use the internal sound player
@@ -1618,7 +1617,14 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         {
 #if !defined(__FLASHPLAYER__)
           SmartBody::util::log("Play AudioFile = %s", soundFile.c_str() );
-          AUDIO_Play( soundFile.c_str() );
+          soundDuration = AUDIO_Play( soundFile.c_str() );
+		  if (soundDuration != 0.0f)
+		  {		  
+			std::stringstream strstr2;
+			strstr2 << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(\"sound\", \"" << strstr.str() << " stop\", \"" << characterObjectName << "\"))";
+			SmartBody::SBScene::getScene()->commandAt(soundDuration, strstr2.str());
+		  }
+
 #else
           std::string souldFileBase = boost::filesystem::basename(soundFile);
           std::string soundFileBaseMP3 = souldFileBase + ".mp3";
@@ -1641,7 +1647,12 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
 #endif
         }
+
+
 #endif
+		strstr << " start " << soundDuration;
+		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
+		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
 
         return CMD_SUCCESS;
     }
