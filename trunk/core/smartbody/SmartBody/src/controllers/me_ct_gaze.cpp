@@ -1077,13 +1077,14 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		int context_index = _toContextCh[ i ];
 		if( context_index < 0 ) {
 			joint_arr[ i ].active = 0;
-			SmartBody::util::log("MeCtGaze:: ERR: '%s' NOT FOUND in skeleton", joint_label( i ) );
+			
+			//SmartBody::util::log("MeCtGaze:: ERR: '%s' NOT FOUND in skeleton", joint_label( i ) );
 		} 
 		else {
 			SkJoint* joint_p = _context->channels().joint( context_index );
 			if( !joint_p )	{
 				joint_arr[ i ].active = 0;
-				SmartBody::util::log("MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton", context_index, joint_label( i ) );
+				//SmartBody::util::log("MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton", context_index, joint_label( i ) );
 			} 
 			else {
 				joint_arr[ i ].init( joint_p );
