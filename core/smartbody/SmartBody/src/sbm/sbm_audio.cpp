@@ -30,6 +30,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdlib>
 #include <sb/SBUtilities.h>
 
+//#define USEAUDIODURATION 1
 
 static vhcl::Audio * g_audio = NULL;
 
@@ -49,18 +50,29 @@ bool AUDIO_Init()
 	return ret;
 }
 
-
-void AUDIO_Play( const char * audio_file )
+float AUDIO_Play( const char * audio_file )
 {
-	
+	float duration = 0.0f;
 	vhcl::Sound * sound = g_audio->CreateSoundLibSndFile( audio_file, audio_file );
 	if ( sound )
 	{
 		sound->Play();
+#ifdef USEAUDIODURATION
+		// determine the length of the audio file
+		float numSamples = (float) sound->getSampleSize();
+		float sampleRate = (float) sound->getSampleRate();
+		
+		if (sampleRate != 0.0)
+		{
+			duration = numSamples / sampleRate;
+		}
+#endif
+		return duration;
 	}
 	else
 	{
 		SmartBody::util::log("no sound available from %s", audio_file);
+		return 0.0f;
 	}
 
 }
@@ -89,8 +101,9 @@ bool AUDIO_Init()
 }
 
 
-void AUDIO_Play( const char * audio_file )
+float AUDIO_Play( const char * audio_file )
 {
+	return 0.0f;
 }
 
 void AUDIO_Stop( const char * audio_file )
