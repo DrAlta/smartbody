@@ -322,8 +322,8 @@ void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const s
 BehaviorSpan BmlRequest::getBehaviorSpan() {
 	if( ! span.isSet() ) {
 		if( speech_request ) {
-			BehaviorSpan span = speech_request->getBehaviorSpan();
-			span.unionWith( span );
+			BehaviorSpan speechSpan = speech_request->getBehaviorSpan();
+			span.unionWith( speechSpan );
 		}
 
 		VecOfBehaviorRequest::iterator behav_it = behaviors.begin();
