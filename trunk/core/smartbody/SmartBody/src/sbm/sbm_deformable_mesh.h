@@ -87,6 +87,7 @@ public:
 	SBAPI ~SkinWeight();
 	SBAPI void normalizeWeights();
 	SBAPI void copyWeights(SkinWeight* copy, const std::string& morphName);
+
 	SBAPI void initWeights(std::string sourceMesh, std::vector<SrVec4i>& boneID, std::vector<SrVec4>& boneWeights, std::vector<std::string>& boneJointNameList, std::vector<SrMat>& bindPoseMatList);
 
 	SBAPI void addWeight(SkinWeight* weight);
@@ -219,6 +220,7 @@ public:
 	SBAPI bool isSkinnedMesh();
 	SBAPI bool saveToSmb(std::string inputFileName);
 	SBAPI bool saveToDmb(std::string inputFileName);
+	SBAPI bool saveToDae(std::string inputFileName, std::string skeletonName);
 	SBAPI bool readFromSmb(std::string inputFileName);
 	SBAPI bool readFromDmb(std::string inputFileName);
 	// helper function
@@ -235,6 +237,7 @@ public:
 	SBAPI void centralize();
 	SBAPI void computeNormals();
 	SBAPI void copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName);
+	SBAPI void copyClosestSkinWeights(DeformableMesh* fromMesh, const std::string& morphName);
 
 };
 

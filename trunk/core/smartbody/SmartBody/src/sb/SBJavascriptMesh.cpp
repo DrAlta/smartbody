@@ -24,6 +24,7 @@ namespace SmartBody
 			.function("centralize", &DeformableMesh::centralize)
 			.function("computeNormals", &DeformableMesh::computeNormals)
 			.function("copySkinWeights", &DeformableMesh::copySkinWeights, emscripten::allow_raw_pointers())
+			.function("copyClosestSkinWeights", &DeformableMesh::copyClosestSkinWeights, emscripten::allow_raw_pointers())
 			.function("getNumMeshes", &DeformableMesh::getNumMeshes)
 			.function("getBoundingBox", &DeformableMesh::computeBoundingBox)
 			;

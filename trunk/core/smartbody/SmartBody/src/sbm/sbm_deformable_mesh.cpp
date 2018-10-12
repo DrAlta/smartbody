@@ -56,6 +56,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include <sbm/ParserCOLLADAFast.h>
+#include <sbm/ParserOpenCOLLADA.h>
+
 
 #define TEST_HAIR_RENDER 1
 
@@ -1663,6 +1665,38 @@ bool DeformableMesh::saveToSmb(std::string inputFileName)
 	return true;
 }
 
+bool DeformableMesh::saveToDae(std::string inputFileName, std::string skeletonName)
+{
+	if (!isSkinnedMesh())
+	{
+		SmartBody::util::log("mesh %s is a static mesh, skip saving to %s", this->getName().c_str(), inputFileName.c_str());
+		return false;
+	}
+	boost::filesystem::path p(inputFileName);
+	std::string baseName = boost::filesystem::basename(p);
+	std::string extension = boost::filesystem::extension(p);
+	if (extension != ".dae")
+	{
+		extension = ".dae";
+		inputFileName = baseName + extension;
+	}
+	std::string filePath = p.parent_path().string();
+
+	SmartBodyBinary::DeformableMesh* outputDeformableMesh = new SmartBodyBinary::DeformableMesh();
+
+	std::vector<std::string> moNames;
+	double scale = 1.0;
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(skeletonName);
+	if (character)
+	{
+		SrVec scale3 = character->getVec3Attribute("deformableMeshScale");
+		scale = scale3.x;
+	}
+
+	ParserOpenCOLLADA::exportCollada(filePath, skeletonName, this->getName(), moNames, true, true, false, scale);
+	return true;
+}
+
 bool DeformableMesh::saveToDmb(std::string inputFileName)
 {
 	if (!isSkinnedMesh())
@@ -2430,7 +2464,6 @@ void DeformableMeshInstance::blendShapes()
 	{
 		return;
 	}
-
 
 	SrSnModel* writeToBaseModel = NULL;
 	SrSnModel* readBaseModel = NULL;
@@ -3271,4 +3304,74 @@ void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string
 		this->skinWeights.push_back(weight);
 	}
 	SmartBody::util::log("Finish copy skin weights");
+}
+
+void DeformableMesh::copyClosestSkinWeights(DeformableMesh* fromMesh, const std::string& morphName)
+{
+	if (!fromMesh)
+	{
+		SmartBody::util::log("No mesh, skin weights will not be copied...");
+		return;
+	}
+
+	// make sure that the skeletons match between the two deformable meshes
+	SmartBody::SBSkeleton* sbskeleton1 = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
+	SmartBody::SBSkeleton* sbskeleton2 = dynamic_cast<SmartBody::SBSkeleton*>(fromMesh->skeleton);
+	
+	if (sbskeleton1->getNumJoints() != sbskeleton2->getNumJoints())
+	{
+		SmartBody::util::log("Number of joints in skeleton %d does not match current mesh %d", sbskeleton1->getNumJoints(), sbskeleton2->getNumJoints());
+		return;
+	}
+
+	// make sure there is the same number of submeshes
+	if (this->dMeshStatic_p.size() != fromMesh->dMeshStatic_p.size())
+	{
+		SmartBody::util::log("Mesh has different number of mesNumber of joints in skeleton %d does not match current mesh %d", sbskeleton1->getNumJoints(), sbskeleton2->getNumJoints());
+		return;
+	}
+
+	SmartBody::util::log("Start copy skin weights");
+	// clear any existing skin weights
+	for (size_t w = 0; w < this->skinWeights.size(); w++)
+	{
+		SkinWeight* weight = this->skinWeights[w];
+		delete weight;
+	}
+	skinWeights.clear();
+
+	for (size_t m = 0; m < this->getNumMeshes(); m++)
+	{
+		SkinWeight* weight = new SkinWeight();
+		skinWeights.push_back(weight);
+		weight->copyWeights(fromMesh->skinWeights[m], (const char*) this->dMeshStatic_p[m]->shape().name);
+
+		weight->numInfJoints.clear();
+		weight->weightIndex.clear();
+		weight->jointNameIndex.clear();
+
+		std::vector<int> mapping;
+		int count = 0;
+		for (size_t n = 0; n < fromMesh->skinWeights[m]->numInfJoints.size(); n++)
+		{
+			mapping.push_back(count);
+			int numInfluences = fromMesh->skinWeights[m]->numInfJoints[n];
+			count += numInfluences;
+		}
+
+		for (int v = 0; v < this->dMeshStatic_p[m]->shape().V.size(); v++)
+		{
+			int closestIndex = fromMesh->dMeshStatic_p[m]->shape().getClosestIndex(this->dMeshStatic_p[m]->shape().V[v]);
+			
+			int numInfluences = fromMesh->skinWeights[m]->numInfJoints[closestIndex];
+			weight->numInfJoints.push_back(numInfluences);
+			int index = mapping[closestIndex];
+
+			for (int i = 0; i < numInfluences; i++)
+			{
+				weight->weightIndex.push_back(fromMesh->skinWeights[m]->weightIndex[index + i]);
+				weight->jointNameIndex.push_back(fromMesh->skinWeights[m]->jointNameIndex[index + i]);
+			}
+		}
+	}
 }

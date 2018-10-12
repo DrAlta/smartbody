@@ -1516,4 +1516,23 @@ SrMaterial& SrModel::getMaterial(int num)
 		return _emptyMaterial;
 }
 
+int SrModel::getClosestIndex(SrVec& vec)
+{
+	float closestDistance = 9999999.0f;
+	int closestIndex = 0;
+
+	// extremely inefficient way to find the closest vertex
+	for (int v = 0; v < V.size(); v++)
+	{
+		float curDist = dist(V[v], vec);
+		if (curDist < closestDistance)
+		{
+			closestDistance = curDist;
+			closestIndex = v;
+		}
+	}
+
+	return closestIndex;
+}
+
 //================================ End of File =================================================
