@@ -286,7 +286,9 @@ class SrModel : public SrSharedClass
 	SBAPI int getNumMaterials();
 	SBAPI SrMaterial& getMaterial(int num);
 	static void removeRedundantTexCoord(TexCoordData& tData, SrModel& model);
- };
+	SBAPI int getClosestIndex(SrVec& vec); 
+
+};
 
 //================================ End of File =================================================
 
