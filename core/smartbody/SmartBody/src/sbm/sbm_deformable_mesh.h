@@ -76,7 +76,7 @@ public:
 	std::vector<unsigned int>	numInfJoints;	// number of influenced joints for very vertex
 	std::vector<unsigned int>	weightIndex;	// looking up the weight according to this index
 	std::vector<unsigned int>	jointNameIndex;	// looking up the joint name according to this index
-
+	std::vector<int>			indexCache;		// fast lookup for skin weights
 	// skin weight buffer for easier access to skinning
 	std::vector<SrVec4i> boneIDs;
 	std::vector<SrVec4>  boneWeights;
@@ -93,6 +93,18 @@ public:
 	SBAPI void addWeight(SkinWeight* weight);
 	SBAPI void mergeRedundantWeight(std::vector<int>& vtxIdxMap);
 	SBAPI void buildSkinWeightBuf();
+
+	SBAPI std::vector<std::string> getInfluenceJointNames();
+	SBAPI int getNumVertices();
+	SBAPI std::vector<int> getInfluenceJoints(int index);
+	SBAPI std::vector<float> getInfluenceWeights(int index);
+	SBAPI SrMat getBindShape();
+	SBAPI SrMat getBindJoint(int jointIndex);
+	SBAPI void createCache();
+
+
+
+
 };
 
 class SbmSubMesh
@@ -205,7 +217,8 @@ public:
 	SBAPI DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
 	SBAPI void initDeformMesh(std::vector<SrModel*>& meshVec);
-	SkinWeight* getSkinWeight(const std::string& skinSourceName);
+	SBAPI SkinWeight* getSkinWeight(const std::string& skinSourceName);
+	SBAPI SkinWeight* getSkinWeightIndex(int index);
 	SBAPI int getNumMeshes();
 	SBAPI const std::string getMeshName(int index);
 	SBAPI SrModel& getStaticModel(int index);
@@ -237,7 +250,7 @@ public:
 	SBAPI void centralize();
 	SBAPI void computeNormals();
 	SBAPI void copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName);
-	SBAPI void copyClosestSkinWeights(DeformableMesh* fromMesh, const std::string& morphName);
+	SBAPI void copyClosestSkinWeights(DeformableMesh* fromMesh);
 
 };
 
