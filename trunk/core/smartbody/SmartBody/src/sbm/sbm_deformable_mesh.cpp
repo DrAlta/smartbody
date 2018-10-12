@@ -328,6 +328,78 @@ SBAPI void SkinWeight::buildSkinWeightBuf()
 	}
 }
 
+std::vector<std::string> SkinWeight::getInfluenceJointNames()
+{
+	return this->infJointName;
+}
+
+int SkinWeight::getNumVertices()
+{
+	return this->numInfJoints.size();
+}
+
+std::vector<int> SkinWeight::getInfluenceJoints(int infIndex)
+{
+	if (infIndex >= numInfJoints.size() || infIndex < 0)
+		return std::vector<int>();
+
+	if (indexCache.size() != numInfJoints.size())
+		createCache();
+
+	int numInfluences = numInfJoints[infIndex];
+	int index = indexCache[infIndex];
+
+	std::vector<int> influenceJoints;
+	for (int w = 0; w < numInfluences; w++)
+	{
+		influenceJoints.push_back(this->jointNameIndex[index + w]);
+	}
+
+	return influenceJoints;
+}
+
+std::vector<float> SkinWeight::getInfluenceWeights(int infIndex)
+{
+	if (infIndex >= numInfJoints.size() || infIndex < 0)
+		return std::vector<float>();
+
+	if (indexCache.size() != numInfJoints.size())
+		createCache();
+
+	int numInfluences = numInfJoints[infIndex];
+	int index = indexCache[infIndex];
+
+	std::vector<float> influenceWeights;
+	for (int w = 0; w < numInfluences; w++)
+	{
+		influenceWeights.push_back(bindWeight[index + w]);
+	}
+
+	return influenceWeights;
+}
+
+SrMat SkinWeight::getBindShape()
+{
+	return this->bindShapeMat;
+}
+
+SrMat SkinWeight::getBindJoint(int jointIndex)
+{
+	return this->bindPoseMat[jointIndex];
+}
+
+void SkinWeight::createCache()
+{
+	indexCache.clear();
+
+	int count = 0;
+
+	for (size_t i = 0; i < numInfJoints.size(); i++)
+	{
+		indexCache.push_back(count);
+		count += numInfJoints[i];
+	}
+}
 
 DeformableMesh::DeformableMesh() : SBAsset()
 {	
@@ -426,7 +498,13 @@ SBAPI void DeformableMesh::initDeformMesh( std::vector<SrModel*>& meshModelVec )
 	}
 	
 }
+SkinWeight* DeformableMesh::getSkinWeightIndex(int index)
+{
+	if (index < 0 || index >= skinWeights.size())
+		return NULL;
 
+	return skinWeights[index];
+}
 
 SkinWeight* DeformableMesh::getSkinWeight(const std::string& skinSourceName)
 {
@@ -3306,7 +3384,7 @@ void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string
 	SmartBody::util::log("Finish copy skin weights");
 }
 
-void DeformableMesh::copyClosestSkinWeights(DeformableMesh* fromMesh, const std::string& morphName)
+void DeformableMesh::copyClosestSkinWeights(DeformableMesh* fromMesh)
 {
 	if (!fromMesh)
 	{
