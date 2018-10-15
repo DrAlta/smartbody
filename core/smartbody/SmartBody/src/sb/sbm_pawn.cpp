@@ -76,7 +76,8 @@ SbmPawn::SbmPawn() : SBObject(),
 dMeshInstance_p(NULL),
 dStaticMeshInstance_p(NULL),
 _skeleton(NULL),
-scene_p( NULL )
+scene_p( NULL ),
+ct_tree_p(NULL)
 {
 	_skeleton = NULL;
 	SbmPawn::initData();
