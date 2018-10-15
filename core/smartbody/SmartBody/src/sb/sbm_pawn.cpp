@@ -102,7 +102,6 @@ wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
 	SmartBody::SBObject::setName( name );
 	//_skeleton->ref();
-	ct_tree_p->ref();
 	ct_tree_p->setPawn(this);
 
 	_skeleton = new SmartBody::SBSkeleton();
@@ -126,7 +125,10 @@ void SbmPawn::initData()
 	}
 	_skeleton = new SmartBody::SBSkeleton();
 	_skeleton->ref();
+	if (ct_tree_p)
+		delete ct_tree_p;
 	ct_tree_p = MeControllerTreeRoot::create();
+	ct_tree_p->ref();
 	world_offset_writer_p = new MeCtChannelWriter();
 	std::string controllerName = this->getName();
 	controllerName += "_worldOffsetWriter";
