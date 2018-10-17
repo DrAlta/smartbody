@@ -1864,11 +1864,11 @@ bool DeformableMesh::readFromSmb(std::string inputFileName)
 	SmartBodyBinary::StaticMesh staticMesh;
 
 	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
-	google::protobuf::io::IstreamInputStream* raw_input = new google::protobuf::io::IstreamInputStream(&input);
-	google::protobuf::io::CodedInputStream* coded_input = new google::protobuf::io::CodedInputStream(raw_input);
-	coded_input->SetTotalBytesLimit(256000000, 256000000);
+  google::protobuf::io::IstreamInputStream raw_input(&input);
+  google::protobuf::io::CodedInputStream coded_input(&raw_input);
+	coded_input.SetTotalBytesLimit(256000000, 256000000);
 	
-	if (!staticMesh.ParseFromCodedStream(coded_input))
+	if (!staticMesh.ParseFromCodedStream(&coded_input))
 	{
 		SmartBody::util::log("Failed to parse binary static mesh from file %s", inputFileName.c_str());
 		return false;
@@ -1915,11 +1915,11 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 	SmartBodyBinary::DeformableMesh deformableMesh;
 
 	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
-	google::protobuf::io::IstreamInputStream* raw_input = new google::protobuf::io::IstreamInputStream(&input);
-	google::protobuf::io::CodedInputStream* coded_input = new google::protobuf::io::CodedInputStream(raw_input);
-	coded_input->SetTotalBytesLimit(256000000, 256000000);
+  google::protobuf::io::IstreamInputStream raw_input(&input);
+  google::protobuf::io::CodedInputStream coded_input(&raw_input);
+	coded_input.SetTotalBytesLimit(256000000, 256000000);
 
-	if (!deformableMesh.ParseFromCodedStream(coded_input))
+	if (!deformableMesh.ParseFromCodedStream(&coded_input))
 	{
 		SmartBody::util::log("Failed to parse binary deformable mesh from file %s", inputFileName.c_str());
 		return false;

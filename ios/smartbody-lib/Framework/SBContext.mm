@@ -143,7 +143,7 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
 
 - (nonnull instancetype)init
 {
-  NSAssert(false, "implement init or use one that has an argument.");
+  NSAssert(false, @"implement init or use one that has an argument.");
   self = [super init];
   return sharedInstance;
 }
@@ -240,14 +240,44 @@ static inline matrix_float4x4 matrix2matrix(const SrMat& mat) {
   return matrix2matrix(matPerspective);
 }
 
-- (matrix_float4x4)transformForJoint:(NSString*)joint
-                           character:(NSString*)character
+static void log(const std::string& inMessage) {
+  SmartBody::util::log(inMessage.c_str());
+}
+
+static const std::string ERROR = "ERROR: ";
+
+- (matrix_float4x4)transformForJoint:(NSString*)jointName
+                           character:(NSString*)characterName
 {
   SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-  return matrix2matrix(scene->getCharacter(character.UTF8String)
-                       ->getSkeleton()
-                       ->getJointByName(joint.UTF8String)
-                       ->getMatrixGlobal());
+  if (!scene) {
+    log(ERROR + "No scene in transformForJoint:character:");
+    return matrix_identity_float4x4;
+  }
+
+  auto character = scene->getCharacter(characterName.UTF8String);
+  if (!character) {
+    log(ERROR + "No character " + characterName.UTF8String
+        + " in transformForJoint:character:");
+    return matrix_identity_float4x4;
+  }
+
+  auto skeleton = character->getSkeleton();
+  if (!skeleton) {
+    log(ERROR + "No skeleton for character " + characterName.UTF8String
+        + " in transformForJoint:character:");
+    return matrix_identity_float4x4;
+  }
+
+  auto joint = skeleton->getJointByName(jointName.UTF8String);
+  if (!joint) {
+    log(ERROR + "No joint " + jointName.UTF8String
+        + " for character " + characterName.UTF8String
+        + " in transformForJoint:character:");
+    return matrix_identity_float4x4;
+  }
+
+  return matrix2matrix(joint->getMatrixGlobal());
 }
 
 - (void)setGazeTarget:(simd_float3)target forKey:(NSString*)name

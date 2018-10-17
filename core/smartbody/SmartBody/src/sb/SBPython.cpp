@@ -218,7 +218,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	// characters
 
-//#ifndef __ANDROID__
+//#if !defined(__ANDROID__)
 
 
 
