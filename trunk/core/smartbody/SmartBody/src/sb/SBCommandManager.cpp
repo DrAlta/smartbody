@@ -359,7 +359,7 @@ int SBCommandManager::execute( char *cmd )
 	if( std::string::npos != startpos )
 		checkCmd = checkCmd.substr( startpos );
 
-	int ret = ( cmd_map.execute( cmd, this ) ); 
+	int ret = ( cmd_map.execute( cmd, this ) );
 
 	return ret;
 }

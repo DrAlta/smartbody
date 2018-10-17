@@ -2089,7 +2089,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 #ifndef SB_NO_PYTHON	
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 #ifndef __native_client__
 	std::string instanceId = args.read_token();
 	// make sure this instance id matches

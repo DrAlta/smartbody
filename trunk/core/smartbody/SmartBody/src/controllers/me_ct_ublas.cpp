@@ -6,13 +6,28 @@
 #include <boost/numeric/bindings/traits/ublas_matrix.hpp>
 #include <boost/numeric/bindings/traits/ublas_vector.hpp>
 
+#define __SB_LA_NONE 0
+#define __SB_LA_UBLAS 1
+#define __SB_LA_EIGEN 2
+
+#if defined(EMSCRIPTEN) || defined(__ANDROID__) || defined(SB_IPHONE)
+#define __SB_LA __SB_LA_EIGEN
+#elif defined(__FLASHPLAYER__)
+#define __SB_LA __SB_LA_NONE
+#else
+#define __SB_LA __SB_LA_UBLAS
+#endif
+
+#if __SB_LA == __SB_LA_UBLAS
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/banded.hpp> 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
+#endif
 #include <boost/numeric/ublas/lu.hpp>
 
-#if defined(EMSCRIPTEN) || defined(__ANDROID__) 
+
+#if __SB_LA == __SB_LA_EIGEN
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 using namespace Eigen;
@@ -31,11 +46,9 @@ void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix&
 		mat3.resize(mat1.size1(),mat2.size2());
 	}
 
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
+#if __SB_LA == __SB_LA_UBLAS
 	blas::gemm(mat1,mat2,mat3);	
-#endif
-
-#if defined(EMSCRIPTEN) || defined(__ANDROID__)
+#elif __SB_LA == __SB_LA_EIGEN
 	MatrixXd m1(mat1.size1(), mat1.size2()), m2(mat2.size1(),mat2.size2()), m3(mat3.size1(), mat3.size2());
 	for(unsigned int i = 0; i < mat1.size1(); ++i)
 		for(unsigned int j = 0; j < mat1.size2(); ++j)
@@ -58,11 +71,9 @@ void MeCtUBLAS::matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& 
 	if (vin.size() != mat1.size2())
 		return;
 
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
+#if __SB_LA == __SB_LA_UBLAS
 	blas::gemv('N',1.0,mat1,vin,0.0,vout);	
-#endif
-
-#if defined(EMSCRIPTEN) || defined(__ANDROID__)
+#elif __SB_LA == __SB_LA_EIGEN
 	MatrixXd m1(mat1.size1(), mat1.size2());
 	for(size_t i = 0; i < mat1.size1(); ++i)
 		for(size_t j = 0; j < mat1.size2(); ++j)
@@ -82,10 +93,9 @@ bool MeCtUBLAS::inverseMatrix( const dMatrix& mat, dMatrix& inv )
 	using namespace boost::numeric::ublas;
 	dMatrix A(mat);
 	inv = identity_matrix<double>(mat.size1());
-#if !defined(__ANDROID__) &&  !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 	lapack::gesv(A,inv);
-#endif
-#if defined(EMSCRIPTEN) || defined(__ANDROID__)
+#elif __SB_LA == __SB_LA_EIGEN
 	MatrixXd m(mat.size1(), mat.size2()), mInv;
 	for(size_t i = 0; i < mat.size1(); ++i)
 		for(size_t j = 0; j < mat.size2(); ++j)
@@ -110,11 +120,10 @@ bool MeCtUBLAS::linearLeastSquare( const dMatrix& A, const dMatrix& B, dMatrix& 
 
 bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V )
 {
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
+#if __SB_LA == __SB_LA_UBLAS
 	dMatrix M(A);
 	lapack::gesvd(M,S,U,V);
-#endif
-#if defined(EMSCRIPTEN) || defined(__ANDROID__)
+#elif __SB_LA == __SB_LA_EIGEN
 	MatrixXd mA;
 	for(size_t i = 0; i < A.size1(); ++i)
 		for(size_t j = 0; j < A.size2(); ++j)

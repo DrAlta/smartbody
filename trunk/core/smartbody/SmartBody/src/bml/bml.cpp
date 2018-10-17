@@ -779,7 +779,7 @@ void BmlRequest::gestureRequestProcess()
 		coarticulate(gestures, useGestureLog);
 		return;
 
-
+    /*
 		std::vector<GestureRequest*> gesturePriorityList;
 		for (size_t g = 0; g < gestures.size(); g++)
 			gesturePriorityList.push_back(gestures[g]);
@@ -1191,7 +1191,7 @@ void BmlRequest::gestureRequestProcess()
 		
 
 		return;
-	}
+	*/}
 
 	if (actor->getBoolAttribute("gestureUseBlends"))
 	{
@@ -1683,7 +1683,6 @@ void BmlRequest::gestureRequestProcess()
 			}
 		}
 	}
-	
 }
 
 void BML::BmlRequest::speechRequestProcess()
@@ -2431,7 +2430,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 
 	if( LOG_BEHAVIOR_SYNCHPOINTS ) {
 		cout << "DEBUG: BmlRequest::registerBehavior(): BehaviorSyncPoints for " << behavior->unique_id << flush;
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 		if( id.size()>0 )
 			wcout << " \"" << id << "\"" << flush;
 #endif

@@ -113,7 +113,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 #endif
 
 		if( XMLString::compareString( type, BML::BMLDefs::VALUE_TEXT_PLAIN )==0 || typeStr.size() == 0) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << BML::BMLDefs::VALUE_TEXT_PLAIN << "\">" << endl;
 #endif
 			// Search for <tm> sync_points
@@ -124,12 +124,12 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
 				 // [BMLR] Changed <tm> to <mark> and id="" to name=""
 				if( XMLString::compareString( tag, TAG_MARK )==0 ) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
 #endif
 #else
 				if( XMLString::compareString( tag, BMLDefs::TAG_TM )==0 ) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 					if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <tm>" << endl;
 #endif
 #endif
@@ -159,7 +159,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 				child = xml_utils::getNextElement( child );
 			}
 		} else if( XMLString::compareString( type, BMLDefs::VALUE_SSML )==0 ) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 			if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" <<  BMLDefs::VALUE_SSML << "\">" << endl;
 #endif
 			// Search for <mark> sync_points
@@ -167,7 +167,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 			while( child!=NULL ) {
 				const XMLCh* tag = child->getTagName();
 				if( tag && XMLString::compareString( tag, BMLDefs::TAG_MARK )==0 ) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 					if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
 #endif
 					const XMLCh* tdIdXml = child->getAttribute(BMLDefs::ATTR_NAME);
@@ -1995,7 +1995,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 			}
 			if( audioTime >= 0 ) {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__)
 				if( BML::LOG_SYNC_POINTS ) wcout << "   Wordbreak SyncPoint \"" << wb_id << "\" @ " << audioTime << endl;
 #endif
 				cur->time = start_time + audioTime;
