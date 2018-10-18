@@ -63,7 +63,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	int curChannelIndex = 0;
 
 	int postureSize = 0;
-	std::vector<ChannelInfo*> channelInfoMap;
+  typedef std::shared_ptr<ChannelInfo> ChannelInfoPtr;
+	std::vector<ChannelInfoPtr> channelInfoMap;
 	std::vector<std::pair<int, int> > bvhIndex;
 	SkChannelArray& skChannels = skeleton.channels();
 	SkChannelArray motionChannels;
@@ -191,7 +192,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						//SmartBody::util::log("Too many channels (%d) found for non-root node at %s, reducing to %d...", numChannels, cur->getName(), numChannels - 3);
 						//cur->setIgnoreChannels(true);
 					}
-					ChannelInfo* channelInfo = new ChannelInfo();
+					ChannelInfoPtr channelInfo = ChannelInfoPtr(new ChannelInfo());
 					channelInfo->numBVHChannels = 0;
 					channelInfo->order = 0;
 					channelInfo->startingChannelIndex = curChannelIndex;
@@ -434,7 +435,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					const std::vector<SkJoint*>& allJoints = skeleton.joints();
 					for (size_t j = 0; j < allJoints.size(); j++)
 					{
-						ChannelInfo* channelInfo = channelInfoMap[j];
+						ChannelInfoPtr channelInfo = channelInfoMap[j];
 						for (int n = 0; n < channelInfo->numBVHChannels; n++)
 							bvhIndex.push_back(std::pair<int, int>(j, n));
 					}
@@ -512,8 +513,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 //                    index -= 3;
 //                  }
 									// TODO: Add data to SkMotion
-									ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-									ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo, frames, posture, curFrame * frameTime, scale);
+									ChannelInfoPtr channelInfo = channelInfoMap[oldJoint->index()];
+									ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo.get(), frames, posture, curFrame * frameTime, scale);
 								}
 
 								for (int x = 0; x < 6; x++)
@@ -540,8 +541,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						if (oldJoint != NULL)
 						{
 							// convert the BVH frame into the appropriate SmartBody frame
-							ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-							ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo, frames, posture, curFrame * frameTime, scale);
+							ChannelInfoPtr channelInfo = channelInfoMap[oldJoint->index()];
+							ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo.get(), frames, posture, curFrame * frameTime, scale);
 						}
 						state = 11;
 					}
