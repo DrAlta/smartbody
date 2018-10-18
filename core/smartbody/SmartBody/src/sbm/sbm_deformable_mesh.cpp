@@ -1354,7 +1354,18 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		{
 			SmartBodyBinary::StringToStringMap* m2DiffuseMapping = newMeshModel->add_materialtodiffusetexturemapping();
 			m2DiffuseMapping->set_from(iter->first);
-			m2DiffuseMapping->set_to(iter->second);
+			// make sure that the prefix isn't save with the data
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(iter->second, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				m2DiffuseMapping->set_to(tokens[1]);
+			}
+			else
+			{
+				m2DiffuseMapping->set_to(iter->second);
+			}
+			
 		}
 		// 15
 		for (iter = curModel->mtlNormalTexNameMap.begin(); iter != curModel->mtlNormalTexNameMap.end(); ++iter)
