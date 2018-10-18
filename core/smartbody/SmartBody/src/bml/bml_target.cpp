@@ -54,9 +54,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 	switch( tokenizer.countTokens() ) {
 		case 1: {
 			// One token is an object id
-			const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
-			string object_id = ascii_object_id;
-			delete [] ascii_object_id;
+			string object_id = xml_utils::asciiString(tokenizer.nextToken());
 			string bone_id;
 			SbmPawn* target;
 
@@ -167,9 +165,7 @@ const SbmPawn* BML::parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTa
 	XMLStringTokenizer tokenizer( attrTarget );	
 	std::stringstream strstr;
 	// One token is an object id
-	const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
-	string object_id = ascii_object_id;
-	delete [] ascii_object_id;
+	string object_id = xml_utils::asciiString(tokenizer.nextToken());
 	string bone_id;
 	SbmPawn* target;
 

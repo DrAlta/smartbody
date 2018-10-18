@@ -2186,7 +2186,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		}
 
 
-		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(xml_utils::UTF16("core"));
 		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
 		DOMConfiguration* dc = pSerializer->getDomConfig(); 
 		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
@@ -2206,6 +2206,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			{
 				XMLCh* curNodeString = pSerializer->writeToString(curNode);
 				DOMComment* commentNode = xmlDoc->createComment(curNodeString);
+        XMLString::release(&curNodeString);
 				bmlNode->replaceChild(commentNode, curNode);
 				continue;
 			}
@@ -2220,6 +2221,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 						SmartBody::util::log("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
 					XMLCh* curNodeString = pSerializer->writeToString(curNode);
 					DOMComment* commentNode = xmlDoc->createComment(curNodeString);
+          XMLString::release(&curNodeString);
 					bmlNode->replaceChild(commentNode, curNode);
 				}
 				numGestures++;
@@ -2250,9 +2252,8 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			SmartBody::util::log("export BML path is not right %s",SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 		XMLCh* outputFile = XMLString::transcode(ss.str().c_str());
 #endif
-		XMLCh* outputFile = XMLString::transcode(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 		DOMLSOutput* xmlstream = ((DOMImplementationLS*)pDOMImplementation)->createLSOutput();
-		xmlstream->setSystemId(outputFile);
+		xmlstream->setSystemId(xml_utils::UTF16(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str()));
 		try
 		{
 			if (!pSerializer->write(xmlDoc, xmlstream))

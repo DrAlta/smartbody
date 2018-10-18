@@ -368,19 +368,15 @@ int xml_utils::parseCString( const char *str, AbstractDOMParser* parser ) {
 	return parser->getErrorCount();
 }
 
-const char* xml_utils::asciiString( const XMLCh* wstr ) {
-	char* str = new char[ XMLString::stringLen(wstr)+1 ];
+std::string xml_utils::asciiString( const XMLCh* wstr ) {
+	std::string str(XMLString::stringLen(wstr), (char)127); // unrepresented character
 	int i = 0;
-    XMLCh c = wstr[0];
-	while( c!=0 ) {
+  XMLCh c = wstr[0];
+	while( c!=0 && i < str.size() ) {
 		if( c<128 )
-			str[i] = (unsigned char)c;
-		else
-			str[i] = 127; // unrepresented character
+			str[i] = (char)c;
 		c = wstr[++i];
 	}
-	str[i] = 0;
-
 	return str;
 }
 

@@ -699,8 +699,7 @@ void AudioFileSpeech::ReadMotionDataBML(const char * filename, std::vector< Vise
 	}
 
 	DOMElement * bml = xmlDoc->getDocumentElement();
-
-	DOMNodeList* motionNodeList = bml->getElementsByTagName(XMLString::transcode("motion"));
+	DOMNodeList* motionNodeList = bml->getElementsByTagName(xml_utils::UTF16("motion"));
 	int motionNodeLength = motionNodeList->getLength();
 	if (motionNodeLength == 0)
 		return;

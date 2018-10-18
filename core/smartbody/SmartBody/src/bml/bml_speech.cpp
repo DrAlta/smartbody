@@ -1981,16 +1981,12 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 					std::string wordBreakIdWithPrefix = this->local_id;
 					wordBreakIdWithPrefix.append(":");
 					wordBreakIdWithPrefix.append(wordBreakId);
-					XMLCh tempStr[256];
-					XMLString::transcode(wordBreakIdWithPrefix.c_str(), tempStr, 255);
-					audioTime = speech_impl->getMarkTime(speech_request_id, tempStr);
+					audioTime = speech_impl->getMarkTime(speech_request_id, xml_utils::UTF16(wordBreakIdWithPrefix.c_str()));
 				}
 				else
 				{ // prefix was given - try again without prefix
 					std::string wordBreakSuffix = wordBreakId.substr(pos + 1, wordBreakId.size() - pos - 1);
-					XMLCh tempStr[256];
-					XMLString::transcode(wordBreakSuffix.c_str(), tempStr, 255);
-					audioTime = speech_impl->getMarkTime(speech_request_id, tempStr);
+					audioTime = speech_impl->getMarkTime(speech_request_id, xml_utils::UTF16(wordBreakSuffix.c_str()));
 				}
 
 			}

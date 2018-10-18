@@ -160,7 +160,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
-		localId = XMLString::transcode(id);
+    localId = std::string(xml_utils::UTF8(id));
 
 	bool bCreateNewController = false;
 	if (!reachCt)

@@ -244,18 +244,18 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	}
 
 	// gain for braking
-	const char* brakingFactor = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_BRAKING));
-	if (strcmp(brakingFactor, "") != 0)
+	auto brakingFactor = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_BRAKING));
+	if (strcmp(brakingFactor.c_str(), "") != 0)
 	{
 		std::stringstream command;
-		command << "steer braking " << c->getName() << " " << (float)atof(brakingFactor);
+		command << "steer braking " << c->getName() << " " << (float)atof(brakingFactor.c_str());
 		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command.str().c_str());	
 	}
 
 	// for facing angle, we need to execute with some delay
-	const char* facingAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FACING));
-	float facingAngleVal = (float) atof(facingAngle);
-	if (strcmp(facingAngle, "") != 0)
+	auto facingAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FACING));
+	float facingAngleVal = (float) atof(facingAngle.c_str());
+	if (strcmp(facingAngle.c_str(), "") != 0)
 	{
 		std::string facingAngleStr = facingAngle;
 		float facingOffset = 0.f;

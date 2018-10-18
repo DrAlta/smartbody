@@ -389,9 +389,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		else
 		{
 			//  Parse sbm:joint-range
-			XMLCh *delim = XMLString::transcode( " \r\n\t\f" );
-			XMLStringTokenizer tokenizer( attrJointRange, delim );
-			XMLString::release( &delim );
+			XMLStringTokenizer tokenizer( attrJointRange, UTF16(" \r\n\t\f") );
 //			XMLStringTokenizer tokenizer( attrJointRange, " \r\n\t\f" );  // include the dash to delimit ranges
 //			XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
 			if( tokenizer.countTokens()==0 ) {
@@ -400,33 +398,31 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				std::string str = convertWStringToString(wstrstr.str());
 				SmartBody::util::log(str.c_str());
 			} else {
-				const char* key_name = asciiString( tokenizer.nextToken() );
-				int key_index = MeCtGaze::key_index( key_name );
+				auto key_name = asciiString( tokenizer.nextToken() );
+				int key_index = MeCtGaze::key_index( key_name.c_str() );
 				if( key_index == -1 ) {
 					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
+					wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name.c_str()<<"\".";
 					std::string str = convertWStringToString(wstrstr.str());
 					SmartBody::util::log(str.c_str());
 				}
-				delete [] key_name;
 
 				while( key_index == -1 && tokenizer.countTokens() > 0 ) {  // find first valid key
 					key_name = asciiString( tokenizer.nextToken() );
-					key_index = MeCtGaze::key_index( key_name );
+					key_index = MeCtGaze::key_index( key_name.c_str() );
 					if( key_index == -1 ) {
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
+						wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name.c_str()<<"\".";
 						std::string str = convertWStringToString(wstrstr.str());
 						SmartBody::util::log(str.c_str());
 					}
-					delete [] key_name;
 				}
 				if( key_index != -1 ) {  // found a valid key
 					low_key_index = high_key_index = key_index;
 
 					while( tokenizer.countTokens() > 0 ) {
 						key_name = asciiString( tokenizer.nextToken() );
-						key_index = MeCtGaze::key_index( key_name );
+						key_index = MeCtGaze::key_index( key_name.c_str() );
 						if( key_index != -1 ) {
 							if( key_index < low_key_index )
 								low_key_index = key_index;
@@ -434,11 +430,10 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 								high_key_index = key_index;
 						} else {
 							std::wstringstream wstrstr;
-							wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
+							wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name.c_str()<<"\".";
 							std::string str = convertWStringToString(wstrstr.str());
 							SmartBody::util::log(str.c_str());
 						}
-						delete [] key_name;
 					}
 				}
 			}
@@ -468,13 +463,13 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 		else
 		{
-			const char* priority_key_name = asciiString(attrPriority);
-			priority_key_index = MeCtGaze::key_index(priority_key_name);
+			auto priority_key_name = asciiString(attrPriority);
+			priority_key_index = MeCtGaze::key_index(priority_key_name.c_str());
 			if(priority_key_index < low_key_index)
 			{
 				priority_key_index = low_key_index;
 				std::wstringstream wstrstr;
-				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name.c_str() << "\"." << endl;
 				std::string str = convertWStringToString(wstrstr.str());
 				SmartBody::util::log(str.c_str());
 			}
@@ -482,7 +477,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			{
 				priority_key_index = high_key_index;
 				std::wstringstream wstrstr;
-				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name.c_str() << "\"." << endl;
 				std::string str = convertWStringToString(wstrstr.str());
 				SmartBody::util::log(str.c_str());
 			}
