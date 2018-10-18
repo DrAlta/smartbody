@@ -1137,9 +1137,11 @@ int SbmCharacter::init_skeleton() {
 		listeners[i]->OnCharacterUpdate( getName() );
 	}
 
-	for( int i=0; i<viseme_channel_count; i++ ) {
-		viseme_history_arr[ i ] = -1.0;
-	}
+  if (viseme_history_arr) {
+    for( int i=0; i<viseme_channel_count; i++ ) {
+      viseme_history_arr[ i ] = -1.0;
+    }
+  }
 
 	return CMD_SUCCESS;
 }
@@ -2032,7 +2034,7 @@ void SbmCharacter::forward_visemes( double curTime )
 			if( buffIndex > -1 )	
 			{
 				float value = frameData.buffer()[ buffIndex ];
-				if( value != viseme_history_arr[ i ] )
+				if( viseme_history_arr && value != viseme_history_arr[ i ] )
 				{
 
 					for (size_t l = 0; l < listeners.size();l++)
@@ -2354,6 +2356,9 @@ void SbmCharacter::updateFaceDefinition()
 	viseme_channel_count = viseme_channel_end_pos - viseme_channel_start_pos;
 //	viseme_channel_count = numAUChannels + numVisemeChannels;
 
+  if (viseme_history_arr) {
+    delete [] viseme_history_arr;
+  }
 	viseme_history_arr = new float[viseme_channel_count];
 	for( int i=0; i<viseme_channel_count; i++ ) {
 		viseme_history_arr[ i ] = -1.0;
