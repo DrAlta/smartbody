@@ -424,8 +424,8 @@ BMLDefs::BMLDefs()
 
 	TAG_CONSTRAINT			= XMLString::transcode("sbm:constraint");
 
-	TAG_SBM_EVENT			= XMLString::transcode("sbm:event");
-	ATTR_MESSAGE			= XMLString::transcode("message");
+	//TAG_SBM_EVENT			= XMLString::transcode("sbm:event");
+	//ATTR_MESSAGE			= XMLString::transcode("message");
 
 	TAG_FACE				= XMLString::transcode("face");
 	
@@ -469,7 +469,7 @@ BMLDefs::BMLDefs()
 	TAG_EVENT     = XMLString::transcode("event");
 
 	TAG_PANIMATION = XMLString::transcode("panimation");
-	TAG_REACH = XMLString::transcode("sbm:reach_old");
+	//TAG_REACH = XMLString::transcode("sbm:reach_old");
 
 	// XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
 	ATTR_SPEAKER      = XMLString::transcode("speaker");
@@ -483,7 +483,7 @@ BMLDefs::BMLDefs()
 	ATTR_VELOCITY     = XMLString::transcode("velocity");
 	ATTR_ANGLE        = XMLString::transcode("angle");
 	ATTR_DIRECTION    = XMLString::transcode("direction");
-	ATTR_ROLL         = XMLString::transcode("sbm:roll");
+	//ATTR_ROLL         = XMLString::transcode("sbm:roll");
 	ATTR_SMOOTH       = XMLString::transcode("sbm:smooth");
 
 	////// XML Direction constants
@@ -526,9 +526,9 @@ BMLDefs::BMLDefs()
 	ATTR_RAMPDOWN	= XMLString::transcode("sbm:rampdown");
 	ATTR_DURATION	= XMLString::transcode("sbm:duration");
 
-	ATTR_X      = XMLString::transcode("pos-x");
-	ATTR_Y      = XMLString::transcode("pos-y");
-	ATTR_Z      = XMLString::transcode("pos-z");
+	//ATTR_X      = XMLString::transcode("pos-x");
+	//ATTR_Y      = XMLString::transcode("pos-y");
+	//ATTR_Z      = XMLString::transcode("pos-z");
 
 	////// XML ATTRIBUTES
 	ATTR_TARGET_POS  = XMLString::transcode("sbm:target-pos");
@@ -638,7 +638,7 @@ BMLDefs::BMLDefs()
 	ATTR_ROOT = XMLString::transcode("sbm:root");
 
 	TAG_GRAB = XMLString::transcode("sbm:grab");
-	ATTR_REACH_FINISH = XMLString::transcode("sbm:reach-finish");
+	//ATTR_REACH_FINISH = XMLString::transcode("sbm:reach-finish");
 	ATTR_CONS_JOINT = XMLString::transcode("sbm:cons-joint");
 	ATTR_CONS_TARGET = XMLString::transcode("sbm:cons-target");
 	ATTR_APEX_DURATION = XMLString::transcode("sbm:apex-duration");

@@ -84,14 +84,12 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	}
 
 	const XMLCh* attrWrist = NULL;
-	const char* wristName = NULL;
-	attrWrist = elem->getAttribute(BMLDefs::ATTR_WRIST);	
+	attrWrist = elem->getAttribute(BMLDefs::ATTR_WRIST);
 	SmartBody::SBJoint* wristJoint = NULL;
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(request->actor->getSkeleton());
 	if( attrWrist && XMLString::stringLen( attrWrist ) ) 
 	{
-		wristName = asciiString(attrWrist);			
-		wristJoint =sbSkel->getJointByName(wristName);		
+		wristJoint =sbSkel->getJointByName(asciiString(attrWrist).c_str());
 	}
 
 	const XMLCh* attrSourceJoint = NULL;
@@ -119,8 +117,8 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 
 
-	const char* attrFadeOut = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_OUT ));
-	const char* attrFadeIn = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_IN ));
+	auto attrFadeOut = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_OUT ));
+	auto attrFadeIn = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_IN ));
 	
 
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);

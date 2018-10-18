@@ -260,7 +260,6 @@ BmlRequestPtr BML::Processor::createBmlRequest(
 
 
 
-
 void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene )
 {
 	if(LOG_METHODS) std::cout<<"BodyPlannerImpl::vrSpeak(..)"<< std::endl;
@@ -320,13 +319,15 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
  			parseBML( bmlElem, request, scene );
 
 			// Added by Yuyu (09-30-2013) to record the whole bml message after parsing
-			DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+      DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(xml_utils::UTF16("core"));
 			DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
 			DOMConfiguration* dc = pSerializer->getDomConfig(); 
 			dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
 			dc->setParameter( XMLUni::fgDOMWRTEntities,true);
 			XMLCh* theXMLString_Unicode = pSerializer->writeToString(xml); 
 			std::string xmlBodyString = xml_utils::xml_translate_string(theXMLString_Unicode);
+      XMLString::release(&theXMLString_Unicode);
+      pSerializer->release();
 			request->xmlBody = xmlBodyString;
 			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
 			{
@@ -403,9 +404,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 					// automatically create an id for this request
 					std::stringstream newIdStr;
 					newIdStr << tagStr << idCounter;
-					XMLCh uniqueId[512];
-					XMLString::transcode(newIdStr.str().c_str(), uniqueId, 511);
-					child->setAttribute(BMLDefs::ATTR_ID, uniqueId);
+					child->setAttribute(BMLDefs::ATTR_ID, xml_utils::UTF16(newIdStr.str().c_str()));
 					idStr = newIdStr.str();
 					request->localId = newIdStr.str();
 					idCounter++;
@@ -595,8 +594,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	const XMLCh* postureName = elem->getAttribute( BMLDefs::ATTR_POSTURE );
 	if( postureName && *postureName != 0 ) {
 		// Look up pose
-		const char* ascii_pose_id = xml_utils::asciiString(postureName);
-		std::string pose_id = ascii_pose_id;
+		std::string pose_id = xml_utils::asciiString(postureName);
 		{
 			// Check for a motion (a motion texture, or motex) of the same name
 			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(pose_id);

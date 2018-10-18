@@ -78,47 +78,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 using namespace SmartBody;
+using namespace xml_utils;
 
-class XStr
-{
-   public:
-      // -----------------------------------------------------------------------
-      //  Constructors and Destructor
-      // -----------------------------------------------------------------------
-      XStr( const char * const toTranscode )
-      {
-         // Call the private transcoding method
-         //fUnicodeForm = xercesc_3_0::XMLString::transcode( toTranscode );
-	  fUnicodeForm = XMLString::transcode( toTranscode );
-      }
-
-      ~XStr()
-      {
-         //xercesc_3_0::XMLString::release( &fUnicodeForm );
-	  XMLString::release( &fUnicodeForm );
-      }
-
-
-      // -----------------------------------------------------------------------
-      //  Getter methods
-      // -----------------------------------------------------------------------
-      const XMLCh * unicodeForm() const
-      {
-         return fUnicodeForm;
-      }
-
-   private:
-       // -----------------------------------------------------------------------
-       //  Private data members
-       //
-       //  fUnicodeForm
-       //      This is the Unicode XMLCh format of the string.
-       // -----------------------------------------------------------------------
-       XMLCh * fUnicodeForm;
-};
-
-
-#define X( str ) XStr( str ).unicodeForm()
 XERCES_CPP_NAMESPACE_USE
 
 #if !USE_FESTIVAL_RELAY
@@ -250,30 +211,26 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 	   if ( root ) 
 	   {
 		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
-		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   DOMNodeList *messageList = root->getElementsByTagName(UTF16("speech"));
 		   if ( messageList && messageList->getLength() > 0)
 		   {
 			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-			   xmlMetaData.speechIdentifier = std::string(speechID);
-			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
-			   XMLString::release(&speechID);
+			   xmlMetaData.speechIdentifier = std::string(UTF8(speechElement->getAttribute(UTF16("id"))));
+			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(UTF16("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(UTF16("type"))) + "\">";
 		   }
-		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+       else if ( !strcmp( UTF8(root->getNodeName()), "speech") ) {
 			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
 			   DOMElement *speechElement = root;
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-			   xmlMetaData.speechIdentifier = std::string(speechID);
-			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
-			   XMLString::release(&speechID);
+			   xmlMetaData.speechIdentifier = std::string(UTF8(speechElement->getAttribute(UTF16("id"))));
+			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(UTF16("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(UTF16("type"))) + "\">";
 		   }
 		   else
 		   {
 			   /// Oops, for some reason all of the above didn't work, default to the default speech id
 			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
 			   //actualText = truncatedTxt.substr(0, truncatedTxt.find_first_of(">") + 1);
-		   }
-		   messageList = root->getElementsByTagName( X("mark"));
+       }
+		   messageList = root->getElementsByTagName( UTF16("mark"));
 
 		   /// Store all the book marks in the input message, so that they can be retrieved later
 		   if ( messageList ) 
@@ -287,8 +244,8 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 				   if (node->getNodeType() && node->getNodeType() == DOMNode::ELEMENT_NODE)
 				   {
 					   DOMElement *element = dynamic_cast<DOMElement*>( node );
-					   XMLCh *mark = (XMLCh*)element->getAttribute(XMLString::transcode("name"));
-					   XMLCh *speech = NULL;
+             std::string markString = std::string(UTF8(element->getAttribute(UTF16("name"))));
+					   const XMLCh *speech = NULL;
 					   DOMNode *speechNode = element->getFirstChild();
 					   if ( speechNode == NULL ) 
 					   {
@@ -299,18 +256,10 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 #ifdef _PARSER_DEBUG_MESSAGES_ON
 						   fprintf(stderr, "Voila! found the text\n");
 #endif
-						   speech = (XMLCh*)speechNode->getNodeValue();
+						   speech = speechNode->getNodeValue();
 					   }
 					   /// Get the timing tag as a string
-					   char * t1, *t2;
-					   std::string markString(t1 = XMLString::transcode(mark));
-					   std::string speechString = (speech)?XMLString::transcode(speech): " ";
-					   XMLString::release(&t1);
-                       if(speech)
-					   {
-                         t2 = XMLString::transcode(speech);
-					     XMLString::release(&t2);
-					   }
+             std::string speechString = speech ? std::string(UTF8(speech)) : " ";
 					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
 					   //if ( mark ) XMLString::release(&mark);
 					   //if ( speech ) XMLString::release(&speech);
@@ -477,34 +426,31 @@ std::string SpeechRelayLocal::TransformTextWithTimes(std::string txt)
 	   if ( root ) 
 	   {
 		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
-		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   DOMNodeList *messageList = root->getElementsByTagName(UTF16("speech"));
 		   if ( messageList && messageList->getLength() > 0)
 		   {
 			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-
-			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">\n\n");
-			   XMLString::release(&speechID);
+			   actualText = actualText.append("<speech id=\""
+                                        + std::string(UTF8(speechElement->getAttribute(UTF16("id"))))
+                                        + "\" ref=\""
+                                        + UTF8(speechElement->getAttribute(UTF16("ref")))
+                                        + "\" type=\""
+                                        + UTF8(speechElement->getAttribute(UTF16("type")))
+                                        + "\">\n\n");
 		   }
-		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
-			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
-			   DOMElement *speechElement = root;
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-			   char *text = XMLString::transcode(speechElement->getTextContent());
+       else if ( !strcmp( UTF8(root->getNodeName()), "speech") ) {
+         /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
+         DOMElement *speechElement = root;
+         std::string textContent = CreateMarkTimeStamps(std::string(UTF8(speechElement->getTextContent())));
 
-			   std::string textContent = CreateMarkTimeStamps(text);
-			   /*if (!speechID)
-			   {
-				   speechID = "sp1";
-			   }*/
-			   //hard coding sp1
-			   speechID = (char*) "sp1";
-			   //XMLString::transcode(speechElement->getAttribute(X("type"))) 
-			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
-			   actualText = actualText.append(textContent);
-			   actualText = actualText.append("</speech>");
-			   //XMLString::release(&speechID);
-		   }
+         actualText = actualText.append("<speech id=\""
+                                        + std::string("sp1")
+                                        + "\" ref=\""
+                                        + UTF8(speechElement->getAttribute(UTF16("ref")))
+                                        + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
+         actualText = actualText.append(textContent);
+         actualText = actualText.append("</speech>");
+       }
 	   }
    }
    return actualText;
@@ -625,31 +571,24 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 	 int errorCode = 0;
 
 
-      DOMImplementation * impl =  DOMImplementationRegistry::getDOMImplementation( X( "Core" ) );
+      DOMImplementation * impl =  DOMImplementationRegistry::getDOMImplementation( UTF16( "Core" ) );
 
       if ( impl != NULL )
       {
          try
          {
-            //XMLCh * end = XMLString::transcode( "end" );
-            //XMLCh * start = XMLString::transcode( "start" );
-            XMLCh * name = XMLString::transcode( "name" );
-            XMLCh * time = XMLString::transcode( "time" );
-           // XMLCh * id = XMLString::transcode( "id" );
-            XMLCh * file_path = XMLString::transcode( cereproc_file_name );
-
             DOMDocument* doc = impl->createDocument(
                0,                    // root element namespace URI.
-               X( "speak" ),         // root element name
+               UTF16( "speak" ),     // root element name
                0 );                  // document type object (DTD).
 
             DOMElement * rootElem = doc->getDocumentElement();
 
-            DOMElement * soundFileElement = doc->createElement( X( "soundFile" ) );
-            soundFileElement->setAttribute( name, file_path );
+            DOMElement * soundFileElement = doc->createElement( UTF16( "soundFile" ) );
+            soundFileElement->setAttribute( UTF16("name"), UTF16(cereproc_file_name) );
             rootElem->appendChild( soundFileElement );
 
-            DOMElement * wordElement = doc->createElement( X( "word" ) );
+            DOMElement * wordElement = doc->createElement( UTF16( "word" ) );
 
             int num_words = 0;
 
@@ -663,20 +602,13 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
                  if ( iter != phonemeToViseme.end() )
                  {
 
-                    XMLCh * start = XMLString::transcode( "start" );
-                    XMLCh * end = XMLString::transcode( "end" );
-                    XMLCh * type = XMLString::transcode( "type" );
-                    XMLCh * phone_type = XMLString::transcode( iter->second.c_str() );
-
                     std::string end_f = SmartBody::util::format( "%0.6f", abuf->trans[i].end );
-                    XMLCh * end_time = XMLString::transcode( end_f.c_str() );
 
                     std::string start_f = SmartBody::util::format( "%0.6f", abuf->trans[i].start );
-                    XMLCh * start_time = XMLString::transcode( start_f.c_str() );
 
-                    DOMElement * visemeElement = doc->createElement( X( "viseme" ) );
-                    visemeElement->setAttribute( start, start_time );
-                    visemeElement->setAttribute( type, phone_type );
+                    DOMElement * visemeElement = doc->createElement( UTF16( "viseme" ) );
+                    visemeElement->setAttribute( UTF16("start"), UTF16(start_f.c_str()) );
+                    visemeElement->setAttribute( UTF16("type"), UTF16(iter->second.c_str()) );
 
                     if ( strcmp( abuf->trans[ i ].name, "sil" ) == 0 )
                     {
@@ -692,16 +624,16 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
                         if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
                            || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
                         {
-                           wordElement->setAttribute( end, end_time );
+                           wordElement->setAttribute( UTF16("end"), UTF16(end_f.c_str()) );
 
                            if ( wordElement->hasChildNodes() )
                               rootElem->appendChild( wordElement );
    
-                           wordElement = doc->createElement( X( "word" ) );
+                           wordElement = doc->createElement( UTF16( "word" ) );
 
                            std::string word_start_f = SmartBody::util::format( "%0.6f", abuf->trans[ i + 1 ].start );
-                           XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
-                           wordElement->setAttribute( start, word_start_time );
+//                           XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                           wordElement->setAttribute( UTF16("start"), UTF16(word_start_f.c_str()) );
 
                            // Add marker information back
                            // Should come from initial XML message, 
@@ -732,10 +664,10 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
 						   }
 
-                           DOMElement * markElement = doc->createElement( X( "mark" ) );
-                           XMLCh * mark_name = XMLString::transcode( s.c_str() );
-                           markElement->setAttribute( name, mark_name ) ;
-                           markElement->setAttribute( time, word_start_time );
+                           DOMElement * markElement = doc->createElement( UTF16( "mark" ) );
+//                           XMLCh * mark_name = XMLString::transcode( s.c_str() );
+                           markElement->setAttribute( UTF16("name"), UTF16(s.c_str()) ) ;
+                           markElement->setAttribute( UTF16("time"), UTF16(word_start_f.c_str()) );
                            rootElem->appendChild( markElement );
 
                            std::ostringstream ostr2;
@@ -763,10 +695,10 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 							   s += last_tag.substr(0, j) + ostr2.str();
 							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
 						   }
-                           DOMElement * markElement2 = doc->createElement( X( "mark" ) );
-                           XMLCh * mark_name2 = XMLString::transcode( s.c_str() );
-                           markElement2->setAttribute( name, mark_name2 ) ;
-                           markElement2->setAttribute( time, end_time );
+                           DOMElement * markElement2 = doc->createElement( UTF16( "mark" ) );
+//                           XMLCh * mark_name2 = XMLString::transcode( s.c_str() );
+                           markElement2->setAttribute( UTF16("name"), UTF16(s.c_str()) ) ;
+                           markElement2->setAttribute( UTF16("time"), UTF16(end_f.c_str()) );
                            rootElem->appendChild( markElement2 );
 
                            //float word_start = abuf->trans[ i + 1 ].start;
@@ -781,7 +713,7 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
                }
                /*else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
                {
-                    DOMElement * markElement = doc->createElement( X( "mark" ) );
+                    DOMElement * markElement = doc->createElement( UTF16( "mark" ) );
                     XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ].name );
                     markElement->setAttribute( name, mark_name ) ;
 
@@ -795,7 +727,8 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 
             DOMLSSerializer* theSerializer = DOMImplementation::getImplementation()->createLSSerializer();
             XMLCh * xml_result = theSerializer->writeToString( rootElem );
-            reply = XMLString::transcode( xml_result );
+            reply = std::string(UTF8(xml_result));
+            XMLString::release(&xml_result);
             theSerializer->release();
          }
 //          catch ( const OutOfMemoryException & )
@@ -1138,27 +1071,23 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 	   {
 		   //SmartBody::util::log("has root");
 		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
-		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   DOMNodeList *messageList = root->getElementsByTagName(UTF16("speech"));
 		   if ( messageList && messageList->getLength() > 0)
 		   {
 			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-			   xmlMetaData.speechIdentifier = std::string(speechID);			   
-			   XMLString::release(&speechID);
+			   xmlMetaData.speechIdentifier = std::string(UTF8(speechElement->getAttribute(UTF16("id"))));
 		   }
-		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+		   else if ( !strcmp( UTF8( root->getNodeName() ), "speech") ) {
 			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
 			   DOMElement *speechElement = root;
-			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
-			   xmlMetaData.speechIdentifier = std::string(speechID);			   
-			   XMLString::release(&speechID);
+			   xmlMetaData.speechIdentifier = std::string(UTF8(speechElement->getAttribute(UTF16("id"))));
 		   }
 		   else
 		   {
 			   /// Oops, for some reason all of the above didn't work, default to the default speech id
 			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
 		   }
-		   messageList = root->getElementsByTagName( X("mark"));
+		   messageList = root->getElementsByTagName( UTF16("mark"));
 		   //SmartBody::util::log("check messageList = %d",messageList);
 		   /// Store all the book marks in the input message, so that they can be retrieved later
 		   if ( messageList ) 
@@ -1182,14 +1111,15 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 
 						// serialize a DOMNode to an internal memory buffer
 						theSerializer2->write(element, myLSOutput2);
+            theSerializer2->release();
 
 						// print the final bml code to the terminal
 						string output =
 						(char*)  ((MemBufFormatTarget*)myFormatTarget2)->getRawBuffer();		
 					   
 
-					   XMLCh *mark = (XMLCh*)element->getAttribute(XMLString::transcode("name"));
-					   XMLCh *speech = NULL;
+             std::string markString = std::string(UTF8(element->getAttribute(UTF16("name"))));
+					   const XMLCh *speech = NULL;
 					   DOMNode *speechNode = element->getFirstChild();
 					   
 
@@ -1200,30 +1130,22 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 					   }
 					   if ( (speechNode !=NULL) && ( speechNode->getNodeType() == DOMNode::TEXT_NODE ) )
 					   {
-						   speech = (XMLCh*)speechNode->getNodeValue();
+						   speech = speechNode->getNodeValue();
 					   }					   					   
 
 
 
 					   /// Get the timing tag as a string
 						
-					   char * t1, *t2;
-					   char* spaceT = " ";        
-					   std::string markString(t1 = XMLString::transcode(mark));
 					   std::string speechString;
 
 					   if(speechNode !=NULL)
 					   {
-						   const char* transcodeT2 = (speech)? XMLString::transcode(speech): " ";
-						   t2 = const_cast<char*>(transcodeT2) ;
-						   speechString = t2;
+               speechString = speech ? std::string(UTF8(speech)) : " ";
 					   }
 					   else
 						   speechString = "";
 						   
-					   XMLString::release(&t1);
-					   XMLString::release(&t2);
-
 					   if( !strcmp(markString.c_str(),"") || !strcmp(speechString.c_str(),"") )
 					   {
 						   /// Null strings tend to cause problems with later code sections

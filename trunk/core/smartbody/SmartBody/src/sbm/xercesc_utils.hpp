@@ -148,7 +148,7 @@ namespace xml_utils {
 
 	//  Convert XMLCh string to ascii c-string.
 	//  chars > 127 are represented as 127 (an unused character in both ascii and Unicode)
-	const char* asciiString( const XMLCh* wstr );
+  std::string asciiString( const XMLCh* wstr );
 
 	//  Read XMLCh string as a float
 	//  assumes the presence of wcstod(..).
@@ -176,6 +176,32 @@ namespace xml_utils {
 	public:
 		bool operator() (const XMLCh*, const XMLCh*) const; 
 	};
+
+  template <typename Ch>
+  struct TemporaryString {
+    template <typename OtherCh>
+    TemporaryString(const OtherCh* otherStr)
+    : _str(XMLString::transcode(otherStr))
+    {}
+
+    ~TemporaryString()
+    {
+      XMLString::release(&_str);
+    }
+
+    operator const Ch* () const { return _str; }
+
+  private:
+    Ch* _str;
+  };
+
+  typedef TemporaryString<char> UTF8;
+  typedef TemporaryString<XMLCh> UTF16;
+
+  inline std::string
+  operator + (const std::string& lhs, const UTF8& rhs) {
+    return lhs + (const char*)rhs;
+  }
 };
 
 std::string convertWStringToString(std::wstring w);
