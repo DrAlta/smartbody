@@ -47,12 +47,7 @@ void SequenceManager::clear()
 {
 	for (size_t x = 0; x < _sequences.size(); x++)
 	{
-		srCmdSeq* seq = _sequences[x].second;
-		seq->reset();
-		while(char* cmd = seq->pull() )	{
-			delete [] cmd;
-		}
-		delete seq;
+		delete _sequences[x].second;
 	}
 
 	_sequenceSet.clear();

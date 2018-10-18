@@ -290,8 +290,10 @@ std::string srCmdSeq::pop( float time )	{
 		if( event->time <= offset_time )	{
 			handle->next = event->next;
 			std::string cmdStr = "";
-			if (event->cmd)
+      if (event->cmd) {
 				cmdStr = event->cmd;
+        delete [] event->cmd;
+      }
 			delete event;
 			event_count--;
 			return( cmdStr );

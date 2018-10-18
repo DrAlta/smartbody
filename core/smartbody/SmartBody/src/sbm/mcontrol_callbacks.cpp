@@ -168,7 +168,11 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, SmartBody:
 		if( cmd )	{
 			// propagate un-consumed command
 			to_seq_p->insert_ref( absolute_offset, cmd );
+      cmd = NULL;
 		}
+    if (cmd) {
+      delete [] cmd;
+    }
 	}
 	delete fr_seq_p;
 }
