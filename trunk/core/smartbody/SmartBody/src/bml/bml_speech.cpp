@@ -1867,6 +1867,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			}
 		}
 
+		// remove results_visemes
+		for (size_t d = 0; d < result_visemes->size(); d++)
+			delete (*result_visemes)[d];
+		(*result_visemes).clear();
 
 		vector<VisemeData*>::iterator cur = visemes.begin();
 		vector<VisemeData*>::iterator end = visemes.end();
