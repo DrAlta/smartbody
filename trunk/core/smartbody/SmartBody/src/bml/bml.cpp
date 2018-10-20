@@ -2038,7 +2038,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(actorId);
 			std::string characterObjectStr = scene->getStringFromObject(character);
 			std::stringstream strstr;
-			strstr << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(\"bmlstatus\", \"blockstart " << actorId << " " << request->msgId << ":" << request->localId  << "\", \"" << characterObjectStr << "\"))";
+			strstr << "sb scene.getEventManager().handleEventRemove(scene.getEventManager().createEvent(\"bmlstatus\", \"blockstart " << actorId << " " << request->msgId << ":" << request->localId  << "\", \"" << characterObjectStr << "\"))";
 			if (start_seq->insert( (float) start_time, strstr.str().c_str()) != CMD_SUCCESS)
 			{
 				std::stringstream strstr;
@@ -2119,7 +2119,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(actorId);
 			std::string characterObjectStr = scene->getStringFromObject(character);
 			std::stringstream strstr;
-			strstr << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(\"bmlstatus\", \"blockend " << actorId << " " << request->msgId << ":" << request->localId << "\", \"" << characterObjectStr << "\"))";
+			strstr << "sb scene.getEventManager().handleEventRemove(scene.getEventManager().createEvent(\"bmlstatus\", \"blockend " << actorId << " " << request->msgId << ":" << request->localId << "\", \"" << characterObjectStr << "\"))";
 			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
 			{
 				std::stringstream strstr;

@@ -1625,7 +1625,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		  if (soundDuration != 0.0f)
 		  {		  
 			std::stringstream strstr2;
-			strstr2 << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(\"sound\", \"" << strstr.str() << " stop\", \"" << characterObjectName << "\"))";
+			strstr2 << "sb scene.getEventManager().handleEventRemove(scene.getEventManager().createEvent(\"sound\", \"" << strstr.str() << " stop\", \"" << characterObjectName << "\"))";
 			SmartBody::SBScene::getScene()->commandAt(soundDuration, strstr2.str());
 		  }
 

@@ -83,6 +83,7 @@ class SBEventManager
 		SBAPI ~SBEventManager();
 
 		SBAPI void handleEvent(SBEvent* e);
+		SBAPI void handleEventRemove(SBEvent* e);
 		SBAPI SBEvent* createEvent(const std::string& type, const std::string parameters, const std::string source);
 		SBAPI void addEventHandler(const std::string& type, SBEventHandler* handle);
 		SBAPI void removeEventHandler(const std::string& type);
