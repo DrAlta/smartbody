@@ -926,8 +926,8 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		debugVwFiltering->setCurveInfo("5");
 		debugVisemeCurves.push_back(debugVwFiltering);
 
-		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		//VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		//newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		
 		std::vector<float> finalCurveData;
 		for (size_t j = 0; j < visemeProcessedData[i]->getFloatCurve().size(); ++j)
@@ -942,6 +942,15 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 			SmartBody::util::log("Cannot have two final curves that have same name!");
 		}
 	}
+
+	for (size_t r = 0; r < visemeRawData.size(); r++)
+		delete visemeRawData[r];
+
+	for (size_t p = 0; p < visemeProcessedData.size(); p++)
+		delete visemeProcessedData[p];
+	
+
+	
 
 	return finalCurves;
 }
@@ -1870,7 +1879,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		// remove results_visemes
 		for (size_t d = 0; d < result_visemes->size(); d++)
 			delete (*result_visemes)[d];
-		(*result_visemes).clear();
+		delete result_visemes;
 
 		vector<VisemeData*>::iterator cur = visemes.begin();
 		vector<VisemeData*>::iterator end = visemes.end();

@@ -111,6 +111,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 			manager->handleEvent(motionEvent);
+			delete motionEvent;
 #endif
 			colRecords.clear();
 			hasGaze = true;
@@ -140,6 +141,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(_character));
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
 			manager->handleEvent(motionEvent);
+			delete motionEvent;
 #endif
 			hasGaze = false;
 			hasPD = true;

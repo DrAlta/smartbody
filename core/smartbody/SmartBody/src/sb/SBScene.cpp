@@ -1412,6 +1412,7 @@ bool SBScene::run(const std::string& command)
 		{
 			SBEvent* event = this->getEventManager()->createEvent("error", command, this->getStringFromObject(this));
 			this->getEventManager()->handleEvent(event);
+			delete event;
 			PyErr_Print();
 			PyErr_Clear();
 		}
@@ -1422,6 +1423,7 @@ bool SBScene::run(const std::string& command)
 		PyErr_Clear();
 		SBEvent* event = this->getEventManager()->createEvent("error", command, this->getStringFromObject(this));
 		this->getEventManager()->handleEvent(event);
+		delete event;
 		return false;
 	}
 #endif
@@ -1465,6 +1467,8 @@ bool SBScene::runScript(const std::string& script)
 			{
 				SBEvent* event = this->getEventManager()->createEvent("error", script, this->getStringFromObject(this));
 				this->getEventManager()->handleEvent(event);
+				delete event;
+				
 				PyErr_Print();
 				PyErr_Clear();
 			}
@@ -1476,6 +1480,7 @@ bool SBScene::runScript(const std::string& script)
 			PyErr_Clear();
 			SBEvent* event = this->getEventManager()->createEvent("error", script, this->getStringFromObject(this));
 			this->getEventManager()->handleEvent(event);
+			delete event;
 			return false;
 		}
 	}
