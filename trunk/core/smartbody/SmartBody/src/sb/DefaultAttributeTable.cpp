@@ -27,6 +27,21 @@ DefaultAttributeTable::DefaultAttributeTable(void)
 
 DefaultAttributeTable::~DefaultAttributeTable(void)
 {
+	for (size_t i = 0; i < _defaultAttributes.size(); i++)
+	{
+		std::pair<SmartBody::SBAttribute*, VariablePointer>& pair = _defaultAttributes[i];
+		delete pair.first;
+	}
+
+	for (std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.begin();
+		iter != _defaultGroups.end();
+		iter++)
+	{
+		delete iter->second;
+	}
+
+	std::map<std::string, SmartBody::SBAttributeGroup*> _defaultGroups;
+
 }
 
 void DefaultAttributeTable::setDefaultAttributeGroupPriority(const std::string& groupName, int priority)

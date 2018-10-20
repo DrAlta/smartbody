@@ -680,6 +680,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	motionEvent->setSource(SmartBody::SBScene::getScene()->getStringFromObject(character));
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	delete motionEvent;
 	//SmartBody::util::log("PPRAISteeringAgent::sendLocomotionEvent Over");
 #else
 	std::string eventType = "locomotion";

@@ -864,6 +864,7 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 			}
 
 			visemeData.push_back((*curViseme));
+			delete curViseme;
 	   }
 	   if (visemeData.size() > 0)
 	   {

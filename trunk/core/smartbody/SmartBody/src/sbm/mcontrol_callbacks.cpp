@@ -1657,7 +1657,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		strstr << " start " << soundDuration;
 		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str(), characterObjectName);
 		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent);
-
+		delete sbevent;
         return CMD_SUCCESS;
     }
 
@@ -3604,6 +3604,7 @@ int mcu_triggerevent_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	char* eventParameters = args.read_remainder_raw();
 	SmartBody::SBEvent* e = eventManager->createEvent(eventName, eventParameters, "");
 	eventManager->handleEvent(e);
+	delete e;
 
 	SmartBody::util::log("TRIGGERING EVENT %s %s AT TIME %f", eventName, eventParameters, scene->getSimulationManager()->getTime());
 	return CMD_SUCCESS;

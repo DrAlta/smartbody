@@ -214,6 +214,7 @@ void ReachHandAction::sendReachEvent(const std::string& etype, const std::string
 	motionEvent->setSource(source);
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(motionEvent);
+	delete motionEvent;
 	
 #else
 	std::string eventType = etype;		

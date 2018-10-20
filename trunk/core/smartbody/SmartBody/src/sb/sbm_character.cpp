@@ -466,6 +466,7 @@ void SbmCharacter::createStandardControllers()
 	this->physics_ct = new MeCtPhysicsController(this);
 	std::string physicsCtName = getName() + "_physicsController";
 	this->physics_ct->setName(physicsCtName.c_str());
+	
 
 	this->noise_ct = new MeCtNoiseController(this);
 	std::string noiseCtName = getName() + "_noiseController";
@@ -493,6 +494,8 @@ void SbmCharacter::createStandardControllers()
 	grab_sched_p->ref();
 	constraint_sched_p->ref();
 	overlayMotion_sched_p->ref();
+	physics_ct->ref();
+	noise_ct->ref();
 
 	posture_sched_p->init(this);
 	motion_sched_p->init(this);
