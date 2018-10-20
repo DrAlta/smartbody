@@ -2282,6 +2282,9 @@ void BML::SpeechRequest::unschedule(  SmartBody::SBScene* scene,
 	                            
 void BML::SpeechRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr request )
 {
+	for (size_t v = 0; v < visemes.size(); v++)
+		delete visemes[v];
+
 	visemes.clear();
 	unschedule_sequence( scene );
 
