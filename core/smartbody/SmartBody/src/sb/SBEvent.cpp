@@ -158,6 +158,12 @@ void SBEventManager::handleEvent(SBEvent* e)
 		handler->executeAction(e);	
 }
 
+void SBEventManager::handleEventRemove(SBEvent* e)
+{
+	handleEvent(e);
+	delete e;
+}
+
 SBEvent* SBEventManager::createEvent(const std::string& type, const std::string parameters, const std::string source)
 {
 	SBEvent* event = new SBEvent();

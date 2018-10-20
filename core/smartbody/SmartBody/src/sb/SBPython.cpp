@@ -757,6 +757,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	boost::python::class_<SBEventManager>("SBEventManager")
 		.def("handleEvent", &SBEventManager::handleEvent, "Processes an event by the appropriate event handler.")
+		.def("handleEventRemove", &SBEventManager::handleEventRemove, "Processes an event by the appropriate event handler then remove the event.")
 		.def("addEventHandler", &SBEventManager::addEventHandler, "Returns the event type.")
 		.def("removeEventHandler", &SBEventManager::removeEventHandler, "Returns the event type.")
 		.def("getNumHandlers", &SBEventManager::getNumEventHandlers, "Gets the number of event handlers.")
