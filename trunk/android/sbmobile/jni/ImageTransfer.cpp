@@ -230,6 +230,7 @@ void replaceSubMesh(std::string deformableMeshName, std::string subMeshName, std
 		{
 			SmartBody::util::log("Updating deformable model in pawn '%s'", pawnNames[i].c_str());
 			SbmDeformableMeshGPUInstance* gpuMeshInst = (SbmDeformableMeshGPUInstance*)pawnMeshInst;
+			gpuMeshInst->setDeformableMesh(gpuMesh);
 			gpuMeshInst->initBuffer();
 		}
 	}
