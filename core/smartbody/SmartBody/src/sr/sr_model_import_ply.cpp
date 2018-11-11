@@ -306,7 +306,8 @@ bool SrModel::import_ply( const char* file )
 			mtlnames.push_back ( mtlName.c_str() );
 			//SmartBody::util::log("texture found : %s", texFile.c_str());
 			std::stringstream strstr2;
-			strstr2 << name << "|" << texFile;
+			//strstr2 << name << "|" << texFile;
+			strstr2 << texFile;
 			mtlTextureNameMap[mtlName] = strstr2.str();	
 		}
 		comment = ply_get_next_comment(ply,comment);
