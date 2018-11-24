@@ -1077,7 +1077,7 @@ void SBDrawCharacters()
         //glLineWidth(1.0f);
         glColor4f(1, 1, 1, 1);
         glEnableClientState(GL_VERTEX_ARRAY);
-      glVertexPointer(3, GL_FLOAT, 0, jointPos);
+        glVertexPointer(3, GL_FLOAT, 0, jointPos);
         glDrawArrays(GL_POINTS, 0, numJoints);
         glDrawElements(GL_LINES,numJoints*2,GL_UNSIGNED_SHORT, boneIdx);
         glDisableClientState(GL_VERTEX_ARRAY);

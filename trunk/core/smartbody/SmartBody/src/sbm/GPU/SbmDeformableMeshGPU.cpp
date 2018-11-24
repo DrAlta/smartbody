@@ -1477,6 +1477,32 @@ void SbmDeformableMeshGPU::cleanBuffer()
 	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 9");
 }
 
+void SbmDeformableMeshGPU::rebuildVertexBuffer(bool rebuild)
+{
+	for (size_t i = 0; i < this->getNumMeshes(); i++)
+	{
+		// update skin weights with new vertices
+		SkinWeight* subSkin = this->skinWeights[i];
+		subSkin->bindWeight.clear();
+		subSkin->jointNameIndex.clear();
+		subSkin->numInfJoints.clear();
+		subSkin->weightIndex.clear();
+		subSkin->bindWeight.push_back(1.0f);
+		int num = subSkin->getNumVertices();
+		for (unsigned int i = 0; i < num; i++)
+		{
+			subSkin->jointNameIndex.push_back(0);
+			subSkin->numInfJoints.push_back(1);
+			subSkin->weightIndex.push_back(0);
+		}
+	}
+
+	DeformableMesh::rebuildVertexBuffer(rebuild);
+	bool ok = rebuildVertexBufferGPU(rebuild);
+	if (!ok)
+		SmartBody::util::log("Problem rebuilding vertex buffer for %s", this->getName().c_str());
+}
+
 bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
 {
 	if (rebuild)
