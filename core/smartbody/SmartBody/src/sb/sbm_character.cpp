@@ -265,11 +265,9 @@ SbmCharacter::~SbmCharacter( void )	{
 
 	if (motiongraph_ct)
 		motiongraph_ct->unref();
-	if (realTimeLipSyncCt)
-		realTimeLipSyncCt->unref();
 
-	if (overlayMotion_sched_p)
-		overlayMotion_sched_p->unref();
+	//if (overlayMotion_sched_p)
+		//overlayMotion_sched_p->unref();
 
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();

@@ -69,6 +69,7 @@ public:
 public:
 	virtual void update();
 	virtual bool buildVertexBufferGPU();	
+	virtual void rebuildVertexBuffer(bool rebuild);
 	SBAPI bool rebuildVertexBufferGPU(bool rebuild);
 	void skinTransformGPU(DeformableMeshInstance* meshInstance);
 	static void initShaderProgram();	

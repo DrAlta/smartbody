@@ -48,6 +48,7 @@ namespace SmartBody
 			.def("getNumSubmeshes", &DeformableMesh::getNumMeshes, "Returns the number of submeshes.")
 			.def("getSkinWeight", &DeformableMesh::getSkinWeight, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skin weight object from mesh name.")
 			.def("getSkinWeightIndex", &DeformableMesh::getSkinWeightIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skin weight object from index.")
+			.def("rebuildVertexBuffer", &DeformableMesh::rebuildVertexBuffer, "Rebuilds the vertex buffer.")
 
 			;
 	}
