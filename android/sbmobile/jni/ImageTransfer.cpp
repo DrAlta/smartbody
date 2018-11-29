@@ -249,12 +249,19 @@ void deformableMeshTextureReplace(std::string meshName, std::string textureName,
 
 	bool meshTextureExist = false;
 	std::string finalTextureName = "";
+	std::string combinedName = "";
 	for (unsigned int i = 0; i < mesh->subMeshList.size(); i++)
 	{
 		SbmSubMesh* subMesh = mesh->subMeshList[i];
 		//if (subMesh->texName == textureName)
 		//	meshTextureExist = true;
-		if (subMesh->texName.find(textureName) != std::string::npos) // texture name exists in the submesh
+		std::string textureNameStr = subMesh->texName;
+		int pos = textureNameStr.find("|");
+		if (pos != std::string::npos)
+			textureNameStr = textureNameStr.substr(pos + 1);
+		
+		SmartBody::util::log("Submesh texture name is %s", subMesh->texName.c_str());
+		if (textureName.find(textureNameStr) != std::string::npos) // texture name exists in the submesh
 		{
 			finalTextureName = subMesh->texName;
 			meshTextureExist = true;
