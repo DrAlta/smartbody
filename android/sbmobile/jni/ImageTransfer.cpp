@@ -261,7 +261,7 @@ void deformableMeshTextureReplace(std::string meshName, std::string textureName,
 			textureNameStr = textureNameStr.substr(pos + 1);
 		
 		SmartBody::util::log("Submesh texture name is %s", subMesh->texName.c_str());
-		if (textureName.find(textureNameStr) != std::string::npos) // texture name exists in the submesh
+		if (textureNameStr.find(textureName) != std::string::npos) // texture name exists in the submesh
 		{
 			finalTextureName = subMesh->texName;
 			meshTextureExist = true;
