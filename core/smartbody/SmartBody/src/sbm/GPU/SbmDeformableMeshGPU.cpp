@@ -1477,8 +1477,11 @@ void SbmDeformableMeshGPU::cleanBuffer()
 	SmartBody::util::log(" DeformableMeshGPU::cleanBuffer 9");
 }
 
+
 void SbmDeformableMeshGPU::rebuildVertexBuffer(bool rebuild)
 {
+	DeformableMesh::rebuildVertexBuffer(rebuild);
+#if 0
 	for (size_t i = 0; i < this->getNumMeshes(); i++)
 	{
 		// update skin weights with new vertices
@@ -1516,7 +1519,9 @@ void SbmDeformableMeshGPU::rebuildVertexBuffer(bool rebuild)
 			gpuMeshInst->initBuffer();
 		}
 	}
+#endif
 }
+
 
 bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
 {
