@@ -1590,9 +1590,9 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 			if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			{
 				std::string prefixedName = newModel->mtlTextureNameMap[matName];
-        std::string::size_type index = prefixedName.find_first_of("|");
+				std::string::size_type index = prefixedName.find_first_of("|");
 				std::string fileName = prefixedName;
-        if (index != std::string::npos)
+				if (index != std::string::npos)
 					fileName = prefixedName.substr(index + 1);
 				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), fileName.c_str(), paths);
 
@@ -1607,7 +1607,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						diffuseTex->bakeAlphaIntoTexture(transTex);
 					}
-          delete transTex;
+				delete transTex;
 				}
 				newModel->mtlTextureNameMap[matName] = prefixedName;
 			}
@@ -1617,7 +1617,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 				std::string prefixedName = newModel->mtlSpecularTexNameMap[matName];
 				std::string::size_type index = prefixedName.find_first_of("|");
 				std::string fileName = prefixedName;
-        if (index != std::string::npos)
+				if (index != std::string::npos)
 					fileName = prefixedName.substr(index + 1);
 				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), fileName.c_str(), paths);
 
@@ -1632,7 +1632,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						specularTex->bakeAlphaIntoTexture(glossyTex);
 					}
-          delete glossyTex;
+					delete glossyTex;
 				}
 
 				newModel->mtlSpecularTexNameMap[matName] = prefixedName;
@@ -2104,17 +2104,18 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
-// 			if (tex)
-// 			{
-// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
-// 				tex = NULL;
-// 			}
+			if (tex)
+			{
+				texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
+				tex = NULL;
+			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				SmartBody::util::log("loading texture label = %s, textureFile = %s", textureLabel.c_str(), textureFile.c_str());
 #if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
@@ -2135,17 +2136,18 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
-// 			if (tex)
-// 			{
-// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
-// 				tex = NULL;
-// 			}
+			if (tex)
+			{
+				texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
+				tex = NULL;
+			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				SmartBody::util::log("loading normal map label = %s, textureFile = %s", textureLabel.c_str(), textureFile.c_str());
 #if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
@@ -2165,17 +2167,18 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
-// 			if (tex)
-// 			{
-// 				texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
-// 				tex = NULL;
-// 			}
+			if (tex)
+			{
+				texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
+				tex = NULL;
+			}
 			if (!tex)
 			{
 				// separate the texture prefix and |
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				SmartBody::util::log("loading specular map = %s, textureFile = %s", textureLabel.c_str(), textureFile.c_str());
 #if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)

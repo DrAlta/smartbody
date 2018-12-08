@@ -171,8 +171,20 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
     // Retrieves texture map type: DIFFUSE, SPECULAR, GLOSSY, or NORMAL
     StrTextureMap& texMap	= findMap(iType);
 
-    // If the texture does not exist in the texture map, create a new one
-    if (texMap.find(strTex) == texMap.end()) 
+    // overwrite the existing textures
+	if (texMap.find(strTex) != texMap.end())
+	{
+		SbmTexture* texture = texMap[strTex];
+		SbmTexture* tempTex = new SbmTexture(textureName);
+		if (!tempTex->loadImage(fileName))
+		{
+			//SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
+			delete tempTex;
+			return;
+		}
+		texture->loadImage(fileName);
+	}
+	else //if (texMap.find(strTex) == texMap.end()) 
     {
         SbmTexture* texture = new SbmTexture(textureName);
         if(!texture->loadImage(fileName))
@@ -548,6 +560,7 @@ bool SbmTexture::loadImage( const char* fileName )
 	  stbi_image_free(buffer);
     //SOIL_free_image_data(buffer);
     buffer = NULL;
+	finishBuild = false;
     return true;
 }
 
