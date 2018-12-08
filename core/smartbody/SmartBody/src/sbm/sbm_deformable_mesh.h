@@ -237,7 +237,7 @@ public:
 	SBAPI bool readFromSmb(std::string inputFileName);
 	SBAPI bool readFromDmb(std::string inputFileName);
 	// helper function
-	void saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
+	void saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::string objectName);
 	void readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models, std::string file);
 	void loadAllFoundTextures(std::string textureDirectory);
 	SBAPI SrVec computeCenterOfMass();

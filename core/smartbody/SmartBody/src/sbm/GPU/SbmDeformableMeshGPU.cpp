@@ -1501,6 +1501,21 @@ void SbmDeformableMeshGPU::rebuildVertexBuffer(bool rebuild)
 	bool ok = rebuildVertexBufferGPU(rebuild);
 	if (!ok)
 		SmartBody::util::log("Problem rebuilding vertex buffer for %s", this->getName().c_str());
+	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector < std::string > pawnNames = scene->getPawnNames();
+	for (unsigned int i = 0; i < pawnNames.size(); i++)
+	{
+		SmartBody::SBPawn* pawn = scene->getPawn(pawnNames[i]);
+		DeformableMeshInstance* pawnMeshInst = pawn->getActiveMesh();
+		if (pawnMeshInst && pawnMeshInst->getDeformableMesh() == this) // need to update mesh instance for this pawn
+		{
+			SmartBody::util::log("Updating deformable model in pawn '%s'", pawnNames[i].c_str());
+			SbmDeformableMeshGPUInstance* gpuMeshInst = (SbmDeformableMeshGPUInstance*)pawnMeshInst;
+			gpuMeshInst->setDeformableMesh(this);
+			gpuMeshInst->initBuffer();
+		}
+	}
 }
 
 bool SbmDeformableMeshGPU::rebuildVertexBufferGPU(bool rebuild)
