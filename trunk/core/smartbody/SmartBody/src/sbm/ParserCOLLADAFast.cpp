@@ -2712,6 +2712,12 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, const SrStringArray& paths)
 {
 	std::string finalFileName = filename;
+	size_t pipepos = filename.find("|");
+	if (pipepos != std::string::npos)
+	{
+		finalFileName = filename.substr(pipepos + 1);
+	}
+	
 	bool isAbsolute = false;
 	if (filename.find("file:///") != std::string::npos)
 	{

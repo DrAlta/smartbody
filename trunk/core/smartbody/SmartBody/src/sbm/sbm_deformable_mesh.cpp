@@ -1217,10 +1217,10 @@ bool DeformableMesh::isSkinnedMesh()
 }
 
 
-void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputStaticMesh)
+void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputStaticMesh, std::string objectName)
 {
-	// 1	StaticMesh	
-	outputStaticMesh->set_staticmeshname(getName());
+	// 1	StaticMesh
+	outputStaticMesh->set_staticmeshname(objectName);
 	// 2
 	std::vector<SrModel*> modelsToSave;
 	// prepare models
@@ -1346,14 +1346,28 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		// 13
 		for (unsigned int m = 0; m < curModel->mtlnames.size(); ++m)
 		{
-			newMeshModel->add_materialnames( curModel->mtlnames[m].c_str());
+			std::string materialName = curModel->mtlnames[m];
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(materialName, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				materialName = objectName + "|" + tokens[1];
+			}
+			newMeshModel->add_materialnames(materialName.c_str());
 		}
 		// 14
 		std::map<std::string,std::string>::iterator iter;
 		for (iter = curModel->mtlTextureNameMap.begin(); iter != curModel->mtlTextureNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2DiffuseMapping = newMeshModel->add_materialtodiffusetexturemapping();
-			m2DiffuseMapping->set_from(iter->first);
+			std::string fromStr = iter->first;
+			std::vector<std::string> tokensFrom;
+			SmartBody::util::tokenize(iter->first, tokensFrom, "|");
+			if (tokensFrom.size() > 1)
+			{
+				fromStr = objectName + "|" + tokensFrom[1];
+			}
+			m2DiffuseMapping->set_from(fromStr);
 			// make sure that the prefix isn't save with the data
 			std::vector<std::string> tokens;
 			SmartBody::util::tokenize(iter->second, tokens, "|");
@@ -1371,15 +1385,57 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		for (iter = curModel->mtlNormalTexNameMap.begin(); iter != curModel->mtlNormalTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2NormalMapping = newMeshModel->add_materialtonormaltexturemapping();
-			m2NormalMapping->set_from(iter->first);
-			m2NormalMapping->set_to(iter->second);
+
+			
+			std::string fromStr = iter->first;
+			std::vector<std::string> tokensFrom;
+			SmartBody::util::tokenize(iter->first, tokensFrom, "|");
+			if (tokensFrom.size() > 1)
+			{
+				fromStr = objectName + "|" + tokensFrom[1];
+			}
+			m2NormalMapping->set_from(fromStr);
+
+
+			// make sure that the prefix isn't save with the data
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(iter->second, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				m2NormalMapping->set_to(tokens[1]);
+			}
+			else
+			{
+				m2NormalMapping->set_to(iter->second);
+			}
 		}
 		// 16
 		for (iter = curModel->mtlSpecularTexNameMap.begin(); iter != curModel->mtlSpecularTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2SpecularMapping = newMeshModel->add_materialtospeculartexturemapping();
-			m2SpecularMapping->set_from(iter->first);
-			m2SpecularMapping->set_to(iter->second);
+
+			
+			std::string fromStr = iter->first;
+			std::vector<std::string> tokensFrom;
+			SmartBody::util::tokenize(iter->first, tokensFrom, "|");
+			if (tokensFrom.size() > 1)
+			{
+				fromStr = objectName + "|" + tokensFrom[1];
+			}
+			m2SpecularMapping->set_from(fromStr);
+
+
+			// make sure that the prefix isn't save with the data
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(iter->second, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				m2SpecularMapping->set_to(tokens[1]);
+			}
+			else
+			{
+				m2SpecularMapping->set_to(iter->second);
+			}
 		}
 		// 17
 		std::map<std::string,std::vector<int> >::iterator iter1;
@@ -1394,19 +1450,70 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		for (iter = curModel->mtlTransparentTexNameMap.begin(); iter != curModel->mtlTransparentTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2TransparentMapping = newMeshModel->add_materialtotransparenttexturemapping();
-			m2TransparentMapping->set_from(iter->first);
-			m2TransparentMapping->set_to(iter->second);
+
+			
+			std::string fromStr = iter->first;
+			std::vector<std::string> tokensFrom;
+			SmartBody::util::tokenize(iter->first, tokensFrom, "|");
+			if (tokensFrom.size() > 1)
+			{
+				fromStr = objectName + "|" + tokensFrom[1];
+			}
+			m2TransparentMapping->set_from(fromStr);
+			
+			// make sure that the prefix isn't save with the data
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(iter->second, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				m2TransparentMapping->set_to(tokens[1]);
+			}
+			else
+			{
+				m2TransparentMapping->set_to(iter->second);
+			}
 		}
 		// 19
 		for (iter = curModel->mtlGlossyTexNameMap.begin(); iter != curModel->mtlGlossyTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2GlossyMapping = newMeshModel->add_materialtoglossytexturemapping();
-			m2GlossyMapping->set_from(iter->first);
-			m2GlossyMapping->set_to(iter->second);
+
+			
+			std::string fromStr = iter->first;
+			std::vector<std::string> tokensFrom;
+			SmartBody::util::tokenize(iter->first, tokensFrom, "|");
+			if (tokensFrom.size() > 1)
+			{
+				fromStr = objectName + "|" + tokensFrom[1];
+			}
+			m2GlossyMapping->set_from(fromStr);
+
+
+			// make sure that the prefix isn't save with the data
+			std::vector<std::string> tokens;
+			SmartBody::util::tokenize(iter->second, tokens, "|");
+			if (tokens.size() > 1)
+			{
+				m2GlossyMapping->set_to(tokens[1]);
+			}
+			else
+			{
+				m2GlossyMapping->set_to(iter->second);
+			}
 		}
 	}
 	
 }
+
+std::string buildName(std::string modelName, std::string textureName)
+{
+	if (textureName.find("|") != std::string::npos)
+		return textureName;
+	std::stringstream strstr;
+	strstr << modelName << "|" << textureName;
+	return strstr.str();
+}
+
 
 void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models, std::string file)
 {
@@ -1532,25 +1639,33 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 		// 13
 		for (int x = 0; x < meshModel.materialnames_size(); ++x)
 		{
-			newModel->mtlnames.push_back(meshModel.materialnames(x).c_str());
+
+			std::string fromName = buildName(getName(), meshModel.materialnames(x).c_str());
+			newModel->mtlnames.push_back(fromName);
 		}
 		// 14
 		for (int x = 0; x < meshModel.materialtodiffusetexturemapping_size(); ++x)
 		{
 			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtodiffusetexturemapping(x);
-			newModel->mtlTextureNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlTextureNameMap.insert(std::make_pair(fromName, m2d.to()));
 		}
 		// 15
 		for (int x = 0; x < meshModel.materialtonormaltexturemapping_size(); ++x)
 		{
 			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtonormaltexturemapping(x);
-			newModel->mtlNormalTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlNormalTexNameMap.insert(std::make_pair(fromName, m2d.to()));
 		}
 		// 16
 		for (int x = 0; x < meshModel.materialtospeculartexturemapping_size(); ++x)
 		{
 			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtospeculartexturemapping(x);
-			newModel->mtlSpecularTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlSpecularTexNameMap.insert(std::make_pair(fromName, m2d.to()));
 		}
 		// 17
 		for (int x = 0; x < meshModel.materialtofaceindices_size(); ++x)
@@ -1559,19 +1674,25 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 			std::vector<int> indices;
 			for (int z = 0; z < m2d.to_size(); ++z)
 				indices.push_back(m2d.to(z));
-			newModel->mtlFaceIndices.insert(std::make_pair(m2d.from(), indices));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlFaceIndices.insert(std::make_pair(fromName, indices));
 		}
 		// 18
 		for (int x = 0; x < meshModel.materialtotransparenttexturemapping_size(); ++x)
 		{
 			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtotransparenttexturemapping(x);
-			newModel->mtlTransparentTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlTransparentTexNameMap.insert(std::make_pair(fromName, m2d.to()));
 		}
 		// 19
 		for (int x = 0; x < meshModel.materialtoglossytexturemapping_size(); ++x)
 		{
 			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtoglossytexturemapping(x);
-			newModel->mtlGlossyTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+
+			std::string fromName = buildName(getName(), m2d.from());
+			newModel->mtlGlossyTexNameMap.insert(std::make_pair(fromName, m2d.to()));
 		}
 
 		// bake transparent and glossy maps into diffuse and specular maps
@@ -1590,11 +1711,8 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 			if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			{
 				std::string prefixedName = newModel->mtlTextureNameMap[matName];
-				std::string::size_type index = prefixedName.find_first_of("|");
-				std::string fileName = prefixedName;
-				if (index != std::string::npos)
-					fileName = prefixedName.substr(index + 1);
-				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), fileName.c_str(), paths);
+       				std::string::size_type index = prefixedName.find_first_of("|");
+				std::string fileName = newModel->mtlTextureNameMap[matName];				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), fileName.c_str(), paths);
 
 				if (newModel->mtlTransparentTexNameMap.find(matName) != newModel->mtlTransparentTexNameMap.end())
 				{
@@ -1607,9 +1725,11 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						diffuseTex->bakeAlphaIntoTexture(transTex);
 					}
+
 				delete transTex;
 				}
-				newModel->mtlTextureNameMap[matName] = prefixedName;
+
+				//newModel->mtlTextureNameMap[matName] = prefixedName;
 			}
 
 			if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
@@ -1617,6 +1737,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 				std::string prefixedName = newModel->mtlSpecularTexNameMap[matName];
 				std::string::size_type index = prefixedName.find_first_of("|");
 				std::string fileName = prefixedName;
+
 				if (index != std::string::npos)
 					fileName = prefixedName.substr(index + 1);
 				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), fileName.c_str(), paths);
@@ -1632,10 +1753,12 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					{
 						specularTex->bakeAlphaIntoTexture(glossyTex);
 					}
+
 					delete glossyTex;
 				}
 
-				newModel->mtlSpecularTexNameMap[matName] = prefixedName;
+
+				//newModel->mtlSpecularTexNameMap[matName] = prefixedName;
 			}
 		}
 #endif
@@ -1729,7 +1852,8 @@ void DeformableMesh::computeNormals()
 bool DeformableMesh::saveToSmb(std::string inputFileName)
 {
 	SmartBodyBinary::StaticMesh* outputStaticMesh = new SmartBodyBinary::StaticMesh();
-	saveToStaticMeshBinary(outputStaticMesh);
+
+	
 	// set properly the binary static mesh to be output file name (fileName + extension)
 	boost::filesystem::path p(inputFileName);
 	std::string fileName = boost::filesystem::basename(p);
@@ -1739,6 +1863,7 @@ bool DeformableMesh::saveToSmb(std::string inputFileName)
 		extension = ".smb";
 		inputFileName = fileName + extension;
 	}
+	saveToStaticMeshBinary(outputStaticMesh, fileName + extension);
 	outputStaticMesh->set_staticmeshname(fileName + extension);
 	
 	// TODO: copy the textures out if needed
@@ -1807,7 +1932,8 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 	outputDeformableMesh->set_deformablemeshname(fileName + extension);
 	// 2
 	SmartBodyBinary::StaticMesh* outputStaticMesh = outputDeformableMesh->mutable_staticmesh(); 
-	saveToStaticMeshBinary(outputStaticMesh);
+
+	saveToStaticMeshBinary(outputStaticMesh, fileName + extension);
 	outputStaticMesh->set_staticmeshname(fileName + extension);
 
 	// save skin weights
@@ -2103,7 +2229,9 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		for (iter = dMeshStatic_p[i]->shape().mtlTextureNameMap.begin(); iter != dMeshStatic_p[i]->shape().mtlTextureNameMap.end(); ++iter)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
-			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
+
+			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->first.c_str());
+
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
@@ -2136,6 +2264,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
+
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
@@ -2167,6 +2296,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 		{
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
+
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
