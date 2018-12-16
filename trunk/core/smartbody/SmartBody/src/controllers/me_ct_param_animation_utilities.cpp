@@ -489,10 +489,12 @@ SrMat PAMotions::getBaseMatFromBuffer(SrBuffer<float>& buffer)
 	mat.set(13, buffer[baseBuffId.y]);
 	mat.set(14, buffer[baseBuffId.z]);
 
+	/* this breaks the locomotion
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("blendFix"))
 	{
 		mat = SrMat();
 	}
+	*/
 	
 	return mat;
 }
