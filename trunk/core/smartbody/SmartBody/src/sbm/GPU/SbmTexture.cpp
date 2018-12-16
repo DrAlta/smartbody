@@ -167,12 +167,12 @@ std::vector<std::string> SbmTextureManager::getTextureNames( int type )
 void SbmTextureManager::loadTexture(int iType, const char* textureName, const char* fileName )
 {
     std::string strTex		= textureName;
-	SmartBody::util::log("Loading texture '%s'.", textureName);
+	//SmartBody::util::log("Loading texture '%s'.", textureName);
     // Retrieves texture map type: DIFFUSE, SPECULAR, GLOSSY, or NORMAL
     StrTextureMap& texMap	= findMap(iType);
 
     // overwrite the existing textures
-	if (texMap.find(strTex) != texMap.end())
+	/*if (texMap.find(strTex) != texMap.end())
 	{
 		SbmTexture* texture = texMap[strTex];
 		SbmTexture* tempTex = new SbmTexture(textureName);
@@ -184,7 +184,7 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
 		}
 		texture->loadImage(fileName);
 	}
-	else //if (texMap.find(strTex) == texMap.end()) 
+	else //*/if (texMap.find(strTex) == texMap.end()) 
     {
         SbmTexture* texture = new SbmTexture(textureName);
         if(!texture->loadImage(fileName))
