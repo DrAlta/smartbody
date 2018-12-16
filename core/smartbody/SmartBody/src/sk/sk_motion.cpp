@@ -582,7 +582,7 @@ void SkMotion::apply ( float t,
 	int csize = _channels.size();
 
 	
-  float outValue[4], origValue[4] = {0,0,0,0}, newValue[4]; // at most 4 
+	float outValue[4], origValue[4], newValue[4]; // at most 4 
 	// Apply to float* buffer
 	float* v = NULL;
 	int sum = 0;		
@@ -2132,10 +2132,10 @@ void SkMotion::smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask
 }
 
 
-SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton, std::vector<std::string> from, std::vector<std::string> to)
+SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton, std::vector<std::string> from, std::vector<std::string> to)
 {
-	std::map<std::string,bool> jointNameMap;
-	for (unsigned int i=0; i<skeleton->joints().size();i++)
+	std::map<std::string, bool> jointNameMap;
+	for (unsigned int i = 0; i<skeleton->joints().size(); i++)
 	{
 		SkJoint* joint = skeleton->joints()[i];
 		jointNameMap[joint->getMappedJointName()] = true;
@@ -2145,180 +2145,6 @@ SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton, std::vector<std::st
 
 SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string, bool>& jointNameMap, std::vector<std::string> from, std::vector<std::string> to)
 {
-	SkChannelArray& mchan_arr = this->channels();
-	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
-	SmartBody::SBMotion *mirror_p = new SmartBody::SBMotion();
-	mirror_p->setMotionSkeletonName(originalMotion->getMotionSkeletonName());
-	srSynchPoints sp(synch_points);
-	mirror_p->synch_points = sp;
-	mirror_p->init(mchan_arr);
-	int num_f = this->frames();
-	for (int i = 0; i < num_f; i++)
-	{
-		mirror_p->insert_frame(i, this->keytime(i));
-		float *ref_p = this->posture(i);
-		float *new_p = mirror_p->posture(i);
-		// go through each channel, and flip the channel value when necessary
-		for (int k = 0; k<mchan_arr.size(); k++)
-		{
-			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.mappedName(k);
-			bool mirrorJoint = true;
-			// not used joints
-			if (jointNameMap.find(jointName) == jointNameMap.end())
-				mirrorJoint = false;
-			else
-				mirrorJoint = jointNameMap.find(jointName)->second;
-
-			int index = mchan_arr.float_position(k);
-			// get the mirrored index position
-			int otherIndex = index;
-			std::string jointNameOther = jointName;
-			bool found = false;
-			for (size_t n = 0; n < from.size(); n++)
-			{
-				if (boost::algorithm::starts_with(jointName, from[n]))
-				{
-					found = true;
-					jointNameOther = jointName;
-					// substitute one part for another
-					jointNameOther.replace(0, from[n].length(), to[n]);
-					break;
-				}
-				if (boost::algorithm::starts_with(jointName, to[n]))
-				{
-					found = true;
-					jointNameOther = jointName;
-					// substitute one part for another
-					jointNameOther.replace(0, to[n].length(), from[n]);
-					break;
-				}
-			}
-			if (found)
-			{
-				int otherChannelIndex = mchan_arr.search(jointNameOther.c_str(), chan.type);
-				if (otherChannelIndex >= 0)
-				{
-					otherIndex = mchan_arr.float_position(otherChannelIndex);
-					mirrorJoint = true;
-				}
-			}
-
-			if (chan.type == SkChannel::XPos)
-			{
-				if (mirrorJoint)
-					new_p[index] = -ref_p[otherIndex]; // flip x-translation
-				else
-					new_p[index] = ref_p[index];
-			}
-			else if (chan.type == SkChannel::Quat)
-			{
-				// flip rotation for y,z axis
-				SrQuat q_orig = SrQuat(ref_p[index], ref_p[index + 1], ref_p[index + 2], ref_p[index + 3]);
-
-				new_p[index + 0] = (float)q_orig.w;
-				new_p[index + 1] = (float)q_orig.x;
-				new_p[index + 2] = (float)q_orig.y;
-				new_p[index + 3] = (float)q_orig.z;
-
-				SrVec qa = q_orig.axisAngle();
-				SkJoint* joint = skeleton->search_joint(jointName.c_str());
-				if (!joint)
-				{
-					// joint not found, simply write to channels
-					for (int n = 0; n<chan.size(); n++)
-						new_p[index + n] = ref_p[index + n];
-				}
-				else
-				{
-					SrQuat q_origOther = SrQuat(ref_p[otherIndex], ref_p[otherIndex + 1], ref_p[otherIndex + 2], ref_p[otherIndex + 3]);
-					SrVec qaOther = q_origOther.axisAngle();
-					SkJoint* jointOther = skeleton->search_joint(jointNameOther.c_str());
-					SrQuat final_qOther = q_origOther;
-					if (mirrorJoint)
-					{
-						SrQuat q_zeroOther = SrQuat(jointOther->gmatZero());
-						SrQuat q_lzeroOther = SrQuat(jointOther->gmatZero());
-						// map left to right joint
-						if (jointOther)
-							q_zeroOther = SrQuat(jointOther->gmatZero());
-
-						SrVec qa_rot = qaOther * q_zeroOther;
-						SrQuat qa_temp = SrQuat(qa_rot);
-						euler_t ref_e = euler_t(quat_t(qa_temp.w, qa_temp.x, qa_temp.y, qa_temp.z));
-						quat_t new_q = euler_t(ref_e.x(), -ref_e.y(), -ref_e.z());
-						vector3_t new_qv = new_q.axisangle();
-						//SrVec new_qa = SrVec(qa_rot.x,-qa_rot.y,-qa_rot.z)*q_lzero.inverse();//SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_zero.inverse();
-						SrVec new_qa = SrVec((float)new_qv.x(), (float)new_qv.y(), (float)new_qv.z())*q_lzeroOther.inverse();
-						final_qOther = SrQuat(new_qa);
-
-						new_p[index + 0] = (float)final_qOther.w;
-						new_p[index + 1] = (float)final_qOther.x;
-						new_p[index + 2] = (float)final_qOther.y;
-						new_p[index + 3] = (float)final_qOther.z;
-					}
-
-#if 0 // print debug info 
-					if (joint->name() == "r_shoulder" || joint->name() == "l_shoulder")
-					{
-						euler_t ref_eorig = euler_t(quat_t(q_orig.w, q_orig.x, q_orig.y, q_orig.z));
-						euler_t final_euler = euler_t(quat_t(final_q.w, final_q.x, final_q.y, final_q.z));
-						SmartBody::util::log("joint %s : ", joint->name().c_str());
-						sr_out << "qa before rot = " << qa << srnl;
-						sr_out << "qa after rot = " << qa_rot << srnl;
-						SmartBody::util::log("euler before rot = %f %f %f", ref_eorig.x(), ref_eorig.y(), ref_eorig.z());
-						SmartBody::util::log("euler after rot = %f %f %f", ref_e.x(), ref_e.y(), ref_e.z());
-						SmartBody::util::log("euler final = %f %f %f", final_euler.x(), final_euler.y(), final_euler.z());
-					}
-#endif
-
-				}
-
-			}
-			else
-			{
-				for (int n = 0; n<chan.size(); n++)
-					new_p[index + n] = ref_p[index + n];
-			}
-		}
-		/*
-		for (int k=0;k<mchan_arr.size();k++)
-		{
-		SkChannel& chan = mchan_arr[k];
-		const std::string& jointName = mchan_arr.mappedName(k);
-		if (jointNameMap.find(jointName) == jointNameMap.end()) // skip joint value swapping
-		continue;
-		int index = mchan_arr.float_position(k);
-		if (boost::algorithm::starts_with(jointName, "l_") ||
-		boost::algorithm::starts_with(jointName, "r_"))
-		{
-		std::string jointNameOther = jointName;
-		// get the mirror joint name
-		if (boost::algorithm::starts_with(jointName, "l_"))
-		jointNameOther[0] = 'r';
-		else
-		jointNameOther[0] = 'l';
-
-		int otherJointIndex = mchan_arr.search(jointNameOther.c_str(), chan.type );
-		if (otherJointIndex < 0)
-		continue;
-		int otherIndex = mchan_arr.float_position(otherJointIndex);
-		// swap left and right channels
-		for (int n=0;n<chan.size();n++)
-		{
-		std::swap(new_p[otherIndex + n],new_p[index + n]);
-		}
-		}
-		}
-		*/
-	}
-	return mirror_p;
-}
-
-/* The following code works for zebra2 characters, but not fuse characters. Need to reconcile the differences. */
-/*
-SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameMap, std::vector<std::string> from, std::vector<std::string> to)
-{	
 	SkChannelArray& mchan_arr = this->channels();
 	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
 	SmartBody::SBMotion *mirror_p = new SmartBody::SBMotion();
@@ -2439,15 +2265,14 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 				for (int n = 0; n<chan.size(); n++)
 				{
 					std::swap(new_p[rindex + n], new_p[index + n]);
+				}
+			}
 		}
-	}
-}
 
 	}
 	return mirror_p;
 }
 
-*/
 
 
 

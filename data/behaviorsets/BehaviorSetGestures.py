@@ -112,12 +112,14 @@ def setupBehaviorSet():
 		
 	print "| BradGestureMap.py |"
 	
+	'''
 	# create sped-up versions of the gestures
 	for s in range(1, len(gestureMotions)):
 		m = scene.getMotion(gestureMotions[s])
 		n = m.copy(gestureMotions[s] + "2x")
 		n.speed(2)
 		scene.getAssetManager().addMotion(n)
+	'''
 		
 
 	# create a set of blends between the 1x and the 2x speed motions
