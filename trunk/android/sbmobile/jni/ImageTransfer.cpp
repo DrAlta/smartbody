@@ -172,7 +172,9 @@ void imageColorTransfer(std::string srcImg, std::string srcMask, std::string tgt
 	}
 	lab2rgb(srcLab, srcBuf, srcSize*forceImgChannel);
 	int imageWriteSuccess = stbi_write_png(outImage.c_str(), srcWidth, srcHeight, 4, srcBuf, srcWidth * 4);
-	//SmartBody::util::log("Writing PNG %s, result = %d", outImage.c_str(), imageWriteSuccess);
+	delete [] srcLab;
+	delete [] tgtLab;
+	SmartBody::util::log("Writing PNG %s, result = %d", outImage.c_str(), imageWriteSuccess);
 }
 
 void replaceSubMesh(std::string deformableMeshName, std::string subMeshName, std::string inputMeshFileName)
