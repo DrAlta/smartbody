@@ -189,12 +189,17 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
         SbmTexture* texture = new SbmTexture(textureName);
         if(!texture->loadImage(fileName))
         {
-            //SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
+            SmartBody::util::log("ERROR: Can't load image %s from %s. Invalid path? Is it an 8-bit image?", textureName, fileName);
 			delete texture;
 			return;
         }		
+		else
+		{
+			SmartBody::util::log("Just loaded texture %s from %s type %d", textureName, fileName, iType);
+		}
         texMap[strTex] = texture;
     }
+
 }
 
 void SbmTextureManager::createWhiteTexture(const char* textureName, int width, int height)
@@ -561,6 +566,9 @@ bool SbmTexture::loadImage( const char* fileName )
     //SOIL_free_image_data(buffer);
     buffer = NULL;
 	finishBuild = false;
+
+
+	SmartBody::util::log("Texture %s is %dx%d", fileName, width, height);
     return true;
 }
 

@@ -757,8 +757,12 @@ void BmlRequest::gestureRequestProcess()
 	
 	if (actor->getBoolAttribute("gestureRequest.experimentalCoarticulation"))
 	{
+		int priorityAdjustment = actor->getIntAttribute("gestureRequest.randomizePriorities");
 		std::vector<GestureRequest*> gestures;
+		std::srand(std::time(nullptr));
+
 		
+
 		for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i)
 		{
 			BehaviorRequest* behavior = (*i).get();
@@ -766,6 +770,10 @@ void BmlRequest::gestureRequestProcess()
 			if (gesture)
 			{
 				gestures.push_back(gesture);
+				if (priorityAdjustment > 0)
+				{
+					gesture->priority += std::rand()/((RAND_MAX + 1u)/priorityAdjustment);
+				}
 				
 				gesture->workReadyTime = (double) gesture->behav_syncs.sync_ready()->time();
 				gesture->workStrokeStartTime = (double) gesture->behav_syncs.sync_stroke_start()->time();
@@ -1257,6 +1265,7 @@ void BmlRequest::gestureRequestProcess()
 				if (tokens[j] == "schedule")
 					isScheduling = true;
 			}
+	
 			if (blendObject && isScheduling &&  blendObject->stateName != PseudoIdleState)
 			{
 				std::vector<float> weights;

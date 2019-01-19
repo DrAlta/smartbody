@@ -116,7 +116,9 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createStringAttribute("gestureRequest.curGestureRandom", "", true, "Gestures", 104, false, false, false, "Current set of randomized gestures choices. Used to replay the BML file exactly as before.");
 	createIntAttribute("gestureRequest.lastGestureRandomIndex", 0, true, "Gestures", 105, false, false, false, "Last set of randomized gestures choices. Used to replay the BML file exactly as before.");
 	createBoolAttribute("gestureRequest.useLastRandomGesture", false, true, "Gestures", 106, false, false, false, "Determines if the last gesture random selections should be applied to the next gesture choices.");
-
+	createIntAttribute("gestureRequest.randomizePriorities", 0, true, "Gestures", 107, false, false, false, "Randomizes the priorites by a given amount.");
+	createBoolAttribute("gestureRequest.useDiscreteBlends", false, true, "Gestures", 108, false, false, false, "Determines if the last gesture random selections should be applied to the next gesture choices.");
+	
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 
 	std::vector<std::string> gesturePolicyVec;

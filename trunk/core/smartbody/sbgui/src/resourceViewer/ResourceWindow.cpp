@@ -442,7 +442,8 @@ void ResourceWindow::updateGUI()
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBMotion * motion = scene->getMotion(motionNames[i]);
-		updateMotion(getTreeFromName("motion"), motion);
+		if (motion)
+			updateMotion(getTreeFromName("motion"), motion);
 	}
 
 	SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();

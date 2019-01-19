@@ -2171,10 +2171,47 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 				mirrorJoint = jointNameMap.find(jointName)->second;
 
 			int index = mchan_arr.float_position(k);
+			
+			// get the mirrored index position
+			int otherIndex = index;
+			std::string jointNameOther = jointName;
+			bool found = false;
+			for (size_t n = 0; n < from.size(); n++)
+			{
+				if (boost::algorithm::starts_with(jointName, from[n]))
+				{
+					found = true;
+					jointNameOther = jointName;
+					// substitute one part for another
+					jointNameOther.replace(0, from[n].length(), to[n]);
+					break;
+				}
+				if (boost::algorithm::starts_with(jointName, to[n]))
+				{
+					found = true;
+					jointNameOther = jointName;
+					// substitute one part for another
+					jointNameOther.replace(0, to[n].length(), from[n]);
+					break;
+				}
+			}
+			if (found)
+			{
+				int otherChannelIndex = mchan_arr.search(jointNameOther.c_str(), chan.type);
+				if (otherChannelIndex >= 0)
+				{
+					otherIndex = mchan_arr.float_position(otherChannelIndex);
+					mirrorJoint = true;
+				}
+			}
+
+			
+
+
 			if (chan.type == SkChannel::XPos)
 			{
 				if (mirrorJoint)
-					new_p[index] = -ref_p[index]; // flip x-translation
+					new_p[index] = -ref_p[otherIndex]; // flip x-translation
 				else
 					new_p[index] = ref_p[index];
 			}
