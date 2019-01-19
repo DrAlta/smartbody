@@ -2738,11 +2738,12 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 	if (isAbsolute)
 	{
 		finalTexturePath = boost::filesystem::complete(imageFile).string();
-		in.init(fopen(finalTexturePath.c_str(), "r"));
-		if (in.valid())
+		//in.init(fopen(finalTexturePath.c_str(), "r"));
+		//if (in.valid())
+		if (boost::filesystem::exists(finalTexturePath))
 		{
 			foundFile = true;
-			in.close();
+			//in.close();
 		}
 	}
 	if (!foundFile)
@@ -2754,11 +2755,13 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 			
 			texturePath /= textureSource; 
 			finalTexturePath = boost::filesystem::complete(texturePath).string();
-			in.init(fopen(finalTexturePath.c_str(), "r"));
-			if (in.valid())
+			//SmartBody::util::log("Checking texture %s in %s", imageFile.c_str(), finalTexturePath.c_str());
+			//in.init(fopen(finalTexturePath.c_str(), "r"));
+			//if (in.valid())
+			if (boost::filesystem::exists(finalTexturePath))
 			{
 				foundFile = true;
-				in.close();
+				//in.close();
 				break;
 			}
 
@@ -2766,12 +2769,13 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 			boost::filesystem::path textureFilename(textureSource.filename());
 			texturePath2 /= textureSource.filename();
 			finalTexturePath = boost::filesystem::complete(texturePath2).string();
-
-			in.init(fopen(finalTexturePath.c_str(), "r"));
-			if (in.valid())
+			//SmartBody::util::log("Checking2 texture %s in %s", imageFile.c_str(), finalTexturePath.c_str());
+			//in.init(fopen(finalTexturePath.c_str(), "r"));
+			//if (in.valid())
+			if (boost::filesystem::exists(finalTexturePath))
 			{
 				foundFile = true;
-				in.close();
+				//in.close();
 				break;
 			}
 		}

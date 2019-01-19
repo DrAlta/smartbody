@@ -2518,6 +2518,8 @@ bool SBAssetManager::addModelToMesh(std::string templateMeshName, std::string mo
 		SrSnModel* staticModel = mesh->dMeshStatic_p[m];
 		SrModel& s = staticModel->shape();
 		std::string curShapeName = (const char*) s.name;
+		SmartBody::util::log("Comparing mesh names: %s to  %s", curShapeName.c_str(), newModelName.c_str());
+
 		if (curShapeName == newModelName)
 		{
 			// model already exists, replace it
@@ -2530,12 +2532,14 @@ bool SBAssetManager::addModelToMesh(std::string templateMeshName, std::string mo
 			mesh->dMeshDynamic_p[m] = modelSrSn;
 			mesh->dMeshDynamic_p[m]->changed(true);
 			found = true;
+			SmartBody::util::log("Replacing existing mesh %s", newModelName.c_str());
 		}
 
 	}
 
 	if (!found)
 	{
+		SmartBody::util::log("Adding new mesh %s", newModelName.c_str());
 		mesh->dMeshStatic_p.push_back(modelSrSn);
 		mesh->dMeshDynamic_p.push_back(modelSrSn);
 	}

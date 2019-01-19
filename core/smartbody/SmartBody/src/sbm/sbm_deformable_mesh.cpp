@@ -2231,12 +2231,12 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->first.c_str());
-
+			/*
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
 				tex = NULL;
-			}
+			}*/
 			if (!tex)
 			{
 				// separate the texture prefix and |
@@ -2265,11 +2265,13 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
 
+			/*
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
 				tex = NULL;
 			}
+			*/
 			if (!tex)
 			{
 				// separate the texture prefix and |
@@ -2297,11 +2299,12 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTextureManager& texManager = SbmTextureManager::singleton();
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
 
+			/*
 			if (tex)
 			{
 				texManager.deleteTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
 				tex = NULL;
-			}
+			}*/
 			if (!tex)
 			{
 				// separate the texture prefix and |

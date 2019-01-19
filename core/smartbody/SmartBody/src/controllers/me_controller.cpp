@@ -661,9 +661,11 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 	if( _record_mode == RECORD_BVH_MOTION )	{
 
 		SkSkeleton* skeleton_p = NULL;
+		skeleton_p = _pawn->getSkeleton();
+		/*
 		if( _context->channels().size() > 0 )	{
 			skeleton_p = _context->channels().skeleton();
-		}
+		}*/
 		if( skeleton_p == NULL )	{
 			SmartBody::util::log("MeController::cont_record NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
@@ -681,10 +683,11 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 	{
 		FRAME frame_data;
 		frame_data.clear();
-		ostringstream frame_data_os;
+		ostringstream frame_data_os; 
 		frame_data_os << "kt " << time << " fr ";
 
-		SkChannelArray& channels =_context->channels();
+		//SkChannelArray& channels =_context->channels();
+		SkChannelArray& channels = _pawn->getSkeleton()->channels();
 		int num_channels = channels.size();
 		SrBuffer<float>& buff = frame.buffer();
 

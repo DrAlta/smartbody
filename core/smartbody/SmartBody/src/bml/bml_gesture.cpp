@@ -210,6 +210,16 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		// including new sync points. Use that new motion as input into the gesture pipeline.
 		SrVec params(atof(xvalStr.c_str()), atof(yvalStr.c_str()), atof(zvalStr.c_str()));
 
+		if (request->actor->getBoolAttribute("useDiscreteBlends"))
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				if (params[0] < .6)
+					params[0] = 0.0;
+				else
+					params[i] = 1.0;
+			}
+		}
 		// optimization; if the blend parameters dictate no blending needed, return the motion directly
 		SmartBody::SBAnimationBlend1D* blend1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(blend);
 		if (blend1D)
