@@ -28,6 +28,9 @@ void RealTimeLipSyncController::setup()
 	addDefaultAttributeDouble("lipsync.realTimeLipSyncMaxCoarticulationTime", 1.0, "Lip Sync");
 	addDefaultAttributeBool("lipsync.useRealTimeCurveCleanup", true, "Lip Sync");
 	addDefaultAttributeBool("lipsync.useRealTimeDebug", false, "Lip Sync");
+	addDefaultAttributeBool("lipsync.usePass3", false, "Lip Sync");
+	addDefaultAttributeBool("lipsync.usePass4", false, "Lip Sync");
+	addDefaultAttributeBool("lipsync.usePass5", false, "Lip Sync");
 }
 
 void RealTimeLipSyncController::updateLipSyncChannels()
@@ -239,7 +242,10 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 
 		_lastPhonemeTime = t;
 		// obtain a set of curves from the phoneme manager based on the two phonemes
-		std::map<std::string, std::vector<float> > lipSyncCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, _pawn->getName());
+		bool pass3 = _pawn->getBoolAttribute("lipsync.usePass3");
+		bool pass4 = _pawn->getBoolAttribute("lipsync.usePass4");
+		bool pass5 = _pawn->getBoolAttribute("lipsync.usePass5");
+		std::map<std::string, std::vector<float> > lipSyncCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, _pawn->getName(), pass3, pass4, pass5);
 
 		// smooth the curves
 		for (std::map<std::string, std::vector<float> >::iterator iter = lipSyncCurves.begin();
