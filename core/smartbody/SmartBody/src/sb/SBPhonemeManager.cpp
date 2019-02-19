@@ -793,7 +793,7 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	}
 
 	// generate the curves
-	std::map<std::string, std::vector<float> > tempCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, characterName);
+	std::map<std::string, std::vector<float> > tempCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, characterName, true, true, true);
 	
 
 	// save the curves to a .dae file

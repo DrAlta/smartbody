@@ -192,7 +192,7 @@ namespace BML {
 		std::string policy;
 
 		// following is the functions that are needed for lip sync run time
-		static std::map<std::string, std::vector<float> > generateCurvesGivenDiphoneSet(std::vector<SmartBody::VisemeData*>* visemes, std::string mappingName, std::string characterName);
+		static std::map<std::string, std::vector<float> > generateCurvesGivenDiphoneSet(std::vector<SmartBody::VisemeData*>* visemes, std::string mappingName, std::string characterName, bool secondpass, bool thirdpass, bool fourthpass);
 
 		static std::vector<float> scaleCurve(std::vector<float>& c1, std::vector<float>& weights);
 
