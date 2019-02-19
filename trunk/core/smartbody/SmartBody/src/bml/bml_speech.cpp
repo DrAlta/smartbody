@@ -784,28 +784,28 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		}
 	}
 
-	if (secondpass)
+	// stitch and smooth
+	for (size_t i = 0; i < visemeProcessedData.size(); i++)
 	{
-		// stitch and smooth
-		for (size_t i = 0; i < visemeProcessedData.size(); i++)
-		{
-			VisemeData* debugVwoSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-			debugVwoSmoothing->setCurveInfo("2");
-			debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		VisemeData* debugVwoSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwoSmoothing->setCurveInfo("2");
+		debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 
+		if (secondPass)
+		{
 			if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
 				smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow-PBM"));
 			else if (strcmp(visemeProcessedData[i]->id(), "FV") == 0)
 				smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow-FV"));
 			else
 				smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow"));
-			VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-			debugVwSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
-			debugVwSmoothing->setCurveInfo("3");
-
-			debugVisemeCurves.push_back(debugVwoSmoothing);
-			debugVisemeCurves.push_back(debugVwSmoothing);
 		}
+		VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		debugVwSmoothing->setCurveInfo("3");
+
+		debugVisemeCurves.push_back(debugVwoSmoothing);
+		debugVisemeCurves.push_back(debugVwSmoothing);
 	}
 
 	if (thirdpass)
@@ -923,32 +923,30 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		}
 	}
 
-	if (fourthpass)
+	// apply low pass filter to the curve
+	for (size_t i = 0; i < visemeProcessedData.size(); i++)
 	{
-		// apply low pass filter to the curve
-		for (size_t i = 0; i < visemeProcessedData.size(); i++)
-		{
+		if (fourthpass)
 			filterCurve(visemeProcessedData[i]->getFloatCurve(), character->getDiphoneSpeedLimit());
-			VisemeData* debugVwFiltering = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-			debugVwFiltering->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
-			debugVwFiltering->setCurveInfo("5");
-			debugVisemeCurves.push_back(debugVwFiltering);
+		VisemeData* debugVwFiltering = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwFiltering->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		debugVwFiltering->setCurveInfo("5");
+		debugVisemeCurves.push_back(debugVwFiltering);
 
-			//VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-			//newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		//VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		//newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 
-			std::vector<float> finalCurveData;
-			for (size_t j = 0; j < visemeProcessedData[i]->getFloatCurve().size(); ++j)
-				finalCurveData.push_back(visemeProcessedData[i]->getFloatCurve()[j]);
+		std::vector<float> finalCurveData;
+		for (size_t j = 0; j < visemeProcessedData[i]->getFloatCurve().size(); ++j)
+			finalCurveData.push_back(visemeProcessedData[i]->getFloatCurve()[j]);
 
-			if (finalCurves.find(visemeProcessedData[i]->id()) == finalCurves.end())
-			{
-				finalCurves.insert(std::make_pair(visemeProcessedData[i]->id(), finalCurveData));
-			}
-			else
-			{
-				SmartBody::util::log("Cannot have two final curves that have same name!");
-			}
+		if (finalCurves.find(visemeProcessedData[i]->id()) == finalCurves.end())
+		{
+			finalCurves.insert(std::make_pair(visemeProcessedData[i]->id(), finalCurveData));
+		}
+		else
+		{
+			SmartBody::util::log("Cannot have two final curves that have same name!");
 		}
 	}
 
