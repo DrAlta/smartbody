@@ -791,7 +791,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		debugVwoSmoothing->setCurveInfo("2");
 		debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 
-		if (secondPass)
+		if (secondpass)
 		{
 			if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
 				smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow-PBM"));

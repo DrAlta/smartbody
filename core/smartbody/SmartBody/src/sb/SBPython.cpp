@@ -484,11 +484,16 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	boost::python::class_<SBDiphone>("SBDiphone")
 		.def("addKey", &SBDiphone::addKey, "add key to the diphone.")
+		.def("setKey", &SBDiphone::setKey, "sets keys to the diphone.")
 		.def("getKeys", &SBDiphone::getKeys, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return the keys given viseme name.")
 		.def("getVisemeNames", &SBDiphone::getVisemeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the viseme names.")
 		.def("getNumVisemes", &SBDiphone::getNumVisemes, "Return the number of viseme.")
 		.def("getFromPhonemeName", &SBDiphone::getFromPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return FROM phoneme name.")
 		.def("getToPhonemeName", &SBDiphone::getToPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return TO phoneme name.")
+		;
+
+	boost::python::class_<std::vector<SBDiphone*> >("SBDiphoneVec")
+		.def(boost::python::vector_indexing_suite<std::vector<SBDiphone*> >())
 		;
 
 	boost::python::class_<SBBehaviorSetManager>("SBBehaviorSetManager")
