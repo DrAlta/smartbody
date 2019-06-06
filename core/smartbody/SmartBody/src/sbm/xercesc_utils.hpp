@@ -180,7 +180,7 @@ namespace xml_utils {
   template <typename Ch>
   struct TemporaryString {
     template <typename OtherCh>
-    TemporaryString(const OtherCh* otherStr)
+    explicit TemporaryString(const OtherCh* otherStr)
     : _str(XMLString::transcode(otherStr))
     {}
 
@@ -191,6 +191,12 @@ namespace xml_utils {
 
     operator const Ch* () const { return _str; }
 
+    // it's a temporary object, so no assignments to it.
+    TemporaryString() = delete;
+    TemporaryString(const TemporaryString&) = delete;
+    TemporaryString(TemporaryString&&) = delete;
+    TemporaryString& operator =(const TemporaryString&) = delete;
+    TemporaryString& operator =(TemporaryString&&) = delete;
   private:
     Ch* _str;
   };
