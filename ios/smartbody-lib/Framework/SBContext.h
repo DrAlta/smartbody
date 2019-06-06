@@ -49,8 +49,6 @@
 @property (nonatomic, strong, readonly) NSString* _Nullable stringValue;
 @end
 
-// make it final
-__attribute__((objc_subclassing_restricted))
 @interface SBContext : NSObject
 @property (nonatomic, weak) id<SBContextDelegate> _Nullable delegate;
 @property (nonatomic, strong) AVAudioPlayer * _Nullable audioPlayer;
