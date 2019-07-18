@@ -34,6 +34,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 
+
 /**
  * MsSpeech Relay
  * Uses the Microsoft SAPI to generate audio for SmartBody
@@ -218,6 +219,8 @@ namespace MsSpeechRelay
             message = message.Replace("</speak>",".</speak>");
 
             ttsServer.SetOutputToWaveFile(outputFileName);
+
+            
             if (voiceRequestMode < 2 && voiceMap != null && voiceMap.Count > 0)
             {
                 /// Voice request mode is either permissive or strict
@@ -771,7 +774,10 @@ namespace MsSpeechRelay
             // the lenght of the audiofile
             //xmlReply += "<viseme start=\"" + e.AudioPosition.TotalSeconds.ToString() + "\" type=\"" + visemeIDMap[e.Viseme] + "\"/>";
             // Instead, we manually keep track of the total duration so far, and use that as the starting point for each viseme.
-            xmlReply += "<viseme start=\"" + totalVisemeDuration.ToString() + "\" type=\"" + visemeIDMap[e.Viseme] + "\"/>";
+            int safeVisemeIndex = e.Viseme;
+            if (safeVisemeIndex > visemeIDMap.Count)
+                safeVisemeIndex = 0;
+            xmlReply += "<viseme start=\"" + totalVisemeDuration.ToString() + "\" type=\"" + visemeIDMap[safeVisemeIndex] + "\"/>";
             this.totalVisemeDuration += e.Duration.TotalSeconds;
         }
 
