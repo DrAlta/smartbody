@@ -16,7 +16,7 @@ class SimpleListener : public SmartBody::SBSceneListener
 	  virtual void OnLogMessage( const std::string & message )
 	  {
 #ifdef WIN32
-		SmartBody::util::log("%s", message.c_str());
+		printf("%s", message.c_str());
 #else
 		std::cout << message << std::endl;
 #endif
@@ -60,26 +60,15 @@ int main( int argc, char ** argv )
 	// set the mediapath which dictates the top-level asset directory
 	//scene->setMediaPath(mediaPath);
 	scene->addAssetPath("script", scriptPath);
-		
-	scene->runScript(script);
-
 
 	// get the simulation object 
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 
-	// if you want to use a real-time clock do the following:
-	bool useRealTimeClock = true;
-	if (useRealTimeClock)
-	{
-		sim->setupTimer();
-	}
-	else
-	{
-		// otherwise, the time will run according
-		sim->setTime(0.0);
-	}
+	sim->setupTimer();
+	sim->setTime(0.0);
 
-	
+	scene->runScript(script);
+
 	SmartBody::util::log("Starting the simulation...");
 	double lastPrint = 0;
 	sim->start();
@@ -91,11 +80,7 @@ int main( int argc, char ** argv )
 			break;
 		}
 		scene->update();
-		if (!useRealTimeClock)
-			sim->setTime(sim->getTime() + 0.16); // update at 1/60 of a second when running in simulated time
-		else
-			sim->updateTimer();
-
+		sim->updateTimer();
 	}
 
 	sim->stop();
