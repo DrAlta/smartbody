@@ -1,4 +1,3 @@
-
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
@@ -26,11 +25,23 @@ class SimpleListener : public SmartBody::SBSceneListener
 
 int main( int argc, char ** argv )
 {
-	// set the relative path from the location of the simplesmartbody binary to the data directory
-	// if you are downloading the source code from SVN, it will be ../../../../data
-	//std::string mediaPath = "../../../../data";
-	// if you're using the SDK, this path will be ../data
-	std::string mediaPath = "../data";
+
+	if (argc < 4)
+	{
+		std::cout << "Usage: simplesmartbody <pythondir> <scriptpath> <script>" << std::endl;
+		exit(-1);
+	}
+	std::string pythonPath = "../Python27/Libs";
+	std::string scriptPath = "";
+	std::string script = "";
+
+	pythonPath = argv[1];
+	scriptPath = argv[2];
+	script = argv[3];
+
+	std::cout << "Python location is [" << pythonPath << "]" << std::endl;
+	std::cout << "Script path [" << scriptPath << "]" << std::endl;
+	std::cout << "Script is [" << script << "]" << std::endl;
 
 	// add a message logger to stdout
 	SmartBody::util::StdoutListener* stdoutLog = new SmartBody::util::StdoutListener();
@@ -39,7 +50,7 @@ int main( int argc, char ** argv )
 	SmartBody::util::log("Loading Python...");
 
 	// initialize the Python libraries
-	initPython("../Python27/Libs");
+	initPython(pythonPath);
 
 	// get the scene object
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -47,34 +58,11 @@ int main( int argc, char ** argv )
 	scene->addSceneListener(&listener);
 
 	// set the mediapath which dictates the top-level asset directory
-	scene->setMediaPath(mediaPath);
+	//scene->setMediaPath(mediaPath);
+	scene->addAssetPath("script", scriptPath);
+		
+	scene->runScript(script);
 
-	// indicate where different assets will be located
-	// "motion" = animations and skeletons
-	// "script" = Python scripts to be executed
-	// "mesh" = models and textures
-	scene->addAssetPath("motion", "ChrBrad");
-
-	// load the assets from the indicated locations
-	SmartBody::util::log("Loading Assets...");
-	scene->loadAssets();
-	int numMotions = scene->getNumMotions();
-	SmartBody::util::log("Loaded %d motions...", numMotions);
-
-	scene->loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/motions/ChrMarine@RunCircleRt01.skm");
-
-	// create a character
-	SmartBody::util::log("Creating the character...");
-	SmartBody::SBCharacter* character = scene->createCharacter("mycharacter", "");
-
-	// load the skeleton from one of the available skeleton types
-	SmartBody::SBSkeleton* skeleton = scene->createSkeleton("ChrBrad.sk");
-
-	// attach the skeleton to the character
-	character->setSkeleton(skeleton);
-
-	// create the standard set of controllers (idling, gesture, nodding, etc.)
-	character->createStandardControllers();
 
 	// get the simulation object 
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
@@ -91,44 +79,27 @@ int main( int argc, char ** argv )
 		sim->setTime(0.0);
 	}
 
-	// make the character do something
-	scene->getBmlProcessor()->execBML("mycharacter", "<body posture=\"ChrMarine@RunCircleRt01\"/>");
 	
 	SmartBody::util::log("Starting the simulation...");
 	double lastPrint = 0;
 	sim->start();
-	while (sim->getTime() < 100.0) // run for 100 simulation seconds
+	while (true)
 	{
+		if (scene->getSimulationManager()->isStopped())
+		{
+			SmartBody::util::log("simulation stopped from script");
+			break;
+		}
 		scene->update();
 		if (!useRealTimeClock)
 			sim->setTime(sim->getTime() + 0.16); // update at 1/60 of a second when running in simulated time
 		else
 			sim->updateTimer();
-		
 
-		if (sim->getTime() > lastPrint)
-		{
-			SmartBody::util::log("Simulation is at time: %5.2f\n", sim->getTime());
-			lastPrint = sim->getTime() + 10;
-		}
-
-		const std::vector<std::string>& characterNames = scene->getCharacterNames();
-		for (size_t c = 0; c < characterNames.size(); c++)
-		{
-			SmartBody::SBCharacter* character = scene->getCharacter(characterNames[c]);
-			std::string jointName = "JtRoot";
-			SmartBody::SBJoint* joint = character->getSkeleton()->getJointByName(jointName);
-			if (joint)
-			{
-				SrVec position = joint->getPosition();
-				SmartBody::util::log("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
-			}
-		}
 	}
 
 	sim->stop();
+	SmartBody::util::log("Ending the simulation...");
 
-	
-	
 	return 0;
 }
