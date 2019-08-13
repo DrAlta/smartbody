@@ -2243,7 +2243,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 				std::string textureLabel = iter->second;
 				std::string::size_type labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
-				SmartBody::util::log("loading texture label = %s, textureFile = %s", textureLabel.c_str(), textureFile.c_str());
+				//SmartBody::util::log("loading texture label = %s, textureFile = %s", textureLabel.c_str(), textureFile.c_str());
 #if 0
 				std::string::size_type prefixIndex = textureFile.find_first_of("file:///");
 				if (prefixIndex == 0)
