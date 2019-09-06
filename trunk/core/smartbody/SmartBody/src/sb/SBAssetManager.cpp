@@ -2487,6 +2487,322 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 }
 
+
+#define SMALL_NUM   0.00000001 // anything that avoids division overflow
+// dot product (3D) which allows vector operations in arguments
+#define ddot(u,v)   ((u).x * (v).x + (u).y * (v).y + (u).z * (v).z)
+
+// from Graphics Gems http://geomalgorithms.com/a06-_intersect-2.html
+bool
+intersect3D_RayTriangle(SrLine L, SrPnt V0, SrPnt V1, SrPnt V2, SrPnt& I, float& rdist, SrVec& normal)
+{
+	SrPnt    u, v, n;              // triangle vectors
+	SrPnt    dir, w0, w;           // ray vectors
+	float     r, a, b;              // params to calc ray-plane intersect
+
+									// get triangle edge vectors and plane normal
+	u = V1 - V0;
+	v = V2 - V0;
+	n = cross(u, v);              // cross product
+	if (n.iszero())             // triangle is degenerate
+		return false;                  // do not deal with this case
+
+	normal = n;
+	normal.normalize();
+
+	dir = L.p2 - L.p1;              // ray direction vector
+	w0 = L.p1 - V0;
+	a = -ddot(n, w0);
+	b = ddot(n, dir);
+	if (fabs(b) < SMALL_NUM) {     // ray is  parallel to triangle plane
+		if (a == 0)                 // ray lies in triangle plane
+			return true;
+		else 
+			return false;              // ray disjoint from plane
+	}
+
+	// get intersect point of ray with triangle plane
+	r = a / b;
+	if (r < 0.0)                    // ray goes away from triangle
+		return false;                   // => no intersect
+	
+	rdist = r;
+										// for a segment, also test if (r > 1.0) => no intersect
+
+	I = L.p1 + r * dir;            // intersect point of ray and plane
+
+									// is I inside T?
+	float    uu, uv, vv, wu, wv, D;
+	uu = ddot(u, u);
+	uv = ddot(u, v);
+	vv = ddot(v, v);
+	w = I - V0;
+	wu = ddot(w, u);
+	wv = ddot(w, v);
+	D = uv * uv - uu * vv;
+
+	// get and test parametric coords
+	float s, t;
+	s = (uv * wv - vv * wu) / D;
+	if (s < 0.0 || s > 1.0)         // I is outside T
+		return false;
+	t = (uv * wu - uu * wv) / D;
+	if (t < 0.0 || (s + t) > 1.0)  // I is outside T
+		return false;
+
+	return true;                       // I is in T
+}
+
+bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string baseModel, std::string penetratingModel, float offset, bool showVisualization)
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(deformableMesh);
+	if (!mesh)
+	{
+		SmartBody::util::log("Cannot find mesh %s to handle penetrations into %s by %s.", deformableMesh.c_str(), baseModel.c_str(), penetratingModel.c_str());
+		return false;
+	}
+
+	int baseModelIndex = -1;
+	// find the base mesh
+	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
+	{
+		std::string modelName = mesh->dMeshStatic_p[m]->shape().name;
+		if (modelName == baseModel)
+		{
+			baseModelIndex = m;
+			break;
+		}
+	}
+
+	if (baseModelIndex == -1)
+	{
+		SmartBody::util::log("Cannot find base model %s in mesh %s to handle penetrations.", baseModel.c_str(), deformableMesh.c_str());
+		return false;
+	}
+
+	int penetratingModelIndex = -1;
+	// find the penetrating mesh
+	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
+	{
+		std::string modelName = mesh->dMeshStatic_p[m]->shape().name;
+		if (modelName == penetratingModel)
+		{
+			penetratingModelIndex = m;
+			break;
+		}
+	}
+
+	if (penetratingModelIndex == -1)
+	{
+		SmartBody::util::log("Cannot find penetrating model %s in mesh %s to handle penetrations.", penetratingModel.c_str(), deformableMesh.c_str());
+		return false;
+	}
+	
+	SrModel& baseShape = mesh->dMeshStatic_p[baseModelIndex]->shape();
+	SrModel& penetratingShape = mesh->dMeshStatic_p[penetratingModelIndex]->shape();
+
+	if (baseShape.F.size() == 0)
+	{
+		SmartBody::util::log("Base shape %s has no faces. ", baseModel.c_str());
+		return false;
+	}
+
+	if (baseShape.V.size() == 0)
+	{
+		SmartBody::util::log("Base shape %s has no vertices. ", penetratingModel.c_str());
+		return false;
+	}
+	SmartBody::SBScene::getScene()->run("import GUIInterface");
+
+	// find the center of the base shape
+	SrVec center;
+	for (int v = 0; v < baseShape.V.size(); v++)
+	{
+		center += baseShape.V[v];
+
+		if (showVisualization)
+		{
+			std::stringstream strstr3;
+			strstr3 << "GUIInterface.addPoint('x" << v << "', SrVec(" << baseShape.V[v].x << ", " << baseShape.V[v].y << ", " << baseShape.V[v].z << "), SrVec(1, .75, .79), 5)";
+			//SmartBody::util::log("Running: %s", strstr2.str().c_str());
+			SmartBody::SBScene::getScene()->run(strstr3.str());
+		}
+	}
+	center /= baseShape.V.size();
+
+	float normalSize = (baseShape.V[0] - center).len() / 5.0f;
+
+	std::vector<SrPnt> avgFaces;
+
+	// draw the face normals
+	for (int f = 0; f < baseShape.F.size(); f++)
+	{
+		SrVec3i& face = baseShape.F[f];
+		// calculate the average position
+		SrPnt avgPoint = (baseShape.V[face[0]] + baseShape.V[face[1]] + baseShape.V[face[2]]) / 3.0;
+		avgFaces.push_back(avgPoint);
+
+		if (false)
+		{
+			SrVec& normal = baseShape.face_normal(f);
+			SrVec endPoint = avgPoint + normalSize * normal;
+			
+			// draw a line from the vertex in the direction of the normal
+			//SmartBody::util::log("Drawing point from %f %f %f to %f %f %f", baseShape.V[face[0]].x, baseShape.V[face[0]].y, baseShape.V[face[0]].z, endPoint.x, endPoint.y, endPoint.z);
+			std::stringstream strstr4;
+			strstr4 << "x = VecArray()";
+			SmartBody::SBScene::getScene()->run(strstr4.str());
+			std::stringstream strstr5;
+			strstr5 << "x.append(SrVec(" << avgPoint.x << ", " << avgPoint.y << ", " << avgPoint.z << "))";
+			SmartBody::SBScene::getScene()->run(strstr5.str());
+			std::stringstream strstr6;
+			strstr6 << "x.append(SrVec(" << endPoint.x << ", " << endPoint.y << ", " << endPoint.z << "))";
+			SmartBody::SBScene::getScene()->run(strstr6.str());
+
+			std::stringstream strstr7;
+			strstr7 << "GUIInterface.addLine('l" << f << "', x, SrVec(0,1,0), 1)";
+			SmartBody::SBScene::getScene()->run(strstr7.str());
+		}
+
+	}
+
+	SrPnt point1(center.x, center.y, center.z);
+
+	if (showVisualization)
+	{
+		//SmartBody::util::log("Center interior point is %f %f %f", center.x, center.y, center.z);
+		std::stringstream strstr10;
+		strstr10 << "GUIInterface.addPoint('center', SrVec(" << center.x << ", " << center.y << ", " << center.z << "), SrVec(0, 1, 0), 8)";
+		//SmartBody::util::log("Running: %s", strstr10.str().c_str());
+		SmartBody::SBScene::getScene()->run(strstr10.str());
+	}
+
+	// loop through the vertices
+	for (int v = 0; v < penetratingShape.V.size(); v++)
+	{
+		SrVec& curV = penetratingShape.V[v];
+			
+		if (showVisualization)
+		{
+			std::stringstream strstr2;
+			strstr2 << "GUIInterface.addPoint('x" << v << "', SrVec(" << curV.x << ", " << curV.y << ", " << curV.z << "), SrVec(1,1,0), 2)";
+			//SmartBody::util::log("Running: %s", strstr2.str().c_str());
+			SmartBody::SBScene::getScene()->run(strstr2.str());
+		}
+		// find the intersecting triangle
+		SrPnt point2(curV.x, curV.y, curV.z);
+		SrLine line(point1, point2);
+			
+		float t = 0;
+		float a = 0;
+		float b = 0;
+		bool foundIntersection = false;
+		int closestFace = -1;
+		int closestDistance = 999999999.9;
+		SrPnt closestIntersectionPoint;
+		float closestRDist = 0.0;
+		for (int f = 0; f < baseShape.F.size(); f++)
+		{
+			SrVec3i& face = baseShape.F[f];
+
+			// ignore any face towards the Z and below the center point
+			if (avgFaces[f].y < center.y)
+				continue;
+
+			SrPnt intersectionPoint;
+			float rdist = 0.0;
+			SrVec faceNormal;
+			bool doesIntersect = intersect3D_RayTriangle(line, baseShape.V[face[0]], baseShape.V[face[1]], baseShape.V[face[2]], intersectionPoint, rdist, faceNormal);
+			if (showVisualization && v == 0)
+			{
+				SrVec endNormal = avgFaces[f] + normalSize * faceNormal;
+				// draw a line from the vertex in the direction of the normal
+				//SmartBody::util::log("Drawing point from %f %f %f to %f %f %f", baseShape.V[face[0]].x, baseShape.V[face[0]].y, baseShape.V[face[0]].z, endPoint.x, endPoint.y, endPoint.z);
+				std::stringstream strstr4;
+				strstr4 << "x = VecArray()";
+				SmartBody::SBScene::getScene()->run(strstr4.str());
+				std::stringstream strstr5;
+				strstr5 << "x.append(SrVec(" << avgFaces[f].x << ", " << avgFaces[f].y << ", " << avgFaces[f].z << "))";
+				SmartBody::SBScene::getScene()->run(strstr5.str());
+				std::stringstream strstr6;
+				strstr6 << "x.append(SrVec(" << endNormal.x << ", " << endNormal.y << ", " << endNormal.z << "))";
+				SmartBody::SBScene::getScene()->run(strstr6.str());
+
+				std::stringstream strstr7;
+				strstr7 << "GUIInterface.addLine('fn" << f << "', x, SrVec(0,1,0), 1)";
+				SmartBody::SBScene::getScene()->run(strstr7.str());
+			}
+			//bool doesIntersect = line.intersects_triangle(baseShape.V[face[0]], baseShape.V[face[1]], baseShape.V[face[2]], t, a, b);
+			if (doesIntersect)
+			{
+				//SmartBody::util::log("Vertex %d intersects with face %d with parameters %f %f %f", v, f, t, a, b);
+				//SrPnt intersectionPoint = baseShape.V[face[0]] * (1.f - a - b) + baseShape.V[face[1]] * a + baseShape.V[face[2]] * b;
+
+							
+				// calculate distance to intersection point
+				SrPnt distance = point2 - intersectionPoint;
+				float currentLength = distance.len();
+				if (currentLength < closestDistance)
+				{
+					closestDistance = currentLength;
+					closestFace = f;
+					closestIntersectionPoint = intersectionPoint;
+					closestRDist = rdist;
+				}
+
+				if (showVisualization)
+				{
+					std::stringstream strstr;
+					strstr << "GUIInterface.addPoint('" << v << "_" << "', SrVec(" << intersectionPoint[0] << ", " << intersectionPoint[1] << ", " << intersectionPoint[2] << "), SrVec(0,0,1), 4)";
+					SmartBody::util::log("Running: %s", strstr.str().c_str());
+					SmartBody::SBScene::getScene()->run(strstr.str());
+				}
+
+				break;
+			}
+		}
+
+		if (closestFace != -1 && closestRDist > 1.0)
+		{
+				
+			SrVec finalLocation = closestIntersectionPoint + (closestIntersectionPoint - point1) * offset;
+			mesh->dMeshStatic_p[penetratingModelIndex]->shape().V[v].x = finalLocation[0];
+			mesh->dMeshStatic_p[penetratingModelIndex]->shape().V[v].y = finalLocation[1];
+			mesh->dMeshStatic_p[penetratingModelIndex]->shape().V[v].z = finalLocation[2];
+
+			mesh->dMeshDynamic_p[penetratingModelIndex]->shape().V[v].x = finalLocation[0];
+			mesh->dMeshDynamic_p[penetratingModelIndex]->shape().V[v].y = finalLocation[1];
+			mesh->dMeshDynamic_p[penetratingModelIndex]->shape().V[v].z = finalLocation[2];
+
+
+			if (showVisualization)
+			{
+				// draw a line from the original vertex to the intersection point
+				std::stringstream strstr4;
+				strstr4 << "x = VecArray()";
+				SmartBody::SBScene::getScene()->run(strstr4.str());
+				std::stringstream strstr5;
+				strstr5 << "x.append(SrVec(" << closestIntersectionPoint[0] << ", " << closestIntersectionPoint[1] << ", " << closestIntersectionPoint[2] << "))";
+				SmartBody::SBScene::getScene()->run(strstr5.str());
+				std::stringstream strstr6;
+				strstr6 << "x.append(SrVec(" << curV.x << ", " << curV.y << ", " << curV.z << "))";
+				SmartBody::SBScene::getScene()->run(strstr6.str());
+
+				std::stringstream strstr7;
+				strstr7 << "GUIInterface.addLine('l" << v << "', x, SrVec(0,1,0), 1)";
+				SmartBody::SBScene::getScene()->run(strstr7.str());
+			}
+	
+
+		}
+		
+	}
+
+	return true;
+}
+
+
 bool SBAssetManager::addModelToMesh(std::string templateMeshName, std::string modelFile, std::string newModelName, std::string rigidBindJoint, std::string bindPoseCopySubMeshName)
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();

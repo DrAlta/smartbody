@@ -3503,7 +3503,7 @@ void FltkViewer::drawDynamicVisuals()
 		_lines3D.size() == 0)
 		return;
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_PROGRAM_POINT_SIZE);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_PROGRAM_POINT_SIZE | GL_LIGHTING_BIT);
 	glDisable(GL_LIGHTING);
 	
 	glBegin(GL_POINTS);
