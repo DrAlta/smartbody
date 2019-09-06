@@ -888,6 +888,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("createMeshFromBlendMasks", &SBAssetManager::createMeshFromBlendMasks, "Writes out a mesh and texture based on: neutralShapeFile, neutralTextureFile, expressiveShapeFile, expressiveTextureFile, maskTextureFile, outputMeshFile, outputTextureFile")
 		.def("addModelToMesh", &SBAssetManager::addModelToMesh, "Adds a submesh to a model.")
 		.def("addBlendshapeToModel", &SBAssetManager::addBlendshapeToModel, "Adds a blendshape to a mesh, or replaces the blendshape within the mesh.")
+		.def("handlePenetrations", &SBAssetManager::handlePenetrations, "Handles penetrations within a mesh given a base model and a penetrative model.")
 		;
 
 

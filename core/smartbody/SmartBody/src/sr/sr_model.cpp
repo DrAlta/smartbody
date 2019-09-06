@@ -579,6 +579,10 @@ bool SrModel::load ( SrInput &in )
 		 {
 			 // bad indices
 		 }
+		 else if (tidx[0] >=  T.size() || tidx[1] >= T.size() || tidx[2] >= T.size())
+		 {
+			 // bad indices
+		 }
 		 else
 		 {
 			 for (int k=0;k<2;k++)
@@ -1534,5 +1538,6 @@ int SrModel::getClosestIndex(SrVec& vec)
 
 	return closestIndex;
 }
+
 
 //================================ End of File =================================================
