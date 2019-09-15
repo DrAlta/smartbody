@@ -53,6 +53,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+
 //#include <external/SOIL/SOIL.h>
 
 #include <boost/filesystem/path.hpp>
@@ -2567,7 +2569,7 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 	// find the base mesh
 	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
 	{
-		std::string modelName = mesh->dMeshStatic_p[m]->shape().name;
+		std::string modelName = (const char*) mesh->dMeshStatic_p[m]->shape().name;
 		if (modelName == baseModel)
 		{
 			baseModelIndex = m;
@@ -2585,7 +2587,7 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 	// find the penetrating mesh
 	for (size_t m = 0; m < mesh->dMeshStatic_p.size(); m++)
 	{
-		std::string modelName = mesh->dMeshStatic_p[m]->shape().name;
+		std::string modelName = (const char*) mesh->dMeshStatic_p[m]->shape().name;
 		if (modelName == penetratingModel)
 		{
 			penetratingModelIndex = m;
@@ -2613,7 +2615,8 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 		SmartBody::util::log("Base shape %s has no vertices. ", penetratingModel.c_str());
 		return false;
 	}
-	SmartBody::SBScene::getScene()->run("import GUIInterface");
+	if (showVisualization)
+		SmartBody::SBScene::getScene()->run("import GUIInterface");
 
 	// find the center of the base shape
 	SrVec center;
@@ -2645,7 +2648,7 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 
 		if (false)
 		{
-			SrVec& normal = baseShape.face_normal(f);
+			SrVec normal = baseShape.face_normal(f);
 			SrVec endPoint = avgPoint + normalSize * normal;
 			
 			// draw a line from the vertex in the direction of the normal
@@ -2699,7 +2702,7 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 		float b = 0;
 		bool foundIntersection = false;
 		int closestFace = -1;
-		int closestDistance = 999999999.9;
+		float closestDistance = 999999999.9f;
 		SrPnt closestIntersectionPoint;
 		float closestRDist = 0.0;
 		for (int f = 0; f < baseShape.F.size(); f++)
@@ -2798,6 +2801,10 @@ bool SBAssetManager::handlePenetrations(std::string deformableMesh, std::string 
 		}
 		
 	}
+	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)mesh;
+	gpuMesh->rebuildVertexBuffer(true);
+	gpuMesh->rebuildVertexBufferGPU(true); // rebuild vertex buffers
+
 
 	return true;
 }

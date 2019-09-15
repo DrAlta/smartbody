@@ -523,7 +523,7 @@ bool canCoarticulate(GestureRequest* a, GestureRequest* b, bool showLog)
 		// transition time is too fast to perform next gesture
 		if (showLog)
 		{
-			SmartBody::util::log("transition time is too fast to perform next gesture from %s to %s", aMotion->getName().c_str(), bMotion->getName().c_str());
+			SmartBody::util::log("transition time is too fast to perform next gesture from %s to %s, %f > %f", aMotion->getName().c_str(), bMotion->getName().c_str(), transitionTime, gestureInterval);
 		}
 		return false;
 	}

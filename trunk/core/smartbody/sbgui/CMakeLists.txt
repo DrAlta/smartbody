@@ -48,6 +48,9 @@ find_library (FLTKLIB fltk )
 find_library (FLTKIMAGESLIB fltk_images )
 find_library (FLTKGLLIB fltk_gl )
 
+find_library (PROTOCLIB protoc PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
+
 endif()
 
 
@@ -317,7 +320,8 @@ target_link_libraries( sbgui
 	#CEGUIBase
 	#CEGUIOpenGLRenderer
 	${PROTOCLIB}
-	${PROTOBUFLIB}
+#	${PROTOBUFLIB}
+	/home/ari/smartbody/lib/libprotobuf.so
 )
 
 set( EXEC_LIST

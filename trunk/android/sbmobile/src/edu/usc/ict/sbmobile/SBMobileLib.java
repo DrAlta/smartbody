@@ -32,11 +32,8 @@ public class SBMobileLib {
     static AudioCallback _audioCallback = null;
 
      static {
-         //System.loadLibrary("gnustl_shared");
-         //System.loadLibrary("js");
-         System.loadLibrary("python2.7");
-         //System.loadLibrary("jerome");
-         System.loadLibrary("sbmobile");
+	//System.loadLibrary("python2.7");
+	System.loadLibrary("sbmobile");
      }
 
     /**

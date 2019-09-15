@@ -813,12 +813,17 @@ int main( int argc, char **argv )	{
 						{
 							boost::filesystem::path ogreFolderPath = parentPath;
 							ogreFolderPath /= tokens[t + 1];
-							std::string absPath = boost::filesystem::canonical(ogreFolderPath).string();
+							try {
+								std::string absPath = boost::filesystem::canonical(ogreFolderPath).string();
 #ifdef WIN32
-							absPath = SmartBody::util::replace(absPath, "\\", "/");
+								absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
-							SmartBody::util::log("ogrepath = %s", absPath.c_str());
-							SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
+								SmartBody::util::log("ogrepath = %s", absPath.c_str());
+								SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
+							} catch (exception& e) {
+								SmartBody::util::log("Could not set ogre path %s", tokens[t + 1]);
+								
+							}
 						}
 						else
 						{

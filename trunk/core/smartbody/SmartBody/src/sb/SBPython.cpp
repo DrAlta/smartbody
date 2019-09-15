@@ -1018,7 +1018,7 @@ void initPython(std::string pythonLibPath)
 	//SmartBody::util::log("After SetProgramName");
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 //#if 0
-	appendPythonModule("pyexpat", initpyexpat);
+	//appendPythonModule("pyexpat", initpyexpat);
 	appendPythonModule("_functools", init_functools);
 	appendPythonModule("itertools", inititertools);
 	appendPythonModule("cStringIO", initcStringIO);

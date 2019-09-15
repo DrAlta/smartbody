@@ -313,9 +313,9 @@ void rgb2lab(unsigned char* rgb, float* lab, unsigned int size)
 	{
 		// log10(0) = -inf, so gotta use FLT_TRUE_MIN
 		// otherwise, image stats are fucked up
-		float r = std::max(FLT_TRUE_MIN, rgb[i] / 255.f);
-		float g = std::max(FLT_TRUE_MIN, rgb[i + 1] / 255.f);
-		float b = std::max(FLT_TRUE_MIN, rgb[i + 2] / 255.f);
+		float r = std::max(std::numeric_limits<float>::min(), rgb[i] / 255.f);
+		float g = std::max(std::numeric_limits<float>::min(), rgb[i + 1] / 255.f);
+		float b = std::max(std::numeric_limits<float>::min(), rgb[i + 2] / 255.f);
 		SrVec rgb(r, g, b);
 
 		//Convert to LMS

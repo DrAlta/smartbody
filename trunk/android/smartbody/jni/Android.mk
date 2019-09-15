@@ -1,46 +1,20 @@
-LOCAL_SHORT_COMMANDS := true
-
-USE_CEREVOICE:=false
+a64AL_SHORT_COMMANDS := true
 
 
 SB_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH := $(SB_LOCAL_PATH)
 SB_MY_DIR := ../../../core/smartbody/SmartBody/src
-ANDROID_LIB_DIR := ../../lib
-BOOST_LIB_DIR := ../../boost_1_59/lib
-BOOST_INCLUDE_DIR := ../../boost_1_59/include
+ANDROID_LIB_DIR := /home/ari/androidbuild/arm64-v8a/lib
+BOOST_LIB_DIR := /home/ari/androidbuild/arm64-v8a/lib
+BOOST_INCLUDE_DIR := /home/ari/androidbuild/arm64-v8a/include/boost-1_70
 ANDROID_DIR := ../../
-CEREVOICE_LIB_DIR := ../../cerevoice_lib
-LIB_DIR := ../../../lib
+LIB_DIR := /home/ari/androidbuild/arm64-v8a/lib
 
-
-ifeq ($(USE_CEREVOICE),true)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := cerevoice-eng
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice_eng.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := cerevoice-pmod
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice_pmod.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := cerevoice
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := cerehts
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerehts.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-CEREVOICE_LIBS:= cerevoice-eng cerevoice-pmod cerehts cerevoice
-
-else
-CEREVOICE_LIBS:=
-endif
+#
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := python-prebuilt-share
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.so 
+#include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := xerces-prebuilt
@@ -48,112 +22,142 @@ LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libxerces-c.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := icu18n
+LOCAL_SRC_FILES := /home/ari/androidbuild/icu/icu4c/aarch64/prebuilt/lib/libicui18n.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := icuuc
+LOCAL_SRC_FILES := /home/ari/androidbuild/icu/icu4c/aarch64/prebuilt/lib/libicuuc.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := icudata
+LOCAL_SRC_FILES := /home/ari/androidbuild/icu/icu4c/aarch64/prebuilt/lib/libicudata.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := boost-filesystem-prebuilt
-LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_filesystem-gcc-mt-1_59.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_filesystem-clang-mt-a64-1_70.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-system-prebuilt
-LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_system-gcc-mt-1_59.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_system-clang-mt-a64-1_70.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-regex-prebuilt
-LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_regex-gcc-mt-1_59.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_regex-clang-mt-a64-1_70.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := python-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := python-prebuilt
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.a
+#include $(PREBUILT_STATIC_LIBRARY)
+
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := python-prebuilt-share
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.so
+LOCAL_MODULE := python-struct
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/_struct.so 
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := python-array
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/array.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-strop
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/strop.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-random
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/_random.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-bisect
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/_bisect.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-parser
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/parser.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-binascii
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/binascii.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-elementtree
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/modules/_elementtree.so 
+include $(PREBUILT_SHARED_LIBRARY)
+
+
+
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := boost-python-prebuilt
-LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_python-gcc-mt-1_59.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_python27-clang-mt-a64-1_70.a
 LOCAL_SHARED_LIBRARIES := python-prebuilt-share	
 include $(PREBUILT_STATIC_LIBRARY)
 
-
-
-
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := lapack
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/lapack_ANDROID.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := lapack
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/lapack_ANDROID.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := blas
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/blas_ANDROID.a
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenblas.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := f2c
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libf2c_ANDROID.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := f2c
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libf2c_ANDROID.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := iconv-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libiconv.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := estbase-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libestbase.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := openal
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenal.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := estools-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libestools.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := alut
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenalut.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := eststring-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libeststring.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := tremolo
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libtremolo.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := festival-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libFestival.a
-LOCAL_STATIC_LIBRARIES := estbase-prebuilt estools-prebuilt eststring-prebuilt
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := openal
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenal.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := alut
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenalut.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := tremolo
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libtremolo.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := sndfile
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libsndfile.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := sndfile
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libsndfile.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := proto-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libprotobuf.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)	
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src \
-					$(SB_LOCAL_PATH)/$(SB_MY_DIR) \
+LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
+			$(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src
 					
 
 LOCAL_SRC_FILES := $(SB_MY_DIR)/external/parser/Bchart.cpp \
@@ -241,22 +245,18 @@ include $(SB_LOCAL_PATH)/../../vhmsg/jni/Android.mk
 include $(SB_LOCAL_PATH)/../../bonebus/jni/Android.mk
 include $(SB_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 
-SB_LIB_PATH := ../../../lib
+SB_LIB_PATH := /home/ari/androidbuild/arm64-v8a/lib
 LOCAL_PATH := $(SB_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := smartbody
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g -DASSIMP_BUILD_NO_OWN_ZLIB
+#LOCAL_CFLAGS    := -O3 -DANDROID_BUILD -DBUILD_ANDROID -frtti -fexceptions -g -DSB_NO_ASSIMP=TRUE -DSB_NO_VHMSG=TRUE -D__ANDROID__ -DSB_NO_VHCL_AUDIO=TRUE
+LOCAL_CFLAGS    := -O3 -DANDROID_BUILD -DBUILD_ANDROID -frtti -fexceptions -DSB_NO_ASSIMP=TRUE -DSB_NO_VHMSG=TRUE -D__ANDROID__ -DSB_NO_VHCL_AUDIO=TRUE
 LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
-					$(SB_LOCAL_PATH)/../../pythonLib_27/include/python2.7 \
-					$(SB_LOCAL_PATH)/../../boost \
-					$(SB_LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
-					$(SB_LOCAL_PATH)/../../include \
-					$(SB_LOCAL_PATH)/../../include/eigen \
-					$(SB_LOCAL_PATH)/$(CEREVOICE_LIB_DIR)/cerevoice_eng/include \
-					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include \
-					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
-					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
-					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
+					/home/ari/androidbuild/arm64-v8a/include \
+					/home/ari/androidbuild/arm64-v8a/include/boost-1_70 \
+					/home/ari/androidbuild/arm64-v8a/include/python2.7 \
+					/home/ari/smartbody/android/vhcl \
+					/home/ari/smartbody/lib/vhcl/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boostnumeric \
@@ -267,6 +267,8 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/ode/include \
+					$(SB_LOCAL_PATH)/../../../core/smartbody/SmartBody/src/sbm/GPU \
+					/home/ari/smartbody/android/include/eigen
 					
 					
 LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
@@ -577,7 +579,7 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerObj.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerBvh.cpp \
 	$(SB_MY_DIR)/sb/SBAssetHandlerPly.cpp \
-	$(SB_MY_DIR)/sb/SBAssetHandlerHdr.cpp \
+	$(SB_MY_DIR)/sb/SBAssetHandlerHDR.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
 	$(SB_MY_DIR)/sb/SBMotionGraph.cpp \
@@ -591,11 +593,12 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/protocols/sbmotion.pb.cpp \
 	$(SB_MY_DIR)/protocols/sbutilities.pb.cpp
 
-LOCAL_LDLIBS    := -landroid -llog -lGLESv3
+LOCAL_LDLIBS    := -landroid -llog -lGLESv3 -L/home/ari/androidbuild/arm64-v8a/lib 
 
-#LOCAL_STATIC_LIBRARIES := ann gl-wes xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile python-prebuilt proto-prebuilt $(CEREVOICE_LIBS)
-LOCAL_STATIC_LIBRARIES := ann xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile proto-prebuilt $(CEREVOICE_LIBS)
-LOCAL_SHARED_LIBRARIES := python-prebuilt-share 
+LOCAL_STATIC_LIBRARIES := ann xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt blas vhcl bonebus iconv-prebuilt pprAI steerlib ode proto-prebuilt vhmsg icuuc icu18n  icudata  
+#lapack f2c openal alut tremolo sndfile  
+#LOCAL_SHARED_LIBRARIES := python-prebuilt-share
+#LOCAL_SHARED_LIBRARIES := 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
 

@@ -14,7 +14,8 @@ TARGET_PLATFORM := android-9
 MY_VHCL_DIR := ../../../lib/vhcl/
 UPDATE_VHCL_DIR := ../
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions
-LOCAL_C_INCLUDES := $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/include/ $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/openal/include $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/libsndfile/include
+#LOCAL_C_INCLUDES := $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/include/ $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/openal/include $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/libsndfile/include
+LOCAL_C_INCLUDES := $(VHCL_LOCAL_PATH)/$(MY_VHCL_DIR)/include/ 
 LOCAL_SRC_FILES := $(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/Pow2Assert.cpp \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_log.cpp \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_string.cpp \
@@ -25,7 +26,8 @@ LOCAL_SRC_FILES := $(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/Pow2Assert.cpp \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_math.cpp  \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_audio.cpp
 LOCAL_LDLIBS    := -llog	
-LOCAL_STATIC_LIBRARIES := openal sndfile alut
+#LOCAL_STATIC_LIBRARIES := openal sndfile alut
+LOCAL_STATIC_LIBRARIES := 
 
 #$(MY_VHCL_DIR)/src/vhcl_audio.cpp \
 				   

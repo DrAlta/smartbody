@@ -7,7 +7,7 @@ include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../../steerlib/jni/Android.mk
 
 LOCAL_MODULE := steerlib
-LOCAL_SRC_FILES := /../../steerlib/libs/armeabi/libsteerlib.so		
+LOCAL_SRC_FILES := /../../steerlib/obj/local/arm64-v8a/libsteerlib.a
 include $(PREBUILT_SHARED_LIBRARY)
 
 LOCAL_MODULE := pprAI
