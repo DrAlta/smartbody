@@ -30,7 +30,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdlib>
 #include <sb/SBUtilities.h>
 
-//#define USEAUDIODURATION 1
+#define USEAUDIODURATION 1
 
 static vhcl::Audio * g_audio = NULL;
 

@@ -24,7 +24,8 @@
 	#include <GL/gl.h>
 #elif defined(BUILD_ANDROID)
 	//#include <GLES2/gl2.h>
-	#include <GLES2/gl2ext.h>
+	#include <GLES3/gl3.h>
+	#include <GLES3/gl3ext.h>
 	//#include "wes_gl.h"
 #elif defined(SB_IPHONE)
     #include <OpenGLES/ES1/gl.h>
@@ -40,7 +41,8 @@
 	#include <GLES2/gl2ext.h>
 #elif defined(__ANDROID__)
 	//#include <GLES/gl.h>
-	#include <GLES2/gl2.h>
+	#include <GLES3/gl3.h>
+	#include <GLES3/gl3.h>
 	//#include "wes_gl.h"
 #else
 	#include <GL/gl.h>

@@ -44,7 +44,8 @@ find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (PROTOCLIB protoc PATHS ${CMAKE_SOURCE_DIR}/lib )
-find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOBUFLIB protobuf PATHS /home/ari/smartbody/lib )
+#find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
@@ -704,7 +705,8 @@ target_link_libraries( SmartBody
 	ncurses
 	${MORE_LIBS}
 	${PROTOCLIB}
-	${PROTOBUFLIB}
+	/home/ari/smartbody/lib/libprotobuf.so
+	#${PROTOBUFLIB}
 	gcc
 	gcc_s
 )

@@ -256,13 +256,13 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				{
 					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false, candidateMsgId);
-					SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+					//SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 					//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 					SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false, candidateMsgId);
-				SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+				//SmartBody::util::log("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 				//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 				SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 			}
