@@ -15,7 +15,8 @@ struct material {
   float   shininess;             
 };                       
 
-uniform float alphaThreshold = 0.2;
+//uniform float alphaThreshold = 0.2;
+uniform float alphaThreshold = -0.00001;
 uniform   material  uMtrl;
 
 in vec4 vPos;

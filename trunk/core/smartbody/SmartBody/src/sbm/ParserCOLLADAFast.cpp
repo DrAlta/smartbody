@@ -2633,7 +2633,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					   SbmTexture* glossyTex = glossyTexMap[matName];
 					   if (specularTex && glossyTex)
 					   {
-						   specularTex->bakeAlphaIntoTexture(glossyTex);
+						   //specularTex->bakeAlphaIntoTexture(glossyTex);
 					   }
 				   }
 
