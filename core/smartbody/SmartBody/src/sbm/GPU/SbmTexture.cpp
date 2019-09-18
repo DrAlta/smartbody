@@ -874,8 +874,45 @@ void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
 	{
 		for (int i = 0; i < width; i++)
 		{
+			float transparency = 1.0f;
+
+			float transr = 1.0f;
+			float transg = 1.0f;
+			float transb = 1.0f;
+			float transa = 1.0f;
+
+			float tr = alphaBuf[j * width*4 + i * 4 + 0];
+			float tg = alphaBuf[j * width*4 + i * 4 + 1];
+			float tb = alphaBuf[j * width*4 + i * 4 + 2];
+			float ta = alphaBuf[j * width*4 + i * 4 + 3];
+
+			float fr = imgBuffer[j*width * 4 + i * 4 + 0];
+			float fg = imgBuffer[j*width * 4 + i * 4 + 1];
+			float fb = imgBuffer[j*width * 4 + i * 4 + 2];
+			float fa = imgBuffer[j*width * 4 + i * 4 + 3];
+
+			//float luminance = (transr * .212671f) +
+				//(transg * .715160f) +
+				//(transb * .072169f);
+
+			float luminance = (tr * .212671f) +
+				(tg * .715160f) +
+			(tb * .072169f);
+
+			// RGB_ZERO
+			imgBuffer[j*width * 4 + i * 4 + 0] = fr * (transr * transparency) + tr * (1.0f - transr * transparency);
+			imgBuffer[j*width * 4 + i * 4 + 1] = fg * (transg * transparency) + tg * (1.0f - transg * transparency);
+			imgBuffer[j*width * 4 + i * 4 + 2] = fb * (transb * transparency) + tb * (1.0f - transb * transparency);
+			imgBuffer[j*width * 4 + i * 4 + 3] = fa * (luminance * transparency) + ta * (1.0f - luminance * transparency);
 			
-			imgBuffer[j*width * 4 + i * 4 + 3] = alphaBuf[j*width*numAlphaChannel + i*numAlphaChannel + 0];
+			// A_ONE
+			//imgBuffer[j*width * 4 + i * 4 + 0] = fr * 1.0f - (transa * transparency) + tr * (transr * transparency);
+			//imgBuffer[j*width * 4 + i * 4 + 1] = fg * 1.0f - (transa * transparency) + tg * (transg * transparency);
+			//imgBuffer[j*width * 4 + i * 4 + 2] = fb * 1.0f - (transa * transparency) + tb * (transb * transparency);
+			//imgBuffer[j*width * 4 + i * 4 + 3] = fa * 1.0f - (transa * transparency) + ta * (transa * transparency);
+			
+							
+			//imgBuffer[j*width * 4 + i * 4 + 3] = alphaBuf[j*width*numAlphaChannel + i*numAlphaChannel + 0];
 		}
 	}
 	transparentTexture = true;
