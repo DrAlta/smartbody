@@ -268,6 +268,8 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	int rightBorderSize = 10;
 
 	int leftGroupSize = 364;
+	if (!useEditor)
+		leftGroupSize = 0;
 	_mainGroup = new Fl_Group(10, curY, w - 20, h - curY, "");
 	_mainGroup->begin();
 
@@ -275,6 +277,8 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 
 	// add the outliner
 	int outlinerWidth = 364;
+	if (!useEditor)
+		outlinerWidth = 0;
 	int outlinerHeight = (int) (h - curY) / 2  - 10;
 	resourceWindow = new ResourceWindow(leftBorderSize, curY, outlinerWidth-10 , outlinerHeight, "");
 	resourceWindow->box(FL_UP_BOX);
@@ -287,6 +291,8 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 
 	// add the viewer
 	int viewerWidth = 640 ;
+	if (!useEditor)
+		viewerWidth = w - 2 * leftBorderSize;
 	int viewerHeight = h - curY - 10;
 	std::string renderer = "custom";
 
