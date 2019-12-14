@@ -25,6 +25,8 @@ public:
 	void playSound(std::string soundFilePath, bool looping = false);
 	void stopSound();
 
+	// callbacks
+	void engineCallback(std::string params);
 
 
 	// Handle screen touch event

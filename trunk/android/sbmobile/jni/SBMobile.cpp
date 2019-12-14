@@ -72,6 +72,7 @@ BOOST_PYTHON_MODULE(SBMobile)
 		.def("stopVideo", &SBMobile::stopVideo, "Stop the video playback.")			
 		.def("playSound", &SBMobile::playSound, "Playback a sound file.") // Sound API
 		.def("stopSound", &SBMobile::stopSound, "Stop the sound playback.")
+		.def("engineCallback", &SBMobile::engineCallback, "Callbacks on the engine to indicate events generated from the simulation.")
 		.def("convertScreenSpaceTo3D", &SBMobile::convertScreenSpaceTo3D, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")			
 		.def("convertScreenSpaceTo3DAR", &SBMobile::convertScreenSpaceTo3DAR, boost::python::return_value_policy<boost::python::return_by_value>(), "Event called when the screen is touched.")
 		.def("testCharacterIntersection", &SBMobile::testCharacterIntersection, boost::python::return_value_policy<boost::python::return_by_value>(), "Test intersection with a character.")						
@@ -399,6 +400,18 @@ void SBMobile::stopSound()
 	}
 }
 
+void SBMobile::engineCallback(std::string params)
+{
+	jclass interfaceClass;
+	jmethodID methodID;
+	bool jvmSuccess = beforeCallJavaMethod("edu/usc/ict/sbmobile/SBMobileLib","engineCallback","(Ljava/lang/String)V", interfaceClass, methodID);
+
+	if (jvmSuccess)
+	{
+		env->CallStaticVoidMethod(interfaceClass, methodID);
+		if(jvmIsAttached) jvm->DetachCurrentThread();
+	}
+}
 #endif
 
 void SBMobile::snapshotPNGResize(std::string imgFileName, int width, int height, int outW, int outH)
