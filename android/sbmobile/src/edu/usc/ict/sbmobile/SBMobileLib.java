@@ -28,8 +28,14 @@ public class SBMobileLib {
         public abstract void onAudioPlayback(String soundFile);
     }
 
+    public static abstract class EngineCallback
+    {
+        public abstract void onEngineCallback(String params);
+    }
+
      static MediaPlayer _mediaPlayer = null;
     static AudioCallback _audioCallback = null;
+    static EngineCallback _engineCallback = null;
 
      static {
 	//System.loadLibrary("python2.7");
@@ -109,10 +115,23 @@ public class SBMobileLib {
             _mediaPlayer = null;
         }
     }
+
+    public static void engineCallback(String params)
+    {
+            if (_engineCallback != null)
+            {
+                _engineCallback.onEngineCallback(params);
+            }
+    }
+
     public static void setAudioCallback(AudioCallback callback)
     {
         _audioCallback = callback;
     }
 
+    public static void setEngineCallback(EngineCallback callback)
+    {
+        _engineCallback = callback;
+    }
 
 }
