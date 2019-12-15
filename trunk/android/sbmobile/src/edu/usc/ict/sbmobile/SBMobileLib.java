@@ -28,7 +28,7 @@ public class SBMobileLib {
         public abstract void onAudioPlayback(String soundFile);
     }
 
-    public static abstract class EngineCallback
+    public static interface EngineCallback
     {
         public abstract void onEngineCallback(String params);
     }
@@ -83,7 +83,7 @@ public class SBMobileLib {
 
     public static void playSound(String soundFile, boolean loopSound)
     {
-        Log.e("SBM", "SBMobileLib: Playing sound " + soundFile);
+        Log.d("SBM", "SBMobileLib: Playing sound " + soundFile);
         if (_mediaPlayer != null)
         {
             stopSound();
@@ -107,7 +107,7 @@ public class SBMobileLib {
     }
 
     public static void stopSound() {
-        Log.e("SBM", "SBMobileLib: Stop playing sound ");
+        Log.d("SBM", "SBMobileLib: Stop playing sound ");
         if (_mediaPlayer != null) {
             if (_mediaPlayer.isPlaying())
                 _mediaPlayer.stop();
@@ -118,6 +118,7 @@ public class SBMobileLib {
 
     public static void engineCallback(String params)
     {
+            Log.d("SBM", "engineCallback: " + params);
             if (_engineCallback != null)
             {
                 _engineCallback.onEngineCallback(params);
