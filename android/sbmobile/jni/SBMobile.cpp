@@ -402,13 +402,14 @@ void SBMobile::stopSound()
 
 void SBMobile::engineCallback(std::string params)
 {
+	jstring paramsJStr = stringToJString(params);
 	jclass interfaceClass;
 	jmethodID methodID;
-	bool jvmSuccess = beforeCallJavaMethod("edu/usc/ict/sbmobile/SBMobileLib","engineCallback","(Ljava/lang/String)V", interfaceClass, methodID);
+	bool jvmSuccess = beforeCallJavaMethod("edu/usc/ict/sbmobile/SBMobileLib","engineCallback","(Ljava/lang/String;)V", interfaceClass, methodID);
 
 	if (jvmSuccess)
 	{
-		env->CallStaticVoidMethod(interfaceClass, methodID);
+		env->CallStaticVoidMethod(interfaceClass, methodID, paramsJStr);
 		if(jvmIsAttached) jvm->DetachCurrentThread();
 	}
 }
