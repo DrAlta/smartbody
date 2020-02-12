@@ -42,16 +42,11 @@ sinbadPos = SrVec(0,5.16, 0)
 sinbad.setPosition(sinbadPos)
 sinbad.createStandardControllers()
 sinbad.setStringAttribute('deformableMesh', 'Sinbad.mesh.xml')
-<<<<<<< .mine
 # setup gestures
 scene.run('BehaviorSetGestures.py')
 setupBehaviorSet()
 retargetBehaviorSet(sinbadName)
-'''
-||||||| .r6601
-=======
 
->>>>>>> .r6619
 # setup locomotion
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
@@ -68,7 +63,6 @@ retargetBehaviorSet(sinbadName)
 
 
 sinbad.setStringAttribute("displayType", "GPUmesh")
-'''
 
 
 print 'Configuring scene parameters and camera'
