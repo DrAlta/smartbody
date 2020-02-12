@@ -44,7 +44,7 @@ find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (PROTOCLIB protoc PATHS ${CMAKE_SOURCE_DIR}/lib )
-find_library (PROTOBUFLIB protobuf PATHS /home/ari/smartbody/lib )
+find_library (PROTOCLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
 #find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
@@ -92,6 +92,8 @@ set( FESTIVAL_LIBS
 	${ESTSTRING}
 	${ESTOOLS}
 )
+
+
 else()
 set( FESTIVAL_LIBS
 )
@@ -176,6 +178,14 @@ add_custom_target(protoctarget
 		COMMAND ${PROTOC} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmesh.proto 
 		)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set (SBDLL )
+set (GCCLIBS )
+else()
+set (SBDLL smartbody-dll.c )
+set (GCCLIBS gcc gcc_s)
+
+endif()
 
 set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
@@ -638,7 +648,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
-	./src/sb/smartbody-c-dll.cpp
+	${SBDLL}
 		
 	./src/protocols/sbmotion.pb.cpp
 	./src/protocols/sbutilities.pb.cpp
@@ -705,10 +715,8 @@ target_link_libraries( SmartBody
 	ncurses
 	${MORE_LIBS}
 	${PROTOCLIB}
-	/home/ari/smartbody/lib/libprotobuf.so
-	#${PROTOBUFLIB}
-	gcc
-	gcc_s
+	${PROTOBUFLIB}
+	${GCCLIBS}
 )
 
 add_dependencies(SmartBody protoctarget)

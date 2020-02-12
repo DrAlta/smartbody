@@ -423,7 +423,8 @@ void SBRenderer::drawForwardRendering(std::vector<SrLight>& lights, bool isDrawF
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if (meshInstance)
 		{
-			renderMesh(meshInstance, false);
+			renderMesh(meshInstance, gbufferShader, true);
+			//renderMesh(meshInstance, false);
 		}
 	}
 	if (isDrawFloor)
