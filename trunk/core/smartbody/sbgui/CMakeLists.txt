@@ -320,8 +320,7 @@ target_link_libraries( sbgui
 	#CEGUIBase
 	#CEGUIOpenGLRenderer
 	${PROTOCLIB}
-#	${PROTOBUFLIB}
-	/home/ari/smartbody/lib/libprotobuf.so
+	${PROTOBUFLIB}
 )
 
 set( EXEC_LIST
