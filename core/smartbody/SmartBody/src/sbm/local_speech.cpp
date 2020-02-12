@@ -399,6 +399,9 @@ std::string SpeechRelayLocal::CreateMarkTimeStamps(std::string text)
 
 std::string SpeechRelayLocal::TransformTextWithTimes(std::string txt)
 {
+#ifdef __APPLE__
+	return txt;
+#else
 	//std::string text_string = "";
 
 	//#define _PARSER_DEBUG_MESSAGES_ON
@@ -454,6 +457,7 @@ std::string SpeechRelayLocal::TransformTextWithTimes(std::string txt)
 	   }
    }
    return actualText;
+#endif
 }
 
 #if USE_CEREPROC_RELAY

@@ -6,9 +6,6 @@ brew install glew
 echo "Installing wget..."
 brew install wget
 
-echo "Installing gcc..."
-brew install gcc
-
 echo "Installing python..."
 brew install python
 

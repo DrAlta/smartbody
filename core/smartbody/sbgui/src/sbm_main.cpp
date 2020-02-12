@@ -404,7 +404,7 @@ int mcu_snapshot_func2(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	int xa = x % 256;
 	int xb = (x - xa) / 256; int ya = y % 256;
 	int yb = (y - ya) / 256;//assemble the header
-	unsigned char header[18] = { 0,0,2,0,0,0,0,0,0,0,0,0,(char)xa,(char)xb,(char)ya,(char)yb,24,0 };
+	unsigned char header[18] = { 0,0,2,0,0,0,0,0,0,0,0,0,(unsigned char)xa,(unsigned char)xb,(unsigned char)ya,(unsigned char)yb,24,0 };
 	// write header and data to file
 	SmartBody::util::log("Snapshot to %s", output_file.c_str());
 	fstream File(output_file, ios::out | ios::binary);
@@ -821,7 +821,7 @@ int main( int argc, char **argv )	{
 								SmartBody::util::log("ogrepath = %s", absPath.c_str());
 								SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
 							} catch (exception& e) {
-								SmartBody::util::log("Could not set ogre path %s", tokens[t + 1]);
+								SmartBody::util::log("Could not set ogre path %s", tokens[t + 1].c_str());
 								
 							}
 						}
