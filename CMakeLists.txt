@@ -24,7 +24,11 @@ set( SB_NO_ASSIMP TRUE)
 
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
 #add_definitions(	-g3 -fPIC -fpermissive -std=c++11)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+add_definitions(	-O3 -D__APPLE__ -fPIC -fpermissive )
+else()
 add_definitions(	-O3 -D__linux__ -fPIC -fpermissive -std=c++11)
+endif()
 #add_definitions(	-v -W -Wall -Wextra -pedantic )
 
 set ( ACTIVEMQ_VERSION activemq-cpp-3.9.0)

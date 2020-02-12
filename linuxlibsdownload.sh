@@ -16,7 +16,7 @@ curl -A "$AGENT" http://smartbody.ict.usc.edu/dependencies/ode-0.12.tar.gz > dep
 echo "Downloading google protocol buffers..."
 curl -A "$AGENT" http://smartbody.ict.usc.edu/dependencies/protobuf-2.5.0.tar.gz > dependencies/protobuf-2.5.0.tar.gz 
 
-echo "Downloading Irrlicht engine..."
-wget --directory-prefix=dependencies http://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.8/1.8.3/irrlicht-1.8.3.zip 
+#echo "Downloading Irrlicht engine..."
+#wget --directory-prefix=dependencies http://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.8/1.8.3/irrlicht-1.8.3.zip 
 
 echo "Finished downloading dependencies for SmartBody on linux"

@@ -4,6 +4,18 @@ MAINDIR=`pwd`
 mkdir -p dependencies
 cd dependencies
 
+# determine which machine we are using
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+echo ${machine}
+
+
 echo "Building boost numeric bindings..."
 gunzip boost-numeric-bindings-20081116.tar.gz
 tar -xvf boost-numeric-bindings-20081116.tar
@@ -17,7 +29,11 @@ cd ..
 echo "Building activemq..."
 tar -xvzf activemq-cpp-library-3.9.0-src.tar.gz
 cd activemq-cpp-library-3.9.0
+if ${machine} == "Mac" then
 ./configure --prefix=${MAINDIR} --enable-shared 
+else
+./configure --prefix=${MAINDIR} --enable-shared --with-apr=/usr/local/opt/apr 
+fi
 make -j6 install
 
 cd ..
