@@ -2,7 +2,8 @@
 #define __OgreSmartBody_h_
  
 #include <OGRE/Ogre.h>
-#include <OIS/OIS.h>
+#include <OGRE/Bites/OgreWindowEventUtilities.h>
+
 // smartbody
 #ifndef NDEBUG
 #define NDEBUG
@@ -10,7 +11,9 @@
 
 #include <sb/SBScene.h>
 
-class OgreSmartBody : public Ogre::WindowEventListener, public Ogre::FrameListener
+class DeformableMeshInstance;
+
+class OgreSmartBody : public OgreBites::WindowEventListener, public Ogre::FrameListener
 {
 public:
     OgreSmartBody(void);
@@ -27,6 +30,10 @@ protected:
     // Ogre::FrameListener
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
+	void updateOgreLights();
+	void updateOgreCamera();
+	void ogreBlendShape(Ogre::Entity* sbEntity, DeformableMeshInstance* meshInstance);
+
 	
  
 private:
@@ -37,11 +44,9 @@ private:
     Ogre::SceneManager* mSceneMgr;
     Ogre::Camera* mCamera;
  
-    // OIS Input devices
-    OIS::InputManager* mInputManager;
-    OIS::Mouse*    mMouse;
-    OIS::Keyboard* mKeyboard;
+    
 	double mStartTime;
+	bool firstTime;
 
 	// smartbody
 	SmartBody::SBScene* m_pScene;

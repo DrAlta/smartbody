@@ -12,6 +12,8 @@ scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('script', 'behaviorsets')
 scene.loadAssets()
 
+scene.loadAssetsFromPath("mesh/Sinbad")
+
 # Map Sinbad to the standard SmartBody setup
 print 'Setting up joint map for Sinbad'
 scene.run('ogre-sinbad-map.py')
@@ -28,15 +30,16 @@ scene.run('default-behavior-sets.py')
 print 'Setting up Sinbad'
 
 
-numCharacters = 15
+numCharacters = 5
 for c in range(0, numCharacters):
-	sinbadName = 'sinbad' + str(c)
-	sinbad = scene.createCharacter(sinbadName,'sinbad')
+	sinbadName = 'Sinbad' + str(c)
+	sinbad = scene.createCharacter(sinbadName,'Sinbad')
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
 	sinbadPos = SrVec(0 + c * 5, 5.16, 0 + c * 5)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
+	sinbad.setStringAttribute("deformableMesh", "Sinbad.mesh.xml")
 
 	# only retarget the first character, the others
 	# can use the same data
@@ -59,7 +62,7 @@ scene.setBoolAttribute('internalAudio', True)
 
 sim.start()
 for c in range(0, numCharacters):
-	sinbadName = 'sinbad' + str(c)
+	sinbadName = 'Sinbad' + str(c)
 	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
 sim.resume()
 
@@ -67,8 +70,10 @@ sim.resume()
 
 # the following is a script that tells Sinbad to run back and forth between two points.
 class LocomotionHandler(SBEventHandler):
+	maxCharacters = 0
 	stareAt = 0
 	def executeAction(self, event):
+		
 		# get the name of the character
 		tokens = event.getParameters().split()
 		# when the character arrives at one location, send it to the other location
@@ -84,18 +89,17 @@ class LocomotionHandler(SBEventHandler):
 			bml.execBML(sinbadName, '<head type="SHAKE" repeats="2"/>')
 
 		# randomly stare at another Sinbad
-		stareAtName = "sinbad" + str(self.stareAt)
+		stareAtName = "Sinbad" + str(random.randrange(self.maxCharacters))
 		#bml.execBML(sinbadName, '<gaze target="' + stareAtName + '" sbm:joint-range="NECK EYES"/>')
 		bml.execBML(sinbadName, '<gaze target="' + stareAtName + '"/>')
-		self.stareAt = self.stareAt + 1
-		if (self.stareAt >= numCharacters):
-			self.startAt = 0
+		
 
 myHandler = LocomotionHandler()
+myHandler.maxCharacters = numCharacters
 eventManager = scene.getEventManager()
 eventManager.addEventHandler("locomotion", myHandler)
 					
 for c in range(0, numCharacters):
-	sinbadName = 'sinbad' + str(c)					
+	sinbadName = 'Sinbad' + str(c)					
 	bml.execBMLAt(2.0, sinbadName, '<locomotion target="-30 0" />')
 
