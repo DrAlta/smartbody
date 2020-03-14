@@ -3,7 +3,7 @@
 VHMSG_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH = $(VHMSG_LOCAL_PATH)
 
-ANDROID_LIB_DIR := /home/ari/androidbuild/arm64-v8a/lib
+ANDROID_LIB_DIR := /home/ari/androidbuild/${TARGET_ARCH_ABI}/lib
 
 #include $(CLEAR_VARS)
 #LOCAL_MODULE := activemq-prebuilt
