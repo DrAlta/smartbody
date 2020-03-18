@@ -144,7 +144,15 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	}
 	else
 	{
+		// get the existing root joint and make it a child of the new root joint
+		SkJoint* oldRoot = this->root();
+		
+		if (oldRoot)
+		{
+			joint->add_child(oldRoot);
+		}
 		this->root(joint);
+		
 	}
 	
 	_joints.push_back(joint);

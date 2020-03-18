@@ -1723,7 +1723,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					transTex->loadImage(finalTextureName.c_str());
 					if (diffuseTex && transTex)
 					{
-						diffuseTex->bakeAlphaIntoTexture(transTex);
+						diffuseTex->bakeAlphaIntoTexture(transTex, newModel->M[i].useAlphaBlend);
 					}
 
 				delete transTex;
@@ -1751,7 +1751,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 					glossyTex->loadImage(finalTextureName.c_str());
 					if (specularTex && glossyTex)
 					{
-						specularTex->bakeAlphaIntoTexture(glossyTex);
+						specularTex->bakeAlphaIntoTexture(glossyTex, newModel->M[i].useAlphaBlend);
 					}
 
 					delete glossyTex;
