@@ -444,6 +444,7 @@ SbmTexture::SbmTexture( const char* texName )
 	texRotate = ROTATE_NONE;
 }
 
+
 SbmTexture::~SbmTexture(void)
 {
     if (buffer)
@@ -844,9 +845,10 @@ void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numChannel
 
 
 
-void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
+void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex, bool useAlphaBlend)
 {
 	unsigned char* alphaBuf = alphaTex->getBuffer();	
+	
 	if (alphaTex->getWidth() != getWidth() || alphaTex->getHeight() != getHeight())
 	{
 		SmartBody::util::log("Warning! Alpha texture size (%d, %d) do not match diffuse texture '%s' size (%d, %d)", alphaTex->getWidth(), alphaTex->getHeight(), this->getName().c_str(), getWidth(), getHeight());
@@ -898,21 +900,37 @@ void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
 			float luminance = (tr * .212671f) +
 				(tg * .715160f) +
 			(tb * .072169f);
-
-			// RGB_ZERO
-			imgBuffer[j*width * 4 + i * 4 + 0] = fr * (transr * transparency) + tr * (1.0f - transr * transparency);
-			imgBuffer[j*width * 4 + i * 4 + 1] = fg * (transg * transparency) + tg * (1.0f - transg * transparency);
-			imgBuffer[j*width * 4 + i * 4 + 2] = fb * (transb * transparency) + tb * (1.0f - transb * transparency);
-			imgBuffer[j*width * 4 + i * 4 + 3] = fa * (luminance * transparency) + ta * (1.0f - luminance * transparency);
 			
-			// A_ONE
-			//imgBuffer[j*width * 4 + i * 4 + 0] = fr * 1.0f - (transa * transparency) + tr * (transr * transparency);
-			//imgBuffer[j*width * 4 + i * 4 + 1] = fg * 1.0f - (transa * transparency) + tg * (transg * transparency);
-			//imgBuffer[j*width * 4 + i * 4 + 2] = fb * 1.0f - (transa * transparency) + tb * (transb * transparency);
-			//imgBuffer[j*width * 4 + i * 4 + 3] = fa * 1.0f - (transa * transparency) + ta * (transa * transparency);
+			if (useAlphaBlend)
+			{
+				// A_ONE
+				//imgBuffer[j*width * 4 + i * 4 + 0] = fr * 1.0f - (transa * transparency) + tr * (transr * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 1] = fg * 1.0f - (transa * transparency) + tg * (transg * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 2] = fb * 1.0f - (transa * transparency) + tb * (transb * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 3] = fa * 1.0f - (transa * transparency) + ta * (transa * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 0] = fr * tr;
+				//imgBuffer[j*width * 4 + i * 4 + 1] = fg * tb;
+				//imgBuffer[j*width * 4 + i * 4 + 2] = fb * tg;
+				//imgBuffer[j*width * 4 + i * 4 + 3] = fa * ta;
 			
+				imgBuffer[j*width * 4 + i * 4 + 3] = 1.0f - fa;
+			}
+			else
+			{
+				// RGB_ZERO
+				//imgBuffer[j*width * 4 + i * 4 + 0] = fr * (transr * transparency) + tr * (1.0f - transr * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 1] = fg * (transg * transparency) + tg * (1.0f - transg * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 2] = fb * (transb * transparency) + tb * (1.0f - transb * transparency);
+				//imgBuffer[j*width * 4 + i * 4 + 3] = fa * (luminance * transparency) + ta * (1.0f - luminance * transparency);
+				
+				imgBuffer[j*width * 4 + i * 4 + 3] = luminance;
+				
+			}
+				
 							
-			//imgBuffer[j*width * 4 + i * 4 + 3] = alphaBuf[j*width*numAlphaChannel + i*numAlphaChannel + 0];
+			//imgBuffer[j*width * 4 + i * 4 + 3] = 1.0;
+
+			
 		}
 	}
 	transparentTexture = true;

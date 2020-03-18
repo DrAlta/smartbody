@@ -2244,7 +2244,11 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 
 			newModel->name = SrString(idString.c_str());
 			rapidxml::xml_node<>* meshNode = ParserCOLLADAFast::getNode("mesh", node);
-			if (!meshNode)	continue;
+			if (!meshNode)
+			{
+				curNode = curNode->next_sibling();
+				continue;
+			}
 			rapidxml::xml_node<>* meshCurNode = meshNode->first_node();
 			while (meshCurNode)
 			//for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
@@ -2604,7 +2608,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					   SbmTexture* transTex = transparentTexMap[matName];
 					   if (diffuseTex && transTex)
 					   {
-						   diffuseTex->bakeAlphaIntoTexture(transTex);
+						   diffuseTex->bakeAlphaIntoTexture(transTex, newModel->M[i].useAlphaBlend);
 					   }
 				   }
 				   newModel->mtlTextureNameMap[matName] = prefixedName;
@@ -2633,13 +2637,13 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					   SbmTexture* glossyTex = glossyTexMap[matName];
 					   if (specularTex && glossyTex)
 					   {
-						   //specularTex->bakeAlphaIntoTexture(glossyTex);
+						   specularTex->bakeAlphaIntoTexture(glossyTex, newModel->M[i].useAlphaBlend);
 					   }
 				   }
 
 				   newModel->mtlSpecularTexNameMap[matName] = prefixedName;
 			   }
-			   /*
+			   
 			   if (newModel->mtlGlossyTexNameMap.find(matName) != newModel->mtlGlossyTexNameMap.end())
 			   {
 				   strstr << newModel->mtlGlossyTexNameMap[matName];
@@ -2648,7 +2652,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_GLOSSYMAP, prefixedName.c_str(), newModel->mtlGlossyTexNameMap[matName].c_str(), paths);
 				   newModel->mtlGlossyTexNameMap[matName] = prefixedName;
 			   }
-			   */
+			   
 			}
 		}
 		curNode = curNode->next_sibling();
@@ -3022,51 +3026,54 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 			{
 				float alpha = 1.f;	
 				rapidxml::xml_attribute<>* opaqueNode = transparentNode->first_attribute("opaque");			
-				std::string opaqueMode;
+				std::string opaqueMode = "A_ONE";
 				if (opaqueNode)
 				{
 					opaqueMode = opaqueNode->value();
-						
-					if (opaqueMode == "RGB_ZERO")
-					{
-						rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", transparentNode);		
-						std::string color;
-						rapidxml::xml_node<>* texNode = ParserCOLLADAFast::getNode("texture", transparentNode);
-						if (texNode)
-						{
-
-							rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");
-							std::string texID = texAttrNode->value();
-							transparentTexture = texID;
-						}
-						else if (colorNode)
-						{
-							color = colorNode->value();
-							std::vector<std::string> tokens;
-							SmartBody::util::tokenize(color, tokens, " \n");
-							SrVec colorVec;
-							if (tokens.size() >= 3)
-							{
-								for (int i=0;i<3;i++)
-								{
-									colorVec[i] = (float)atof(tokens[i].c_str());
-								}
-							}
-							alpha = 1.f - (colorVec[0]+colorVec[1]+colorVec[2])/3;
-							//alpha = 1.f - colorVec.norm();		
-							if (alpha >= 1.f)
-							{
-								M.back().useAlphaBlend = false;
-							}
-						}														
-					}
-					else if (opaqueMode == "A_ONE")
-					{
-						alpha = 1.0f;
-						M.back().useAlphaBlend = true;
-					}
 				}
-				else // by default it should be RGB_ZERO ?
+						
+				if (opaqueMode == "RGB_ZERO")
+				{
+					rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", transparentNode);		
+					std::string color;
+					rapidxml::xml_node<>* texNode = ParserCOLLADAFast::getNode("texture", transparentNode);
+					if (texNode)
+					{
+
+						rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");
+						std::string texID = texAttrNode->value();
+						transparentTexture = texID;
+					}
+					else if (colorNode)
+					{
+						color = colorNode->value();
+						std::vector<std::string> tokens;
+						SmartBody::util::tokenize(color, tokens, " \n");
+						SrVec colorVec;
+						if (tokens.size() >= 3)
+						{
+							for (int i=0;i<3;i++)
+							{
+								colorVec[i] = (float)atof(tokens[i].c_str());
+							}
+						}
+						alpha = 1.f - (colorVec[0]+colorVec[1]+colorVec[2])/3;
+						//alpha = 1.f - colorVec.norm();		
+						if (alpha >= 1.f)
+						{
+							M.back().useAlphaBlend = false;
+						}
+						
+					}														
+				}
+				else if (opaqueMode == "A_ONE")
+				{
+					alpha = 1.0f;
+					M.back().useAlphaBlend = true;
+				}
+				
+			/*
+				else // by default it should be A_ONE
 				{
 					rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", transparentNode);		
 					std::string color;
@@ -3090,8 +3097,8 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 							M.back().useAlphaBlend = false;
 						}
 					}														
-				}				
-				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
+				}			
+				*/
 				M.back().diffuse.a = (srbyte) ( alpha*255.0f );
 			}
 

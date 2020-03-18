@@ -153,10 +153,12 @@ public:
 	SBAPI void setBuffer(unsigned char* buffer, int size);
 	SBAPI void setTextureSize(int w, int h, int numChannels);
 
-	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex);
+	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex, bool useAlphaBlend);
 	// Creates a 1x1 white texture
 	SBAPI void createWhiteTexture(int w = 1, int h = 1);	
 	SBAPI void createEmptyTexture(int w , int h, int numChannels, GLenum type = GL_UNSIGNED_BYTE, SrColor initColor = SrColor::white);		
+
+	
 };
 #if USE_CUBE_MAP
 class SbmCubeMapTexture // simple place holder for OpenGL ES cubemap texture
