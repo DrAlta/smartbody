@@ -813,6 +813,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 	boost::python::class_<SBScriptWrap, boost::noncopyable, boost::shared_ptr<SBScriptWrap> >("SBScript")
+		.def(boost::python::init<>())
 		.def("start", &SBScript::start, &SBScriptWrap::default_start, "Script start.")
 		.def("beforeUpdate", &SBScript::beforeUpdate, &SBScriptWrap::default_beforeUpdate, "Script before update step.")
 		.def("update", &SBScript::update, &SBScriptWrap::default_update, "Script updates.")

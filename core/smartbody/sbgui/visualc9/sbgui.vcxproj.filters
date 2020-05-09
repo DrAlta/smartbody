@@ -70,6 +70,9 @@
     <Filter Include="sbrender">
       <UniqueIdentifier>{662cc2a8-078c-4ab8-877d-e8380e4a434b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ogre">
+      <UniqueIdentifier>{ac47bb25-92db-453f-a30c-c9cb35d53e8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -294,6 +297,21 @@
     </ClCompile>
     <ClCompile Include="..\src\SBBaseRenderer.cpp">
       <Filter>sbrender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EmbeddedOgre.cpp">
+      <Filter>ogre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FLTKOgreViewer.cpp">
+      <Filter>ogre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\OgreFrameListener.cpp">
+      <Filter>ogre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SBOgreListener.cpp">
+      <Filter>ogre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ogre\ExampleFrameListener.cpp">
+      <Filter>ogre</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +544,21 @@
     </ClInclude>
     <ClInclude Include="..\src\SBBaseRenderer.h">
       <Filter>sbrender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EmbeddedOgre.h">
+      <Filter>ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FLTKOgreViewer.h">
+      <Filter>ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\OgreFrameListener.h">
+      <Filter>ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBOgreListener.h">
+      <Filter>ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ogre\ExampleFrameListener.h">
+      <Filter>ogre</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

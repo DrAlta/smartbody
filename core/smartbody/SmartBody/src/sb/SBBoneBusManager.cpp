@@ -182,7 +182,7 @@ void SBBoneBusManager::afterUpdate(double time)
 					if( buffIndex > -1 )	
 					{
 						float value = frameData.buffer()[ buffIndex ];
-						if( value != character->viseme_history_arr[ i ] )
+						if( true ) //value != character->viseme_history_arr[ i ] )
 						{
 							if( character->bonebusCharacter )
 							{

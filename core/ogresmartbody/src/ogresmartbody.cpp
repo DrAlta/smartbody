@@ -58,7 +58,7 @@ bool OgreSmartBody::go(void)
 #endif
  
     // construct Ogre::Root
-    mRoot = new Ogre::Root(mPluginsCfg);
+    mRoot = new Ogre::Root(mPluginsCfg, "", "ogre.log");
  
     // setup resources
     // Load resource paths from config file
