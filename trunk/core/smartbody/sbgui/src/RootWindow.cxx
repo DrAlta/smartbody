@@ -29,6 +29,7 @@
 #include <sb/SBUtilities.h>
 #include "SBRenderer.h" 
 #include"resourceViewer/AttributeEditor.h"
+#include "FLTKOgreViewer.h"
 
 
 #include "SBGUIManager.h"
@@ -295,13 +296,49 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 		viewerWidth = w - 2 * leftBorderSize;
 	int viewerHeight = h - curY - 10;
 	std::string renderer = "custom";
-
+	
+#if USE_OGRE_VIEWER > 0
+	renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
+	if (renderer == "ogre" || renderer == "OGRE")
+	{
+		if (!useEditor)
+		{
+			ogreViewer = new FLTKOgreWindow(0, 0, w, h);	
+		}
+		else
+		{
+			ogreViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
+		}
+		curViewer = ogreViewer;
+		customViewer = NULL;
+	}
+	else
+	{
+		if (renderer != "custom" && renderer != "CUSTOM")
+		{
+			SmartBody::util::log("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
+		}
+		if (!useEditor)
+		{
+			customViewer = new FltkViewer(0,0, w, h);
+		}
+		else
+		{
+			customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+		}
+		curViewer = customViewer;
+		ogreViewer = NULL;
+	}
+#else
 	if (renderer != "custom" && renderer != "CUSTOM")
 	{
-		SmartBody::util::log("Renderer '%s' not recognized. Use 'custom' instead.");
+		LOG("Renderer '%s' not recognized. Use 'custom' instead.");
 	}
 	customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
 	curViewer = customViewer;
+	//ogreViewer = NULL;
+#endif
+
 	//ogreViewer = NULL;
 	curViewer->box(FL_UP_BOX);
 	curViewer->baseWin = this;
@@ -2051,6 +2088,7 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	strstr << "light = scene.createPawn(\"light" << highestLightNum << "\")\n";
 	strstr << "light.createBoolAttribute(\"enabled\", True, True, \"LightParameters\", 200, False, False, False, \"Is the light enabled?\")\n";
 	strstr << "light.createBoolAttribute(\"lightIsDirectional\", True, True, \"LightParameters\", 205, False, False, False, \"Is the light directional?\")\n";
+	strstr << "light.createBoolAttribute(\"lightIsPoint\", False, True, \"LightParameters\", 206, False, False, False, \"Is the light a point light?\")\n";
 	strstr << "light.createVec3Attribute(\"lightDiffuseColor\", 1, .95, .8, True, \"LightParameters\", 210, False, False, False, \" Diffuse light color\")\n";
 	strstr << "light.createVec3Attribute(\"lightAmbientColor\", 0, 0, 0, True, \"LightParameters\", 220, False, False, False, \" Ambient light color\")\n";
 	strstr << "light.createVec3Attribute(\"lightSpecularColor\", 0, 0, 0, True, \"LightParameters\", 230, False, False, False, \"Specular light color\")\n";

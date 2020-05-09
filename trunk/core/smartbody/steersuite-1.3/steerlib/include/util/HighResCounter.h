@@ -113,7 +113,7 @@ namespace Util {
 		clock_gettime(CLOCK_HIGHRES, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);
 		return nanosecs;
-	#elif defined (BUILD_ANDROID) || defined (EMSCRIPTEN)
+	#elif defined (ANDROID_BUILD) || defined (EMSCRIPTEN)
 		timespec timeInfo;
 		clock_gettime(CLOCK_REALTIME, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);

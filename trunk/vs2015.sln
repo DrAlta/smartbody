@@ -67,6 +67,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sbgui_dependencies", "sbgui
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "smartbody_dependencies", "smartbody_dependencies", "{4CF6AB09-45E2-4D6A-9DA4-AB2AC50AF902}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ogresmartbody", "core\ogresmartbody\ogresmartbody.vcxproj", "{B19F5657-AA08-4D34-B3A3-58045174DBBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Emscripten = Debug|Emscripten
@@ -250,6 +252,14 @@ Global
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|Win32.ActiveCfg = Release|Win32
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|Win32.Build.0 = Release|Win32
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|x64.ActiveCfg = Release|x64
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Debug|Emscripten.ActiveCfg = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Debug|Win32.Build.0 = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Debug|x64.ActiveCfg = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|Emscripten.ActiveCfg = Release|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|Win32.ActiveCfg = Release|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|Win32.Build.0 = Release|Win32
+		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

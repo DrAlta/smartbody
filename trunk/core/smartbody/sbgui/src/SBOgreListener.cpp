@@ -4,7 +4,6 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBAttribute.h>
-#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 
@@ -59,7 +58,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	//std::string logMsg = "Character " + name ;
 	//LogManager::getSingleton().logMessage(logMsg.c_str());
 
-	Entity * ent = NULL;
+	Ogre::MovableObject* movableObject = NULL;
 	if (ogreInterface->getSceneManager()->hasEntity(name))
 	{
 		SmartBody::util::log("ALREADY FOUND ENTITY NAMED %s", name.c_str());
@@ -79,18 +78,6 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
-	attr = pawn->getAttribute("meshPivot");
-	if (attr)
-		attr->registerObserver(this);
-
-	attr = pawn->getAttribute("meshRotate");
-	if (attr)
-		attr->registerObserver(this);
-
-	attr = pawn->getAttribute("meshTranslate");
-	if (attr)
-		attr->registerObserver(this);
-
 	attr = pawn->getAttribute("deformableMeshScale");
 	if (attr)
 		attr->registerObserver(this);
@@ -103,29 +90,25 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	{
 		//Create character from characterType
 		//ent = ogreInterface->getSceneManager()->createEntity(name, name + ".mesh" );
-		//SmartBody::util::log("create ogre chracter = %s",name.c_str());		
+		//LOG("create ogre chracter = %s",name.c_str());		
 		if (isPawn)
-			ent = ogreInterface->createOgrePawn(pawn);
+			movableObject = ogreInterface->createOgrePawn(pawn);
 		else
-			ent = ogreInterface->createOgreCharacter(sbChar);
+			movableObject = ogreInterface->createOgreCharacter(sbChar);
 	}
-	catch( Ogre::ItemIdentityException& )
+	catch( Ogre::ItemIdentityException& identityException)
 	{
-		;
+		SmartBody::util::log("IdentityException %s",identityException.getDescription().c_str());
 	}
 	catch( Ogre::Exception& e )
 	{
 		if (sbChar)
 			SmartBody::util::log("Can not create character %s ...",sbChar->getName().c_str());
 		SmartBody::util::log("Exception %s",e.getDescription().c_str());
-		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
-		{
-			//Default to existing Brad character			
-			ent = ogreInterface->getSceneManager()->createEntity(name, "Brad.mesh" );
-		}
+
 	}
 
-	if (ent == NULL)
+	if (movableObject == NULL)
 	{
 		if (objectClass != "")
 		{
@@ -135,22 +118,11 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 				SmartBody::util::log("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
 		}
 		return;
-	}
-
-
-
+	}		
 	// Add entity to the scene node	
-	SrVec meshScale = pawn->getVec3Attribute("meshScale");
 	SceneNode * mSceneNode = ogreInterface->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
-	// scale the node
-	SmartBody::SBAttribute* scaleAttr = pawn->getAttribute("meshScale");
-	SmartBody:Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(scaleAttr);
-	if (vec3Attr)
-		mSceneNode->setScale(vec3Attr->getValue().x, vec3Attr->getValue().y, vec3Attr->getValue().z);
-
-	mSceneNode->attachObject(ent);
+	mSceneNode->attachObject(movableObject);
 	mSceneNode->setVisible(ogreInterface->getCharacterVisiblility());
-	mSceneNode->setScale(meshScale[0], meshScale[1], meshScale[2]);
 	
 	
 
@@ -168,6 +140,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 		else
 		{
 			// insert into character list
+			Ogre::Entity* ent = dynamic_cast<Ogre::Entity*>(movableObject);
 			Ogre::Skeleton* skel = ent->getSkeleton();	
 			if (!skel) return; // this should not happen at all ?
 			frameListener->m_characterList.push_back(name);
@@ -261,28 +234,12 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 {
 	// notify the FLTKListener first
 	FLTKListener::notify(subject);
-
-
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
-		const std::string& name = attribute->getName();		
-		
-		SmartBody::SBScene* scene = dynamic_cast<SmartBody::SBScene*>(attribute->getObject());
-		if (scene)
-		{
-			if (name == "floorMaterial")
-			{
-				SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
-				const std::string& value = strAttribute->getValue();
-				ogreInterface->updateOgreFloorMaterial(value);
-			}
-		}
-
-
 		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
-		
-		if (name == "deformableMesh" || name == "mesh" || name == "meshScale" || name == "meshPivot")
+		const std::string& name = attribute->getName();		
+		if (name == "deformableMesh" || name == "mesh")
 		{
 			OnCharacterUpdate(pawn->getName());
 		}		
@@ -374,20 +331,11 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 void OgreListener::OnPawnCreate( const std::string & name )
 {
 	OgreListener::OnCharacterCreate(name, "");
-
-	if (name.compare(0, 5, "light") == 0)
-	{
-		ogreInterface->resetOgreLights();
-	}
 }
 
 void OgreListener::OnPawnDelete( const std::string & name )
 {
 	OgreListener::OnCharacterDelete(name);
-	if (name.compare(0, 5, "light") == 0)
-	{
-		ogreInterface->resetOgreLights();
-	}
 }
 
 void OgreListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
@@ -403,8 +351,4 @@ void OgreListener::OnChannel( const std::string & name, const std::string & chan
 void OgreListener::OnSimulationStart()
 {
 	FLTKListener::OnSimulationStart();
-
-	SmartBody::SBAttribute* attribute = SmartBody::SBScene::getScene()->getAttribute("floorMaterial");
-	if (attribute)
-		attribute->registerObserver(this);
 }
