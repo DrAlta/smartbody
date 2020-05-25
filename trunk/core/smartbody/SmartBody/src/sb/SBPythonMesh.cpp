@@ -30,6 +30,7 @@ namespace SmartBody
 			.def("getBindShape", &SkinWeight::getBindShape, "Returns the bind pose for the overall shape.")
 			.def("getBindJoint", &SkinWeight::getBindJoint, "Returns the bind pose for a specified joint.")
 			.def("createCache", &SkinWeight::createCache, "Creates a fast lookup for skin weights.")
+			.def("getInfluencesByJointIndex", &SkinWeight::getInfluencesByJointIndex, "Returns vertex numbers affected by joint index.")
 			;
 
 		boost::python::class_<DeformableMesh, boost::python::bases<SBObject> >("SBMesh")
