@@ -242,7 +242,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				}				
 			}
 	
-			std::map<std::string, std::vector<std::string> >::iterator morphTargetIter;
+			std::vector<SrModel*> meshModelToDelete;
 			// handling morph targets
 			for (unsigned int i = 0; i < meshModelVec.size(); i++)
 			{
@@ -261,21 +261,23 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 #endif
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*meshModelVec[i]);
-				srSnModelStatic->shape().name = meshModelVec[i]->name;
+				srSnModelStatic->shape().name = SrString(meshModelVec[i]->name);
 				
 				SrSnModel* srSnModelDynamic = new SrSnModel();
 				srSnModelDynamic->shape(*meshModelVec[i]);
 				srSnModelDynamic->changed(true);
 				srSnModelDynamic->visible(false);
-				srSnModelDynamic->shape().name = meshModelVec[i]->name;
+
+				std::string currentModelName = (const char*) meshModelVec[i]->name;
+				srSnModelDynamic->shape().name = SrString(currentModelName.c_str());
 				
 				bool isBlendShape = false;
 				bool isBaseShape = false;
 				std::string baseShape = "";
 
-				for (morphTargetIter = mesh->morphTargets.begin(); 
+				for (std::map<std::string, std::vector<std::string> >::iterator morphTargetIter = mesh->morphTargets.begin(); 
 					 morphTargetIter != mesh->morphTargets.end(); 
-					++morphTargetIter)	
+					morphTargetIter++)	
 				{
 					std::string morphControllerName = (*morphTargetIter).first;
 					std::vector<std::string>& targets = (*morphTargetIter).second;
@@ -294,6 +296,9 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					{
 						for (size_t c = 1; c < targets.size(); c++)
 						{
+							std::string targetName = targets[c];
+							std::string modelName = (const char*)meshModelVec[i]->name;
+
 							if (strcmp(targets[c].c_str(), (const char*)meshModelVec[i]->name) == 0)
 							{
 									isBlendShape = true;
@@ -368,8 +373,11 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 						srSnGroup->add(meshGroup);
 				}
 				*/
-				delete meshModelVec[i];
+				meshModelToDelete.push_back(meshModelVec[i]);
 			}
+
+			for (size_t d = 0; d < meshModelToDelete.size(); d++)
+				delete meshModelToDelete[d];
 
 			// dump the blend shape info
 			for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = mesh->blendShapeMap.begin();

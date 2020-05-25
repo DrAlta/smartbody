@@ -101,6 +101,7 @@ public:
 	SBAPI SrMat getBindShape();
 	SBAPI SrMat getBindJoint(int jointIndex);
 	SBAPI void createCache();
+	SBAPI std::vector<int> getInfluencesByJointIndex(int index);
 
 
 

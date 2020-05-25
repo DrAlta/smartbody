@@ -59,6 +59,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sbm/ParserOpenCOLLADA.h>
 
 
+
+
 #define TEST_HAIR_RENDER 1
 
 typedef std::pair<int,int> IntPair;
@@ -376,6 +378,28 @@ std::vector<float> SkinWeight::getInfluenceWeights(int infIndex)
 	}
 
 	return influenceWeights;
+}
+
+std::vector<int> SkinWeight::getInfluencesByJointIndex(int index)
+{
+	this->buildSkinWeightBuf();
+
+	std::vector<int> vertices;
+
+	for (size_t id = 0; id < boneIDs.size(); id++)
+	{
+		SrVec4i& influence = boneIDs[id];
+		for (int x = 0; x < 4; x++)
+		{
+			if (influence[x] == index)
+			{
+				vertices.push_back(id);
+				break;
+			}
+		}
+	}
+
+	return vertices;
 }
 
 SrMat SkinWeight::getBindShape()
@@ -703,7 +727,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
 				{
 					std::string& jointName = skinWeight->infJointName[j];
-					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());					
+					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());		
 					skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
 				}
 
@@ -1002,6 +1026,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 						int    jointIndex  = boneJointIdxMap[curJointName];
 						// 					 					if (numOfInfJoints > 8)
 						// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
+	
 						weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
 						globalCounter ++;									
 					}

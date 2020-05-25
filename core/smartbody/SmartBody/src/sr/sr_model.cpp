@@ -103,7 +103,11 @@ void SrModel::validate ()
 
    // check if the model is empty
    if ( fsize==0 || V.size()==0 )
-    { init ();
+    { 
+	   // preserve the name
+	   std::string curName = this->name;
+	   init ();
+	   this->name = SrString(curName.c_str());
       compress ();
       return;
     }

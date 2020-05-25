@@ -393,7 +393,6 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 					std::string childName = childNode->name();
 					if (childName == "skin")	// parsing skinning weights
 					{
-
 						rapidxml::xml_attribute<>* skinAttr = childNode->first_attribute("source");
 						std::string skinSource = skinAttr->value();
 						skinSource = skinSource.substr(1, skinSource.size() - 1);
@@ -525,6 +524,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 										{
 											skinWeight->jointNameIndex.push_back(atoi(tokens[i].c_str()));
 											i++;
+
 											skinWeight->weightIndex.push_back(atoi(tokens[i].c_str()));
 										}
 									}
@@ -538,7 +538,10 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 							}
 							childOfSkinCurNode = childOfSkinCurNode->next_sibling();
 						}
+
 						mesh->skinWeights.push_back(skinWeight);
+
+
 					} // end of if (childName == "skin")
 					if (childName == "morph")	// parsing morph targets
 					{
@@ -664,8 +667,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 			// process this node as a joint if it's a non-geometry node
 			bool treatAsJoint = false;
  			if (typeAttr == "NODE" && hasRootJoint)
- 			{
- 				treatAsJoint = true;
+ 			{			
  				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
  				if (geometryNode)
  					treatAsJoint = false;
@@ -686,6 +688,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					SmartBody::util::log("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), idAttr.c_str());
 					joint->name(idAttr);
 					joint->extName(idAttr);
+					nameAttr = idAttr;
 				}
 				else
 				{
