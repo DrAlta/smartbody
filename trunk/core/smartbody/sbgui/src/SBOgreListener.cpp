@@ -1,3 +1,4 @@
+#ifndef NO_OGRE_VIEWER_CMD
 #include "SBOgreListener.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBPawn.h>
@@ -352,3 +353,4 @@ void OgreListener::OnSimulationStart()
 {
 	FLTKListener::OnSimulationStart();
 }
+#endif

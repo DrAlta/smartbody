@@ -470,7 +470,9 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 
 					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInstance->setDeformableMesh(mesh);
-					//meshInsance->setSkeleton(pawn->getSkeleton());	
+					
+					//meshInstance->setSkeleton(pawn->getSkeleton());	
+					
 					meshInstance->setPawn(pawn);
 					pawn->setStringAttribute("displayType", pawn->getStringAttribute("displayType"));
 					

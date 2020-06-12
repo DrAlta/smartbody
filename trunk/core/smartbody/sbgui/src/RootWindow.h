@@ -30,20 +30,6 @@
 
 class SbmCharacter;
 
- 
-#ifdef WIN_BUILD
-#if _MSC_VER > 1500
-#define USE_OGRE_VIEWER 1
-#else
-#define USE_OGRE_VIEWER 0
-#endif
-#elif LINUX_BUILD
-#define USE_OGRE_VIEWER 0
-#else
-#define USE_OGRE_VIEWER 0
-#endif
-#define NO_OGRE_VIEWER_CMD 0
-
 class CharacterCreatorWindow;
 class ResolutionWindow;
 
@@ -127,7 +113,9 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		std::vector<Fl_Menu_Item> deleteCameraList;
 		std::vector<Fl_Menu_Item> deleteObjectList;
 
+#ifndef NO_OGRE_VIEWER_CMD
 		FLTKOgreWindow* ogreViewer;
+#endif
 
 		//std::vector<SrCamera*> cameraList;
 		//std::map<std::string,SrCamera*> cameraMap;

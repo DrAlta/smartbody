@@ -297,7 +297,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	int viewerHeight = h - curY - 10;
 	std::string renderer = "custom";
 	
-#if USE_OGRE_VIEWER > 0
+#ifndef  NO_OGRE_VIEWER_CMD
 	renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
 	if (renderer == "ogre" || renderer == "OGRE")
 	{
@@ -332,7 +332,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 #else
 	if (renderer != "custom" && renderer != "CUSTOM")
 	{
-		LOG("Renderer '%s' not recognized. Use 'custom' instead.");
+		SmartBody::util::log("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
 	}
 	customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
 	curViewer = customViewer;
