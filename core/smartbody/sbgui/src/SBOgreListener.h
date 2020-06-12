@@ -1,5 +1,7 @@
 #ifndef SBOGRELISTENER_H
 #define SBOGRELISTENER_H
+
+#ifndef NO_OGRE_VIEWER_CMD
 #include "FLTKListener.h"
 #include <sb/SBObserver.h>
 
@@ -23,4 +25,5 @@ protected:
 	EmbeddedOgre* ogreInterface;	
 };
 
+#endif
 #endif
